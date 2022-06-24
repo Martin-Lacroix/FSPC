@@ -1,0 +1,134 @@
+-- Problem Parameters
+
+Problem = {}
+Problem.autoRemeshing = false
+Problem.verboseOutput = false
+Problem.simulationTime = math.huge
+Problem.id = 'IncompNewtonNoT'
+
+-- FSPC Parameters
+
+Problem.interface = 'FSInterface'
+Problem.maxFactor = 100
+
+-- Mesh Parameters
+
+Problem.Mesh = {}
+Problem.Mesh.alpha = 1.2
+Problem.Mesh.omega = 0.5
+Problem.Mesh.gamma = 0.6
+Problem.Mesh.hchar = 0.005
+Problem.Mesh.addOnFS = false
+Problem.Mesh.keepFluidElements = true
+Problem.Mesh.deleteFlyingNodes = false
+Problem.Mesh.deleteBoundElements = true
+Problem.Mesh.laplacianSmoothingBoundaries = false
+Problem.Mesh.exclusionZones = {{0.28,0,0.299,0.18},{0,0.18,0.28,0.199}}
+Problem.Mesh.boundingBox = {0,0,1.64,0.6}
+
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometry.msh'
+Problem.Mesh.exclusionGroups = {'PolyTop','PolyBot','FSInterface'}
+Problem.Mesh.ignoreGroups = {'Tool','Solid'}
+
+-- Extractor Parameters
+
+Problem.Extractors = {}
+
+Problem.Extractors[0] = {}
+Problem.Extractors[0].kind = 'GMSH'
+Problem.Extractors[0].writeAs = 'NodesElements'
+Problem.Extractors[0].outputFile = 'pfem/fluid.msh'
+Problem.Extractors[0].whatToWrite = {'p','velocity'}
+Problem.Extractors[0].timeBetweenWriting = math.huge
+
+Problem.Extractors[1] = {}
+Problem.Extractors[1].kind = 'Global'
+Problem.Extractors[1].whatToWrite = 'mass'
+Problem.Extractors[1].outputFile = 'mass.txt'
+Problem.Extractors[1].timeBetweenWriting = math.huge
+
+-- Material Parameters
+
+Problem.Material = {}
+Problem.Material.mu = 1e-3
+Problem.Material.gamma = 0
+Problem.Material.rho = 1000
+
+-- Initial Conditions
+
+Problem.IC = {}
+Problem.IC.InletFixed = true
+Problem.IC.BorderFixed = true
+Problem.IC.MasterFixed = true
+Problem.IC.PolyBotFixed = true
+Problem.IC.PolyTopFixed = true
+Problem.IC.FSInterfaceFixed = false
+
+-- Solver Parameters
+
+Problem.Solver = {}
+Problem.Solver.id = 'FracStep'
+
+Problem.Solver.adaptDT = true
+Problem.Solver.maxDT = math.huge
+Problem.Solver.initialDT = math.huge
+Problem.Solver.coeffDTDecrease = math.huge
+Problem.Solver.coeffDTincrease = math.huge
+
+-- Momentum Continuity Equation
+
+Problem.Solver.MomContEq = {}
+Problem.Solver.MomContEq.residual = 'U'
+Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
+
+Problem.Solver.MomContEq.maxIter = 25
+Problem.Solver.MomContEq.gammaFS = 0.5
+Problem.Solver.MomContEq.minRes = 1e-6
+Problem.Solver.MomContEq.cgTolerance = 1e-12
+Problem.Solver.MomContEq.bodyForce = {0,-9.81}
+
+-- Momentum Continuity BC
+
+Problem.Solver.MomContEq.BC = {}
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
+function Problem.IC:initStates(pos)
+	return {0,0,0}
+end
+
+function Problem.Solver.MomContEq.BC:BorderV(pos,t)
+	return {0,0}
+end
+
+function Problem.Solver.MomContEq.BC:MasterV(pos,t)
+	return {0,0}
+end
+
+function Problem.Solver.MomContEq.BC:PolyTopV(pos,t)
+	return {0,0}
+end
+
+function Problem.Solver.MomContEq.BC:PolyBotV(pos,t)
+	return {0,0}
+end
+
+function Problem.Solver.MomContEq.BC:InletV(pos,t)
+
+	local vmax = 5
+	local tmax = 0.5
+	local vt = (t/tmax)*vmax
+	local r = math.abs(pos[2]-0.25)
+	local R = 0.05
+
+	if (t<tmax) then
+
+		local v = vt*(1-(r*r)/(R*R))
+		return {v,0}
+	else
+		
+		local v = vmax*(1-(r*r)/(R*R))
+		return {v,0}
+	end
+end
