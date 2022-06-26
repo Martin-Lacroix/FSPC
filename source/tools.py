@@ -6,6 +6,19 @@ def printY(*text): print('\033[33m'); print(*text,'\033[0m')
 def printB(*text): print('\033[96m'); print(*text,'\033[0m')
 def printG(*text): print('\033[92m'); print(*text,'\033[0m')
 
+# %% Prints the computation time stats
+
+def timerPrint(clock):
+
+    printG('FSPC Time Stats\n')
+    total = clock['Total time'].time
+
+    for key,value in clock.items():
+
+        time = ' {:.5f} '.format(value.time)
+        percent = ' {:.3f} %'.format(value.time/total*100)
+        print((str(key)+' ').ljust(25,'-')+time.ljust(20,'-')+percent)
+
 # %% Write Output
 
 class Logs(object):
@@ -17,10 +30,7 @@ class Logs(object):
     # Writes an empty line
 
     def newLine(self):
-
-        f = open(self.file,'a')
-        f.write('\n')
-        f.close()
+        with open(self.file,'a') as f: f.write('\n')
 
     # Writes a line of logs
 
@@ -123,3 +133,28 @@ def qrSolve(V,W,res):
     s = np.dot(np.transpose(Q), -res)
     c = np.linalg.solve(R, s)
     return c, W
+
+
+
+
+
+
+
+
+
+# %% MPI Transfer Functions
+
+def scatterSF(data,com):
+
+        if com.rank == 0: data = None
+        if com.rank == 1: data = np.repeat(data,2)
+        data = com.scatter(data,root=1)
+        return data
+
+
+def scatterFS(data,com):
+
+        if com.rank == 1: data = None
+        if com.rank == 0: data = np.repeat(data,2)
+        data = com.scatter(data,root=0)
+        return data

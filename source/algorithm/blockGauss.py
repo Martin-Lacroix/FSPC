@@ -1,5 +1,5 @@
 from .algorithm import Algorithm
-from ..tools import printY
+from ..tools import printY,scatterFS,scatterSF
 import numpy as np
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation
@@ -18,7 +18,7 @@ class BGS_ADR(Algorithm):
     def couplingAlgo(self):
 
         self.iter = 0
-        self.converg.epsilon = np.inf
+        if self.com.rank == 1: self.converg.epsilon = np.inf
 
         while True:
             print("FSI iteration {}".format(self.iter))
@@ -27,7 +27,7 @@ class BGS_ADR(Algorithm):
             # Solid to fluid mechanical transfer
 
             self.clock['Communication'].start()
-            self.transferDispSF()
+            self.transferDispSF(self.com)
             self.clock['Communication'].end()
 
             # Fluid solver call for FSI subiteration
@@ -40,17 +40,13 @@ class BGS_ADR(Algorithm):
             if self.com.rank == 0: ok = self.solverF.run(self.step.time,self.step.nextTime)
             self.clock['Fluid run'].end()
 
-            if self.com.rank == 0: ok = np.repeat(ok,2)
-            self.com.Barrier()
-            ok = self.com.scatter(ok,root=0)
-            self.com.Barrier()
-
+            ok = scatterFS(ok,self.com)
             if not ok: return False
                 
             # Fluid to solid mechanical transfer
 
             self.clock['Communication'].start()
-            self.transferLoadFS()
+            self.transferLoadFS(self.com)
             self.clock['Communication'].end()
 
             # Solid solver call for FSI subiteration
@@ -62,20 +58,16 @@ class BGS_ADR(Algorithm):
             if self.com.rank == 1: ok = self.solverS.run(self.step.time,self.step.nextTime)
             self.clock['Solid run'].end()
 
-            if self.com.rank == 1: ok = np.repeat(ok,2)
-            ok = self.com.scatter(ok,root=1)
-            self.com.Barrier()
-
+            ok = scatterSF(ok,self.com)
             if not ok: return False
 
             # Compute the mechanical residual
             
             if self.com.rank == 1: self.residualDispS()
-            self.getResidualDispS() # REMOVE THIS !
 
-            self.converg.update(self.residualS)
-            self.logIter.write(self.iter,self.converg.epsilon)
-            print('Residual =',self.converg.epsilon)
+            if self.com.rank == 1: self.converg.update(self.residualS)
+            if self.com.rank == 1: self.logIter.write(self.iter,self.converg.epsilon)
+            if self.com.rank == 1: print('Residual =',self.converg.epsilon)
 
             # Use BGS relaxation for solid displacement
             
@@ -85,8 +77,13 @@ class BGS_ADR(Algorithm):
 
             # End of the coupling iteration
 
+            verified = None
+            if self.com.rank == 1: verified = self.converg.isVerified()
+            verified = scatterSF(verified,self.com)
+
+
             self.iter += 1
-            if self.converg.isVerified(): break
+            if verified: break
             elif self.iter > self.iterMax: return False
         
         return True

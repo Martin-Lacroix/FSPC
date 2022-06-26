@@ -1,6 +1,5 @@
-from ..tools import printY,printG,Logs,Clock
+from ..tools import printY,printG,Logs,Clock,timerPrint
 import collections
-import numpy as np
 
 # %% Parent Algorithm Class
 
@@ -16,7 +15,7 @@ class Algorithm(object):
         self.step = input['step']
         self.interp = input['interp']
 
-        self.converg = input['converg']
+        if com.rank == 1: self.converg = input['converg']
         if com.rank == 0: self.solverF = input['solverF']
         if com.rank == 1: self.solverS = input['solverS']
 
@@ -112,7 +111,7 @@ class Algorithm(object):
         if self.com.rank == 0: self.solverF.exit()
 
         self.clock['Total time'].end()
-        self.timerPrint(self.clock)
+        timerPrint(self.clock)
 
 # %% Transfer and Update Functions
 
@@ -123,38 +122,15 @@ class Algorithm(object):
 
     # Transfers mechanical data fluid -> solid
 
-    def transferLoadFS(self):
+    def transferLoadFS(self,com):
 
-        if self.com.rank == 0: self.interp.getLoadF()
-        self.interp.interpLoadFS()
-        if self.com.rank == 1: self.interp.applyLoadS(self.step.nextTime)
+        if com.rank == 0: self.interp.getLoadF()
+        self.interp.interpLoadFS(com)
+        if com.rank == 1: self.interp.applyLoadS(self.step.nextTime)
         
     # Transfers mechanical data solid -> fluid
 
-    def transferDispSF(self):
+    def transferDispSF(self,com):
         
-        self.interp.interpDispSF()
-        if self.com.rank == 0: self.interp.applyDispF(self.step.dt)
-
-    # Prints the computation time stats
-
-    def timerPrint(self,clock):
-
-        printG('FSPC Time Stats\n')
-        total = clock['Total time'].time
-
-        for key,value in clock.items():
-
-            time = ' {:.5f} '.format(value.time)
-            percent = ' {:.3f} %'.format(value.time/total*100)
-            print((str(key)+' ').ljust(25,'-')+time.ljust(20,'-')+percent)
-
-    def getResidualDispS(self):
-
-        if self.com.rank == 0: nbrNode = np.zeros(1,dtype=int)
-        if self.com.rank == 1: self.com.Send(np.atleast_1d(self.interp.nbrNode),dest=0)
-        if self.com.rank == 0: self.com.Recv(nbrNode,source=1)
-
-        if self.com.rank == 0: self.residualS = np.zeros((nbrNode[0],self.dim))
-        if self.com.rank == 1: self.com.Send(self.residualS.copy(),dest=0)
-        if self.com.rank == 0: self.com.Recv(self.residualS,source=1)
+        self.interp.interpDispSF(com)
+        if com.rank == 0: self.interp.applyDispF(self.step.dt)

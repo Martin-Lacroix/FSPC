@@ -19,7 +19,7 @@ class Master(object):
         # Initialize some FSPC objects
         
         input['step'] = criterion.TimeStep(param)
-        input['converg'] = criterion.Convergence(param)
+        if com.rank == 1: input['converg'] = criterion.Convergence(param)
         input['interp'] = interpolator.Matching(input,param,com)
 
         # Initialize the FSI algorithm
