@@ -146,15 +146,23 @@ def qrSolve(V,W,res):
 
 def scatterSF(data,com):
 
-        if com.rank == 0: data = None
-        if com.rank == 1: data = np.repeat(data,2)
-        data = com.scatter(data,root=1)
-        return data
+    data = np.atleast_1d(data)
+    if com.rank == 0: data = np.zeros(1,dtype=int)
+    if com.rank == 1: com.Send(data.copy(),dest=0)
+    if com.rank == 0: com.Recv(data,source=1)
+    return data[0]
 
+# def scatterSF(data,com):
+
+#     if com.rank == 0: data = None
+#     if com.rank == 1: data = np.repeat(data,2)
+#     data = com.scatter(data,root=1)
+#     return data
 
 def scatterFS(data,com):
 
-        if com.rank == 1: data = None
-        if com.rank == 0: data = np.repeat(data,2)
-        data = com.scatter(data,root=0)
-        return data
+    data = np.atleast_1d(data)
+    if com.rank == 1: data = np.zeros(1,dtype=int)
+    if com.rank == 0: com.Send(data.copy(),dest=1)
+    if com.rank == 1: com.Recv(data,source=0)
+    return data[0]

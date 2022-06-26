@@ -62,7 +62,7 @@ module = importlib.import_module(module)
 
 param = module.getParam(inputFolder)
 master = FSPC.Master(param,com)
-master.algo.run()
+master.algo.run(com)
 
 
 com.Barrier()

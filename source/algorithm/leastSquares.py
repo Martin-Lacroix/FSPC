@@ -36,7 +36,7 @@ class IQN_ILS(Algorithm):
             printY('Launching fluid solver\n')
 
             self.clock['Fluid run'].start()
-            ok = self.solverF.run(self.step.time,self.step.nextTime)
+            ok = self.solver.run(self.step.time,self.step.nextTime)
             self.clock['Fluid run'].end()
             if not ok: return False
 
@@ -51,14 +51,14 @@ class IQN_ILS(Algorithm):
             printY('Launching solid solver\n')
 
             self.clock['Solid run'].start()
-            ok = self.solverS.run(self.step.time,self.step.nextTime)
+            ok = self.solver.run(self.step.time,self.step.nextTime)
             self.clock['Solid run'].end()
             if not ok: return False
 
             # Compute the mechanical residual
             
             self.residualDispS()
-            self.converg.update(self.residualS)
+            self.converg.update(self.residual)
             self.logIter.write(self.iter,self.converg.epsilon)
             print('Residual =',self.converg.epsilon)
 
@@ -104,28 +104,28 @@ class IQN_ILS(Algorithm):
 
     def relaxation(self):
 
-            dispS = self.solverS.getDisplacement()
+            dispS = self.solver.getDisplacement()
 
             # Performs either BGS or IQN iteration
 
             if (self.iter == 0) and (len(self.V) == 0):
-                self.interp.dispS += self.omega*self.residualS
+                self.interp.disp += self.omega*self.residual
 
             else:
                 if self.iter > 0:
 
-                    self.V.insert(0,np.concatenate((self.residualS-self.prevResidualS).T))
-                    self.W.insert(0,np.concatenate((dispS-self.prevDispS).T))
+                    self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
+                    self.W.insert(0,np.concatenate((dispS-self.prevDisp).T))
 
                 # V and W are stored as transpose and list
 
-                R = np.concatenate(self.residualS.T)
+                R = np.concatenate(self.residual.T)
                 C,W = qrSolve(np.transpose(self.V),np.transpose(self.W),R)
                 #C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=None)[0]
                 correction = np.split(np.dot(W,C).T+R,self.dim)
-                self.interp.dispS += np.transpose(correction)
+                self.interp.disp += np.transpose(correction)
 
             # Updates the residuals and displacement
 
-            self.prevDispS = dispS.copy()
-            self.prevResidualS = self.residualS.copy()
+            self.prevDisp = dispS.copy()
+            self.prevResidual = self.residual.copy()

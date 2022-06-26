@@ -11,7 +11,7 @@ class IQN_MVJ(Algorithm):
         self.makeBGS = True
         self.dim = param['dim']
         self.omega = param['omega']
-        size = self.solverF.nbrNode*self.dim
+        size = self.solver.nbrNode*self.dim
         self.J = np.zeros((size,size))
 
 # %% Coupling at Each Time Step
@@ -38,7 +38,7 @@ class IQN_MVJ(Algorithm):
             printY('Launching fluid solver\n')
 
             self.clock['Fluid run'].start()
-            ok = self.solverF.run(self.step.time,self.step.nextTime)
+            ok = self.solver.run(self.step.time,self.step.nextTime)
             self.clock['Fluid run'].end()
             if not ok: return False
 
@@ -53,14 +53,14 @@ class IQN_MVJ(Algorithm):
             printY('Launching solid solver\n')
 
             self.clock['Solid run'].start()
-            ok = self.solverS.run(self.step.time,self.step.nextTime)
+            ok = self.solver.run(self.step.time,self.step.nextTime)
             self.clock['Solid run'].end()
             if not ok: return False
 
             # Compute the mechanical residual
             
             self.residualDispS()
-            self.converg.update(self.residualS)
+            self.converg.update(self.residual)
             self.logIter.write(self.iter,self.converg.epsilon)
             print('Residual =',self.converg.epsilon)
 
@@ -82,28 +82,28 @@ class IQN_MVJ(Algorithm):
 
     def relaxation(self):
 
-            dispS = self.solverS.getDisplacement()
+            dispS = self.solver.getDisplacement()
 
             # Performs either BGS or IQN iteration
 
             if self.makeBGS:
 
-                self.interp.dispS += self.omega*self.residualS
+                self.interp.disp += self.omega*self.residual
                 self.makeBGS = False
 
             elif (self.iter == 0):
 
                 J = self.Jprev.copy()
                 np.fill_diagonal(J,J.diagonal()-1)
-                R = np.concatenate(self.residualS.T)
+                R = np.concatenate(self.residual.T)
                 correction = np.split(np.dot(J,-R),self.dim)
-                self.interp.dispS += np.transpose(correction)
+                self.interp.disp += np.transpose(correction)
 
             else:
 
-                self.V.insert(0,np.concatenate((self.residualS-self.prevResidualS).T))
-                self.W.insert(0,np.concatenate((dispS-self.prevDispS).T))
-                R = np.concatenate(self.residualS.T)
+                self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
+                self.W.insert(0,np.concatenate((dispS-self.prevDisp).T))
+                R = np.concatenate(self.residual.T)
                 V = np.transpose(self.V)
                 W = np.transpose(self.W)
 
@@ -115,9 +115,9 @@ class IQN_MVJ(Algorithm):
                 J = self.J.copy()
                 np.fill_diagonal(J,J.diagonal()-1)
                 correction = np.split(np.dot(J,-R),self.dim)
-                self.interp.dispS += np.transpose(correction)
+                self.interp.disp += np.transpose(correction)
 
             # Updates the residuals and displacement
 
-            self.prevDispS = dispS.copy()
-            self.prevResidualS = self.residualS.copy()
+            self.prevDisp = dispS.copy()
+            self.prevResidual = self.residual.copy()

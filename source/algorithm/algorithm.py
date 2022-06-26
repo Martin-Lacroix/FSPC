@@ -8,16 +8,14 @@ class Algorithm(object):
 
         printY('Initializing FSI algorithm\n')
         
-        self.ok = True
-        self.com = com
+        self.verified = True
         self.dim = param['dim']
 
         self.step = input['step']
         self.interp = input['interp']
+        self.solver = input['solver']
 
         if com.rank == 1: self.converg = input['converg']
-        if com.rank == 0: self.solverF = input['solverF']
-        if com.rank == 1: self.solverS = input['solverS']
 
         self.clock = collections.defaultdict(Clock)
         self.logTime = Logs('Iteration.log',['Time','Time Step'])
@@ -29,7 +27,7 @@ class Algorithm(object):
 
 # %% Runs the Fluid-Solid Coupling
 
-    def run(self):
+    def run(self,com):
 
         print('Begin FSI Computation')
         self.clock['Total time'].start()
@@ -39,77 +37,57 @@ class Algorithm(object):
         
         while self.step.time < self.totTime:
 
-            self.com.Barrier()
-
-            printG('FSPC: t =',self.step.time,'| dt =',self.step.dt)
-
             self.logTime.newLine()
-            self.interp.logForce.newLine()
             self.logTime.write(self.step.time,self.step.dt)
+            printG('FSPC: t =',self.step.time,'| dt =',self.step.dt)
 
             # Save previous time step
 
-            if self.ok is True:
+            if self.verified is True:
 
-                if self.com.rank == 0: prevDispF = self.interp.dispF.copy()
-                if self.com.rank == 1: prevDispS = self.interp.dispS.copy()
-                if self.com.rank == 0: prevLoadF = self.interp.loadF.copy()
-                if self.com.rank == 1: prevLoadS = self.interp.loadS.copy()
-
-                if self.com.rank == 1: self.velS = self.solverS.getVelocity()
-                if self.com.rank == 1: self.accS = self.solverS.getAcceleration()
+                prevDisp = self.interp.disp.copy()
+                prevLoad = self.interp.load.copy()
+                if com.rank == 1: self.vel = self.solver.getVelocity()
+                if com.rank == 1: self.acc = self.solver.getAcceleration()
 
             # Predictor and Internal FSI loop
 
-            if self.com.rank == 1: self.interp.dispS += self.step.dt*(self.velS+self.accS*self.step.dt/2)
-            self.ok = self.couplingAlgo()
+            if com.rank == 1:
+                self.interp.disp += self.step.dt*(self.vel+self.acc*self.step.dt/2)
+            self.verified = self.couplingAlgo(com)
 
             # Restart the time step if fail
 
-            if not self.ok:
+            if not self.verified:
                 
-                if self.com.rank == 0: self.interp.dispF = prevDispF.copy()
-                if self.com.rank == 1: self.interp.dispS = prevDispS.copy()
-                if self.com.rank == 0: self.interp.loadF = prevLoadF.copy()
-                if self.com.rank == 1: self.interp.loadS = prevLoadS.copy()
-
-                self.step.update(self.ok)
+                self.interp.disp = prevDisp.copy()
+                self.interp.load = prevLoad.copy()
+                self.step.update(self.verified)
                 continue
 
             # Update the F and S solvers for the next time step
             
-            self.clock['Solid update'].start()
-            if self.com.rank == 1: self.solverS.update()
-            self.clock['Solid update'].end()
-
-            self.clock['Fluid update'].start()
-            if self.com.rank == 0: self.solverF.update()
-            self.clock['Fluid update'].end()
+            self.clock['Solver update'].start()
+            self.solver.update()
+            self.clock['Solver update'].end()
 
             # Write fluid and solid solution
             
             if self.step.time-prevWrite > self.dtWrite:
 
-                self.clock['Fluid save'].start()
-                if self.com.rank == 0: self.solverF.save()
-                self.clock['Fluid save'].end()
-
-                self.clock['Solid save'].start()
-                if self.com.rank == 1: self.solverS.save()
-                self.clock['Solid save'].end()
+                self.clock['Solver save'].start()
+                self.solver.save()
+                self.clock['Solver save'].end()
 
                 prevWrite = self.step.time
 
-            # Displacement predictor for next time step and update the S solution
+            # Update the time step manager class
 
-            self.step.update(self.ok)
-            self.com.Barrier()
+            self.step.update(self.verified)
 
-        # Ends the simulation
+        # Ends the FSI simulation
 
-        if self.com.rank == 1: self.solverS.exit()
-        if self.com.rank == 0: self.solverF.exit()
-
+        self.solver.exit()
         self.clock['Total time'].end()
         timerPrint(self.clock)
 
@@ -117,8 +95,8 @@ class Algorithm(object):
 
     def residualDispS(self):
         
-        dispS = self.solverS.getDisplacement()
-        self.residualS = dispS-self.interp.dispS
+        disp = self.solver.getDisplacement()
+        self.residual = disp-self.interp.disp
 
     # Transfers mechanical data fluid -> solid
 

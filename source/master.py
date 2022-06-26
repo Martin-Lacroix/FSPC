@@ -8,16 +8,12 @@ class Master(object):
         
         input = dict()
 
-        if com.rank == 0: input['solverF'] = self.getFluidSolver(param)
-        if com.rank == 1: input['solverS'] = self.getSolidSolver(param)
-
-        # Check the dimension of the solvers
-
-        if com.rank == 0: param['dim'] = input['solverF'].dim
-        if com.rank == 1: param['dim'] = input['solverS'].dim
+        if com.rank == 0: input['solver'] = self.getFluidSolver(param)
+        if com.rank == 1: input['solver'] = self.getSolidSolver(param)
 
         # Initialize some FSPC objects
         
+        param['dim'] = input['solver'].dim
         input['step'] = criterion.TimeStep(param)
         if com.rank == 1: input['converg'] = criterion.Convergence(param)
         input['interp'] = interpolator.Matching(input,param,com)
