@@ -15,11 +15,11 @@ class Algorithm(object):
         self.interp = input['interp']
         self.solver = input['solver']
 
-        if com.rank == 1: self.converg = input['converg']
-
         self.clock = collections.defaultdict(Clock)
         self.logTime = Logs('Iteration.log',['Time','Time Step'])
         self.logIter = Logs('Iteration.log',['Iteration','Residual'])
+
+        if com.rank == 1: self.converg = input['converg']
 
         self.totTime = param['tTot']
         self.iterMax = param['maxIt']
@@ -102,9 +102,9 @@ class Algorithm(object):
 
     def transferLoadFS(self,com):
 
-        if com.rank == 0: self.interp.getLoadF()
         self.interp.interpLoadFS(com)
-        if com.rank == 1: self.interp.applyLoadS(self.step.nextTime)
+        if com.rank == 1: nextTime = self.step.timeFrame()[1]
+        if com.rank == 1: self.interp.applyLoadS(nextTime)
         
     # Transfers mechanical data solid -> fluid
 

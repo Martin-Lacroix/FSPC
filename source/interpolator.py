@@ -14,10 +14,7 @@ class Interpolator(object):
         self.solver = input['solver']
         self.nbrNode = self.solver.nbrNode
 
-    # Apply and get data from solid and fluid solvers
-
-    def getLoadF(self):
-        self.load = self.solver.getLoading()
+    # Apply boundary conditions to the solvers
 
     def applyLoadS(self,time):
         self.solver.applyLoading(self.load,time)
@@ -28,11 +25,12 @@ class Interpolator(object):
     # Loading interpolation from fluid to solid
 
     def interpLoadFS(self,com):
-
+        
         nbrNode = scatterFS(self.nbrNode,com)
+        if com.rank == 0: self.load = self.solver.getLoading()
 
         if com.rank == 1: load = np.zeros((nbrNode,self.dim))
-        if com.rank == 0: com.Send(self.load.copy(),dest=1)
+        if com.rank == 0: com.Isend(self.load.copy(),dest=1)
 
         if com.rank == 1: com.Recv(load,source=0)
         if com.rank == 1: self.load = self.interpData(load)
@@ -44,7 +42,7 @@ class Interpolator(object):
         nbrNode = scatterSF(self.nbrNode,com)
 
         if com.rank == 0: disp = np.zeros((nbrNode,self.dim))
-        if com.rank == 1: com.Send(self.disp.copy(),dest=0)
+        if com.rank == 1: com.Isend(self.disp.copy(),dest=0)
 
         if com.rank == 0: com.Recv(disp,source=1)
         if com.rank == 0: self.disp = self.interpData(disp)
@@ -61,10 +59,10 @@ class Matching(Interpolator):
         input = np.zeros((self.dim,nbrNode))
         output = self.solver.getPosition().T
 
-        if com.rank == 0: com.Send(output.copy(),dest=1)
+        if com.rank == 0: com.Isend(output.copy(),dest=1)
         if com.rank == 1: com.Recv(input,source=0)
 
-        if com.rank == 1: com.Send(output.copy(),dest=0)
+        if com.rank == 1: com.Isend(output.copy(),dest=0)
         if com.rank == 0: com.Recv(input,source=1)
 
         self.makeInterfaceData()

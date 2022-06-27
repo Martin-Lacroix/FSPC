@@ -36,12 +36,17 @@ class TimeStep(object):
         self.dtLast = param['dt']
         self.nextTime = param['dt']
         self.keepStep = param['keepStep']
+
+    # Return the curent time frame
+
+    def timeFrame(self):
+        return self.time,self.time+self.dt
         
     # Update the time step
 
-    def update(self,ok):
+    def update(self,verified):
 
-        if ok is True:
+        if verified:
 
             self.count += 1
             self.time += self.dt
@@ -58,5 +63,3 @@ class TimeStep(object):
             self.count = 0
             if self.dtLast < self.dt: self.dt = self.dtLast
             else: self.dtLast = self.dt = self.dt/self.factor
-
-        self.nextTime = self.time+self.dt

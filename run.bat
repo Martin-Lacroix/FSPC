@@ -1,6 +1,7 @@
 :: Set input file
 
 set INPUT=examples\damNcomp\input.py
+::set INPUT=examples\streamNcomp\input.py
 
 :: Clean output folder
 
@@ -12,8 +13,5 @@ mkdir workspace
 set MKL_NUM_THREADS=8
 set OMP_NUM_THREADS=8
 set OMP_PROC_BIND=true
-
-:: python main.py -k 8 %INPUT%
-
 
 mpiexec -n 2 python main.py -k 8 %INPUT%

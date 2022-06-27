@@ -15,8 +15,8 @@ class Master(object):
         
         param['dim'] = input['solver'].dim
         input['step'] = criterion.TimeStep(param)
-        if com.rank == 1: input['converg'] = criterion.Convergence(param)
         input['interp'] = interpolator.Matching(input,param,com)
+        if com.rank == 1: input['converg'] = criterion.Convergence(param)
 
         # Initialize the FSI algorithm
 

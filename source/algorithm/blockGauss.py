@@ -16,14 +16,13 @@ class BGS_ADR(Algorithm):
 # %% Coupling at Each Time Step
 
     def couplingAlgo(self,com):
-        
-        self.iter = 0
+
         verified = False
+        self.iteration = 0
         if com.rank == 1: self.converg.epsilon = np.inf
 
         while True:
-
-            print("FSI iteration {}".format(self.iter))
+            print('FSI iteration {}'.format(self.iteration))
 
             # Solid to fluid mechanical transfer
 
@@ -32,13 +31,13 @@ class BGS_ADR(Algorithm):
             self.clock['Communication'].end()
 
             # Fluid solver call for FSI subiteration
-            
+
             printY('Launching fluid solver\n')
 
-            if com.rank == 0: 
+            if com.rank == 0:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(self.step.time,self.step.nextTime)
+                verified = self.solver.run(*self.step.timeFrame())
                 self.clock['Solver run'].end()
 
             verified = scatterFS(verified,com)
@@ -57,7 +56,7 @@ class BGS_ADR(Algorithm):
             if com.rank == 1:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(self.step.time,self.step.nextTime)
+                verified = self.solver.run(*self.step.timeFrame())
                 self.clock['Solver run'].end()
 
             verified = scatterSF(verified,com)
@@ -69,7 +68,7 @@ class BGS_ADR(Algorithm):
             
                 self.residualDispS()
                 self.converg.update(self.residual)
-                self.logIter.write(self.iter,self.converg.epsilon)
+                self.logIter.write(self.iteration,self.converg.epsilon)
                 print('Residual =',self.converg.epsilon)
 
                 # Use BGS relaxation for solid displacement
@@ -85,9 +84,9 @@ class BGS_ADR(Algorithm):
 
             # End of the coupling iteration
 
-            self.iter += 1
             if verified: break
-            elif self.iter > self.iterMax: return False
+            self.iteration += 1
+            if self.iteration > self.iterMax: return False
         
         return True
 
@@ -102,7 +101,7 @@ class BGS_ADR(Algorithm):
 
     def setOmega(self):
 
-        if self.iter == 0:
+        if self.iteration == 0:
             self.omega = max(self.omegaMax,self.omega)
 
         else:

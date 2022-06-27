@@ -10,8 +10,7 @@ def getParam(path):
 
     # Algorithm parameters
 
-    param['algo'] = 'BGS_ADR'
-    param['aitken'] = True
+    param['algo'] = 'IQN_MVJ'
     param['keepStep'] = 0
     param['omega'] = 0.5
     param['maxIt'] = 25
