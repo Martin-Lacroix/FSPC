@@ -14,38 +14,6 @@ def timerPrint(clock,com):
         percent = ' {:.3f} %'.format(value.time/total*100)
         print((str(key)+' ').ljust(25,'-')+time.ljust(20,'-')+percent)
 
-# %% Write Output
-
-class Logs(object):
-    def __init__(self,file,data):
-
-        self.file = file
-        self.data = data
-
-    # Writes an empty line
-
-    def newLine(self):
-        with open(self.file,'a') as f: f.write('\n')
-
-    # Writes a line of logs
-
-    def write(self,*input):
-
-        f = open(self.file,'a')
-        for i in range(len(input)):
-
-            text = self.data[i]+' : '
-            if isinstance(input[i],int): text += str(input[i])
-            else: text += '{:.3e}'.format(input[i])
-            f.write(text.ljust(20))
-
-        f.write('\n')
-        f.close()
-
-
-
-
-
 # %% Simulation Timer Class
 
 class Clock(object):
