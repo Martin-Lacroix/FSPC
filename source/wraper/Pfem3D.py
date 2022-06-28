@@ -1,4 +1,3 @@
-from ..tools import printY
 import pfem3Dw as w
 import numpy as np
 
@@ -7,8 +6,8 @@ import numpy as np
 class Pfem3D(object):
 
     def __init__(self,param):
-        
-        printY('Initializing PFEM3D')
+
+        self.redirect = w.StdOutErr2Py()
         path = param['inputF']
         self.read(path)
 
@@ -204,7 +203,7 @@ class Pfem3D(object):
     def timeStats(self,time,dt):
 
         start = self.problem.getCurrentSimTime()
-        print('[PFEM-1] : t1 = {:.5e} - dt = {:.3e}'.format(start,dt))
+        print('\n[PFEM-1] : t1 = {:.5e} - dt = {:.3e}'.format(start,dt))
         print('[PFEM-2] : t2 = {:.5e} - factor = {:.0f}'.format(time,self.factor))
         print('----------------------------')
 
@@ -212,7 +211,5 @@ class Pfem3D(object):
         self.problem.dump()
 
     def exit(self):
-
         self.problem.displayTimeStats()
-        printY('Exit PFEM3D')
         

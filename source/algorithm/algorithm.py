@@ -1,35 +1,36 @@
-from ..tools import printY,printG,Logs,Clock,timerPrint
+from .. import tools
 import collections
+import sys
 
 # %% Parent Algorithm Class
 
 class Algorithm(object):
-    def __init__(self,input,param,com):
-
-        printY('Initializing FSI algorithm\n')
-        
-        self.verified = True
-        self.dim = param['dim']
+    def __init__(self,input,param):
+    
+        # Data from the input dictionary
 
         self.step = input['step']
         self.interp = input['interp']
         self.solver = input['solver']
 
-        self.clock = collections.defaultdict(Clock)
-        self.logTime = Logs('Iteration.log',['Time','Time Step'])
-        self.logIter = Logs('Iteration.log',['Iteration','Residual'])
+        # Data from the param dictionary
 
-        if com.rank == 1: self.converg = input['converg']
-
+        self.log = param['log']
         self.totTime = param['tTot']
         self.iterMax = param['maxIt']
         self.dtWrite = param['dtWrite']
+        self.converg = input['converg']
+
+        # Initialize other simulation data
+
+        self.verified = True
+        self.dim = self.solver.dim
+        self.clock = collections.defaultdict(tools.Clock)
 
 # %% Runs the Fluid-Solid Coupling
 
     def run(self,com):
 
-        print('Begin FSI Computation')
         self.clock['Total time'].start()
         prevWrite = self.step.time
 
@@ -37,9 +38,16 @@ class Algorithm(object):
         
         while self.step.time < self.totTime:
 
-            self.logTime.newLine()
-            self.logTime.write(self.step.time,self.step.dt)
-            printG('FSPC: t =',self.step.time,'| dt =',self.step.dt)
+
+            if com.rank == 1:
+
+                time = '\nTime : {:.3e}'.format(self.step.time).ljust(20)
+                timeStep = 'Time Step : {:.3e}'.format(self.step.dt)
+                print(time,timeStep)
+                sys.stdout.flush()
+
+
+
 
             # Save previous time step
 
@@ -87,9 +95,10 @@ class Algorithm(object):
 
         # Ends the FSI simulation
 
-        self.solver.exit()
+        com.Barrier()
         self.clock['Total time'].end()
-        timerPrint(self.clock)
+        self.log.exec(self.solver.exit)
+        tools.timerPrint(self.clock,com)
 
 # %% Transfer and Update Functions
 

@@ -22,9 +22,9 @@ com = mpi.COMM_WORLD
 
 parentFolder = os.path.dirname(os.getcwd())
 sys.path.append(parentFolder+'/Metafor/Metafor')
-sys.path.append(parentFolder+'/Metafor/oo_meta')
+# sys.path.append(parentFolder+'/Metafor/oo_meta')
 sys.path.append(parentFolder+'/PFEM3D/build/bin')
-sys.path.append(parentFolder+'/Metafor/build/bin')
+# sys.path.append(parentFolder+'/Metafor/build/bin')
 
 # %% Terminal and Paths
 
@@ -63,7 +63,3 @@ module = importlib.import_module(module)
 param = module.getParam(inputFolder)
 master = FSPC.Master(param,com)
 master.algo.run(com)
-
-
-com.Barrier()
-print('\nRank = ',com.rank,'- END\n')

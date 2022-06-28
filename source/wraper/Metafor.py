@@ -1,7 +1,7 @@
-from ..tools import printY
 import numpy as np
 import wrap as w
 import importlib
+import fwkw
 
 # %% Nodal Load class
 
@@ -30,7 +30,7 @@ class Metafor(object):
     def __init__(self,param):
 
         input = dict()
-        printY('Initializing Metafor')
+        self.redirect = fwkw.StdOutErr2Py()
         module = importlib.import_module(param['inputS'])
         self.metafor = module.getMetafor(input)
         domain = self.metafor.getDomain()
@@ -193,4 +193,4 @@ class Metafor(object):
         self.exporter.execute()
 
     def exit(self):
-        printY('Exit Metafor\n')
+        return

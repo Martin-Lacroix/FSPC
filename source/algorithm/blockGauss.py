@@ -1,12 +1,13 @@
 from .algorithm import Algorithm
-from ..tools import printY,scatterFS,scatterSF
+from .. import tools
 import numpy as np
+import sys
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation
 
 class BGS_ADR(Algorithm):
-    def __init__(self,input,param,com):
-        Algorithm.__init__(self,input,param,com)
+    def __init__(self,input,param):
+        Algorithm.__init__(self,input,param)
 
         self.omegaMin = 1e-12
         self.omega = param['omega']
@@ -19,10 +20,10 @@ class BGS_ADR(Algorithm):
 
         verified = False
         self.iteration = 0
-        if com.rank == 1: self.converg.epsilon = np.inf
+        self.converg.epsilon = np.inf
+        timeFrame = self.step.timeFrame()
 
         while True:
-            print('FSI iteration {}'.format(self.iteration))
 
             # Solid to fluid mechanical transfer
 
@@ -32,15 +33,13 @@ class BGS_ADR(Algorithm):
 
             # Fluid solver call for FSI subiteration
 
-            printY('Launching fluid solver\n')
-
             if com.rank == 0:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(*self.step.timeFrame())
+                verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver run'].end()
 
-            verified = scatterFS(verified,com)
+            verified = tools.scatterFS(verified,com)
             if not verified: return False
                 
             # Fluid to solid mechanical transfer
@@ -50,16 +49,14 @@ class BGS_ADR(Algorithm):
             self.clock['Communication'].end()
 
             # Solid solver call for FSI subiteration
-            
-            printY('Launching solid solver\n')
 
             if com.rank == 1:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(*self.step.timeFrame())
+                verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver run'].end()
 
-            verified = scatterSF(verified,com)
+            verified = tools.scatterSF(verified,com)
             if not verified: return False
 
             # Compute the mechanical residual
@@ -68,8 +65,15 @@ class BGS_ADR(Algorithm):
             
                 self.residualDispS()
                 self.converg.update(self.residual)
-                self.logIter.write(self.iteration,self.converg.epsilon)
-                print('Residual =',self.converg.epsilon)
+
+
+
+                iter = 'Iteration : {:.0f}'.format(self.iteration).ljust(20)
+                epsilon = 'Residual : {:.3e}'.format(self.converg.epsilon)
+                print(iter,epsilon)
+                sys.stdout.flush()
+
+
 
                 # Use BGS relaxation for solid displacement
             
@@ -80,7 +84,7 @@ class BGS_ADR(Algorithm):
             # Check the converence of the FSI
 
             if com.rank == 1: verified = self.converg.isVerified()
-            verified = scatterSF(verified,com)
+            verified = tools.scatterSF(verified,com)
 
             # End of the coupling iteration
 

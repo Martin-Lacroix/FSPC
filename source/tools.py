@@ -1,16 +1,11 @@
+from contextlib import redirect_stdout
 import time
-
-# %% Coloured Print
-
-def printY(*text): print('\033[33m'); print(*text,'\033[0m')
-def printB(*text): print('\033[96m'); print(*text,'\033[0m')
-def printG(*text): print('\033[92m'); print(*text,'\033[0m')
 
 # %% Prints the computation time stats
 
-def timerPrint(clock):
+def timerPrint(clock,com):
 
-    printG('FSPC Time Stats\n')
+    print('\nRank',com.rank,'Time Stats\n')
     total = clock['Total time'].time
 
     for key,value in clock.items():
@@ -46,6 +41,10 @@ class Logs(object):
 
         f.write('\n')
         f.close()
+
+
+
+
 
 # %% Simulation Timer Class
 
@@ -135,12 +134,18 @@ def qrSolve(V,W,res):
     return c, W
 
 
+# %% Redirecting Prints to Files
 
+class Log(object):
 
+    def __init__(self,file):
+        self.file = file
 
-
-
-
+    def exec(self,function,*args):
+            
+        with open(self.file,'a') as F:
+            with redirect_stdout(F): output = function(*args)
+        return output
 
 # %% MPI Transfer Functions
 

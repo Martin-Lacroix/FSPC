@@ -1,18 +1,16 @@
 from scipy.sparse import dok_matrix
-from .tools import printY,scatterFS,scatterSF
+from . import tools
 from functools import reduce
 import numpy as np
 
 # %% Parent InterpolatorClass
 
 class Interpolator(object):
-    def __init__(self,input,param,com):
+    def __init__(self,input):
 
-        printY('Initializing FSI Interpolator\n')
-
-        self.dim = param['dim']
         self.solver = input['solver']
         self.nbrNode = self.solver.nbrNode
+        self.dim = self.solver.dim
 
     # Apply boundary conditions to the solvers
 
@@ -26,7 +24,7 @@ class Interpolator(object):
 
     def interpLoadFS(self,com):
         
-        nbrNode = scatterFS(self.nbrNode,com)
+        nbrNode = tools.scatterFS(self.nbrNode,com)
         if com.rank == 0: self.load = self.solver.getLoading()
 
         if com.rank == 1: load = np.zeros((nbrNode,self.dim))
@@ -39,7 +37,7 @@ class Interpolator(object):
 
     def interpDispSF(self,com):
 
-        nbrNode = scatterSF(self.nbrNode,com)
+        nbrNode = tools.scatterSF(self.nbrNode,com)
 
         if com.rank == 0: disp = np.zeros((nbrNode,self.dim))
         if com.rank == 1: com.Isend(self.disp.copy(),dest=0)
@@ -50,12 +48,11 @@ class Interpolator(object):
 # %% Matching Meshes Interpolator
 
 class Matching(Interpolator):
-    def __init__(self,input,param,com):
+    def __init__(self,input,com):
 
-        Interpolator.__init__(self,input,param,com)
-        print('Setting matching mesh interpolator')
+        Interpolator.__init__(self,input)
 
-        nbrNode = scatterSF(self.nbrNode,com)
+        nbrNode = tools.scatterSF(self.nbrNode,com)
         input = np.zeros((self.dim,nbrNode))
         output = self.solver.getPosition().T
 
@@ -81,7 +78,6 @@ class Matching(Interpolator):
 
     def makeMapping(self,input,output):
 
-        print('Building interpolation matrix')
         find = lambda F,S : np.where(np.isclose(F,S))
         
         for i in range(self.nbrNode):
