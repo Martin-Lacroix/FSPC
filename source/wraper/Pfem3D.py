@@ -7,7 +7,6 @@ class Pfem3D(object):
 
     def __init__(self,param):
 
-        self.redirect = w.StdOutErr2Py()
         path = param['inputF']
         self.read(path)
 

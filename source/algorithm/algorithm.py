@@ -25,6 +25,7 @@ class Algorithm(object):
 
         self.verified = True
         self.dim = self.solver.dim
+        self.logGen = tools.Log('general.log')
         self.clock = collections.defaultdict(tools.Clock)
 
 # %% Runs the Fluid-Solid Coupling
@@ -33,21 +34,16 @@ class Algorithm(object):
 
         self.clock['Total time'].start()
         prevWrite = self.step.time
-
-        # External temporal loop
         
         while self.step.time < self.totTime:
-
+            
+            # Print the current time step
 
             if com.rank == 1:
 
                 time = '\nTime : {:.3e}'.format(self.step.time).ljust(20)
                 timeStep = 'Time Step : {:.3e}'.format(self.step.dt)
-                print(time,timeStep)
-                sys.stdout.flush()
-
-
-
+                self.logGen.print(time,timeStep)
 
             # Save previous time step
 
@@ -86,7 +82,6 @@ class Algorithm(object):
                 self.clock['Solver save'].start()
                 self.solver.save()
                 self.clock['Solver save'].end()
-
                 prevWrite = self.step.time
 
             # Update the time step manager class

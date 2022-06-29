@@ -1,18 +1,19 @@
 from .algorithm import Algorithm
 from .. import tools
 import numpy as np
-import sys
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation
 
 class BGS_ADR(Algorithm):
-    def __init__(self,input,param):
+    def __init__(self,input,param,com):
         Algorithm.__init__(self,input,param)
 
-        self.omegaMin = 1e-12
-        self.omega = param['omega']
-        self.aitken = param['aitken']
-        self.omegaMax = param['omega']
+        if com.rank == 1:
+
+            self.omegaMin = 1e-12
+            self.omega = param['omega']
+            self.aitken = param['aitken']
+            self.omegaMax = param['omega']
 
 # %% Coupling at Each Time Step
 
@@ -66,16 +67,13 @@ class BGS_ADR(Algorithm):
                 self.residualDispS()
                 self.converg.update(self.residual)
 
-
+                # Print the curent iteration and residual
 
                 iter = 'Iteration : {:.0f}'.format(self.iteration).ljust(20)
                 epsilon = 'Residual : {:.3e}'.format(self.converg.epsilon)
-                print(iter,epsilon)
-                sys.stdout.flush()
+                self.logGen.print(iter,epsilon)
 
-
-
-                # Use BGS relaxation for solid displacement
+                # Use the relaxation for solid displacement
             
                 self.clock['Relax BGS-ADR'].start()
                 self.relaxation()

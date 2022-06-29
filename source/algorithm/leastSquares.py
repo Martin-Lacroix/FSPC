@@ -1,17 +1,12 @@
-from ..tools import printY,qrSolve
-from ..tools import printY,scatterFS,scatterSF
 from .algorithm import Algorithm
+from .. import tools
 import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Squares
 
 class IQN_ILS(Algorithm):
     def __init__(self,input,param,com):
-        Algorithm.__init__(self,input,param,com)
-
-        self.dim = param['dim']
-        self.omega = param['omega']
-        self.retainStep = param['retainStep']
+        Algorithm.__init__(self,input,param)
 
         if com.rank == 1:
 
@@ -19,16 +14,19 @@ class IQN_ILS(Algorithm):
             self.W = list()
             self.nbrCol = list()
 
+            self.omega = param['omega']
+            self.retainStep = param['retainStep']
+
 # %% Coupling at Each Time Step
 
     def couplingAlgo(self,com):
 
         verified = False
         self.iteration = 0
-        if com.rank == 1: self.converg.epsilon = np.inf
+        self.converg.epsilon = np.inf
+        timeFrame = self.step.timeFrame()
 
         while True:
-            print('FSI iteration {}'.format(self.iteration))
 
             # Solid to fluid mechanical transfer
 
@@ -38,15 +36,13 @@ class IQN_ILS(Algorithm):
 
             # Fluid solver call for FSI subiteration
             
-            printY('Launching fluid solver\n')
-
-            if com.rank == 0: 
+            if com.rank == 0:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(*self.step.timeFrame())
+                verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver run'].end()
 
-            verified = scatterFS(verified,com)
+            verified = tools.scatterFS(verified,com)
             if not verified: return False
 
             # Fluid to solid mechanical transfer
@@ -57,15 +53,13 @@ class IQN_ILS(Algorithm):
 
             # Solid solver call for FSI subiteration
             
-            printY('Launching solid solver\n')
-
             if com.rank == 1:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(*self.step.timeFrame())
+                verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver run'].end()
 
-            verified = scatterSF(verified,com)
+            verified = tools.scatterSF(verified,com)
             if not verified: return False
 
             # Compute the mechanical residual
@@ -74,20 +68,24 @@ class IQN_ILS(Algorithm):
             
                 self.residualDispS()
                 self.converg.update(self.residual)
-                self.logIter.write(self.iteration,self.converg.epsilon)
-                print('Residual =',self.converg.epsilon)
 
-                # Use ILS relaxation for solid displacement
+                # Print the curent iteration and residual
+
+                iter = 'Iteration : {:.0f}'.format(self.iteration).ljust(20)
+                epsilon = 'Residual : {:.3e}'.format(self.converg.epsilon)
+                self.logGen.print(iter,epsilon)
+
+                # Use the relaxation for solid displacement
             
                 self.clock['Relax IQN-ILS'].start()
                 self.relaxation()
-                self.resizeMatrixVW()
+                self.resizeMatrices()
                 self.clock['Relax IQN-ILS'].end()
             
             # Check the converence of the FSI
 
             if com.rank == 1: verified = self.converg.isVerified()
-            verified = scatterSF(verified,com)
+            verified = tools.scatterSF(verified,com)
 
             # End of the coupling iteration
 
@@ -99,7 +97,7 @@ class IQN_ILS(Algorithm):
 
 # %% Add and Remove Time Steps From V and W
 
-    def resizeMatrixVW(self):
+    def resizeMatrices(self):
 
         if self.retainStep == 0:
 
@@ -140,7 +138,7 @@ class IQN_ILS(Algorithm):
                 # V and W are stored as transpose and list
 
                 R = np.concatenate(self.residual.T)
-                C,W = qrSolve(np.transpose(self.V),np.transpose(self.W),R)
+                C,W = tools.qrSolve(np.transpose(self.V),np.transpose(self.W),R)
                 #C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=None)[0]
                 correction = np.split(np.dot(W,C).T+R,self.dim)
                 self.interp.disp += np.transpose(correction)

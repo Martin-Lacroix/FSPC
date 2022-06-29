@@ -30,7 +30,6 @@ class Metafor(object):
     def __init__(self,param):
 
         input = dict()
-        self.redirect = fwkw.StdOutErr2Py()
         module = importlib.import_module(param['inputS'])
         self.metafor = module.getMetafor(input)
         domain = self.metafor.getDomain()

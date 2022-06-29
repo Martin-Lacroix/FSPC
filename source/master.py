@@ -32,26 +32,30 @@ class Master(object):
         if param['algo']=='BGS_ADR':
 
             from source.algorithm.blockGauss import BGS_ADR
-            self.algo = BGS_ADR(input,param)
+            self.algo = BGS_ADR(input,param,com)
 
         elif param['algo']=='IQN_ILS':
             
             from source.algorithm.leastSquares import IQN_ILS
-            self.algo = IQN_ILS(input,param)
+            self.algo = IQN_ILS(input,param,com)
 
         elif param['algo']=='IQN_MVJ':
             
             from source.algorithm.multiVector import IQN_MVJ
-            self.algo = IQN_MVJ(input,param)
+            self.algo = IQN_MVJ(input,param,com)
 
 # %% Initializes Metafor and Pfem3D
 
     def getSolid(self,param):
 
+        import fwkw
+        self.redirect = fwkw.StdOutErr2Py()
         from source.wraper.Metafor import Metafor
         return Metafor(param)
 
     def getFluid(self,param):
-
+        
+        import pfem3Dw
+        self.redirect = pfem3Dw.StdOutErr2Py()
         from source.wraper.Pfem3D import Pfem3D
         return Pfem3D(param)

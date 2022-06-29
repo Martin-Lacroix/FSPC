@@ -1,18 +1,6 @@
 from contextlib import redirect_stdout
 import time
-
-# %% Prints the computation time stats
-
-def timerPrint(clock,com):
-
-    print('\nRank',com.rank,'Time Stats\n')
-    total = clock['Total time'].time
-
-    for key,value in clock.items():
-
-        time = ' {:.5f} '.format(value.time)
-        percent = ' {:.3f} %'.format(value.time/total*100)
-        print((str(key)+' ').ljust(25,'-')+time.ljust(20,'-')+percent)
+import sys
 
 # %% Simulation Timer Class
 
@@ -35,8 +23,57 @@ class Clock(object):
         self.time += time.time()-self.begin
         self.run = False
 
+# %% Redirecting Prints to Files
 
+class Log(object):
 
+    def __init__(self,file):
+        self.file = file
+
+    def exec(self,function,*args):
+            
+        with open(self.file,'a') as F:
+            with redirect_stdout(F): output = function(*args)
+        return output
+
+    def print(self,*text):
+
+        print(*text)
+        sys.stdout.flush()
+        
+        with open(self.file,'a') as F:
+            with redirect_stdout(F): print(*text)
+
+# %% MPI Transfer Functions
+
+def scatterSF(data,com):
+
+    data = np.atleast_1d(data)
+    if com.rank == 0: data = np.zeros(1,dtype=int)
+    if com.rank == 1: com.Isend(data.copy(),dest=0)
+    if com.rank == 0: com.Recv(data,source=1)
+    return data[0]
+
+def scatterFS(data,com):
+
+    data = np.atleast_1d(data)
+    if com.rank == 1: data = np.zeros(1,dtype=int)
+    if com.rank == 0: com.Isend(data.copy(),dest=1)
+    if com.rank == 1: com.Recv(data,source=0)
+    return data[0]
+
+# %% Prints the computation time stats
+
+def timerPrint(clock,com):
+
+    print('\nRank',com.rank,'Time Stats\n')
+    total = clock['Total time'].time
+
+    for key,value in clock.items():
+
+        time = ' {:.5f} '.format(value.time)
+        percent = ' {:.3f} %'.format(value.time/total*100)
+        print((str(key)+' ').ljust(25,'-')+time.ljust(20,'-')+percent)
 
 
 
@@ -100,35 +137,3 @@ def qrSolve(V,W,res):
     s = np.dot(np.transpose(Q), -res)
     c = np.linalg.solve(R, s)
     return c, W
-
-
-# %% Redirecting Prints to Files
-
-class Log(object):
-
-    def __init__(self,file):
-        self.file = file
-
-    def exec(self,function,*args):
-            
-        with open(self.file,'a') as F:
-            with redirect_stdout(F): output = function(*args)
-        return output
-
-# %% MPI Transfer Functions
-
-def scatterSF(data,com):
-
-    data = np.atleast_1d(data)
-    if com.rank == 0: data = np.zeros(1,dtype=int)
-    if com.rank == 1: com.Isend(data.copy(),dest=0)
-    if com.rank == 0: com.Recv(data,source=1)
-    return data[0]
-
-def scatterFS(data,com):
-
-    data = np.atleast_1d(data)
-    if com.rank == 1: data = np.zeros(1,dtype=int)
-    if com.rank == 0: com.Isend(data.copy(),dest=1)
-    if com.rank == 1: com.Recv(data,source=0)
-    return data[0]

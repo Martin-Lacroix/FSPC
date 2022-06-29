@@ -1,18 +1,19 @@
 from .algorithm import Algorithm
-from ..tools import printY,scatterFS,scatterSF
+from .. import tools
 import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Squares
 
 class IQN_MVJ(Algorithm):
     def __init__(self,input,param,com):
-        Algorithm.__init__(self,input,param,com)
+        Algorithm.__init__(self,input,param)
 
-        self.makeBGS = True
-        self.dim = param['dim']
-        self.omega = param['omega']
-        size = self.solver.nbrNode*self.dim
-        if com.rank == 1: self.J = np.zeros((size,size))
+        if com.rank == 1: 
+
+            self.makeBGS = True
+            self.omega = param['omega']
+            size = self.solver.nbrNode*self.dim
+            self.J = np.zeros((size,size))
 
 # %% Coupling at Each Time Step
 
@@ -20,16 +21,16 @@ class IQN_MVJ(Algorithm):
 
         verified = False
         self.iteration = 0
+        self.converg.epsilon = np.inf
+        timeFrame = self.step.timeFrame()
 
         if com.rank == 1:
 
             self.V = list()
             self.W = list()
             self.Jprev = self.J.copy()
-            self.converg.epsilon = np.inf
 
         while True:
-            print('FSI iteration {}'.format(self.iteration))
 
             # Solid to fluid mechanical transfer
 
@@ -39,15 +40,13 @@ class IQN_MVJ(Algorithm):
 
             # Fluid solver call for FSI subiteration
             
-            printY('Launching fluid solver\n')
-
-            if com.rank == 0: 
+            if com.rank == 0:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(*self.step.timeFrame())
+                verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver run'].end()
 
-            verified = scatterFS(verified,com)
+            verified = tools.scatterFS(verified,com)
             if not verified: return False
 
             # Fluid to solid mechanical transfer
@@ -58,15 +57,13 @@ class IQN_MVJ(Algorithm):
 
             # Solid solver call for FSI subiteration
             
-            printY('Launching solid solver\n')
-
             if com.rank == 1:
 
                 self.clock['Solver run'].start()
-                verified = self.solver.run(*self.step.timeFrame())
+                verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver run'].end()
 
-            verified = scatterSF(verified,com)
+            verified = tools.scatterSF(verified,com)
             if not verified: return False
 
             # Compute the mechanical residual
@@ -75,10 +72,14 @@ class IQN_MVJ(Algorithm):
             
                 self.residualDispS()
                 self.converg.update(self.residual)
-                self.logIter.write(self.iteration,self.converg.epsilon)
-                print('Residual =',self.converg.epsilon)
 
-                # Use MVJ relaxation for solid displacement
+                # Print the curent iteration and residual
+
+                iter = 'Iteration : {:.0f}'.format(self.iteration).ljust(20)
+                epsilon = 'Residual : {:.3e}'.format(self.converg.epsilon)
+                self.logGen.print(iter,epsilon)
+
+                # Use the relaxation for solid displacement
             
                 self.clock['Relax IQN-MVJ'].start()
                 self.relaxation()
@@ -87,7 +88,7 @@ class IQN_MVJ(Algorithm):
             # Check the converence of the FSI
 
             if com.rank == 1: verified = self.converg.isVerified()
-            verified = scatterSF(verified,com)
+            verified = tools.scatterSF(verified,com)
 
             # End of the coupling iteration
 
