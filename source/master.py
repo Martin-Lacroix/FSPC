@@ -56,6 +56,6 @@ class Master(object):
     def getFluid(self,param):
         
         import pfem3Dw
-        self.redirect = pfem3Dw.StdOutErr2Py()
+        self.redirect = pfem3Dw.PythonCerrCout()
         from source.wraper.Pfem3D import Pfem3D
         return Pfem3D(param)

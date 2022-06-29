@@ -1,7 +1,6 @@
 import numpy as np
 import wrap as w
 import importlib
-import fwkw
 
 # %% Nodal Load class
 
