@@ -1,6 +1,5 @@
 from .. import tools
 import collections
-import sys
 
 # %% Parent Algorithm Class
 
@@ -72,7 +71,7 @@ class Algorithm(object):
             # Update the F and S solvers for the next time step
             
             self.clock['Solver update'].start()
-            self.solver.update()
+            self.log.exec(self.solver.update)
             self.clock['Solver update'].end()
 
             # Write fluid and solid solution

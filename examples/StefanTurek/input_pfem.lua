@@ -17,7 +17,7 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.005
+Problem.Mesh.hchar = 0.01
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
@@ -53,7 +53,7 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 1e-3
+Problem.Material.mu = 1
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
@@ -61,7 +61,7 @@ Problem.Material.rho = 1000
 
 Problem.IC = {}
 Problem.IC.InletFixed = true
-Problem.IC.OutletFixed = true
+--Problem.IC.OutletFixed = true
 Problem.IC.BorderFixed = true
 Problem.IC.FSInterfaceFixed = false
 
@@ -79,14 +79,14 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-6
-Problem.Solver.MomContEq.cgTolerance = 1e-12
+Problem.Solver.MomContEq.cgTolerance = 1e-9
 Problem.Solver.MomContEq.bodyForce = {0,0}
 
 -- Momentum Continuity BC
@@ -104,26 +104,24 @@ end
 
 function Problem.Solver.MomContEq.BC:InletV(pos,t)
 
-	local L = 1.5
+	local H = 0.41
 	local tmax = 2
-	local vmean = 1
-	local vy = L*vmean*(4/0.1681)*pos[2]*(0.41-pos[2])
+	local vmean = 2
+	local v = 6*vmean*pos[2]*(H-pos[2])/(H*H)
 
 	if (t<tmax) then
 
-		local v = vy*(1-math.cos(math.pi*t/tmax))/2
-		return {v,0}
+		local vt = v*(1-math.cos(math.pi*t/tmax))/2
+		return {vt,0}
 	else
-		
-		local v = vy
 		return {v,0}
 	end
 end
 
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
-	local f = 10
-	local L = 1.5
+	local f = 0
+	local L = 2.5
 	local hchar = Problem.Mesh.hchar
     return f*dist*hchar/(L/2)+hchar
 end

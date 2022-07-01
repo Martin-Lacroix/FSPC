@@ -47,14 +47,14 @@ class Master(object):
 # %% Initializes Metafor and Pfem3D
 
     def getSolid(self,param):
-
+        
         import fwkw
         self.redirect = fwkw.StdOutErr2Py()
         from source.wraper.Metafor import Metafor
         return Metafor(param)
 
     def getFluid(self,param):
-        
+
         import pfem3Dw
         self.redirect = pfem3Dw.PythonCerrCout()
         from source.wraper.Pfem3D import Pfem3D

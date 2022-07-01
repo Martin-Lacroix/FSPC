@@ -1,6 +1,6 @@
 from scipy.sparse import dok_matrix
-from . import tools
 from functools import reduce
+from . import tools
 import numpy as np
 
 # %% Parent InterpolatorClass
@@ -28,7 +28,7 @@ class Interpolator(object):
         if com.rank == 0: self.load = self.solver.getLoading()
 
         if com.rank == 1: load = np.zeros((nbrNode,self.dim))
-        if com.rank == 0: com.Isend(self.load.copy(),dest=1)
+        if com.rank == 0: com.Send(self.load.copy(),dest=1)
 
         if com.rank == 1: com.Recv(load,source=0)
         if com.rank == 1: self.load = self.interpData(load)
@@ -40,7 +40,7 @@ class Interpolator(object):
         nbrNode = tools.scatterSF(self.nbrNode,com)
 
         if com.rank == 0: disp = np.zeros((nbrNode,self.dim))
-        if com.rank == 1: com.Isend(self.disp.copy(),dest=0)
+        if com.rank == 1: com.Send(self.disp.copy(),dest=0)
 
         if com.rank == 0: com.Recv(disp,source=1)
         if com.rank == 0: self.disp = self.interpData(disp)
@@ -56,10 +56,10 @@ class Matching(Interpolator):
         input = np.zeros((self.dim,nbrNode))
         output = self.solver.getPosition().T
 
-        if com.rank == 0: com.Isend(output.copy(),dest=1)
+        if com.rank == 0: com.Send(output.copy(),dest=1)
         if com.rank == 1: com.Recv(input,source=0)
 
-        if com.rank == 1: com.Isend(output.copy(),dest=0)
+        if com.rank == 1: com.Send(output.copy(),dest=0)
         if com.rank == 0: com.Recv(input,source=1)
 
         self.makeInterfaceData()

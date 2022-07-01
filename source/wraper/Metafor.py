@@ -180,10 +180,10 @@ class Metafor(object):
 # %% Other Functions
 
     def update(self):
-
+        
         for nodeLoad in self.Fnods.values():
             for i in range(self.dim): nodeLoad[i].nextstep()
-
+        
         self.metaFac.save(self.mfac)
         self.reload = False
 

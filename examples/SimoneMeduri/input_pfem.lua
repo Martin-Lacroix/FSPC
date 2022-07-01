@@ -9,7 +9,7 @@ Problem.id = 'IncompNewtonNoT'
 -- FSPC Parameters
 
 Problem.interface = 'FSInterface'
-Problem.maxFactor = 1e+8
+Problem.maxFactor = 100
 
 -- Mesh Parameters
 
@@ -85,7 +85,7 @@ Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-6
-Problem.Solver.MomContEq.cgTolerance = 1e-12
+Problem.Solver.MomContEq.cgTolerance = 1e-9
 Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
 -- Momentum Continuity BC

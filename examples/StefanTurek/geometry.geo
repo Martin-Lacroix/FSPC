@@ -1,9 +1,11 @@
-d = 0.006;
-Nx = 60;
-Ny = 5;
+f = 0;
+d = 0.01;
+Nx = 40;
+Ny = 4;
 
-L = 1.5;
-S = 0.2;
+L = 2.5;
+X = 0.2;
+Y = 0.2;
 R = 0.05;
 H = 0.41;
 Ls = 0.35;
@@ -16,13 +18,13 @@ Point(2) = {L,0,0,d};
 Point(3) = {L,H,0,d};
 Point(4) = {0,H,0,d};
 
-Point(5) = {S,H/2,0,d};
-Point(6) = {S-R,H/2,0,d};
+Point(5) = {X,Y,0,d};
+Point(6) = {X-R,Y,0,d};
 
-Point(7) = {S+R*Cos(A),H/2+R*Sin(A),0,d};
-Point(8) = {S+R*Cos(A),H/2-R*Sin(A),0,d};
-Point(9) = {S+R+Ls,H/2+R*Sin(A),0,d};
-Point(10) = {S+R+Ls,H/2-R*Sin(A),0,d};
+Point(7) = {X+R*Cos(A),Y+R*Sin(A),0,d};
+Point(8) = {X+R*Cos(A),Y-R*Sin(A),0,d};
+Point(9) = {X+R+Ls,Y+R*Sin(A),0,d};
+Point(10) = {X+R+Ls,Y-R*Sin(A),0,d};
 
 // Lines List
 
@@ -68,7 +70,26 @@ Physical Surface("Fluid") = {3};
 Physical Curve("FSInterface") = {6,-9,-8,-7,-5};
 Physical Curve("Border") = {1,3};
 Physical Curve("Inlet") = {4};
-Physical Curve("Outlet") = {2};
+Physical Curve("FreeSurface") = {2};
 Physical Curve("Clamped") = {5,6};
 
+
+// Fluid Mesh Size
+
+Field[1] = Distance;
+Field[1].CurvesList = {5,6,7,8,9};
+
+Field[2] = MathEval;
+Field[2].F = Sprintf("%g*F1*%g/(%g/2)+%g",f,d,L,d);
+
+// Makes the Mesh
+
+Field[4] = Min;
+Field[4].FieldsList = {2};
+Background Field = 4;
+
+Mesh.MeshSizeExtendFromBoundary = 0;
+Mesh.MeshSizeFromCurvature = 0;
+Mesh.MeshSizeFromPoints = 0;
+Mesh.Algorithm = 5;
 Mesh 2;

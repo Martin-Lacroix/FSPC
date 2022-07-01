@@ -1,33 +1,19 @@
+from mpi4py import MPI
 import argparse
 import sys
 import os
-
-
-
-
-
-
-
-
-import mpi4py.MPI as mpi
-
-com = mpi.COMM_WORLD
-
-
-
-
-
 
 # %% Solver Paths
 
 parentFolder = os.path.dirname(os.getcwd())
 sys.path.append(parentFolder+'/Metafor/Metafor')
-# sys.path.append(parentFolder+'/Metafor/oo_meta')
+sys.path.append(parentFolder+'/Metafor/oo_meta')
 sys.path.append(parentFolder+'/PFEM3D/build/bin')
-# sys.path.append(parentFolder+'/Metafor/build/bin')
+sys.path.append(parentFolder+'/Metafor/build/bin')
 
 # %% Terminal and Paths
 
+com = MPI.COMM_WORLD
 parser = argparse.ArgumentParser()
 parser.add_argument('file',nargs=1,help='Python input file')
 parser.add_argument('-k',nargs=1,help='Number of threads')
@@ -44,12 +30,9 @@ sys.path.append(inputFolder)
 
 workspace = os.path.basename(inputFolder)
 workspace = os.path.join(baseFolder,'workspace',workspace)
-
-if(com.rank == 0):
-    if not os.path.isdir(workspace): os.makedirs(workspace)
+if (com.rank == 0) and not os.path.isdir(workspace): os.makedirs(workspace)
 
 com.Barrier()
-
 os.chdir(workspace)
 
 # %% Runs the simulation

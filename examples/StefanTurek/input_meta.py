@@ -42,24 +42,34 @@ def getMetafor(input):
 
     # Defines the solid domain
 
-    app = w.FieldApplicator(1)
-    app.push(groups['Solid'])
-    interactionset.add(app)
+    app1 = w.FieldApplicator(1)
+    app1.push(groups['Solid'])
+    interactionset.add(app1)
+
+    app2 = w.FieldApplicator(2)
+    app2.push(groups['Solid'])
+    interactionset.add(app2)
 
     # Solid material parameters
 
     materset.define(1,w.ElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1.4e6)
+    materset(1).put(w.ELASTIC_MODULUS,1.4e6) # 5.6e6 for Turek
     materset(1).put(w.POISSON_RATIO,0.4)
-    materset(1).put(w.MASS_DENSITY,1e4)
+    materset(1).put(w.MASS_DENSITY,1e3)
 
     # Finite element properties
 
-    prp = w.ElementProperties(w.Volume2DElement)
-    prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp.put(w.MATERIAL,1)
-    app.addProperty(prp)
+    prp1 = w.ElementProperties(w.Volume2DElement)
+    prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
+    prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
+    prp1.put(w.MATERIAL,1)
+    app1.addProperty(prp1)
+
+    prp2 = w.ElementProperties(w.TriangleVolume2DElement)
+    prp2.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
+    prp2.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
+    prp2.put(w.MATERIAL,1)
+    app2.addProperty(prp2)
 
     # Boundary conditions
     

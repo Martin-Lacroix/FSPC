@@ -1,7 +1,7 @@
 :: Set input file
 
 set INPUT=examples\damNcomp\input.py
-set INPUT=examples\streamNcomp\input.py
+set INPUT=examples\StefanTurek\input.py
 
 :: Clean output folder
 

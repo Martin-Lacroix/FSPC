@@ -111,7 +111,7 @@ class Pfem3D(object):
 # %% Sets Boundary Conditions
 
     def applyDispIncomp(self,disp,dt):
-        
+
         self.disp = disp.copy()
         if self.reload: self.problem.loadSolution(self.prevSolution)
         BC = (self.disp-self.prevDisp)/dt
@@ -193,6 +193,7 @@ class Pfem3D(object):
 
     def update(self):
 
+        print('\nUpdate')
         self.mesh.remesh(False)
         if (self.ID == 'IncompNewtonNoT'): self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
