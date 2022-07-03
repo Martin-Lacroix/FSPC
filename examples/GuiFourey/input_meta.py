@@ -40,37 +40,32 @@ def getMetafor(input):
     importer.verb = False
     importer.execute()
 
-    # Defines the solid domain
+    # Defines the ball domain
 
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
     interactionset.add(app)
-    
-    # Material parameters
 
-    G = 2.4e6
-    C1 = -1.2e6
-    C2 = G/2.0-C1
+    # Solid material parameters
 
-    materset.define(1,w.MooneyRivlinHyperMaterial)
-    materset(1).put(w.RUBBER_PENAL,1.3e6)
-    materset(1).put(w.MASS_DENSITY,1100)
-    materset(1).put(w.RUBBER_C1,C1)
-    materset(1).put(w.RUBBER_C2,C2)
+    materset.define(1,w.ElastHypoMaterial)
+    materset(1).put(w.ELASTIC_MODULUS,67.5e9)
+    materset(1).put(w.POISSON_RATIO,0.34)
+    materset(1).put(w.MASS_DENSITY,2700)
     
     # Finite element properties
 
     prp = w.ElementProperties(w.Volume2DElement)
     prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp.put(w.STIFFMETHOD,w.STIFF_NUMERIC)
+    prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp.put(w.GRAVITY_Y,-9.81)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
-    
+
     # Boundary conditions
     
-    loadingset.define(groups['SolidBase'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['SolidBase'],w.Field1D(w.TY,w.RE))
+    loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
+    loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 
@@ -80,10 +75,10 @@ def getMetafor(input):
     # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-8)
+    mim.setResidualTolerance(1e-6)
 
     # Time step iterations
-
+    
     tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)

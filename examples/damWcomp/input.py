@@ -12,7 +12,6 @@ def getParam(path):
 
     param['algo'] = 'IQN_ILS'
     param['retainStep'] = 0
-    param['keepStep'] = 0
     param['omega'] = 0.5
     param['maxIt'] = 25
     param['tol'] = 1e-8

@@ -1,0 +1,49 @@
+class Convergence(object):
+    def __init__(self,param):
+
+        self.count = 0
+        self.min = np.inf
+        self.prevMin = np.inf
+        self.epsilon = np.inf
+        self.converging = True
+        self.tol = param['tol']
+
+    # Update the displacement norm
+    
+    def update(self,res):
+
+        self.count += 1
+        norm = np.linalg.norm(res,axis=0)
+        self.epsilon = np.linalg.norm(norm)
+        self.min = np.minimum(self.min,self.epsilon)
+
+        if self.count > 3:
+
+            if self.prevMin < self.min: self.converging = False
+            self.prevMin = self.min
+            self.min = self.epsilon
+            self.count = 0
+
+    # Check the convergence criterion
+
+    def isVerified(self):
+
+        if self.epsilon < self.tol: return True
+        else: return False
+
+    # Check if the residual tends to zero
+
+    def isConverging(self):
+
+        if self.converging: return True
+        else: return False
+
+    # Reset the critetion parameters
+
+    def reset(self):
+
+        self.count = 0
+        self.min = np.inf
+        self.epsilon = np.inf
+        self.prevMin = np.inf
+        self.converging = True

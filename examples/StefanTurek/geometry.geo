@@ -73,7 +73,6 @@ Physical Curve("Inlet") = {4};
 Physical Curve("FreeSurface") = {2};
 Physical Curve("Clamped") = {5,6};
 
-
 // Fluid Mesh Size
 
 Field[1] = Distance;

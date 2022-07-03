@@ -9,28 +9,29 @@ Problem.id = 'IncompNewtonNoT'
 -- FSPC Parameters
 
 Problem.interface = 'FSInterface'
-Problem.maxFactor = 100
+Problem.maxFactor = 10
 
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.3
+Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.5
-Problem.Mesh.hchar = 4e-3
-Problem.Mesh.addOnFS = true
-Problem.Mesh.minAspectRatio = 1e-2
+Problem.Mesh.gamma = 0.6
+Problem.Mesh.hchar = 0.005
+Problem.Mesh.addOnFS = false
+Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.laplacianSmoothingBoundaries = true
-Problem.Mesh.boundingBox = {0,0,0,0.305,0.1,0.14}
+Problem.Mesh.laplacianSmoothingBoundaries = false
+Problem.Mesh.boundingBox = {0,-1,1,2.1}
 Problem.Mesh.exclusionZones = {}
 
-Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.remeshAlgo = 'CGAL'
 Problem.Mesh.mshFile = 'geometry.msh'
-Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.ignoreGroups = {'Solid'}
+Problem.Mesh.ignoreGroups = {'Solid','Bottom','Clamped'}
+Problem.Mesh.localHcharGroups = {'FSInterface'}
+Problem.Mesh.exclusionGroups = {}
 
 -- Extractor Parameters
 
@@ -59,7 +60,7 @@ Problem.Material.rho = 1000
 -- Initial Conditions
 
 Problem.IC = {}
-Problem.IC.ReservoirFixed = true
+Problem.IC.WallFixed = true
 Problem.IC.FSInterfaceFixed = false
 
 -- Solver Parameters
@@ -78,13 +79,13 @@ Problem.Solver.coeffDTincrease = math.huge
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
+Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.cgTolerance = 1e-12
-Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
+Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
 -- Momentum Continuity BC
 
@@ -92,9 +93,17 @@ Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 function Problem.IC:initStates(pos)
-    return {0,0,0,0}
+	return {0,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
-    return {0,0,0}
+function Problem.Solver.MomContEq.BC:WallV(pos,t)
+	return {0,0}
+end
+
+function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+
+	local f = 2
+	local L = 1
+	local hchar = Problem.Mesh.hchar
+    return f*dist*hchar/(L/2)+hchar
 end

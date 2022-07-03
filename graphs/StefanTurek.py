@@ -6,14 +6,14 @@ import os
 # %% Main Code
 
 workspace = os.getcwd()
-workspace += '/workspace/FangBaoTian/metafor'
+workspace += '/workspace/StefanTurek/metafor'
 os.chdir(workspace)
 
 # Reads the results
 
 D = 0.1
-time,disp = tools.readNode(753) # CHECK IF GOOD NODE !!!
-results = [time,disp[:,1]/D]
+time,disp = tools.readNode(657) # CHECK IF GOOD NODE !!!
+results = [time,disp[:,1]]
 disp = disp[:,1]
 
 # Moves to main folder
@@ -35,7 +35,7 @@ Turek = [0.83,0.19]
 Fang_Bao = [0.78,0.19]
 Bhardwaj = [0.92,0.19]
 
-print('\nRelative Amplitude =',amplitude/D)
+print('\nSolid Amplitude =',amplitude)
 print('Strouhal Number =',strouhal,'\n')
 
 # %% Save Results

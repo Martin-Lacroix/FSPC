@@ -78,13 +78,13 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
-Problem.Solver.MomContEq.minRes = 1e-6
+Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.cgTolerance = 1e-9
 Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 

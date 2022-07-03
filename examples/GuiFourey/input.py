@@ -7,18 +7,18 @@ def getParam(path):
     param = dict()
     param['inputS'] = 'input_meta'
     param['inputF'] = path+'/input_pfem.lua'
-    
+
     # Algorithm parameters
 
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
     param['maxIt'] = 25
-    param['tol'] = 1e-6
+    param['tol'] = 1e-12
 
     # Time Parameters
 
-    param['dt'] = 0.001
-    param['dtWrite'] = 0.01
-    param['tTot'] = 1
+    param['dt'] = 5e-4
+    param['dtWrite'] = 5e-4
+    param['tTot'] = 0.15
 
     return param

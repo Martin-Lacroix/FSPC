@@ -59,6 +59,7 @@ def getMetafor(input):
     prp = w.ElementProperties(w.Volume2DElement)
     prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
+    prp.put(w.GRAVITY_Y,-9.81)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
     
@@ -75,7 +76,7 @@ def getMetafor(input):
     # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-6)
+    mim.setResidualTolerance(1e-8)
 
     # Time step iterations
 

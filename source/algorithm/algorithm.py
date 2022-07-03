@@ -11,6 +11,7 @@ class Algorithm(object):
         self.step = input['step']
         self.interp = input['interp']
         self.solver = input['solver']
+        self.converg = input['converg']
 
         # Data from the param dictionary
 
@@ -18,31 +19,23 @@ class Algorithm(object):
         self.totTime = param['tTot']
         self.iterMax = param['maxIt']
         self.dtWrite = param['dtWrite']
-        self.converg = input['converg']
 
         # Initialize other simulation data
 
         self.verified = True
         self.dim = self.solver.dim
-        self.logGen = tools.Log('general.log')
+        self.logGen = tools.LogGen(self)
         self.clock = collections.defaultdict(tools.Clock)
 
 # %% Runs the Fluid-Solid Coupling
 
     def run(self,com):
 
-        self.clock['Total time'].start()
+        self.clock['Total Time'].start()
         prevWrite = self.step.time
         
         while self.step.time < self.totTime:
-            
-            # Print the current time step
-
-            if com.rank == 1:
-
-                time = '\nTime : {:.3e}'.format(self.step.time).ljust(20)
-                timeStep = 'Time Step : {:.3e}'.format(self.step.dt)
-                self.logGen.print(time,timeStep)
+            if com.rank == 1: self.logGen.printStep()
 
             # Save previous time step
 
@@ -70,17 +63,17 @@ class Algorithm(object):
 
             # Update the F and S solvers for the next time step
             
-            self.clock['Solver update'].start()
+            self.clock['Solver Update'].start()
             self.log.exec(self.solver.update)
-            self.clock['Solver update'].end()
+            self.clock['Solver Update'].end()
 
             # Write fluid and solid solution
             
             if self.step.time-prevWrite > self.dtWrite:
 
-                self.clock['Solver save'].start()
+                self.clock['Solver Save'].start()
                 self.solver.save()
-                self.clock['Solver save'].end()
+                self.clock['Solver Save'].end()
                 prevWrite = self.step.time
 
             # Update the time step manager class
@@ -90,9 +83,9 @@ class Algorithm(object):
         # Ends the FSI simulation
 
         com.Barrier()
-        self.clock['Total time'].end()
+        self.clock['Total Time'].end()
         self.log.exec(self.solver.exit)
-        tools.timerPrint(self.clock,com)
+        self.logGen.printClock(com)
 
 # %% Transfer and Update Functions
 

@@ -36,9 +36,9 @@ class BGS_ADR(Algorithm):
 
             if com.rank == 0:
 
-                self.clock['Solver run'].start()
+                self.clock['Solver Run'].start()
                 verified = self.log.exec(self.solver.run,*timeFrame)
-                self.clock['Solver run'].end()
+                self.clock['Solver Run'].end()
 
             verified = tools.scatterFS(verified,com)
             if not verified: return False
@@ -53,9 +53,9 @@ class BGS_ADR(Algorithm):
 
             if com.rank == 1:
 
-                self.clock['Solver run'].start()
+                self.clock['Solver Run'].start()
                 verified = self.log.exec(self.solver.run,*timeFrame)
-                self.clock['Solver run'].end()
+                self.clock['Solver Run'].end()
 
             verified = tools.scatterSF(verified,com)
             if not verified: return False
@@ -66,12 +66,7 @@ class BGS_ADR(Algorithm):
             
                 self.residualDispS()
                 self.converg.update(self.residual)
-
-                # Print the curent iteration and residual
-
-                iter = 'Iteration : {:.0f}'.format(self.iteration).ljust(20)
-                epsilon = 'Residual : {:.3e}'.format(self.converg.epsilon)
-                self.logGen.print(iter,epsilon)
+                self.logGen.printRes()
 
                 # Use the relaxation for solid displacement
             
