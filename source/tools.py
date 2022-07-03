@@ -38,6 +38,8 @@ class Log(object):
             with redirect_stdout(F): output = function(*args)
         return output
 
+# %% General Print and Log File
+
 class LogGen(object):
 
     def __init__(self,algorithm):
@@ -76,7 +78,6 @@ class LogGen(object):
         print(text)
         with open(self.file,'a') as F: F.write(text)
         sys.stdout.flush()
-
 
 # %% MPI Transfer Functions
 
