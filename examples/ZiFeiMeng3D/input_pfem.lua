@@ -9,7 +9,7 @@ Problem.id = 'IncompNewtonNoT'
 -- FSPC Parameters
 
 Problem.interface = 'FSInterface'
-Problem.maxFactor = 100
+Problem.maxFactor = 10
 
 -- Mesh Parameters
 

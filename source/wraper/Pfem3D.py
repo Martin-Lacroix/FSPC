@@ -193,7 +193,7 @@ class Pfem3D(object):
 
     def update(self):
 
-        print('\nUpdate')
+        print('\nUpdate\n')
         self.mesh.remesh(False)
         if (self.ID == 'IncompNewtonNoT'): self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
@@ -203,7 +203,7 @@ class Pfem3D(object):
     def timeStats(self,time,dt):
 
         start = self.problem.getCurrentSimTime()
-        print('\n[PFEM-1] : t1 = {:.5e} - dt = {:.3e}'.format(start,dt))
+        print('[PFEM-1] : t1 = {:.5e} - dt = {:.3e}'.format(start,dt))
         print('[PFEM-2] : t2 = {:.5e} - factor = {:.0f}'.format(time,self.factor))
         print('----------------------------')
 
