@@ -1,7 +1,8 @@
 :: Set input file
 
-set INPUT=examples\StreamNcomp\input.py
-set INPUT=examples\ZiFeiMeng3D\input.py
+set CPU_PER_PROC=8
+set INPUT=examples\damNcomp\input.py
+::set INPUT=examples\ZiFeiMeng3D\input.py
 
 :: Clean output folder
 
@@ -10,8 +11,7 @@ mkdir workspace
 
 :: Runs the code
 
-set MKL_NUM_THREADS=8
-set OMP_NUM_THREADS=8
-set OMP_PROC_BIND=true
-
-mpiexec -n 2 python main.py -k 1 %INPUT%
+set OPTION=-cores %CPU_PER_PROC%
+set MKL_NUM_THREADS=%CPU_PER_PROC%
+set OMP_NUM_THREADS=%CPU_PER_PROC%
+mpiexec %OPTION% -n 2 python main.py -k %CPU_PER_PROC% %INPUT%

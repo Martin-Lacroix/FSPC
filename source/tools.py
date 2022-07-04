@@ -51,7 +51,7 @@ class LogGen(object):
 
         time = '\nTime : {:.3e}'.format(self.algo.step.time).ljust(20)
         timeStep = 'Time Step : {:.3e}'.format(self.algo.step.dt)
-        with open(self.file,'a') as F: F.write(time+timeStep)
+        with open(self.file,'a') as F: F.write('\n'+time+timeStep)
         print(time,timeStep)
         sys.stdout.flush()
 
@@ -59,7 +59,7 @@ class LogGen(object):
 
         iter = 'Iteration : {:.0f}'.format(self.algo.iteration).ljust(20)
         epsilon = 'Residual : {:.3e}'.format(self.algo.converg.epsilon)
-        with open(self.file,'a') as F: F.write(iter+epsilon)
+        with open(self.file,'a') as F: F.write('\n'+iter+epsilon)
         print(iter,epsilon)
         sys.stdout.flush()
 
