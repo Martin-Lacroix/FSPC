@@ -94,15 +94,15 @@ Plane Surface(4) = {4};
 Plane Surface(5) = {5};
 Plane Surface(6) = {6};
 
-Transfinite Surface{1:6};
-Recombine Surface{1:6};
+// Transfinite Surface{1:6};
+// Recombine Surface{1:6};
 
 Surface Loop(1) = {1,2,3,4,5,6};
 Volume(1) = {1};
 Physical Volume("Solid") = {1};
 
-Transfinite Volume(1);
-Recombine Volume(1);
+// Transfinite Volume(1);
+// Recombine Volume(1);
 
 // Polytope Surface
 

@@ -15,13 +15,13 @@ Problem.maxFactor = 100
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.6
+Problem.Mesh.omega = 0.4
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.006
-Problem.Mesh.addOnFS = true
+Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = true
+Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = true
 Problem.Mesh.boundingBox = {0,0,0,0.584,0.2,0.584}
@@ -76,14 +76,14 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
-Problem.Solver.MomContEq.minRes = 1e-6
-Problem.Solver.MomContEq.cgTolerance = 1e-12
+Problem.Solver.MomContEq.minRes = 1e-8
+Problem.Solver.MomContEq.cgTolerance = 1e-9
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Momentum Continuity BC

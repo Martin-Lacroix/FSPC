@@ -60,9 +60,10 @@ def getMetafor(input):
     
     # Finite element properties
 
-    prp = w.ElementProperties(w.Volume3DElement)
+    prp = w.ElementProperties(w.TetraVolume3DElement)
     prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp.put(w.STIFFMETHOD,w.STIFF_NUMERIC)
+    prp.put(w.GRAVITY_Y,-9.81)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
     

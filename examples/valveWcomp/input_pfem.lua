@@ -99,7 +99,7 @@ function Problem.Solver.MomEq.BC:ClampLV(pos,t)
 	return {0,0}
 end
 
-function Problem.Solver.MomEq.BC:OutletV(pos,t)
+function Problem.Solver.MomEq.BC:InletV(pos,t)
 
 	local tmax = 1
 	local acc = 10

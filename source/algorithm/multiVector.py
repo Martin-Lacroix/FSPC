@@ -15,6 +15,8 @@ class IQN_MVJ(Algorithm):
             size = self.solver.nbrNode*self.dim
             self.J = np.zeros((size,size))
 
+            self.Jprev = np.zeros((size,size))
+
 # %% Coupling at Each Time Step
 
     def couplingAlgo(self,com):
@@ -28,7 +30,13 @@ class IQN_MVJ(Algorithm):
 
             self.V = list()
             self.W = list()
-            self.Jprev = self.J.copy()
+            #self.Jprev = self.J.copy()
+
+
+
+            print("\nJprev =",sum(sum(self.Jprev)))
+            print("J =",sum(sum(self.J)))
+            print("\n")
 
         while True:
 
@@ -79,19 +87,25 @@ class IQN_MVJ(Algorithm):
                 self.clock['Relax IQN-MVJ'].start()
                 self.relaxation()
                 self.clock['Relax IQN-MVJ'].end()
+
+                print("J =",sum(sum(self.J)))
             
             # Check the converence of the FSI
 
             if com.rank == 1: verified = self.converg.isVerified()
             verified = tools.scatterSF(verified,com)
+            self.iteration += 1
 
             # End of the coupling iteration
 
-            if verified: break
-            self.iteration += 1
-            if self.iteration > self.iterMax: return False
+            if verified:
+                if com.rank == 1: self.Jprev = self.J.copy()
+                return True
 
-        return True
+            if self.iteration > self.iterMax:
+                if com.rank == 1: self.Jprev.fill(0)
+                self.makeBGS = True
+                return False
 
 # %% IQN Relaxation of Solid Displacement
 

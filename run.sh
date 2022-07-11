@@ -1,6 +1,6 @@
 # Environment variables
 
-export CPU_PER_PROC=8
+export CPU_PER_PROC=2
 export INPUT=examples/damNcomp/input.py
 
 # Clean output folder

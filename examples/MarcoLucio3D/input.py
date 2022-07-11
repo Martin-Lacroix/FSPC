@@ -10,7 +10,7 @@ def getParam(path):
     
     # Algorithm parameters
 
-    param['algo'] = 'IQN_ILS'
+    param['algo'] = 'IQN_MVJ'
     param['retainStep'] = 0
     param['omega'] = 0.5
     param['maxIt'] = 25

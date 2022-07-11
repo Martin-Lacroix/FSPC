@@ -132,9 +132,9 @@ class IQN_ILS(Algorithm):
                 # V and W are stored as transpose and list
 
                 R = np.concatenate(self.residual.T)
-                C,W = tools.qrSolve(np.transpose(self.V),np.transpose(self.W),R)
-                #C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=None)[0]
-                correction = np.split(np.dot(W,C).T+R,self.dim)
+                #C,W = tools.qrSolve(np.transpose(self.V),np.transpose(self.W),R)
+                C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=None)[0]
+                correction = np.split(np.dot(np.transpose(self.W),C)+R,self.dim)
                 self.interp.disp += np.transpose(correction)
 
             # Updates the residuals and displacement

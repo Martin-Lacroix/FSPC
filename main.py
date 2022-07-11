@@ -6,7 +6,6 @@ import os
 # %% Solver Paths
 
 parentFolder = os.path.dirname(os.getcwd())
-sys.path.append(parentFolder+'/Metafor/Metafor')
 sys.path.append(parentFolder+'/Metafor/oo_meta')
 sys.path.append(parentFolder+'/PFEM3D/build/bin')
 sys.path.append(parentFolder+'/Metafor/build/bin')

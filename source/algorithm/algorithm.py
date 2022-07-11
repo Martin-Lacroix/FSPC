@@ -37,27 +37,45 @@ class Algorithm(object):
         while self.step.time < self.totTime:
             if com.rank == 1: self.logGen.printStep()
 
-            # Save previous time step
 
-            if self.verified is True:
+
+
+
+
+
+            if self.step.dt < 1e-9:
+
+                self.solver.save()
+                com.Barrier()
+                raise Exception('Small Time Step')
+
+
+
+
+
+
+
+
+
+            # Save previous time step data
+
+            if (com.rank == 1) and self.verified:
 
                 prevDisp = self.interp.disp.copy()
-                prevLoad = self.interp.load.copy()
-                if com.rank == 1: self.vel = self.solver.getVelocity()
-                if com.rank == 1: self.acc = self.solver.getAcceleration()
+                velocity = self.solver.getVelocity()
+                acceler = self.solver.getAcceleration()
 
             # Predictor and Internal FSI loop
 
-            if com.rank == 1:
-                self.interp.disp += self.step.dt*(self.vel+self.acc*self.step.dt/2)
+            dt = self.step.dt
+            if com.rank == 1: self.interp.disp += dt*(velocity+acceler*dt/2)
             self.verified = self.couplingAlgo(com)
 
             # Restart the time step if fail
 
             if not self.verified:
-                
-                self.interp.disp = prevDisp.copy()
-                self.interp.load = prevLoad.copy()
+
+                if com.rank == 1: self.interp.disp = prevDisp.copy()
                 self.step.update(self.verified)
                 continue
 
@@ -72,7 +90,7 @@ class Algorithm(object):
             if self.step.time-prevWrite > self.dtWrite:
 
                 self.clock['Solver Save'].start()
-                self.solver.save()
+                self.log.exec(self.solver.save)
                 self.clock['Solver Save'].end()
                 prevWrite = self.step.time
 
@@ -94,17 +112,14 @@ class Algorithm(object):
         disp = self.solver.getDisplacement()
         self.residual = disp-self.interp.disp
 
-    # Transfers mechanical data fluid -> solid
+    # Transfers mechanical data Fluid -> Solid
 
     def transferLoadFS(self,com):
 
-        self.interp.interpLoadFS(com)
-        if com.rank == 1: nextTime = self.step.timeFrame()[1]
-        if com.rank == 1: self.interp.applyLoadS(nextTime)
+        nextTime = self.step.timeFrame()[1]
+        self.interp.applyLoadFS(nextTime,com)
         
-    # Transfers mechanical data solid -> fluid
+    # Transfers mechanical data Solid -> Fluid
 
     def transferDispSF(self,com):
-        
-        self.interp.interpDispSF(com)
-        if com.rank == 0: self.interp.applyDispF(self.step.dt)
+        self.interp.applyDispSF(com)

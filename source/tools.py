@@ -1,4 +1,4 @@
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout as stdout
 import numpy as np
 import time
 import sys
@@ -35,7 +35,7 @@ class Log(object):
     def exec(self,function,*args):
             
         with open(self.file,'a') as F:
-            with redirect_stdout(F): output = function(*args)
+            with stdout(F): output = function(*args)
         return output
 
 # %% General Print and Log File
@@ -51,7 +51,7 @@ class LogGen(object):
 
         time = '\nTime : {:.3e}'.format(self.algo.step.time).ljust(20)
         timeStep = 'Time Step : {:.3e}'.format(self.algo.step.dt)
-        with open(self.file,'a') as F: F.write('\n'+time+timeStep)
+        with stdout(open(self.file,'a')): print(time,timeStep)
         print(time,timeStep)
         sys.stdout.flush()
 
@@ -59,7 +59,7 @@ class LogGen(object):
 
         iter = 'Iteration : {:.0f}'.format(self.algo.iteration).ljust(20)
         epsilon = 'Residual : {:.3e}'.format(self.algo.converg.epsilon)
-        with open(self.file,'a') as F: F.write('\n'+iter+epsilon)
+        with stdout(open(self.file,'a')): print(iter,epsilon)
         print(iter,epsilon)
         sys.stdout.flush()
 
@@ -72,11 +72,11 @@ class LogGen(object):
         for key,value in clock.items():
             
             text += '\n{} '.format(key).ljust(25,'-')
-            text += ' {:.3f} % '.format(value.time/total).ljust(20,'-')
-            text += ' {:.5f}'.format(value.time)
-        
+            text += ' {:.5f} '.format(value.time).ljust(20,'-')
+            text += ' {:.3f} %'.format(value.time/total)
+
         print(text)
-        with open(self.file,'a') as F: F.write(text)
+        with stdout(open(self.file,'a')): print(text)
         sys.stdout.flush()
 
 # %% MPI Transfer Functions

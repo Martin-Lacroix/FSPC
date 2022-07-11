@@ -1,4 +1,3 @@
-from . import interpolator
 from . import criterion
 from . import tools
 
@@ -25,7 +24,12 @@ class Master(object):
 
         input['step'] = criterion.TimeStep(param)
         input['converg'] = criterion.Convergence(param)
-        input['interp'] = interpolator.Matching(input,com)
+
+
+
+        from source.interpolator.matching import Matching
+        input['interp'] = Matching(input,com)
+
 
         # Initialize the FSI algorithm
 
@@ -50,12 +54,12 @@ class Master(object):
         
         import fwkw
         self.redirect = fwkw.StdOutErr2Py()
-        from source.wraper.Metafor import Metafor
+        from source.solver.Metafor import Metafor
         return Metafor(param)
 
     def getFluid(self,param):
 
         import pfem3Dw
         self.redirect = pfem3Dw.PythonCerrCout()
-        from source.wraper.Pfem3D import Pfem3D
+        from source.solver.Pfem3D import Pfem3D
         return Pfem3D(param)
