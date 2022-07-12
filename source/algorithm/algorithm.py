@@ -108,7 +108,7 @@ class Algorithm(object):
 # %% Transfer and Update Functions
 
     def residualDispS(self):
-        
+
         disp = self.solver.getDisplacement()
         self.residual = disp-self.interp.disp
 

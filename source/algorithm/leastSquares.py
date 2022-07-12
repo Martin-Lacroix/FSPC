@@ -9,12 +9,7 @@ class IQN_ILS(Algorithm):
         Algorithm.__init__(self,input,param)
 
         if com.rank == 1:
-
-            self.V = list()
-            self.W = list()
-            self.nbrCol = list()
             self.omega = param['omega']
-            self.retainStep = param['retainStep']
 
 # %% Coupling at Each Time Step
 
@@ -24,6 +19,11 @@ class IQN_ILS(Algorithm):
         self.iteration = 0
         self.converg.epsilon = np.inf
         timeFrame = self.step.timeFrame()
+
+        if com.rank == 1:
+
+            self.V = list()
+            self.W = list()
 
         while True:
 
@@ -73,7 +73,6 @@ class IQN_ILS(Algorithm):
             
                 self.clock['Relax IQN-ILS'].start()
                 self.relaxation()
-                self.resizeMatrices()
                 self.clock['Relax IQN-ILS'].end()
             
             # Check the converence of the FSI
@@ -89,29 +88,6 @@ class IQN_ILS(Algorithm):
 
         return True
 
-# %% Add and Remove Time Steps From V and W
-
-    def resizeMatrices(self):
-
-        if self.retainStep == 0:
-
-            self.V.clear()
-            self.W.clear()
-
-        elif self.converg.isVerified():
-
-            self.nbrCol.insert(0,self.iteration)
-            if len(self.nbrCol) > self.retainStep:
-
-                self.W = self.W[:(len(self.W)-self.nbrCol[-1])]
-                self.V = self.V[:(len(self.V)-self.nbrCol[-1])]
-                self.nbrCol.pop()
-
-        elif self.iteration+1 > self.iterMax:
-            
-            self.W = self.W[self.iteration:]
-            self.V = self.V[self.iteration:]
-
 # %% IQN Relaxation of Solid Displacement
 
     def relaxation(self):
@@ -120,19 +96,17 @@ class IQN_ILS(Algorithm):
 
             # Performs either BGS or IQN iteration
 
-            if (self.iteration == 0) and (len(self.V) == 0):
+            if self.iteration == 0:
                 self.interp.disp += self.omega*self.residual
 
             else:
-                if self.iteration > 0:
 
-                    self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
-                    self.W.insert(0,np.concatenate((disp-self.prevDisp).T))
+                self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
+                self.W.insert(0,np.concatenate((disp-self.prevDisp).T))
 
                 # V and W are stored as transpose and list
 
                 R = np.concatenate(self.residual.T)
-                #C,W = tools.qrSolve(np.transpose(self.V),np.transpose(self.W),R)
                 C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=None)[0]
                 correction = np.split(np.dot(np.transpose(self.W),C)+R,self.dim)
                 self.interp.disp += np.transpose(correction)

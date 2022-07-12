@@ -31,7 +31,6 @@ class TimeStep(object):
         self.factor = 2
         self.dt = param['dt']
         self.dtMax = param['dt']
-        self.dtLast = param['dt']
 
     # Return the curent time frame
 
@@ -45,11 +44,7 @@ class TimeStep(object):
         if verified:
 
             self.time += self.dt
-            self.dtLast = self.dt
             self.dt = self.factor**(1/7)*self.dt
             if self.dt > self.dtMax: self.dt = self.dtMax
 
-        else:
-
-            if self.dtLast < self.dt: self.dt = self.dtLast
-            else: self.dtLast = self.dt = self.dt/self.factor
+        else: self.dt = self.dt/self.factor

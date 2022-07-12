@@ -22,7 +22,7 @@ class Pfem3D(object):
 
             self.run = self.runWcomp
             self.problem = w.ProbWCompNewton(path)
-            self.applyDispPC = self.applyDispWcomp
+            self.applyDispBC = self.applyDispWcomp
 
         else: raise Exception('Problem type not supported')
 
@@ -53,6 +53,10 @@ class Pfem3D(object):
 
         self.problem.displayParams()
         self.problem.dump()
+
+
+
+        self.check = False
 
 # %% Run for Incompressible Flows
 
@@ -205,12 +209,26 @@ class Pfem3D(object):
         if (self.ID == 'IncompNewtonNoT'): self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
         self.reload = False
-
+    
     # Prepare to solve one time step
 
     def resetSystem(self,dt):
 
         if self.reload: self.problem.loadSolution(self.prevSolution)
+
+
+
+        if self.check:
+            self.mesh.remesh(False)
+            if (self.ID == 'IncompNewtonNoT'): self.solver.precomputeMatrix()
+            self.problem.copySolution(self.prevSolution)
+            self.check = False
+
+            print("\nCheck ...\n")
+
+
+
+
         if self.autoRemesh and (self.ID == 'IncompNewtonNoT'):
             if self.reload: self.solver.precomputeMatrix()
 

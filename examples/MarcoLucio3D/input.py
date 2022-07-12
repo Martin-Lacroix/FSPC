@@ -11,7 +11,7 @@ def getParam(path):
     # Algorithm parameters
 
     param['algo'] = 'IQN_MVJ'
-    param['retainStep'] = 0
+    
     param['omega'] = 0.5
     param['maxIt'] = 25
     param['tol'] = 1e-6

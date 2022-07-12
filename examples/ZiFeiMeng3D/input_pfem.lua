@@ -2,7 +2,7 @@
 
 Problem = {}
 Problem.autoRemeshing = false
-Problem.verboseOutput = true
+Problem.verboseOutput = false
 Problem.simulationTime = math.huge
 Problem.id = 'IncompNewtonNoT'
 
@@ -15,14 +15,14 @@ Problem.maxFactor = 10
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.3
-Problem.Mesh.omega = 0.4
-Problem.Mesh.gamma = 0.6
+Problem.Mesh.omega = 0.5
+Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 4e-3
 Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = true
 Problem.Mesh.boundingBox = {0,0,0,0.305,0.1,0.14}
 Problem.Mesh.exclusionZones = {}
@@ -82,7 +82,7 @@ Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
-Problem.Solver.MomContEq.minRes = 1e-6
+Problem.Solver.MomContEq.minRes = 1e-7
 Problem.Solver.MomContEq.cgTolerance = 1e-9
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 

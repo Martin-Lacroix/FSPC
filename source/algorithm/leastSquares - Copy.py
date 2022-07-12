@@ -4,16 +4,17 @@ import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Squares
 
-class IQN_MVJ(Algorithm):
+class IQN_ILS(Algorithm):
     def __init__(self,input,param,com):
         Algorithm.__init__(self,input,param)
 
-        if com.rank == 1: 
+        if com.rank == 1:
 
-            self.makeBGS = True
+            self.V = list()
+            self.W = list()
+            self.nbrCol = list()
             self.omega = param['omega']
-            size = self.solver.nbrNode*self.dim
-            self.Jprev = np.zeros((size,size))
+            self.retainStep = param['retainStep']
 
 # %% Coupling at Each Time Step
 
@@ -23,11 +24,6 @@ class IQN_MVJ(Algorithm):
         self.iteration = 0
         self.converg.epsilon = np.inf
         timeFrame = self.step.timeFrame()
-
-        if com.rank == 1:
-
-            self.V = list()
-            self.W = list()
 
         while True:
 
@@ -42,8 +38,6 @@ class IQN_MVJ(Algorithm):
             if com.rank == 0:
 
                 self.clock['Solver Run'].start()
-
-                if self.solver.check: print("\nCheck ...\n")
                 verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver Run'].end()
 
@@ -68,7 +62,7 @@ class IQN_MVJ(Algorithm):
             if not verified: return False
 
             # Compute the mechanical residual
-            
+
             if com.rank == 1:
             
                 self.residualDispS()
@@ -77,26 +71,46 @@ class IQN_MVJ(Algorithm):
 
                 # Use the relaxation for solid displacement
             
-                self.clock['Relax IQN-MVJ'].start()
+                self.clock['Relax IQN-ILS'].start()
                 self.relaxation()
-                self.clock['Relax IQN-MVJ'].end()
+                self.resizeMatrices()
+                self.clock['Relax IQN-ILS'].end()
             
             # Check the converence of the FSI
 
             if com.rank == 1: verified = self.converg.isVerified()
             verified = tools.scatterSF(verified,com)
-            self.iteration += 1
 
             # End of the coupling iteration
 
-            if verified:
-                if com.rank == 1: self.Jprev = self.J.copy()
-                return True
+            if verified: break
+            self.iteration += 1
+            if self.iteration > self.iterMax: return False
 
-            if self.iteration > self.iterMax:
-                if com.rank == 1: self.Jprev.fill(0)
-                self.makeBGS = True
-                return False
+        return True
+
+# %% Add and Remove Time Steps From V and W
+
+    def resizeMatrices(self):
+
+        if self.retainStep == 0:
+
+            self.V.clear()
+            self.W.clear()
+
+        elif self.converg.isVerified():
+
+            self.nbrCol.insert(0,self.iteration)
+            if len(self.nbrCol) > self.retainStep:
+
+                self.W = self.W[:(len(self.W)-self.nbrCol[-1])]
+                self.V = self.V[:(len(self.V)-self.nbrCol[-1])]
+                self.nbrCol.pop()
+
+        elif self.iteration+1 > self.iterMax:
+            
+            self.W = self.W[self.iteration:]
+            self.V = self.V[self.iteration:]
 
 # %% IQN Relaxation of Solid Displacement
 
@@ -106,35 +120,31 @@ class IQN_MVJ(Algorithm):
 
             # Performs either BGS or IQN iteration
 
-            if self.makeBGS:
-
+            if (self.iteration == 0) and (len(self.V) == 0):
                 self.interp.disp += self.omega*self.residual
-                self.makeBGS = False
-
-            elif self.iteration == 0:
-
-                J = self.Jprev.copy()
-                np.fill_diagonal(J,J.diagonal()-1)
-                R = np.concatenate(self.residual.T)
-                correction = np.split(np.dot(J,-R),self.dim)
-                self.interp.disp += np.transpose(correction)
 
             else:
+                if self.iteration > 0:
 
-                self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
-                self.W.insert(0,np.concatenate((disp-self.prevDisp).T))
+                    self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
+                    self.W.insert(0,np.concatenate((disp-self.prevDisp).T))
+
+                # V and W are stored as transpose and list
+
+                Vinv = np.linalg.pinv(np.transpose(self.V))
+
                 R = np.concatenate(self.residual.T)
-                V = np.transpose(self.V)
-                W = np.transpose(self.W)
+                #C,W = tools.qrSolve(np.transpose(self.V),np.transpose(self.W),R)
+                #C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=-1)[0]
+                #correction = np.split(np.dot(W,C)+R,self.dim)
+                #correction = np.split(np.dot(np.transpose(self.W)+R,C),self.dim)
 
-                # Computes the inverse Jacobian and new displacement
 
-                Vinv = np.linalg.pinv(V)
-                self.J = self.Jprev+np.dot(W-self.Jprev.dot(V),Vinv)
-
-                J = self.J.copy()
+                J = np.transpose(self.W).dot(Vinv)
                 np.fill_diagonal(J,J.diagonal()-1)
                 correction = np.split(np.dot(J,-R),self.dim)
+
+
                 self.interp.disp += np.transpose(correction)
 
             # Updates the residuals and displacement
