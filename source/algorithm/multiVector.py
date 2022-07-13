@@ -42,8 +42,6 @@ class IQN_MVJ(Algorithm):
             if com.rank == 0:
 
                 self.clock['Solver Run'].start()
-
-                if self.solver.check: print("\nCheck ...\n")
                 verified = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver Run'].end()
 

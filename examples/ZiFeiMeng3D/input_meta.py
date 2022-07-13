@@ -5,9 +5,9 @@ import os
 # %% Parallel Computing
 
 metafor = None
-w.StrVectorBase.useTBB()
-w.StrMatrixBase.useTBB()
-w.ContactInteraction.useTBB()
+# w.StrVectorBase.useTBB()
+# w.StrMatrixBase.useTBB()
+# w.ContactInteraction.useTBB()
 
 # %% Main Function
 
@@ -23,14 +23,14 @@ def getMetafor(input):
     tsm = metafor.getTimeStepManager()
     materset = domain.getMaterialSet()
     loadingset = domain.getLoadingSet()
-    solvermanager = metafor.getSolverManager()
+    #solvermanager = metafor.getSolverManager()
     interactionset = domain.getInteractionSet()
     mim = metafor.getMechanicalIterationManager()
 
     # Dimension and DSS solver
 
     domain.getGeometry().setDim3D()
-    solvermanager.setSolver(w.DSSolver())
+    #solvermanager.setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -48,24 +48,37 @@ def getMetafor(input):
     
     # Material parameters
 
-    G = 2.4e6
-    C1 = -1.2e6
-    C2 = G/2.0-C1
+    # G = 2.4e6
+    # C1 = -1.2e6
+    # C2 = G/2.0-C1
 
-    materset.define(1,w.MooneyRivlinHyperMaterial)
-    materset(1).put(w.RUBBER_PENAL,1.3e6)
+    # materset.define(1,w.MooneyRivlinHyperMaterial)
+    # materset(1).put(w.RUBBER_PENAL,1.3e6)
+    # materset(1).put(w.MASS_DENSITY,1100)
+    # materset(1).put(w.RUBBER_C1,C1)
+    # materset(1).put(w.RUBBER_C2,C2)
+
+
+    materset.define(1,w.ElastHypoMaterial)
+    materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.MASS_DENSITY,1100)
-    materset(1).put(w.RUBBER_C1,C1)
-    materset(1).put(w.RUBBER_C2,C2)
+    materset(1).put(w.POISSON_RATIO,0.4)
     
     # Finite element properties
 
     prp = w.ElementProperties(w.TetraVolume3DElement)
     prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp.put(w.STIFFMETHOD,w.STIFF_NUMERIC)
+    prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp.put(w.GRAVITY_Y,-9.81)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
+
+    # prp = w.ElementProperties(w.TetraVolume3DElement)
+    # prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
+    # prp.put(w.STIFFMETHOD,w.STIFF_NUMERIC)
+    # prp.put(w.GRAVITY_Y,-9.81)
+    # prp.put(w.MATERIAL,1)
+    # app.addProperty(prp)
     
     # Boundary conditions
     

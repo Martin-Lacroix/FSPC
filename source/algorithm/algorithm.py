@@ -43,6 +43,7 @@ class Algorithm(object):
 
 
 
+
             if self.step.dt < 1e-9:
 
                 self.solver.save()
@@ -79,7 +80,7 @@ class Algorithm(object):
                 self.step.update(self.verified)
                 continue
 
-            # Update the F and S solvers for the next time step
+            # Update the solvers for the next time step
             
             self.clock['Solver Update'].start()
             self.log.exec(self.solver.update)

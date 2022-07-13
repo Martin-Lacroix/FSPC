@@ -1,14 +1,29 @@
 import pfem3Dw as w
 import numpy as np
 
+# %% Read Data From the Lua File
+
+def read(path):
+
+    with open(path,'r') as file: text = file.read()
+    text = text.replace('"','').replace("'",'').replace(' ','')
+    text = [x.split('=') for x in text.splitlines() if '=' in x]
+    return dict(text)
+
 # %% Initializes the Fluid Wraper
 
 class Pfem3D(object):
-
     def __init__(self,param):
 
         path = param['inputF']
-        self.read(path)
+        input = read(path)
+
+        # Read data from the lua file
+
+        self.ID = input['Problem.id']
+        self.group = input['Problem.interface']
+        self.maxFactor = input['Problem.maxFactor']
+        self.autoRemesh = input['Problem.autoRemeshing']
 
         # Problem class and functions initialization
 
@@ -54,10 +69,6 @@ class Pfem3D(object):
         self.problem.displayParams()
         self.problem.dump()
 
-
-
-        self.check = False
-
 # %% Run for Incompressible Flows
 
     def runIncomp(self,t1,t2):
@@ -84,7 +95,7 @@ class Pfem3D(object):
 
             if not self.ok:
 
-                print('PFEM3D: Problem occured')
+                print('PFEM3D: Problem occured\n')
                 if 2*self.factor > self.maxFactor: return False
                 self.factor = 2*self.factor
                 self.resetSystem(t2-t1)
@@ -182,25 +193,6 @@ class Pfem3D(object):
         for i in range(self.nbrNode): load[i] = vec[i][:self.dim]
         return -load
 
-# %% Reads From the Lua File
-
-    def read(self,path):
-
-        file = open(path,'r')
-        text = file.read().splitlines()
-        file.close()
-
-        for S in text:
-
-            S = S.replace('"','').replace("'",'')
-            try: value = S.replace(' ','').split('=')[1]
-            except: continue
-
-            if 'Problem.id' in S: self.ID = value
-            if 'Problem.interface' in S: self.group = value
-            if 'Problem.maxFactor' in S: self.maxFactor = int(value)
-            if 'Problem.autoRemeshing' in S: self.autoRemesh = (value=='true')
-
 # %% Other Functions
 
     def update(self):
@@ -215,20 +207,6 @@ class Pfem3D(object):
     def resetSystem(self,dt):
 
         if self.reload: self.problem.loadSolution(self.prevSolution)
-
-
-
-        if self.check:
-            self.mesh.remesh(False)
-            if (self.ID == 'IncompNewtonNoT'): self.solver.precomputeMatrix()
-            self.problem.copySolution(self.prevSolution)
-            self.check = False
-
-            print("\nCheck ...\n")
-
-
-
-
         if self.autoRemesh and (self.ID == 'IncompNewtonNoT'):
             if self.reload: self.solver.precomputeMatrix()
 

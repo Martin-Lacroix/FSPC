@@ -5,7 +5,6 @@ import importlib
 # %% Nodal Load class
 
 class NLoad(object):
-
     def __init__(self,val1,t1,val2,t2):
 
         self.t1 = t1
@@ -25,7 +24,6 @@ class NLoad(object):
 # %% Initializes the Solid Wraper
 
 class Metafor(object):
-
     def __init__(self,param):
 
         input = dict()
