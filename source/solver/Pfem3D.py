@@ -22,8 +22,8 @@ class Pfem3D(object):
 
         self.ID = input['Problem.id']
         self.group = input['Problem.interface']
-        self.maxFactor = input['Problem.maxFactor']
-        self.autoRemesh = input['Problem.autoRemeshing']
+        self.maxFactor = int(input['Problem.maxFactor'])
+        self.autoRemesh = (input['Problem.autoRemeshing'] == 'true')
 
         # Problem class and functions initialization
 
