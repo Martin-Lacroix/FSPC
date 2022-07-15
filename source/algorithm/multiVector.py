@@ -14,6 +14,7 @@ class IQN_MVJ(Algorithm):
             self.omega = param['omega']
             size = self.solver.nbrNode*self.dim
             self.Jprev = np.zeros((size,size))
+            self.J = np.zeros((size,size))
 
 # %% Coupling at Each Time Step
 

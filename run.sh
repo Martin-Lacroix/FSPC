@@ -13,4 +13,4 @@ mkdir workspace
 export MKL_NUM_THREADS=${CPU_PER_PROC}
 export OMP_NUM_THREADS=${CPU_PER_PROC}
 export OPTION="-map-by node:PE=${CPU_PER_PROC}"
-mpiexec ${OPTION} -n 2 python3 main.py -k ${CPU_PER_PROC} ${INPUT}
+mpiexec ${OPTION} -n 2 python main.py -k ${CPU_PER_PROC} ${INPUT}

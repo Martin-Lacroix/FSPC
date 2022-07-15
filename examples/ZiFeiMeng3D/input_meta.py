@@ -23,14 +23,14 @@ def getMetafor(input):
     tsm = metafor.getTimeStepManager()
     materset = domain.getMaterialSet()
     loadingset = domain.getLoadingSet()
-    #solvermanager = metafor.getSolverManager()
+    solvermanager = metafor.getSolverManager()
     interactionset = domain.getInteractionSet()
     mim = metafor.getMechanicalIterationManager()
 
     # Dimension and DSS solver
 
     domain.getGeometry().setDim3D()
-    #solvermanager.setSolver(w.DSSolver())
+    solvermanager.setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -73,17 +73,17 @@ def getMetafor(input):
     # prp.put(w.MATERIAL,1)
     # app.addProperty(prp)
 
-    prp = w.ElementProperties(w.TetraVolume3DElement)
+    prp = w.ElementProperties(w.Volume3DElement)
     prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp.put(w.STIFFMETHOD,w.STIFF_NUMERIC)
-    prp.put(w.GRAVITY_Y,-9.81)
+    prp.put(w.GRAVITY_Z,-9.81)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
     
     # Boundary conditions
     
     loadingset.define(groups['SolidBase'],w.Field1D(w.TX,w.RE))
-    #loadingset.define(groups['SolidBase'],w.Field1D(w.TY,w.RE))
+    loadingset.define(groups['SolidBase'],w.Field1D(w.TY,w.RE))
     loadingset.define(groups['SolidBase'],w.Field1D(w.TZ,w.RE))
     #loadingset.define(groups['SolidSide'],w.Field1D(w.TY,w.RE))
 
@@ -94,15 +94,15 @@ def getMetafor(input):
 
     # Mechanical iterations
 
-    mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-7)
+    mim.setMaxNbOfIterations(100)
+    mim.setResidualTolerance(1e-4)
 
     # Time step iterations
 
     tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
-    tscm.setNbOptiIte(25)
+    tscm.setNbOptiIte(100)
 
     # Parameters for FSPC
 
