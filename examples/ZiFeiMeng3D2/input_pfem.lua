@@ -14,12 +14,12 @@ Problem.maxFactor = 10
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.3
+Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.5
-Problem.Mesh.hchar = 4e-3
+Problem.Mesh.hchar = 3e-3
 Problem.Mesh.addOnFS = true
-Problem.Mesh.minAspectRatio = 1e-2
+Problem.Mesh.minAspectRatio = 5e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
@@ -30,15 +30,8 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometry.msh'
 Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.localHcharGroups = {'FSInterface'}
+Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir'}
 Problem.Mesh.ignoreGroups = {'Solid'}
-
-'FreeSurface'
-'FSInterface'
-'Reservoir'
-Physical Surface("Polytope'
-Physical Surface("SolidSide'
-Physical Surface("SolidBase'
 
 -- Extractor Parameters
 
@@ -90,8 +83,8 @@ Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
-Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.cgTolerance = 1e-12
+Problem.Solver.MomContEq.minRes = 1e-6
+Problem.Solver.MomContEq.cgTolerance = 1e-9
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Momentum Continuity BC
@@ -109,8 +102,8 @@ end
 
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
-	local f = 2
-	local L = 1
+	local f = 3
+	local L = 0.1
 	local hchar = Problem.Mesh.hchar
     return f*dist*hchar/(L/2)+hchar
 end

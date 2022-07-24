@@ -35,7 +35,7 @@ os.chdir(workspace)
 
 # Reads the results
 
-time,disp = tools.readNode(916)
+time,disp = tools.readNode(1232)
 resultsX = [time,disp[:,0]]
 resultsY = [time,disp[:,2]]
 

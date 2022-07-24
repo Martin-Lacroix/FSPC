@@ -6,7 +6,7 @@ L2 = 0.2;
 W = 0.1;
 
 eps = 1e-5;
-d = 4e-3;
+d = 3e-3;
 
 // Point List
 

@@ -17,7 +17,7 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.3
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.5
-Problem.Mesh.hchar = 4e-3
+Problem.Mesh.hchar = 3e-3
 Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
@@ -82,8 +82,8 @@ Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
 
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
-Problem.Solver.MomContEq.minRes = 1e-7
-Problem.Solver.MomContEq.cgTolerance = 1e-9
+Problem.Solver.MomContEq.minRes = 1e-8
+Problem.Solver.MomContEq.cgTolerance = 1e-12
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Momentum Continuity BC

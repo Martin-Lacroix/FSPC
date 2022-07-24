@@ -5,9 +5,8 @@ L1 = 0.1;
 L2 = 0.2;
 W = 0.1;
 
-f = 6;
 eps = 1e-5;
-d = 4e-3;
+d = 3e-3;
 
 // Point List
 
@@ -164,34 +163,4 @@ Physical Surface("Polytope") = {2,3,4,5,6,7,8,9,10,11};
 Physical Surface("SolidSide") = {3,4};
 Physical Surface("SolidBase") = {1};
 
-// Fluid Mesh Size
-
-Field[1] = Distance;
-Field[1].SurfacesList =
-{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
-23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40};
-
-Field[2] = MathEval;
-Field[2].F = Sprintf("%g*F1*%g/(%g/2)+%g",f,d,W,d);
-
-Field[3] = Box;
-Field[3].VIn = d;
-Field[3].VOut = 1;
-Field[3].XMin = L1;
-Field[3].XMax = L1+S;
-Field[3].YMin = 0;
-Field[3].YMax = W;
-Field[3].ZMin = 0;
-Field[3].ZMax = H;
-
-// Makes the Mesh
-
-Field[4] = Min;
-Field[4].FieldsList = {2,3};
-Background Field = 4;
-
-Mesh.MeshSizeExtendFromBoundary = 0;
-Mesh.MeshSizeFromCurvature = 0;
-Mesh.MeshSizeFromPoints = 0;
-Mesh.Algorithm = 5;
 Mesh 3;
