@@ -27,8 +27,15 @@ class Master(object):
 
 
 
-        from source.interpolator.matching import Matching
-        input['interp'] = Matching(input,com)
+        # from source.interpolator.matching import Matching
+        # input['interp'] = Matching(input,com)
+
+
+
+        from source.interpolator.radialBasis import EC_RBF
+        input['interp'] = EC_RBF(input,com)
+
+
 
 
         # Initialize the FSI algorithm

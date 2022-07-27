@@ -22,7 +22,7 @@ class Matching(Interpolator):
 
             # Compute H and send its transpose to Solid
 
-            self.makeMapping(positionS,positionF)
+            self.computeMappingF(positionS,positionF)
             com.send(self.H.transpose(),dest=1)
             self.H = self.H.tocsr()
 
@@ -35,7 +35,7 @@ class Matching(Interpolator):
 
 # %% Mapping matrix from Solid to Fluid
 
-    def makeMapping(self,positionS,positionF):
+    def computeMappingF(self,positionS,positionF):
 
         for i in range(self.nbrNode):
 
