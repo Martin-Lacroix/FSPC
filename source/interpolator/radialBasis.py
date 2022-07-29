@@ -2,7 +2,7 @@ from .interpolator import Interpolator
 from scipy import linalg
 import numpy as np
 
-# %% Matching Meshes Interpolator
+# %% Energy Conservative Radial Basis Function
 
 class EC_RBF(Interpolator):
     def __init__(self,input,com):
@@ -16,30 +16,31 @@ class EC_RBF(Interpolator):
             positionF = self.solver.getPosition()
             com.Recv(positionS,source=1)
 
-            # Compute H and send its transpose to Solid
+            # Compute A,B and send their transpose to Solid
 
-            self.computeMappingF(positionS,positionF)
-            com.send(self.H.transpose(),dest=1)
+            A = self.computeMappingF(positionS,positionF)
+            com.send(np.transpose(self.B),dest=1)
+            com.send(np.transpose(A),dest=1)
+            self.LU = linalg.lu_factor(A)
 
         if com.rank == 1:
-            
-            self.H = None
+
+            A = None
+            self.B = None
             com.Send(self.solver.getPosition(),dest=0)
-            self.H = com.recv(self.H,source=0)
+            self.B = com.recv(self.B,source=0)
+
+            # Precompute the LU decomposition for solve
+
+            A = com.recv(A,source=0)
+            self.LU = linalg.lu_factor(A)
 
 # %% Mapping matrix from Solid to Fluid
 
-    def phiTPS(self,dist):
-
-        if dist > 0: return (dist*dist)*np.log10(dist)
-        else: return 0
-
-
-
     def computeMappingF(self,positionS,positionF):
 
-        A = np.zeros((self.nbrNode,self.recvNode+self.dim+1))
-        B = np.zeros((self.recvNode+self.dim+1,self.recvNode+self.dim+1))
+        self.B = np.zeros((self.nbrNode,self.recvNode+self.dim+1))
+        A = np.zeros((self.recvNode+self.dim+1,self.recvNode+self.dim+1))
         Cfs = np.zeros((self.nbrNode,self.recvNode))
         Css = np.zeros((self.recvNode,self.recvNode))
         Pf = np.ones((self.nbrNode,self.dim+1))
@@ -60,25 +61,35 @@ class EC_RBF(Interpolator):
         Ps[:,1:] = positionS
         Pf[:,1:] = positionF
 
-        A[:,0:self.recvNode] = Cfs
-        A[:,self.recvNode:] = Pf
+        self.B[:,0:self.recvNode] = Cfs
+        self.B[:,self.recvNode:] = Pf
 
-        B[:self.recvNode,:self.recvNode] = Css
-        B[:self.recvNode,self.recvNode:] = Ps
-        B[self.recvNode:,:self.recvNode] = Ps.T
+        A[:self.recvNode,:self.recvNode] = Css
+        A[:self.recvNode,self.recvNode:] = Ps
+        A[self.recvNode:,:self.recvNode] = Ps.T
 
-        H = A.dot(np.linalg.inv(B))
-        self.H = H[:,:self.recvNode]
-
-        # Il vaut mieux calculer le LU de B une fois
-        # pour ensuite résoudre avec un simple produit
-        # Bx = b, B=LU, LUx=b, Ly=b, Ux=y
-
-        # self.LUP = linalg.lu_factor(B)
-        # Solution = linalg.lu_solve(self.LUP)
+        return A
 
 
-    # Interpolate recvData and return the result
+# %% Interpolate recvData and return the result
 
-    def interpData(self,recvData):
-        return self.H.dot(recvData)
+    def interpDataSF(self,recvData):
+
+            d = np.zeros((self.recvNode+self.dim+1,self.dim))
+            d[:self.recvNode] = recvData
+
+            test = linalg.lu_solve(self.LU,d)
+            return self.B.dot(test)
+
+    def interpDataFS(self,recvData):
+            
+            test = np.dot(self.B,recvData)
+            t = linalg.lu_solve(self.LU,test)
+            return t[:self.nbrNode]
+
+# %% Thin Plate Spline Function
+
+    def phiTPS(self,dist):
+
+        if dist > 0: return (dist*dist)*np.log10(dist)
+        else: return 0

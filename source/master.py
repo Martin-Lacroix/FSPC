@@ -20,25 +20,24 @@ class Master(object):
             log = param['log'] = tools.Log('metafor.log')
             input['solver'] = log.exec(self.getSolid,param)
 
-        # Initialize some FSPC objects
+        # Initialize the time step and convergence manager
 
         input['step'] = criterion.TimeStep(param)
         input['converg'] = criterion.Convergence(param)
 
+        # Initialize the interface mesh intrepolator
 
+        if param['interp']=='MM_CNS':
 
-        # from source.interpolator.matching import Matching
-        # input['interp'] = Matching(input,com)
+            from source.interpolator.matchMesh import MM_CNS
+            input['interp'] = MM_CNS(input,com)
 
+        elif param['interp']=='EC_RBF':
 
+            from source.interpolator.radialBasis import EC_RBF
+            input['interp'] = EC_RBF(input,com)
 
-        from source.interpolator.radialBasis import EC_RBF
-        input['interp'] = EC_RBF(input,com)
-
-
-
-
-        # Initialize the FSI algorithm
+        # Initialize the fluid-structure coupling algorithm
 
         if param['algo']=='BGS_ADR':
 
@@ -55,7 +54,7 @@ class Master(object):
             from source.algorithm.multiVector import IQN_MVJ
             self.algo = IQN_MVJ(input,param,com)
 
-# %% Initializes Metafor and Pfem3D
+# %% Initialize Metafor and Pfem3D
 
     def getSolid(self,param):
         

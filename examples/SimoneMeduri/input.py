@@ -10,6 +10,7 @@ def getParam(path):
     
     # Algorithm parameters
 
+    param['interp'] = 'MM_CNS'
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
     param['maxIt'] = 100

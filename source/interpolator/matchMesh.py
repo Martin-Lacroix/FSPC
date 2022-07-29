@@ -2,9 +2,9 @@ from .interpolator import Interpolator
 from scipy.sparse import dok_matrix
 import numpy as np
 
-# %% Matching Meshes Interpolator
+# %% Matching Mesh with Closest Neighbour Search
 
-class Matching(Interpolator):
+class MM_CNS(Interpolator):
     def __init__(self,input,com):
         Interpolator.__init__(self,input,com)
 
@@ -45,5 +45,8 @@ class Matching(Interpolator):
 
     # Interpolate recvData and return the result
 
-    def interpData(self,recvData):
+    def interpDataSF(self,recvData):
+        return self.H.dot(recvData)
+
+    def interpDataFS(self,recvData):
         return self.H.dot(recvData)

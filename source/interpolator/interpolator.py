@@ -32,7 +32,7 @@ class Interpolator(object):
         if com.rank == 1:
 
             com.Recv(recvLoad,source=0)
-            load = self.interpData(recvLoad)
+            load = self.interpDataFS(recvLoad)
             self.solver.applyLoading(load,time)
 
 # %% Apply predicted displacement Solid -> Fluid
@@ -44,5 +44,5 @@ class Interpolator(object):
         if com.rank == 0:
 
             com.Recv(recvDisp,source=1)
-            disp = self.interpData(recvDisp)
+            disp = self.interpDataSF(recvDisp)
             self.solver.applyDisplacement(disp)

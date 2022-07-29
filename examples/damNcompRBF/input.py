@@ -10,6 +10,7 @@ def getParam(path):
     
     # Algorithm parameters
 
+    param['interp'] = 'EC_RBF'
     param['algo'] = 'BGS_ADR'
     param['aitken'] = True
     param['omega'] = 0.5
