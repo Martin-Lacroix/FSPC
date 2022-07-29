@@ -25,13 +25,13 @@ class EC_RBF(Interpolator):
 
         if com.rank == 1:
 
-            A = None
             self.B = None
             com.Send(self.solver.getPosition(),dest=0)
             self.B = com.recv(self.B,source=0)
 
             # Precompute the LU decomposition for solve
 
+            A = None
             A = com.recv(A,source=0)
             self.LU = linalg.lu_factor(A)
 
@@ -39,57 +39,44 @@ class EC_RBF(Interpolator):
 
     def computeMappingF(self,positionS,positionF):
 
-        self.B = np.zeros((self.nbrNode,self.recvNode+self.dim+1))
-        A = np.zeros((self.recvNode+self.dim+1,self.recvNode+self.dim+1))
-        Cfs = np.zeros((self.nbrNode,self.recvNode))
-        Css = np.zeros((self.recvNode,self.recvNode))
-        Pf = np.ones((self.nbrNode,self.dim+1))
-        Ps = np.ones((self.recvNode,self.dim+1))
+        size = self.recvNode+self.dim+1
+        self.B = np.ones((self.nbrNode,size))
+        A = np.ones((size,size))
+
+        # Fill the matrices A,B with raw positions
+
+        self.B[:,(self.recvNode+1):] = positionF
+        A[(self.recvNode+1):,:self.recvNode] = positionS.T
+        A[:self.recvNode,(self.recvNode+1):] = positionS
+
+        # Fill the matrices A,B using the basis function
 
         for i in range(self.recvNode):
-            for j in range(self.recvNode):
+            
+            r = np.linalg.norm(positionS[i]-positionS,axis=1)
+            A[i,:self.recvNode] = self.phiTPS(r)
 
-                r = np.linalg.norm(positionS[i]-positionS[j])
-                Css[i,j] = self.phiTPS(r)
-
-        for i in range(self.nbrNode):
-            for j in range(self.recvNode):
-
-                r = np.linalg.norm(positionF[i]-positionS[j])
-                Cfs[i,j] = self.phiTPS(r)
-
-        Ps[:,1:] = positionS
-        Pf[:,1:] = positionF
-
-        self.B[:,0:self.recvNode] = Cfs
-        self.B[:,self.recvNode:] = Pf
-
-        A[:self.recvNode,:self.recvNode] = Css
-        A[:self.recvNode,self.recvNode:] = Ps
-        A[self.recvNode:,:self.recvNode] = Ps.T
+            r = np.linalg.norm(positionF-positionS[i],axis=1)
+            self.B[:,i] = self.phiTPS(r)
 
         return A
-
 
 # %% Interpolate recvData and return the result
 
     def interpDataSF(self,recvData):
 
-            d = np.zeros((self.recvNode+self.dim+1,self.dim))
-            d[:self.recvNode] = recvData
-
-            test = linalg.lu_solve(self.LU,d)
-            return self.B.dot(test)
+        zero = np.zeros((self.dim+1,self.dim))
+        recvData = np.append(recvData,zero,axis=0)
+        recvData = linalg.lu_solve(self.LU,recvData)
+        return self.B.dot(recvData)
 
     def interpDataFS(self,recvData):
-            
-            test = np.dot(self.B,recvData)
-            t = linalg.lu_solve(self.LU,test)
-            return t[:self.nbrNode]
+        
+        recvData = self.B.dot(recvData)
+        recvData = linalg.lu_solve(self.LU,recvData)
+        return recvData[:self.nbrNode]
 
 # %% Thin Plate Spline Function
 
     def phiTPS(self,dist):
-
-        if dist > 0: return (dist*dist)*np.log10(dist)
-        else: return 0
+        return (dist*dist)*np.ma.log10(dist)
