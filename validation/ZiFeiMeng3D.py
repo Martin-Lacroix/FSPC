@@ -12,7 +12,7 @@ data = [np.loadtxt(folder+file).T for file in listdir(folder)]
 # %% Print the Mass
 
 workspace = os.getcwd()
-workspace += '/workspace/ZiFeiMeng3D'
+workspace += '/workspace/ZiFeiMeng_3D_RBF'
 os.chdir(workspace)
 
 # Reads the results
@@ -23,6 +23,7 @@ mass[1] = 100*mass[1]/mass[1,0]
 # Save Results
 
 plt.figure(1)
+plt.gca().set_title('Total Mass')
 np.savetxt('mass.dat',np.transpose(mass),fmt=['%.6f','%.6f'])
 plt.plot(*mass)
 plt.grid()
@@ -35,7 +36,8 @@ os.chdir(workspace)
 
 # Reads the results
 
-time,disp = tools.readNode(1232)
+tag = tools.getIndex([0.1025,0.05,0])
+time,disp = tools.readNode(tag)
 resultsX = [time,disp[:,0]]
 resultsY = [time,disp[:,2]]
 
@@ -47,6 +49,7 @@ os.chdir(workspace)
 # Save Results
 
 plt.figure(2)
+plt.gca().set_title('Output Data')
 np.savetxt('output.dat',np.transpose(resultsX),fmt=['%.6f','%.6f'])
 np.savetxt('output.dat',np.transpose(resultsY),fmt=['%.6f','%.6f'])
 for curve in data: plt.plot(*curve)

@@ -6,7 +6,7 @@ import os
 # %% Print the Mass
 
 workspace = os.getcwd()
-workspace += '/workspace/GuiFourey'
+workspace += '/workspace/GuiFourey_2D'
 os.chdir(workspace)
 
 # Reads the results
@@ -17,6 +17,7 @@ mass[1] = 100*mass[1]/mass[1,0]
 # Save Results
 
 plt.figure(1)
+plt.gca().set_title('Total Mass')
 np.savetxt('mass.dat',np.transpose(mass),fmt=['%.6f','%.6f'])
 plt.plot(*mass)
 plt.grid()
@@ -29,7 +30,8 @@ os.chdir(workspace)
 
 # Reads the results
 
-time,disp = tools.readNode(106)
+tag = tools.getIndex([0.5,0,0])
+time,disp = tools.readNode(tag)
 results = [time,disp[:,1]]
 exact = -6.85e-5
 
@@ -41,6 +43,7 @@ os.chdir(workspace)
 # Save Results
 
 plt.figure(2)
+plt.gca().set_title('Output Data')
 np.savetxt('output.dat',np.transpose(results),fmt=['%.6f','%.6f'])
 plt.plot([0,time[-1]],[exact,exact])
 plt.plot(*results,'k--')

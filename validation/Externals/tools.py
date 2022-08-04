@@ -15,7 +15,7 @@ def readNode(index):
     time = np.array([float(file[6:-4]) for file in name])
     coord = np.zeros((time.size,3))
 
-    # Gets the vertical displacement
+    # Gets the nodal coordinates
 
     for i in range(len(name)):
 
@@ -31,7 +31,34 @@ def readNode(index):
     gmsh.finalize()
     return time,coord-coord[0]
 
-#%% Intercept Function
+# %% Find the Node Tag at Position
+
+def getIndex(position):
+
+    gmsh.initialize()
+    gmsh.option.setNumber('General.Terminal',0)
+
+    # Lists the files and times
+
+    name = [file for file in os.listdir() if('.msh' in file)]
+    time = np.array([float(file[6:-4]) for file in name])
+    coord = np.zeros((time.size,3))
+
+    # Find the closest node of position
+
+    index = np.argmin(time)
+    gmsh.open(name[index])
+
+    tag,coord,_ = gmsh.model.mesh.getNodes()
+    coord = np.array(np.split(coord,coord.size//3))
+
+    dist = np.linalg.norm(position-coord,axis=1)
+    index = np.argmin(dist)
+
+    gmsh.finalize()
+    return tag[index]
+
+#%% Curve Intercept Function
 
 def interpolated_intercepts(x,y1,y2):
     def intercept(point1,point2,point3,point4):
