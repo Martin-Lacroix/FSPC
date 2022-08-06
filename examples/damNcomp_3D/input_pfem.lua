@@ -77,7 +77,7 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
 
