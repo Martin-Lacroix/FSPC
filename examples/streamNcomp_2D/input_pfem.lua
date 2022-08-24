@@ -18,8 +18,9 @@ Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 6e-3
+Problem.Mesh.gammaFS = 0.6
 Problem.Mesh.addOnFS = false
-Problem.Mesh.minAspectRatio = 1e-3
+Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
@@ -78,7 +79,7 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
@@ -99,6 +100,10 @@ end
 
 function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
 	return {0,0}
+end
+
+function Problem.Solver.MomContEq.BC:OutletP(pos,t)
+	return {0}
 end
 
 function Problem.Solver.MomContEq.BC:InletV(pos,t)

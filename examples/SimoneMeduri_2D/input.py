@@ -13,7 +13,7 @@ def getParam(path):
     param['interp'] = 'MM_CNS'
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
-    param['maxIt'] = 100
+    param['maxIt'] = 10
     param['tol'] = 1e-6
 
     # Time Parameters

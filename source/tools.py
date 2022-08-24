@@ -49,11 +49,16 @@ class LogGen(object):
 
     def printStep(self):
 
-        time = '\nTime : {:.3e}'.format(self.algo.step.time).ljust(20)
+        print('\n----------------------------------------------')
+        time = 'Time : {:.3e}'.format(self.algo.step.time).ljust(20)
+
+        #time = '\nTime : {:.3e}'.format(self.algo.step.time).ljust(20)
         timeStep = 'Time Step : {:.3e}'.format(self.algo.step.dt)
         with stdout(open(self.file,'a')): print(time,timeStep)
         print(time,timeStep)
         sys.stdout.flush()
+
+        print('----------------------------------------------\n')
 
     def printRes(self):
 

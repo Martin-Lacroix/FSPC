@@ -18,6 +18,7 @@ Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.01
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
@@ -97,6 +98,10 @@ end
 
 function Problem.Solver.MomEq.BC:ClampLV(pos,t)
 	return {0,0}
+end
+
+function Problem.Solver.ContEq.BC:OutletP(pos,t)
+	return {0}
 end
 
 function Problem.Solver.MomEq.BC:InletV(pos,t)

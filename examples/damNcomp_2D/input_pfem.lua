@@ -15,9 +15,10 @@ Problem.maxFactor = 10
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.4
-Problem.Mesh.gamma = 0.8
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.01
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true

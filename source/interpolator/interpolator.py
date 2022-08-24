@@ -35,6 +35,8 @@ class Interpolator(object):
             load = self.interpDataFS(recvLoad)
             self.solver.applyLoading(load,time)
 
+            print('- Load : F -> S = {:.5e}\n'.format(np.sum(np.sum(recvLoad))))
+
 # %% Apply predicted displacement Solid -> Fluid
 
     def applyDispSF(self,com):
@@ -46,3 +48,5 @@ class Interpolator(object):
             com.Recv(recvDisp,source=1)
             disp = self.interpDataSF(recvDisp)
             self.solver.applyDisplacement(disp)
+
+            print('- Disp : S -> F = {:.5e}'.format(np.sum(np.sum(recvDisp))))

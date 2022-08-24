@@ -98,8 +98,8 @@ Physical Volume("Fluid") = {1};
 
 // Physical Surfaces
 
+Physical Surface("Reservoir") = {2,7,8,9,10,3,4,5};
 Physical Surface("FSInterface") = {1};
 Physical Surface("FreeSurface") = {6};
-Physical Surface("Reservoir") = {2,7,8,9,10,3,4,5};
 
 Mesh 3;
