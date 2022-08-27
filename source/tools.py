@@ -47,22 +47,23 @@ class LogGen(object):
         self.file = 'general.log'
         self.algo = algorithm
 
+    def printData(self,text):
+
+        with stdout(open(self.file,'a')): print(text)
+        print(text)
+
     def printStep(self):
 
-        print('\n----------------------------------------------')
-        time = 'Time : {:.3e}'.format(self.algo.step.time).ljust(20)
-
-        #time = '\nTime : {:.3e}'.format(self.algo.step.time).ljust(20)
+        L = '\n------------------------------------------'
         timeStep = 'Time Step : {:.3e}'.format(self.algo.step.dt)
-        with stdout(open(self.file,'a')): print(time,timeStep)
-        print(time,timeStep)
+        time = '\nTime : {:.3e}'.format(self.algo.step.time).ljust(20)
+        with stdout(open(self.file,'a')): print(L,time,timeStep,L)
+        print(L,time,timeStep,L)
         sys.stdout.flush()
-
-        print('----------------------------------------------\n')
 
     def printRes(self):
 
-        iter = 'Iteration : {:.0f}'.format(self.algo.iteration).ljust(20)
+        iter = '[{:.0f}]'.format(self.algo.iteration)
         epsilon = 'Residual : {:.3e}'.format(self.algo.converg.epsilon)
         with stdout(open(self.file,'a')): print(iter,epsilon)
         print(iter,epsilon)

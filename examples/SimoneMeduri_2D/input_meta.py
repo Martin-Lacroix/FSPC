@@ -36,8 +36,8 @@ def getMetafor(input):
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometry.msh')
     importer = gmsh.GmshImport(mshFile,domain)
+    importer.verb = importer.writeLogs = False
     groups = importer.groups
-    importer.verb = False
     importer.execute()
 
     # Defines the solid domain
@@ -74,7 +74,7 @@ def getMetafor(input):
 
     # Mechanical iterations
 
-    mim.setMaxNbOfIterations(10)
+    mim.setMaxNbOfIterations(25)
     mim.setResidualTolerance(1e-7)
 
     # Time step iterations

@@ -37,15 +37,15 @@ def getMetafor(input):
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometry.msh')
     importer = gmsh.GmshImport(mshFile,domain)
+    importer.verb = importer.writeLogs = False
     groups = importer.groups
-    importer.verb = False
     importer.execute()
     
     # Defines the solid domain
 
-    app1 = w.FieldApplicator(1)
-    app1.push(groups['Solid'])
-    interactionset.add(app1)
+    app = w.FieldApplicator(1)
+    app.push(groups['Solid'])
+    interactionset.add(app)
     
     # Solid material parameters
 
@@ -76,7 +76,7 @@ def getMetafor(input):
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp1.put(w.GRAVITY_Y,-9.81)
     prp1.put(w.MATERIAL,1)
-    app1.addProperty(prp1)
+    app.addProperty(prp1)
 
     # Contact properties
 

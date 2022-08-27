@@ -2,15 +2,9 @@ import toolbox.gmsh as gmsh
 import wrap as w
 import os
 
-# %% Parallel Computing
-
-metafor = None
-w.StrVectorBase.useTBB()
-w.StrMatrixBase.useTBB()
-w.ContactInteraction.useTBB()
-
 # %% Main Function
 
+metafor = None
 def getMetafor(input):
 
     global metafor
@@ -36,8 +30,8 @@ def getMetafor(input):
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometry.msh')
     importer = gmsh.GmshImport(mshFile,domain)
+    importer.verb = importer.writeLogs = False
     groups = importer.groups
-    importer.verb = False
     importer.execute()
 
     # Defines the solid domain

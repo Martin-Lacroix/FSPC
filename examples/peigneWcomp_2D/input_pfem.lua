@@ -18,6 +18,7 @@ Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.06
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
@@ -81,9 +82,9 @@ Problem.Solver.maxRemeshDT = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomEq = {}
-Problem.Solver.MomEq.bodyForce = {0,0}
-
 Problem.Solver.ContEq = {}
+Problem.Solver.ContEq.pExt = 0
+Problem.Solver.MomEq.bodyForce = {0,0}
 Problem.Solver.ContEq.stabilization = 'Meduri'
 
 -- Momentum Continuity BC

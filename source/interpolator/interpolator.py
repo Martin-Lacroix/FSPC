@@ -1,3 +1,4 @@
+from .. import tools
 import numpy as np
 
 # %% Parent Interpolator Class
@@ -6,6 +7,7 @@ class Interpolator(object):
     def __init__(self,input,com):
 
         self.solver = input['solver']
+        self.logGen = tools.LogGen(self)
         self.nbrNode = self.solver.nbrNode
         self.dim = self.solver.dim
         self.recvNode = None
@@ -35,7 +37,11 @@ class Interpolator(object):
             load = self.interpDataFS(recvLoad)
             self.solver.applyLoading(load,time)
 
-            print('- Load : F -> S = {:.5e}\n'.format(np.sum(np.sum(recvLoad))))
+            # Print the transfered load in the log file
+
+            S = np.mean((np.linalg.norm(load,axis=1)))
+            F = np.mean((np.linalg.norm(recvLoad,axis=1)))
+            self.logGen.printData('Load F|S : {:.5e} -> {:.5e}'.format(F,S))
 
 # %% Apply predicted displacement Solid -> Fluid
 
@@ -49,4 +55,8 @@ class Interpolator(object):
             disp = self.interpDataSF(recvDisp)
             self.solver.applyDisplacement(disp)
 
-            print('- Disp : S -> F = {:.5e}'.format(np.sum(np.sum(recvDisp))))
+            # Print the transfered load in the log file
+
+            S = np.mean((np.linalg.norm(disp,axis=1)))
+            F = np.mean((np.linalg.norm(recvDisp,axis=1)))
+            self.logGen.printData('\nDisp S|F : {:.5e} -> {:.5e}'.format(F,S))

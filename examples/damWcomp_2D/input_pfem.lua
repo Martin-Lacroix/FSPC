@@ -15,15 +15,16 @@ Problem.maxFactor = 1000
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.4
-Problem.Mesh.gamma = 0.8
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.01
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.laplacianSmoothingBoundaries = false
+Problem.Mesh.laplacianSmoothingBoundaries = true
 Problem.Mesh.boundingBox = {0,0,0.6,0.6}
 Problem.Mesh.exclusionZones = {}
 
@@ -79,6 +80,7 @@ Problem.Solver.maxRemeshDT = math.huge
 
 Problem.Solver.MomEq = {}
 Problem.Solver.ContEq = {}
+Problem.Solver.ContEq.pExt = 0
 Problem.Solver.MomEq.bodyForce = {0,-9.81}
 Problem.Solver.ContEq.stabilization = 'Meduri'
 

@@ -37,6 +37,16 @@ class Algorithm(object):
         while self.step.time < self.totTime:
             if com.rank == 1: self.logGen.printStep()
 
+
+
+
+
+
+
+            if self.step.dt < 1e-6:
+                self.solver.save()
+                raise Exception('Small DT')
+
             # Save previous time step data
 
             if (com.rank == 1) and self.verified:

@@ -2,10 +2,9 @@ import toolbox.gmsh as gmsh
 import wrap as w
 import os
 
-metafor = None
-
 # %% Main Function
 
+metafor = None
 def getMetafor(input):
 
     global metafor
@@ -31,7 +30,7 @@ def getMetafor(input):
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
     importer = gmsh.GmshImport(mshFile,domain)
-    importer.writeLogs = False
+    importer.verb = importer.writeLogs = False
     groups = importer.groups
     importer.execute()
 

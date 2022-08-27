@@ -81,9 +81,9 @@ Problem.Solver.maxRemeshDT = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomEq = {}
-Problem.Solver.MomEq.bodyForce = {0,0}
-
 Problem.Solver.ContEq = {}
+Problem.Solver.ContEq.pExt = 0
+Problem.Solver.MomEq.bodyForce = {0,0}
 Problem.Solver.ContEq.stabilization = 'Meduri'
 
 -- Momentum Continuity BC

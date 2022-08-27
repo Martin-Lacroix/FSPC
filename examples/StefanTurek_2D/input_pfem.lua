@@ -18,6 +18,7 @@ Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.01
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
@@ -81,8 +82,10 @@ Problem.Solver.coeffDTincrease = math.huge
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
+Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-6
@@ -100,6 +103,10 @@ end
 
 function Problem.Solver.MomContEq.BC:BorderV(pos,t)
 	return {0,0}
+end
+
+function Problem.Solver.MomContEq.BC:OutletP(pos,t)
+	return {0}
 end
 
 function Problem.Solver.MomContEq.BC:InletV(pos,t)

@@ -1,3 +1,0 @@
-Initial velocity dans metafor
-Alpha-generalized -> alpha_m mettre 0.7 à la place de 0.97.
-Autre param -> 0.1 au lieu de 0.01.

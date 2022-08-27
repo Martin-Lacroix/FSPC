@@ -22,7 +22,6 @@ def getMetafor(input):
     domain = metafor.getDomain()
     tsm = metafor.getTimeStepManager()
     materset = domain.getMaterialSet()
-    lawset = domain.getMaterialLawSet()
     loadingset = domain.getLoadingSet()
     solvermanager = metafor.getSolverManager()
     interactionset = domain.getInteractionSet()
@@ -37,8 +36,8 @@ def getMetafor(input):
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometry.msh')
     importer = gmsh.GmshImport(mshFile,domain)
+    importer.verb = importer.writeLogs = False
     groups = importer.groups
-    importer.verb = False
     importer.execute()
 
     # Defines the solid domain

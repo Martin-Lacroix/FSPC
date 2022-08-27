@@ -81,10 +81,11 @@ Problem.Solver.coeffDTincrease = math.huge
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
--- Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
-Problem.Solver.MomContEq.maxIter = 10
+Problem.Solver.MomContEq.pExt = 0
+Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-7
 Problem.Solver.MomContEq.cgTolerance = 1e-12

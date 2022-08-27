@@ -74,7 +74,7 @@ class Pfem3D(object):
     def runIncomp(self,t1,t2):
 
         print('\nSolve ({:.5e}, {:.5e})'.format(t1,t2))
-        print('----------------------------')
+        print('----------------------------------')
 
         # The line order is important here
 
@@ -109,7 +109,7 @@ class Pfem3D(object):
     def runWcomp(self,t1,t2):
 
         print('\nSolve ({:.5e}, {:.5e})'.format(t1,t2))
-        print('----------------------------')
+        print('----------------------------------')
 
         # Estimate the time step only once
         
@@ -221,7 +221,7 @@ class Pfem3D(object):
         start = self.problem.getCurrentSimTime()
         print('t1 = {:.5e} - dt = {:.3e}'.format(start,dt))
         print('t2 = {:.5e} - factor = {:.0f}'.format(time,self.factor))
-        print('----------------------------')
+        print('----------------------------------')
 
     # Save the results or finalize
 
