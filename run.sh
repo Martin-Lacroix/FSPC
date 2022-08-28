@@ -2,11 +2,11 @@
 
 export CPU_PER_PROC=4
 export INPUT=examples/damNcomp_2D/input.py
-export INPUT=examples/streamNcomp_2D/input.py
+# export INPUT=examples/streamNcomp_2D/input.py
 # export INPUT=examples/staticNcomp_2D/input.py
-export INPUT=examples/MarcoLucio_2D/input.py
-export INPUT=examples/SimoneMeduri_2D/input.py
-export INPUT=examples/ZiFeiMeng_2D/input.py
+# export INPUT=examples/MarcoLucio_2D/input.py
+# export INPUT=examples/SimoneMeduri_2D/input.py
+# export INPUT=examples/ZiFeiMeng_2D/input.py
 
 # Clean output folder
 

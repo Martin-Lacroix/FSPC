@@ -107,7 +107,7 @@ class IQN_ILS(Algorithm):
                 # V and W are stored as transpose and list
 
                 R = np.concatenate(self.residual.T)
-                C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=None)[0]
+                C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=-1)[0]
                 correction = np.split(np.dot(np.transpose(self.W),C)+R,self.dim)
                 self.interp.disp += np.transpose(correction)
 
