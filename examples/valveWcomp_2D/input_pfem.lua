@@ -100,10 +100,6 @@ function Problem.Solver.MomEq.BC:ClampLV(pos,t)
 	return {0,0}
 end
 
-function Problem.Solver.ContEq.BC:OutletP(pos,t)
-	return {0}
-end
-
 function Problem.Solver.MomEq.BC:InletV(pos,t)
 
 	local tmax = 1
