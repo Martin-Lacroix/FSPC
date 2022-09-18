@@ -111,3 +111,7 @@ end
 function Problem.Solver.MomContEq.BC:PolyRV(pos,t)
 	return {0,0}
 end
+
+function Problem.Solver.MomContEq.BC:SolidBaseV(pos,t)
+	return {0,0}
+end

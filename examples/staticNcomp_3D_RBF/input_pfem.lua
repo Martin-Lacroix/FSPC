@@ -20,11 +20,11 @@ Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.03
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
-Problem.Mesh.minAspectRatio = 1e-3
+Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.laplacianSmoothingBoundaries = false
+Problem.Mesh.laplacianSmoothingBoundaries = true
 Problem.Mesh.boundingBox = {0,0,-10,1,1,1}
 Problem.Mesh.exclusionZones = {}
 

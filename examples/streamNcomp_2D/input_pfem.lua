@@ -15,10 +15,10 @@ Problem.maxFactor = 10
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 6e-3
-Problem.Mesh.gammaFS = 0.6
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.7
+Problem.Mesh.hchar = 7e-3
+Problem.Mesh.gammaFS = 0.7
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
@@ -57,14 +57,6 @@ Problem.Material.mu = 1e-3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.InletFixed = true
-Problem.IC.OutletFixed = true
-Problem.IC.ReservoirFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
@@ -93,6 +85,7 @@ Problem.Solver.MomContEq.bodyForce = {0,0}
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
@@ -100,29 +93,18 @@ function Problem.IC:initStates(pos)
 	return {0,0,0}
 end
 
+function Problem.Solver.MomContEq.BC:SolidBaseV(pos,t)
+	return {0,0}
+end
+
 function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
 	return {0,0}
 end
 
 function Problem.Solver.MomContEq.BC:OutletP(pos,t)
-	return {0}
+	return {Problem.Solver.MomContEq.pExt}
 end
 
-function Problem.Solver.MomContEq.BC:InletV(pos,t)
-
-	local tmax = 1
-	local vmax = 0.1
-	local vt = (t/tmax)*vmax
-	local r = math.abs(pos[2]-0.075)
-	local R = 0.075
-
-	if (t<tmax) then
-
-		local v = vt*(1-(r*r)/(R*R))
-		return {v,0}
-	else
-		
-		local v = vmax*(1-(r*r)/(R*R))
-		return {v,0}
-	end
+function Problem.Solver.MomContEq.BC:InletP(pos,t)
+	return{10}
 end

@@ -21,7 +21,7 @@ Problem.Mesh.gamma = 0.7
 Problem.Mesh.hchar = 0.03
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = true
-Problem.Mesh.minAspectRatio = 1e-3
+Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = false
@@ -81,7 +81,7 @@ Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
-Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
+Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25

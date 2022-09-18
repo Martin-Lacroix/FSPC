@@ -47,18 +47,24 @@ class Algorithm(object):
                 self.solver.save()
                 raise Exception('Small DT')
 
+
+
+
+
+
+
+
             # Save previous time step data
 
             if (com.rank == 1) and self.verified:
 
                 prevDisp = self.interp.disp.copy()
                 velocity = self.solver.getVelocity()
-                acceler = self.solver.getAcceleration()
 
             # Predictor and Internal FSI loop
 
             dt = self.step.dt
-            if com.rank == 1: self.interp.disp += dt*(velocity+acceler*dt/2)
+            if com.rank == 1: self.interp.disp += dt*velocity
             self.verified = self.couplingAlgo(com)
 
             # Restart the time step if fail

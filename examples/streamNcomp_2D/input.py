@@ -18,7 +18,7 @@ def getParam(path):
 
     # Time Parameters
 
-    param['dt'] = 0.1
+    param['dt'] = 0.01
     param['dtWrite'] = 0.1
     param['tTot'] = 4
 

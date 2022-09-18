@@ -38,14 +38,14 @@ def getMetafor(input):
     importer = gmsh.GmshImport(mshFile,domain)
     importer.verb = importer.writeLogs = False
     groups = importer.groups
-    importer.execute()()
+    importer.execute()
 
     # Defines the solid domain
-
+    
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
     interactionset.add(app)
-    
+
     # Material parameters
 
     materset.define(1,w.ElastHypoMaterial)
@@ -60,7 +60,7 @@ def getMetafor(input):
     prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
-    
+
     # Boundary conditions
 
     loadingset.define(groups['SolidBase'],w.Field1D(w.TX,w.RE))

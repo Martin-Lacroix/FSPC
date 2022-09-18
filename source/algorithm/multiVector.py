@@ -10,9 +10,11 @@ class IQN_MVJ(Algorithm):
 
         if com.rank == 1: 
 
+            self.makeBGS = True
             self.omega = param['omega']
-            self.Vprev = list()
-            self.Wprev = list()
+            size = self.solver.nbrNode*self.dim
+            self.Jprev = np.zeros((size,size))
+            self.J = np.zeros((size,size))
 
 # %% Coupling at Each Time Step
 
@@ -87,13 +89,12 @@ class IQN_MVJ(Algorithm):
             # End of the coupling iteration
 
             if verified == True:
-                if com.rank == 1: self.Vprev = self.V.copy()
-                if com.rank == 1: self.Wprev = self.W.copy()
+                if com.rank == 1: self.Jprev = self.J.copy()
                 return True
 
             if self.iteration > self.iterMax:
-                if com.rank == 1: self.Vprev = list()
-                if com.rank == 1: self.Wprev = list()
+                if com.rank == 1: self.Jprev.fill(0)
+                self.makeBGS = True
                 return False
 
 # %% IQN Relaxation of Solid Displacement
@@ -101,45 +102,39 @@ class IQN_MVJ(Algorithm):
     def relaxation(self):
 
             disp = self.solver.getDisplacement()
-            R = np.concatenate(self.residual.T)
 
             # Performs either BGS or IQN iteration
 
-            if self.iteration > 0:
+            if self.makeBGS:
+
+                self.interp.disp += self.omega*self.residual
+                self.makeBGS = False
+
+            elif self.iteration == 0:
+
+                J = self.Jprev.copy()
+                np.fill_diagonal(J,J.diagonal()-1)
+                R = np.concatenate(self.residual.T)
+                correction = np.split(np.dot(J,-R),self.dim)
+                self.interp.disp += np.transpose(correction)
+
+            else:
 
                 self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
                 self.W.insert(0,np.concatenate((disp-self.prevDisp).T))
+                R = np.concatenate(self.residual.T)
                 V = np.transpose(self.V)
                 W = np.transpose(self.W)
 
-                if not self.Vprev:
+                # Computes the inverse Jacobian and new displacement
 
-                    C = np.linalg.lstsq(V,-R,rcond=-1)[0]
-                    correction = np.split(np.dot(W,C)+R,self.dim)
-                    self.interp.disp += np.transpose(correction)
+                Vinv = np.linalg.pinv(V)
+                self.J = self.Jprev+np.dot(W-self.Jprev.dot(V),Vinv)
 
-                else:
-
-                    Vprev = np.transpose(self.Vprev)
-                    Wprev = np.transpose(self.Wprev)
-
-                    # Make the actual multi-vector Jacobian computation
-
-                    C1 = np.linalg.lstsq(V,R,rcond=-1)[0]
-                    C2 = np.linalg.lstsq(Vprev,R,rcond=-1)[0]
-                    C3 = np.linalg.lstsq(Vprev,V.dot(C1),rcond=-1)[0]
-                    correction = np.split(Wprev.dot(C3-C2)-W.dot(C1)+R,self.dim)
-                    self.interp.disp += np.transpose(correction)
-
-            elif self.Vprev:
-
-                    V = np.transpose(self.Vprev)
-                    W = np.transpose(self.Wprev)
-                    C = np.linalg.lstsq(V,-R,rcond=-1)[0]
-                    correction = np.split(np.dot(W,C)+R,self.dim)
-                    self.interp.disp += np.transpose(correction)
-
-            else: self.interp.disp += self.omega*self.residual
+                J = self.J.copy()
+                np.fill_diagonal(J,J.diagonal()-1)
+                correction = np.split(np.dot(J,-R),self.dim)
+                self.interp.disp += np.transpose(correction)
 
             # Updates the residuals and displacement
 
