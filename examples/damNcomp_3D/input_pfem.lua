@@ -102,3 +102,7 @@ end
 function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
     return {0,0,0}
 end
+
+function Problem.Solver.MomContEq.BC:SolidBaseV(pos,t)
+    return {0,0,0}
+end

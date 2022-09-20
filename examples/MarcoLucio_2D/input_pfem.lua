@@ -17,13 +17,13 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.8
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.gammaFS = 0.6
 Problem.Mesh.hchar = 0.005
+Problem.Mesh.gammaFS = 0.6
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = true
+Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,0,0.584,0.584}
 Problem.Mesh.exclusionZones = {}
@@ -71,8 +71,8 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U'
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.nlAlgo = 'QuasiNRApprox'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0

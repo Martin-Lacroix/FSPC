@@ -39,7 +39,6 @@ Line(12) = {8,11};
 
 Curve Loop(1) = {2,3,4,5};
 Plane Surface(1) = {1};
-Transfinite Surface{1};
 
 // Solid Surface
 
