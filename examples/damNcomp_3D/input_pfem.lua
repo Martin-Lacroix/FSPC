@@ -10,7 +10,7 @@ Problem.simulationTime = math.huge
 -- FSPC Parameters
 
 Problem.interface = 'FSInterface'
-Problem.maxFactor = 100
+Problem.maxFactor = 10
 
 -- Mesh Parameters
 
@@ -58,12 +58,6 @@ Problem.Material.mu = 1e-3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.ReservoirFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
@@ -92,6 +86,7 @@ Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 

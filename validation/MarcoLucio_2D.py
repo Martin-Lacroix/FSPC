@@ -12,7 +12,7 @@ data = [np.loadtxt(folder+file).T for file in listdir(folder)]
 # %% Print the Mass
 
 workspace = os.getcwd()
-workspace += '/workspace/MarcoLucio_2D'
+workspace += '/workspace/MarcoLucio_2D_RBF'
 os.chdir(workspace)
 
 # Reads the results

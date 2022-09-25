@@ -57,12 +57,6 @@ Problem.Material.mu = 1e+3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.WallFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
@@ -88,6 +82,7 @@ Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 

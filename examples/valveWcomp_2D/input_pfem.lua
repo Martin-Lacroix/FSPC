@@ -59,14 +59,6 @@ Problem.Material.mu = 1e-4
 Problem.Material.gamma = 0
 Problem.Material.rhoStar = 1e-3
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.InletFixed = true
-Problem.IC.OutletFixed = true
-Problem.IC.ClampLFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
@@ -88,6 +80,7 @@ Problem.Solver.ContEq.stabilization = 'Meduri'
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomEq.BC = {}
 Problem.Solver.ContEq.BC = {}
 Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true

@@ -17,18 +17,18 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.03
-Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = false
-Problem.Mesh.minAspectRatio = 1e-2
+Problem.Mesh.hchar = 0.05
+Problem.Mesh.gammaFS = 0.6
+Problem.Mesh.addOnFS = true
+Problem.Mesh.minAspectRatio = 1e-12
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.laplacianSmoothingBoundaries = true
+Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,0,-10,1,1,1}
 Problem.Mesh.exclusionZones = {}
 
-Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.remeshAlgo = 'CGAL'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {}
 Problem.Mesh.ignoreGroups = {}
@@ -57,16 +57,10 @@ Problem.Material.mu = 1e+3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.WallFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'FracStep'
+Problem.Solver.id = 'PSPG'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -77,20 +71,19 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U_P'
+Problem.Solver.MomContEq.residual = 'Ax_f'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
-Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.cgTolerance = 1e-12
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 

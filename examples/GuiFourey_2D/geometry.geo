@@ -1,6 +1,5 @@
 // Parameters
 
-f = 2;
 d = 0.005;
 N = 12;
 
@@ -59,7 +58,7 @@ Field[1] = Distance;
 Field[1].CurvesList = {3};
 
 Field[2] = MathEval;
-Field[2].F = Sprintf("%g*F1*%g/(%g/2)+%g",f,d,L,d);
+Field[2].F = Sprintf("%g+F1*0.1",d);
 
 Field[3] = Box;
 Field[3].VIn = d;

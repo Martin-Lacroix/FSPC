@@ -6,7 +6,7 @@ import os
 # %% Print the Mass
 
 workspace = os.getcwd()
-workspace += '/workspace/StefanTurek_2D'
+workspace += '/workspace/StefanTurek_2D_RBF'
 os.chdir(workspace)
 
 # Reads the results

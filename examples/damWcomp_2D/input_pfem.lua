@@ -59,12 +59,6 @@ Problem.Material.gamma = 0
 Problem.Material.K0 = 2.2e+7
 Problem.Material.rhoStar = 1000
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.ReservoirFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
@@ -86,6 +80,7 @@ Problem.Solver.ContEq.stabilization = 'Meduri'
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomEq.BC = {}
 Problem.Solver.ContEq.BC = {}
 Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true

@@ -58,12 +58,6 @@ Problem.Material.mu = 1e-3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
--- Initial Conditions
-
-Problem.IC = {}
-Problem.IC.WallFixed = true
-Problem.IC.FSInterfaceFixed = false
-
 -- Solver Parameters
 
 Problem.Solver = {}
@@ -92,6 +86,7 @@ Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
 -- Momentum Continuity BC
 
+Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
@@ -105,8 +100,6 @@ end
 
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
-	local f = 2
-	local L = 1
 	local hchar = Problem.Mesh.hchar
-    return f*dist*hchar/(L/2)+hchar
+	return hchar+dist*0.1
 end

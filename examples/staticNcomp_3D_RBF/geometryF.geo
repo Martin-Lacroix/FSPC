@@ -1,6 +1,6 @@
 // Parameters
 
-d = 0.03;
+d = 0.05;
 
 L = 1;
 W = 1;
@@ -63,7 +63,5 @@ Physical Volume("Fluid") = {1};
 Physical Surface("FSInterface") = {5};
 Physical Surface("FreeSurface") = {6};
 Physical Surface("Wall") = {1,2,3,4};
-
-// Builds 3D Mesh
 
 Mesh 3;
