@@ -84,7 +84,7 @@ def getMetafor(input):
     # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-6)
+    mim.setResidualTolerance(1e-8)
 
     # Time step iterations
     

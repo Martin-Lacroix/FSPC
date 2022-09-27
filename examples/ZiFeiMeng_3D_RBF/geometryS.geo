@@ -3,18 +3,20 @@ S = 0.005;
 L1 = 0.1;
 W = 0.1;
 
-d = 3e-3;
+d = 0.002;
+eps = 2e-3;
+hps = 1e-5;
 
 // Point List
 
-Point(1) = {L1,0,H,d};
-Point(2) = {L1+S,0,H,d};
-Point(3) = {L1,W,H,d};
-Point(4) = {L1+S,W,H,d};
-Point(5) = {L1,0,0,d};
-Point(6) = {L1+S,eps,0,d};
-Point(7) = {L1,W,0,d};
-Point(8) = {L1+S,W,0,d};
+Point(1) = {L1,eps,H,d};
+Point(2) = {L1+S,eps,H,d};
+Point(3) = {L1,W-eps,H,d};
+Point(4) = {L1+S,W-eps,H,d};
+Point(5) = {L1,eps,hps,d};
+Point(6) = {L1+S,eps,hps,d};
+Point(7) = {L1,W-eps,hps,d};
+Point(8) = {L1+S,W-eps,hps,d};
 
 // Line List
 

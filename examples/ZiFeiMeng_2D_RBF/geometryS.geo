@@ -32,7 +32,7 @@ Physical Surface("Solid") = {1};
 
 // Boundary Domains
 
-Physical Curve("FSInterface") = {1,3,4};
+Physical Curve("FSInterface") = {3};
 Physical Curve("SolidBase") = {2};
 
 Mesh 2;

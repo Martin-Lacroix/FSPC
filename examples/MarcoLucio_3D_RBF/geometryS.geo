@@ -4,14 +4,14 @@ h = 0.08;
 D = 0.2;
 
 d = 0.005;
-eps = 1e-5;
+eps = 5e-3;
 
 // Points List
 
-Point(1) = {2*L,0,0,d};
-Point(2) = {2*L+w,0,0,d};
-Point(3) = {2*L,D,0,d};
-Point(4) = {2*L+w,D,0,d};
+Point(1) = {2*L,eps,0,d};
+Point(2) = {2*L+w,eps,0,d};
+Point(3) = {2*L,D-eps,0,d};
+Point(4) = {2*L+w,D-eps,0,d};
 Point(5) = {2*L,eps,h,d};
 Point(6) = {2*L+w,eps,h,d};
 Point(7) = {2*L,D-eps,h,d};
@@ -60,7 +60,7 @@ Recombine Volume(1);
 
 // Physical Surfaces
 
-Physical Surface("FSInterface") = {1,2,3,4,5,6};
+Physical Surface("FSInterface") = {2,3,4,5,6};
 Physical Surface("SolidSide") = {5,6};
 Physical Surface("SolidBase") = {1};
 

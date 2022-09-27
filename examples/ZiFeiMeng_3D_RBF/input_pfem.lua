@@ -15,10 +15,10 @@ Problem.maxFactor = 10
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.3
-Problem.Mesh.omega = 0.5
+Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 3e-3
-Problem.Mesh.gammaFS = 0.2
+Problem.Mesh.gammaFS = 0.5
 Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
@@ -27,6 +27,7 @@ Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = true
 Problem.Mesh.boundingBox = {0,0,0,0.305,0.1,0.14}
 Problem.Mesh.exclusionZones = {{0.1,0,0.079,0.2,0.1,0.14}}
+Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface','Reservoir'}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
@@ -100,4 +101,10 @@ end
 
 function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
     return {0,0,0}
+end
+
+function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+
+	local hchar = Problem.Mesh.hchar
+	return hchar+(dist)*0.3
 end

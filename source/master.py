@@ -5,7 +5,6 @@ from . import tools
 
 class Master(object):
     def __init__(self,param,com):
-        
         input = dict()
 
         # Creates the external solver objects
@@ -35,7 +34,7 @@ class Master(object):
         elif param['interp']=='EC_RBF':
 
             from source.interpolator.radialBasis import EC_RBF
-            input['interp'] = EC_RBF(input,com)
+            input['interp'] = EC_RBF(input,param,com)
 
         # Initialize the fluid-structure coupling algorithm
 

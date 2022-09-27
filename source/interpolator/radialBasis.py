@@ -5,8 +5,25 @@ import numpy as np
 # %% Energy Conservative Radial Basis Function
 
 class EC_RBF(Interpolator):
-    def __init__(self,input,com):
+    def __init__(self,input,param,com):
         Interpolator.__init__(self,input,com)
+
+        # Global support radial basis functions
+
+        if param['RBF']=='VSF': self.function = self.phiVSF
+        if param['RBF']=='TPS': self.function = self.phiTPS
+
+        # Local support radial basis functions
+
+        elif param['RBF']=='CSF':
+            
+            self.radius = param['radius']
+            self.function = self.phiCSF
+
+        elif param['RBF']=='EHF':
+            
+            self.radius = param['radius']
+            self.function = self.phiEHF
 
         # Initialize the FS interpolation matrix
 
@@ -54,10 +71,10 @@ class EC_RBF(Interpolator):
         for i in range(self.recvNode):
             
             r = np.linalg.norm(positionS[i]-positionS,axis=1)
-            A[i,:self.recvNode] = self.phiTPS(r)
+            A[i,:self.recvNode] = self.function(r)
 
             r = np.linalg.norm(positionF-positionS[i],axis=1)
-            self.B[:,i] = self.phiTPS(r)
+            self.B[:,i] = self.function(r)
 
         return A
 
@@ -76,7 +93,21 @@ class EC_RBF(Interpolator):
         recvData = linalg.lu_solve(self.LU,recvData)
         return recvData[:self.nbrNode]
 
-# %% Thin Plate Spline Function
+# %% Radial Basis Functions
+
+    def phiVSF(self,dist):
+        return dist
 
     def phiTPS(self,dist):
         return (dist*dist)*np.ma.log10(dist)
+
+    def phiCSF(self,dist):
+
+        local = (1-dist/self.radius).clip(min=0)
+        return (4*dist/self.radius+1)*np.power(local,4)
+
+    def phiEHF(self,dist):
+
+        local = dist.clip(max=self.radius)
+        local = np.power(local,3)/12-np.power(self.radius,2)*local
+        return np.pi*(local+4*np.power(self.radius,3)/3)

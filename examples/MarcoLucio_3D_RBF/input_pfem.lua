@@ -20,7 +20,7 @@ Problem.Mesh.gamma = 0.4
 Problem.Mesh.hchar = 0.006
 Problem.Mesh.gammaFS = 0.4
 Problem.Mesh.addOnFS = true
-Problem.Mesh.minAspectRatio = 0
+Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = false
@@ -30,8 +30,8 @@ Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'FSInterface'}
-Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface','Reservoir'}
+Problem.Mesh.exclusionGroups = {'Polytope'}
+Problem.Mesh.localHcharGroups = {'Polytope','FreeSurface','Reservoir'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -98,8 +98,12 @@ function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
 	return {0,0,0}
 end
 
+function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
+	return {0,0,0}
+end
+
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
 	local hchar = Problem.Mesh.hchar
-	return hchar+(dist)*0.1
+	return hchar+(dist)*0.2
 end

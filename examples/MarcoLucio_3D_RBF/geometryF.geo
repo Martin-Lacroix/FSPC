@@ -4,20 +4,20 @@ h = 0.08;
 D = 0.2;
 
 d = 0.006;
-eps = 1e-5;
+eps = 5e-3;
 
 // Points List
 
 Point(1) = {0,0,0,d};
 Point(2) = {L,0,0,d};
-Point(3) = {2*L,0,0,d};
-Point(4) = {2*L+w,0,0,d};
+Point(3) = {2*L,eps,0,d};
+Point(4) = {2*L+w,eps,0,d};
 Point(5) = {4*L,0,0,d};
 
 Point(6) = {0,D,0,d};
 Point(7) = {L,D,0,d};
-Point(8) = {2*L,D,0,d};
-Point(9) = {2*L+w,D,0,d};
+Point(8) = {2*L,D-eps,0,d};
+Point(9) = {2*L+w,D-eps,0,d};
 Point(10) = {4*L,D,0,d};
 
 Point(11) = {0,0,3*L,d};
@@ -38,14 +38,14 @@ Point(22) = {2*L+w,D-eps,h,d};
 // Lines List
 
 Line(1) = {1,2};
-Line(2) = {2,3};
+Line(2) = {2,5};
 Line(3) = {3,4};
-Line(4) = {4,5};
-Line(5) = {6,7};
-Line(6) = {7,8};
-Line(7) = {8,9};
-Line(8) = {9,10};
+Line(4) = {6,7};
+Line(5) = {7,10};
+Line(6) = {8,9};
 
+Line(7) = {19,21};
+Line(8) = {20,22};
 Line(9) = {11,12};
 Line(10) = {13,14};
 
@@ -76,17 +76,15 @@ Line(32) = {8,21};
 Line(33) = {9,22};
 Line(34) = {19,20};
 Line(35) = {21,22};
-Line(36) = {19,21};
-Line(37) = {20,22};
 
 // Mesh of the Fluid
 
-Curve Loop(1) = {1,12,-5,-11};
+Curve Loop(1) = {1,12,-4,-11};
 Curve Loop(2) = {15,13,-16,-14};
 Curve Loop(3) = {11,20,-14,-17};
 Curve Loop(4) = {18,13,-19,-12};
 Curve Loop(5) = {1,18,-15,-17};
-Curve Loop(6) = {5,19,-16,-20};
+Curve Loop(6) = {4,19,-16,-20};
 
 Plane Surface(1) = {1};
 Plane Surface(2) = {2};
@@ -101,12 +99,12 @@ Physical Volume("Fluid") = {1};
 
 // Mesh of the Solid
 
-Curve Loop(7) = {7,-28,-3,29};
-Curve Loop(8) = {34,37,-35,-36};
-Curve Loop(9) = {28,33,-37,-31};
-Curve Loop(10) = {30,36,-32,-29};
+Curve Loop(7) = {6,-28,-3,29};
+Curve Loop(8) = {34,8,-35,-7};
+Curve Loop(9) = {28,33,-8,-31};
+Curve Loop(10) = {30,7,-32,-29};
 Curve Loop(11) = {3,31,-34,-30};
-Curve Loop(12) = {32,35,-33,-7};
+Curve Loop(12) = {32,35,-33,-6};
 
 Plane Surface(7) = {7};
 Plane Surface(8) = {8};
@@ -117,25 +115,24 @@ Plane Surface(12) = {12};
 
 // Reservoir Surface
 
-Curve Loop(13) = {2,3,4,26,-9,-21,15,-18};
-Curve Loop(14) = {6,7,8,27,-10,-22,16,-19};
-Curve Loop(15) = {2,29,-6,-12};
-Curve Loop(16) = {4,25,-8,-28};
-Curve Loop(17) = {14,22,-23,-21};
-Curve Loop(18) = {25,27,-24,-26};
+Curve Loop(13) = {2,26,-9,-21,15,-18};
+Curve Loop(14) = {-5,19,-16,22,10,-27};
+Curve Loop(15) = {-14,21,23,-22};
+Curve Loop(16) = {25,27,-24,-26};
+Curve Loop(17) = {2,25,-5,-12};
 
 Plane Surface(13) = {13};
 Plane Surface(14) = {14};
 Plane Surface(15) = {15};
 Plane Surface(16) = {16};
-Plane Surface(17) = {17};
-Plane Surface(18) = {18};
+Plane Surface(17) = {17,-7};
 
 // Physical Surfaces
 
 Physical Surface("FreeSurface") = {2,4};
-Physical Surface("FSInterface") = {7,8,9,10,11,12};
-Physical Surface("Reservoir") = {1,3,5,6,7,13,14,15,16,17,18};
+Physical Surface("Polytope") = {7,8,9,10,11,12};
+Physical Surface("FSInterface") = {8,9,10,11,12};
+Physical Surface("Reservoir") = {1,3,5,6,13,14,15,16,17};
 
 // Fluid Mesh Size
 
@@ -152,23 +149,23 @@ Field[1].ZMax = 2*L;
 // Distance from X
 
 Field[2] = MathEval;
-Field[2].F = "0.006+0.5*Fabs(x)";
+Field[2].F = "0.006 + 0.2*Fabs(x)";
 Field[3] = MathEval;
-Field[3].F = "0.006+0.5*Fabs(0.146-x)";
+Field[3].F = "0.006 + 0.2*Fabs(0.146-x)";
 
 // Distance from Y
 
 Field[4] = MathEval;
-Field[4].F = "0.006+0.5*Fabs(y)";
+Field[4].F = "0.006 + 0.2*Fabs(y)";
 Field[5] = MathEval;
-Field[5].F = "0.006+0.5*Fabs(0.2-y)";
+Field[5].F = "0.006 + 0.2*Fabs(0.2-y)";
 
 // Distance from Z
 
 Field[6] = MathEval;
-Field[6].F = "0.006+0.5*Fabs(z)";
+Field[6].F = "0.006 + 0.2*Fabs(z)";
 Field[7] = MathEval;
-Field[7].F = "0.006+0.5*Fabs(0.292-z)";
+Field[7].F = "0.006 + 0.2*Fabs(0.292-z)";
 
 // Makes the Mesh
 
