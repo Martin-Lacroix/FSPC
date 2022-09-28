@@ -149,23 +149,23 @@ Field[1].ZMax = 2*L;
 // Distance from X
 
 Field[2] = MathEval;
-Field[2].F = "0.006 + 0.2*Fabs(x)";
+Field[2].F = "0.006 + 0.3*Fabs(x)";
 Field[3] = MathEval;
-Field[3].F = "0.006 + 0.2*Fabs(0.146-x)";
+Field[3].F = "0.006 + 0.3*Fabs(0.146-x)";
 
 // Distance from Y
 
 Field[4] = MathEval;
-Field[4].F = "0.006 + 0.2*Fabs(y)";
+Field[4].F = "0.006 + 0.3*Fabs(y)";
 Field[5] = MathEval;
-Field[5].F = "0.006 + 0.2*Fabs(0.2-y)";
+Field[5].F = "0.006 + 0.3*Fabs(0.2-y)";
 
 // Distance from Z
 
 Field[6] = MathEval;
-Field[6].F = "0.006 + 0.2*Fabs(z)";
+Field[6].F = "0.006 + 0.3*Fabs(z)";
 Field[7] = MathEval;
-Field[7].F = "0.006 + 0.2*Fabs(0.292-z)";
+Field[7].F = "0.006 + 0.3*Fabs(0.292-z)";
 
 // Makes the Mesh
 

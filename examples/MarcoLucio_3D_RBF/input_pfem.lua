@@ -105,5 +105,5 @@ end
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
 	local hchar = Problem.Mesh.hchar
-	return hchar+(dist)*0.2
+	return hchar+(dist)*0.3
 end

@@ -23,11 +23,11 @@ Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = true
-Problem.Mesh.boundingBox = {0,0,0,0.305,0.1,0.14}
-Problem.Mesh.exclusionZones = {{0.1,0,0.079,0.2,0.1,0.14}}
+Problem.Mesh.boundingBox = {0,0,0,0.205,0.1,0.14}
 Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface','Reservoir'}
+Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
