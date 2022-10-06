@@ -24,7 +24,7 @@ Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.laplacianSmoothingBoundaries = true
+Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,0,0.6,0.6}
 Problem.Mesh.exclusionZones = {}
 
@@ -91,6 +91,10 @@ Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 function Problem.IC:initStates(pos)
 	return {0,0,0}
+end
+
+function Problem.Solver.MomContEq.BC:SolidBaseV(pos,t)
+	return {0,0}
 end
 
 function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)

@@ -4,13 +4,13 @@ export CPU_PER_PROC=4
 # export INPUT=examples/damNcomp_2D/input.py
 # export INPUT=examples/damNcomp_3D/input.py
 # export INPUT=examples/streamNcomp_2D/input.py
-# export INPUT=examples/staticNcomp_2D/input.py
+# export INPUT=examples/staticNcomp_2D_RBF/input.py
 # export INPUT=examples/staticNcomp_3D_RBF/input.py
-# export INPUT=examples/MarcoLucio_2D_RBF/input.py
+export INPUT=examples/MarcoLucio_2D_RBF/input.py
 # export INPUT=examples/MarcoLucio_3D_RBF/input.py
 # export INPUT=examples/SimoneMeduri_2D_RBF/input.py
 # export INPUT=examples/ZiFeiMeng_2D_RBF/input.py
-export INPUT=examples/ZiFeiMeng_3D_RBF/input.py
+# export INPUT=examples/ZiFeiMeng_3D_RBF/input.py
 # export INPUT=examples/GuiFourey_2D/input.py
 # export INPUT=examples/StefanTurek_2D_RBF/input.py
 

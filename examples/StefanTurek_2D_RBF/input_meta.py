@@ -52,10 +52,14 @@ def getMetafor(input):
 
     # Solid material parameters
 
+    v = 0.4
+    G = 2e6
+    E = 2*G*(1+v)
+
     materset.define(1,w.ElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1.4e6) # 5.6e6 for Turek
-    materset(1).put(w.POISSON_RATIO,0.4)
-    materset(1).put(w.MASS_DENSITY,1e3)
+    materset(1).put(w.ELASTIC_MODULUS,E)
+    materset(1).put(w.MASS_DENSITY,1000)
+    materset(1).put(w.POISSON_RATIO,v)
 
     # Finite element properties
 

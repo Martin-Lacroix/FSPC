@@ -10,7 +10,9 @@ def getParam(path):
 
     # Algorithm parameters
 
-    param['interp'] = 'MM_CNS'
+    param['RBF'] = 'MQ'
+    param['radius'] = 1
+    param['interp'] = 'NM_RBF'
     param['algo'] = 'IQN_ILS'
     param['omega'] = 0.5
     param['maxIt'] = 25

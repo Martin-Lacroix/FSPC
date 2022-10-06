@@ -84,6 +84,12 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
+
+
+
+
+        self.makeFaceList()
+
 # %% Calculates One Time Step
         
     def run(self,t1,t2):
@@ -108,6 +114,8 @@ class Metafor(object):
 
     def applyLoading(self,load,time):
 
+        nLoad = self.integrate2D(load)
+
         for i in range(self.nbrNode):
 
             node = self.FSI.getMeshPoint(i)
@@ -115,9 +123,25 @@ class Metafor(object):
 
             for j in range(len(nodeLoad)):
 
-                nodeLoad[j].val2 = load[i,j]
+                nodeLoad[j].val2 = nLoad[i,j]
                 nodeLoad[j].t2 = time
 
+    def integrate2D(self,load):
+
+        nLoad = np.zeros(load.shape)
+
+        for i in range(len(self.facetNodes)):
+
+            n1 = self.facetNodes[i][0]
+            n2 = self.facetNodes[i][1]
+            Sn = (load[n1]+load[n2])/2
+            L = self.facets[i].length()*Sn
+
+            nLoad[n1] += L/2
+            nLoad[n2] += L/2
+        
+        return nLoad
+        
 # %% Gets Nodal Values
 
     def getPosition(self):
@@ -190,3 +214,41 @@ class Metafor(object):
 
     def exit(self):
         return
+
+# %% TEST LOAD
+
+    def makeFaceList(self):
+
+        facets = list()
+        for i in range(self.nbrNode):
+
+            node = self.FSI.getMeshPoint(i)
+            curve = node.getCurves()
+
+            for j in range(len(curve)):
+
+                face = curve[j]
+                if face.getNbOfUpSides() > 1: continue
+                if face not in facets: facets.append(face)
+
+        facetNodes = [[] for _ in range(len(facets))]
+        for i in range(self.nbrNode):
+
+            node = self.FSI.getMeshPoint(i)
+            curve = node.getCurves()
+
+            for j in range(len(curve)):
+
+                face = curve[j]
+                if face in facets:
+
+                    idx = facets.index(face)
+                    facetNodes[idx].append(i)
+        
+        keep = list()
+        for i in range(len(facetNodes)):
+            if len(facetNodes[i]) == 2:
+               keep.append(i)
+
+        self.facetNodes = [facetNodes[q] for q in keep]
+        self.facets = [facets[q] for q in keep]

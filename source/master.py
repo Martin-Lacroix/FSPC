@@ -28,13 +28,13 @@ class Master(object):
 
         if param['interp']=='MM_CNS':
 
-            from source.interpolator.matchMesh import MM_CNS
+            from source.interpolator.closeNeigh import MM_CNS
             input['interp'] = MM_CNS(input,com)
 
-        elif param['interp']=='EC_RBF':
+        elif param['interp']=='NM_RBF':
 
-            from source.interpolator.radialBasis import EC_RBF
-            input['interp'] = EC_RBF(input,param,com)
+            from source.interpolator.radialBasis import NM_RBF
+            input['interp'] = NM_RBF(input,param,com)
 
         # Initialize the fluid-structure coupling algorithm
 

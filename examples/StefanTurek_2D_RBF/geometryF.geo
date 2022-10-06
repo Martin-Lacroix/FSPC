@@ -1,4 +1,4 @@
-d = 0.03;
+d = 0.005;
 
 L = 1.5; // 2.5
 X = 0.2;
@@ -56,16 +56,24 @@ Physical Curve("Polytope") = {5,6,7,8,9};
 // Fluid Mesh Size
 
 Field[1] = Distance;
-Field[1].CurvesList = {4,5,6,7,8,9};
+Field[1].CurvesList = {1,3,4,5,6,7,8,9};
 
 Field[2] = MathEval;
-Field[2].F = Sprintf("%g+F1*0.05",d);
+Field[2].F = Sprintf("%g+F1*0.2",d);
+
+Field[3] = Box;
+Field[3].VIn = 1;
+Field[3].VOut = d;
+Field[3].XMin = 0;
+Field[3].XMax = L;
+Field[3].YMin = d;
+Field[3].YMax = H-d;
 
 // Makes the Mesh
 
-Field[3] = Min;
-Field[3].FieldsList = {2};
-Background Field = 3;
+Field[4] = Min;
+Field[4].FieldsList = {2,3};
+Background Field = 4;
 
 Mesh.MeshSizeExtendFromBoundary = 0;
 Mesh.MeshSizeFromCurvature = 0;

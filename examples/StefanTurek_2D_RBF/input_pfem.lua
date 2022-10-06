@@ -15,10 +15,10 @@ Problem.maxFactor = 10
 
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.03
-Problem.Mesh.gammaFS = 0.2
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.5
+Problem.Mesh.hchar = 0.005
+Problem.Mesh.gammaFS = 0.5
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
@@ -31,7 +31,7 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.localHcharGroups = {'FSInterface','Inlet'}
+Problem.Mesh.localHcharGroups = {'Polytope','Inlet','Border'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -73,7 +73,7 @@ Problem.Solver.coeffDTincrease = math.huge
 
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.nlAlgo = 'QuasiNRApprox'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
@@ -110,7 +110,7 @@ function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
 	local H = 0.41
 	local tmax = 2
 	local vmean = 2
-	local v = 6*vmean*pos[2]*(H-pos[2])/(H*H)
+	local v = 1.5*vmean*pos[2]*(H-pos[2])/(H*H/4)
 
 	if (t<tmax) then
 
@@ -124,5 +124,5 @@ end
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
 	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.05
+	return hchar+dist*0.2
 end

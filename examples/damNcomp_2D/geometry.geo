@@ -47,6 +47,7 @@ Recombine Surface{2};
 
 // Physical Boundaries
 
+Physical Curve("FreeSurface") = {4,5};
 Physical Curve("FSInterface") = {7,8,9,12};
 Physical Curve("Reservoir") = {1,2,3,6,10,11};
 Physical Curve("SolidBase") = {12};

@@ -17,7 +17,7 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.03
+Problem.Mesh.hchar = 0.01
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
@@ -28,10 +28,10 @@ Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,-10,1,1}
 Problem.Mesh.exclusionZones = {}
 
-Problem.Mesh.remeshAlgo = 'CGAL'
-Problem.Mesh.mshFile = 'geometry.msh'
-Problem.Mesh.ignoreGroups = {'Solid','Bottom','Clamped'}
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {}
+Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
 
