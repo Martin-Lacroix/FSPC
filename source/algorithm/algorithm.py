@@ -37,8 +37,9 @@ class Algorithm(object):
         while self.step.time < self.totTime:
             if com.rank == 1: self.logGen.printStep()
 
-
-
+            self.clock['Check Interp'].start()
+            self.interp.checkInterp(com)
+            self.clock['Check Interp'].end()
 
 
 

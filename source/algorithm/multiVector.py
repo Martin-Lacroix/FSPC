@@ -112,10 +112,8 @@ class IQN_MVJ(Algorithm):
 
             elif self.iteration == 0:
 
-                J = self.Jprev.copy()
-                np.fill_diagonal(J,J.diagonal()-1)
                 R = np.concatenate(self.residual.T)
-                correction = np.split(np.dot(J,-R),self.dim)
+                correction = np.split(np.dot(self.Jprev,-R)+R,self.dim)
                 self.interp.disp += np.transpose(correction)
 
             else:
@@ -128,12 +126,9 @@ class IQN_MVJ(Algorithm):
 
                 # Computes the inverse Jacobian and new displacement
 
-                Vinv = np.linalg.pinv(V)
-                self.J = self.Jprev+np.dot(W-self.Jprev.dot(V),Vinv)
-
-                J = self.J.copy()
-                np.fill_diagonal(J,J.diagonal()-1)
-                correction = np.split(np.dot(J,-R),self.dim)
+                X = np.transpose(W-np.dot(self.Jprev,V))
+                self.J = self.Jprev+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
+                correction = np.split(np.dot(self.J,-R)+R,self.dim)
                 self.interp.disp += np.transpose(correction)
 
             # Updates the residuals and displacement

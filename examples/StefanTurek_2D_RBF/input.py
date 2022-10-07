@@ -10,8 +10,9 @@ def getParam(path):
 
     # Algorithm parameters
 
-    param['RBF'] = 'VSF'
-    param['interp'] = 'EC_RBF'
+    param['RBF'] = 'GS'
+    param['radius'] = 0.02
+    param['interp'] = 'NM_RBF'
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
     param['maxIt'] = 25

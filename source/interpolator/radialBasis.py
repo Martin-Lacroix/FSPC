@@ -63,67 +63,9 @@ class NM_RBF(Interpolator):
 # %% Interpolate recvData and return the result
 
     def interpDataSF(self,recvData):
-
-        # count = 0
-        # recvData = np.zeros(recvData.shape)
-        # for i in range(recvData.shape[0]):
-        #     recvData[i,0] += count
-        #     count += 1
-
-
-        # f = open("TEST.txt", "a")
-        # f.write('\n\n[uS] Matrix\n')
-
-        # for i in range(recvData.shape[0]):
-        #     for j in range(recvData.shape[1]):
-        #         f.write('{:.4e}'.format(recvData[i,j]).ljust(15))
-
-        #     f.write('\n')
-        # f.close()
-
-        # recvData2 = self.H.dot(recvData)
-
-        # f = open("TEST.txt", "a")
-        # f.write('\n\n[uF] Matrix\n')
-
-        # for i in range(recvData2.shape[0]):
-        #     for j in range(recvData2.shape[1]):
-        #         f.write('{:.4e}'.format(recvData2[i,j]).ljust(15))
-
-        #     f.write('\n')
-        # f.close()
-
-        # raise Exception('END')
-
         return self.H.dot(recvData)
 
     def interpDataFS(self,recvData):
-
-        # f = open("TEST.txt", "a")
-        # f.write('\n\n[fF] Matrix\n')
-
-        # for i in range(recvData.shape[0]):
-        #     for j in range(recvData.shape[1]):
-        #         f.write('{:.4e}'.format(recvData[i,j]).ljust(15))
-
-        #     f.write('\n')
-        # f.close()
-        
-
-        # recvData2 = self.H.dot(recvData)
-
-        # f = open("TEST.txt", "a")
-        # f.write('\n\n[fS] Matrix\n')
-
-        # for i in range(recvData2.shape[0]):
-        #     for j in range(recvData2.shape[1]):
-        #         f.write('{:.4e}'.format(recvData2[i,j]).ljust(15))
-
-        #     f.write('\n')
-        # f.close()
-
-        # raise Exception('END')
-
         return self.H.dot(recvData)
 
 # %% Global Radial Basis Functions
