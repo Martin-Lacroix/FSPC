@@ -1,5 +1,6 @@
 d = 0.05;
 N = 160;
+M = 80;
 
 R = 2.25;
 H = 3.75;
@@ -46,6 +47,11 @@ Recombine Surface{2};
 
 Transfinite Line{9} = N;
 Transfinite Line{10} = N;
+
+Transfinite Line{2} = M;
+Transfinite Line{4} = M;
+Transfinite Line{8} = M;
+Transfinite Line{6} = M;
 
 Curve Loop(3) = {-3,9,-5,-10};
 Plane Surface(3) = {3};

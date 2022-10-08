@@ -26,15 +26,15 @@ class Master(object):
 
         # Initialize the interface mesh intrepolator
 
-        if param['interp']=='MM_CNS':
+        if param['interp']=='NNS':
 
-            from source.interpolator.closeNeigh import MM_CNS
-            input['interp'] = MM_CNS(input,com)
+            from source.interpolator.nearNeigh import NNS
+            input['interp'] = NNS(input,com)
 
-        elif param['interp']=='NM_RBF':
+        elif param['interp']=='RBF':
 
-            from source.interpolator.radialBasis import NM_RBF
-            input['interp'] = NM_RBF(input,param,com)
+            from source.interpolator.radialBasis import RBF
+            input['interp'] = RBF(input,param,com)
 
         # Initialize the fluid-structure coupling algorithm
 

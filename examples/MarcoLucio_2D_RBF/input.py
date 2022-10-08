@@ -12,11 +12,11 @@ def getParam(path):
 
     param['RBF'] = 'GS'
     param['radius'] = 0.01
-    param['interp'] = 'NM_RBF'
+    param['interp'] = 'RBF'
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
     param['maxIt'] = 25
-    param['tol'] = 1e-6
+    param['tol'] = 1e-8
 
     # Time Parameters
 

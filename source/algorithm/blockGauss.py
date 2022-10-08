@@ -19,7 +19,7 @@ class BGS_ADR(Algorithm):
 
     def couplingAlgo(self,com):
 
-        verified = False
+        verif = False
         self.iteration = 0
         self.converg.epsilon = np.inf
         timeFrame = self.step.timeFrame()
@@ -37,11 +37,11 @@ class BGS_ADR(Algorithm):
             if com.rank == 0:
 
                 self.clock['Solver Run'].start()
-                verified = self.log.exec(self.solver.run,*timeFrame)
+                verif = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver Run'].end()
 
-            verified = tools.scatterFS(verified,com)
-            if not verified: return False
+            verif = com.scatter([verif,verif],root=0)
+            if not verif: return False
                 
             # Fluid to solid mechanical transfer
 
@@ -54,11 +54,11 @@ class BGS_ADR(Algorithm):
             if com.rank == 1:
 
                 self.clock['Solver Run'].start()
-                verified = self.log.exec(self.solver.run,*timeFrame)
+                verif = self.log.exec(self.solver.run,*timeFrame)
                 self.clock['Solver Run'].end()
 
-            verified = tools.scatterSF(verified,com)
-            if not verified: return False
+            verif = com.scatter([verif,verif],root=1)
+            if not verif: return False
 
             # Compute the mechanical residual
 
@@ -76,12 +76,12 @@ class BGS_ADR(Algorithm):
 
             # Check the converence of the FSI
 
-            if com.rank == 1: verified = self.converg.isVerified()
-            verified = tools.scatterSF(verified,com)
+            if com.rank == 1: verif = self.converg.isVerified()
+            verif = com.scatter([verif,verif],root=1)
 
             # End of the coupling iteration
 
-            if verified: break
+            if verif: break
             self.iteration += 1
             if self.iteration > self.iterMax: return False
         

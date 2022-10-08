@@ -1,17 +1,15 @@
 from .interpolator import Interpolator
 import numpy as np
 
-# %% Energy Conservative Radial Basis Function
+# %% Mesh Interpolation with Radial Basis Functions
 
-class NM_RBF(Interpolator):
+class RBF(Interpolator):
     def __init__(self,input,param,com):
         Interpolator.__init__(self,input,com)
 
-        # Defines the radial basis function
-
         self.radius = param['radius']
-        self.function = getattr(self,'phi'+param['RBF'])
         recvPos = np.zeros((self.recvNode,self.dim))
+        self.function = getattr(self,'phi'+param['RBF'])
 
         # Share the position vectors between solvers
 
@@ -62,10 +60,7 @@ class NM_RBF(Interpolator):
 
 # %% Interpolate recvData and return the result
 
-    def interpDataSF(self,recvData):
-        return self.H.dot(recvData)
-
-    def interpDataFS(self,recvData):
+    def interpData(self,recvData):
         return self.H.dot(recvData)
 
 # %% Global Radial Basis Functions

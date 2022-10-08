@@ -84,9 +84,7 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
-
-
-
+        # This function musr be in Metafor !!!
 
         self.makeFaceList()
 
@@ -115,6 +113,7 @@ class Metafor(object):
     def applyLoading(self,load,time):
 
         nLoad = self.integrate2D(load)
+        #nLoad = load
 
         for i in range(self.nbrNode):
 
@@ -125,6 +124,8 @@ class Metafor(object):
 
                 nodeLoad[j].val2 = nLoad[i,j]
                 nodeLoad[j].t2 = time
+
+    # This function must be in Metafor !!!
 
     def integrate2D(self,load):
 
@@ -215,7 +216,7 @@ class Metafor(object):
     def exit(self):
         return
 
-# %% TEST LOAD
+# %% # This Function Must be in Metafor !!!
 
     def makeFaceList(self):
 

@@ -34,7 +34,7 @@ class Interpolator(object):
         if com.rank == 1:
 
             com.Recv(recvLoad,source=0)
-            load = self.interpDataFS(recvLoad)
+            load = self.interpData(recvLoad)
             self.solver.applyLoading(load,time)
 
             # Print the transfered load in the log file
@@ -52,7 +52,7 @@ class Interpolator(object):
         if com.rank == 0:
 
             com.Recv(recvDisp,source=1)
-            disp = self.interpDataSF(recvDisp)
+            disp = self.interpData(recvDisp)
             self.solver.applyDisplacement(disp)
 
             # Print the transfered load in the log file
@@ -70,7 +70,7 @@ class Interpolator(object):
         if com.rank == 1:
 
             com.Recv(recvLoad,source=0)
-            load = self.interpDataFS(recvLoad)
+            load = self.interpData(recvLoad)
 
         # Interpolate-back the load on the fluid
 
@@ -80,7 +80,7 @@ class Interpolator(object):
             
             interpLoad = None
             com.Recv(recvLoad,source=1)
-            interpLoad = self.interpDataSF(recvLoad)
+            interpLoad = self.interpData(recvLoad)
             load = self.solver.getLoading()
 
             # Compute the average relative error

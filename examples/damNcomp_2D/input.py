@@ -10,7 +10,7 @@ def getParam(path):
     
     # Algorithm parameters
 
-    param['interp'] = 'MM_CNS'
+    param['interp'] = 'NNS'
     param['algo'] = 'BGS_ADR'
     param['aitken'] = True
     param['omega'] = 0.5

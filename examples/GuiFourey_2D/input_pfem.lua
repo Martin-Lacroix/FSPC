@@ -29,10 +29,10 @@ Problem.Mesh.boundingBox = {0,-1,1,2.1}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'CGAL'
-Problem.Mesh.mshFile = 'geometry.msh'
-Problem.Mesh.ignoreGroups = {'Solid','Bottom','Clamped'}
+Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.exclusionGroups = {}
+Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
 
