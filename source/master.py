@@ -36,6 +36,16 @@ class Master(object):
             from source.interpolator.radialBasis import RBF
             input['interp'] = RBF(input,param,com)
 
+        if param['interp']=='test2D':
+
+            from source.interpolator.test2D import NNS
+            input['interp'] = NNS(input,com)
+
+        if param['interp']=='test3D':
+
+            from source.interpolator.test3D import NNS
+            input['interp'] = NNS(input,com)
+
         # Initialize the fluid-structure coupling algorithm
 
         if param['algo']=='BGS_ADR':

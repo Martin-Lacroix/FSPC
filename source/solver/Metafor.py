@@ -84,9 +84,10 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
-        # This function musr be in Metafor !!!
+        # This function must be in Metafor !!!
 
-        self.makeFaceList()
+        #if self.dim == 2: self.makeFaceList2D()
+        #if self.dim == 3: self.makeFaceList3D()
 
 # %% Calculates One Time Step
         
@@ -112,8 +113,9 @@ class Metafor(object):
 
     def applyLoading(self,load,time):
 
-        nLoad = self.integrate2D(load)
-        #nLoad = load
+        #if self.dim == 2: nLoad = self.integrate2D(load)
+        #if self.dim == 3: nLoad = self.integrate3D(load)
+        nLoad = load
 
         for i in range(self.nbrNode):
 
@@ -124,24 +126,6 @@ class Metafor(object):
 
                 nodeLoad[j].val2 = nLoad[i,j]
                 nodeLoad[j].t2 = time
-
-    # This function must be in Metafor !!!
-
-    def integrate2D(self,load):
-
-        nLoad = np.zeros(load.shape)
-
-        for i in range(len(self.facetNodes)):
-
-            n1 = self.facetNodes[i][0]
-            n2 = self.facetNodes[i][1]
-            Sn = (load[n1]+load[n2])/2
-            L = self.facets[i].length()*Sn
-
-            nLoad[n1] += L/2
-            nLoad[n2] += L/2
-        
-        return nLoad
         
 # %% Gets Nodal Values
 
@@ -218,7 +202,9 @@ class Metafor(object):
 
 # %% # This Function Must be in Metafor !!!
 
-    def makeFaceList(self):
+    def makeFaceList2D(self):
+
+        # List the curves with only 1 neighbor side
 
         facets = list()
         for i in range(self.nbrNode):
@@ -231,6 +217,8 @@ class Metafor(object):
                 face = curve[j]
                 if face.getNbOfUpSides() > 1: continue
                 if face not in facets: facets.append(face)
+
+        # List the number of FSI nodes for ach curve
 
         facetNodes = [[] for _ in range(len(facets))]
         for i in range(self.nbrNode):
@@ -245,6 +233,8 @@ class Metafor(object):
 
                     idx = facets.index(face)
                     facetNodes[idx].append(i)
+
+        # Keep the facets with 2 FSI nodes
         
         keep = list()
         for i in range(len(facetNodes)):
@@ -253,3 +243,85 @@ class Metafor(object):
 
         self.facetNodes = [facetNodes[q] for q in keep]
         self.facets = [facets[q] for q in keep]
+
+
+    def makeFaceList3D(self):
+
+        # List the sides with only 1 neighbor volume
+
+        facets = list()
+        for i in range(self.nbrNode):
+
+            node = self.FSI.getMeshPoint(i)
+            side = node.getSides()
+
+            for j in range(len(side)):
+
+                face = side[j]
+                if face.getNbOfUpVolumes() > 1: continue
+                if face not in facets: facets.append(face)
+
+        # List the number of FSI nodes for each side
+
+        facetNodes = [[] for _ in range(len(facets))]
+        for i in range(self.nbrNode):
+
+            node = self.FSI.getMeshPoint(i)
+            sides = node.getSides()
+
+            for j in range(len(sides)):
+
+                face = sides[j]
+                if face in facets:
+
+                    idx = facets.index(face)
+                    facetNodes[idx].append(i)
+
+        # Keep only the facets with 4 FSI nodes
+        
+        keep = list()
+        for i in range(len(facetNodes)):
+            if len(facetNodes[i]) == 4:
+               keep.append(i)
+
+        self.facetNodes = [facetNodes[q] for q in keep]
+        self.facets = [facets[q] for q in keep]
+
+# %% This function must be in Metafor !!!
+
+    def integrate2D(self,load):
+
+        nLoad = np.zeros(load.shape)
+
+        for i in range(len(self.facetNodes)):
+
+            n1 = self.facetNodes[i][0]
+            n2 = self.facetNodes[i][1]
+            Sn = (load[n1]+load[n2])/2
+            L = self.facets[i].length()*Sn
+
+            nLoad[n1] += L/2
+            nLoad[n2] += L/2
+        
+        return nLoad
+
+    def integrate3D(self,load):
+
+        nLoad = np.zeros(load.shape)
+
+        for i in range(len(self.facetNodes)):
+
+            n1 = self.facetNodes[i][0]
+            n2 = self.facetNodes[i][1]
+            n3 = self.facetNodes[i][2]
+            n4 = self.facetNodes[i][3]
+            
+            Sn = (load[n1]+load[n2]+load[n3]+load[n4])/4
+            L = self.facets[i].area()*Sn
+
+            nLoad[n1] += L/4
+            nLoad[n2] += L/4
+            nLoad[n3] += L/4
+            nLoad[n4] += L/4
+        
+        return nLoad

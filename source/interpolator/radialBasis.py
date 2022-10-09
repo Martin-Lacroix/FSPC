@@ -28,6 +28,14 @@ class RBF(Interpolator):
         position = self.solver.getPosition()
         self.computeMapping(recvPos,position)
 
+        # For energy-conservating interpolation !!!
+
+        if com.rank == 0: com.send(np.transpose(self.H),dest=1)
+        if com.rank == 1:
+            
+            self.H = None
+            self.H = com.recv(self.H,source=0)
+
 # %% Mapping matrix from recvPos to position
 
     def computeMapping(self,recvPos,position):
