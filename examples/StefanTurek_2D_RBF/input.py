@@ -21,7 +21,7 @@ def getParam(path):
     # Time Parameters
 
     param['dt'] = 1e-3
-    param['dtWrite'] = 1e-2
+    param['dtWrite'] = 1e-3
     param['tTot'] = 100
 
     return param

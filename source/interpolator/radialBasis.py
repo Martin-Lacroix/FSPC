@@ -11,28 +11,22 @@ class RBF(Interpolator):
         recvPos = np.zeros((self.recvNode,self.dim))
         self.function = getattr(self,'phi'+param['RBF'])
 
-        # Share the position vectors between solvers
+        # Compute the FS mesh interpolation matrix
 
         if com.rank == 0:
 
             com.Recv(recvPos,source=1)
             com.Send(self.solver.getPosition(),dest=1)
 
+            position = self.solver.getPosition()
+            self.computeMapping(recvPos,position)
+            com.send(np.transpose(self.H),dest=1)
+
         if com.rank == 1:
 
             com.Send(self.solver.getPosition(),dest=0)
             com.Recv(recvPos,source=0)
 
-        # Compute the FS mesh interpolation matrix
-
-        position = self.solver.getPosition()
-        self.computeMapping(recvPos,position)
-
-        # For energy-conservating interpolation !!!
-
-        if com.rank == 0: com.send(np.transpose(self.H),dest=1)
-        if com.rank == 1:
-            
             self.H = None
             self.H = com.recv(self.H,source=0)
 
@@ -61,7 +55,7 @@ class RBF(Interpolator):
             r = np.linalg.norm(position-recvPos[i],axis=1)
             B[:,i] = self.function(r/self.radius)
 
-        # Compute the interpolation  H matrix
+        # Compute the interpolation H matrix
 
         self.H = np.linalg.solve(A.T,B.T).T
         self.H = self.H[:self.nbrNode,:self.recvNode]

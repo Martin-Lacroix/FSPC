@@ -35,25 +35,9 @@ class Algorithm(object):
         prevWrite = self.step.time
         
         while self.step.time < self.totTime:
+
             if com.rank == 1: self.logGen.printStep()
-
-            self.clock['Check Interp'].start()
-            self.interp.checkInterp(com)
-            self.clock['Check Interp'].end()
-
-
-
-
-            if self.step.dt < 1e-6:
-                self.solver.save()
-                raise Exception('Small DT')
-
-
-
-
-
-
-
+            if self.step.dt < 1e-9: raise Exception('Small time step')
 
             # Save previous time step data
 
