@@ -39,8 +39,8 @@ class Interpolator(object):
 
             # Print the transfered load in the log file
 
-            S = np.mean((np.linalg.norm(load,axis=1)))
-            F = np.mean((np.linalg.norm(recvLoad,axis=1)))
+            S = np.sum((np.linalg.norm(load,axis=1)))
+            F = np.sum((np.linalg.norm(recvLoad,axis=1)))
             self.logGen.printData('Load F|S : {:.5e} - {:.5e}'.format(F,S))
 
 # %% Apply Predicted Displacement Solid -> Fluid
