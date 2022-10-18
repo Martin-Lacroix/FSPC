@@ -3,6 +3,9 @@ w = 0.012;
 h = 0.08;
 d = 0.005;
 
+N = 16;
+M = 4;
+
 // Points List
 
 Point(1) = {0,0,0,d};
@@ -36,13 +39,19 @@ Line(12) = {8,11};
 
 Curve Loop(1) = {2,3,4,5};
 Plane Surface(1) = {1};
+Physical Surface("Fluid") = {1};
+
+Transfinite Line{7} = N;
+Transfinite Line{8} = M;
+Transfinite Line{9} = N;
+Transfinite Line{12} = M;
 
 // Physical Boundaries
 
-Physical Curve("FSInterface") = {7,8,9,12};
+Physical Curve("FSInterface") = {7,8,9};
 Physical Curve("Reservoir") = {1,2,3,6,10,11};
+Physical Curve("Polytope") = {7,8,9,12};
 Physical Curve("FreeSurface") = {5,4};
-Physical Surface("Fluid") = {1};
 
 // Fluid Mesh Size
 

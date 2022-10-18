@@ -3,20 +3,23 @@ S = 0.005;
 L1 = 0.1;
 W = 0.1;
 
-d = 0.002;
 eps = 2e-3;
 hps = 1e-5;
 
+N = 40;
+M = 50;
+P = 4;
+
 // Point List
 
-Point(1) = {L1,eps,H,d};
-Point(2) = {L1+S,eps,H,d};
-Point(3) = {L1,W-eps,H,d};
-Point(4) = {L1+S,W-eps,H,d};
-Point(5) = {L1,eps,hps,d};
-Point(6) = {L1+S,eps,hps,d};
-Point(7) = {L1,W-eps,hps,d};
-Point(8) = {L1+S,W-eps,hps,d};
+Point(1) = {L1,eps,H};
+Point(2) = {L1+S,eps,H};
+Point(3) = {L1,W-eps,H};
+Point(4) = {L1+S,W-eps,H};
+Point(5) = {L1,eps,hps};
+Point(6) = {L1+S,eps,hps};
+Point(7) = {L1,W-eps,hps};
+Point(8) = {L1+S,W-eps,hps};
 
 // Line List
 
@@ -54,15 +57,30 @@ Plane Surface(6) = {6};
 Transfinite Surface{1:6};
 Recombine Surface{1:6};
 
+Transfinite Line{9} = N;
+Transfinite Line{10} = N;
+Transfinite Line{11} = N;
+Transfinite Line{12} = N;
+
+Transfinite Line{3} = M;
+Transfinite Line{4} = M;
+Transfinite Line{7} = M;
+Transfinite Line{8} = M;
+
+Transfinite Line{1} = P;
+Transfinite Line{2} = P;
+Transfinite Line{5} = P;
+Transfinite Line{6} = P;
+
 Surface Loop(1) = {1,2,3,4,5,6};
 Volume(1) = {1};
-Physical Volume("Solid") = {1};
 
 Transfinite Volume(1);
 Recombine Volume(1);
 
 // Physical Surfaces
 
+Physical Volume("Solid") = {1};
 Physical Surface("FSInterface") = {6};
 Physical Surface("Side") = {3,4};
 Physical Surface("Base") = {1};

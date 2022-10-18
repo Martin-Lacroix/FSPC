@@ -2,16 +2,15 @@ L = 0.146;
 w = 0.012;
 h = 0.08;
 
-d = 0.005;
 N = 40;
 M = 8;
 
 // Points List
 
-Point(1) = {2*L,0,0,d};
-Point(2) = {2*L,h,0,d};
-Point(3) = {2*L+w,h,0,d};
-Point(4) = {2*L+w,0,0,d};
+Point(1) = {2*L,0,0};
+Point(2) = {2*L,h,0};
+Point(3) = {2*L+w,h,0};
+Point(4) = {2*L+w,0,0};
 
 // Lines List
 
@@ -34,7 +33,7 @@ Transfinite Line{4} = M;
 
 // Physical Boundaries
 
-Physical Curve("FSInterface") = {1,2,3,4};
+Physical Curve("FSInterface") = {1,2,3};
 Physical Curve("SolidBase") = {4};
 Physical Surface("Solid") = {2};
 

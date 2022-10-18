@@ -1,12 +1,17 @@
-d = 0.005;
-
-L = 1.5; // 2.5
+L = 1.5;
 X = 0.2;
 Y = 0.2;
 R = 0.05;
 H = 0.41;
 Ls = 0.35;
 A = Asin(0.2);
+
+d = 0.005;
+NF = 300;
+MF = 82;
+
+NS = 80;
+MS = 5;
 
 // Points List
 
@@ -45,13 +50,21 @@ Curve Loop(2) = {-9,-8,-7,-5,6};
 Plane Surface(1) = {1,-2};
 Physical Surface("Fluid") = {1};
 
+Transfinite Line{7} = NS;
+Transfinite Line{8} = MS;
+Transfinite Line{9} = NS;
+
+Transfinite Line{1} = NF;
+Transfinite Line{3} = NF;
+Transfinite Line{4} = MF;
+
 // Boundary Domains
 
+Physical Curve("FreeSurface") = {2};
 Physical Curve("FSInterface") = {7,8,9};
+Physical Curve("Polytope") = {5,6,7,8,9};
 Physical Curve("Border") = {1,3};
 Physical Curve("Inlet") = {4};
-Physical Curve("Outlet") = {2};
-Physical Curve("Polytope") = {5,6,7,8,9};
 
 // Fluid Mesh Size
 
@@ -59,21 +72,13 @@ Field[1] = Distance;
 Field[1].CurvesList = {1,3,4,5,6,7,8,9};
 
 Field[2] = MathEval;
-Field[2].F = Sprintf("%g+F1*0.2",d);
-
-Field[3] = Box;
-Field[3].VIn = 1;
-Field[3].VOut = d;
-Field[3].XMin = 0;
-Field[3].XMax = L;
-Field[3].YMin = d;
-Field[3].YMax = H-d;
+Field[2].F = Sprintf("%g+F1*0.1",d);
 
 // Makes the Mesh
 
-Field[4] = Min;
-Field[4].FieldsList = {2,3};
-Background Field = 4;
+Field[3] = Min;
+Field[3].FieldsList = {2};
+Background Field = 3;
 
 Mesh.MeshSizeExtendFromBoundary = 0;
 Mesh.MeshSizeFromCurvature = 0;

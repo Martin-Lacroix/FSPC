@@ -8,10 +8,12 @@ def getParam(path):
     param['inputS'] = 'input_meta'
     param['inputF'] = path+'/input_pfem.lua'
 
+    param['load'] = 'stress'
+
     # Algorithm parameters
 
-    param['RBF'] = 'GS'
-    param['radius'] = 0.1
+    param['RBF'] = 'C0'
+    param['radius'] = 1
     param['interp'] = 'RBF'
     param['algo'] = 'IQN_ILS'
     param['omega'] = 0.5

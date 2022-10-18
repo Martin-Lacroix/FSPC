@@ -6,6 +6,7 @@ L2 = 0.1;
 
 d = 1e-3;
 eps = 1e-5;
+N = 79;
 
 // Point List
 
@@ -32,6 +33,8 @@ Line(7) = {2,7};
 Curve Loop(1) = {1,7,-4,-5,6,3};
 Plane Surface(1) = {1};
 Physical Surface("Fluid") = {1};
+
+Transfinite Line{4} = N;
 
 // Boundary Domains
 

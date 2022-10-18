@@ -30,8 +30,8 @@ Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'FSInterface'}
-Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
+Problem.Mesh.exclusionGroups = {'Polytope'}
+Problem.Mesh.localHcharGroups = {'Polytope','Reservoir','FreeSurface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -95,7 +95,7 @@ function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
 	return {0,0}
 end
 
-function Problem.Solver.MomContEq.BC:SolidBaseV(pos,t)
+function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
 	return {0,0}
 end
 

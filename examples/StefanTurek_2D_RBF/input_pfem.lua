@@ -72,8 +72,8 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U_P'
-Problem.Solver.MomContEq.nlAlgo = 'QuasiNRApprox'
+Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
@@ -101,10 +101,6 @@ function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
 	return {0,0}
 end
 
-function Problem.Solver.MomContEq.BC:OutletP(pos,t)
-	return {Problem.Solver.MomContEq.pExt}
-end
-
 function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
 
 	local H = 0.41
@@ -112,17 +108,19 @@ function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
 	local vmean = 2
 	local v = 1.5*vmean*pos[2]*(H-pos[2])/(H*H/4)
 
-	if (t<tmax) then
+	return {v,0}
 
-		local vt = v*(1-math.cos(math.pi*t/tmax))/2
-		return {vt,0}
-	else
-		return {v,0}
-	end
+	-- if (t<tmax) then
+
+	-- 	local vt = v*(1-math.cos(math.pi*t/tmax))/2
+	-- 	return {vt,0}
+	-- else
+	-- 	return {v,0}
+	-- end
 end
 
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
 
 	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.2
+	return hchar+dist*0.1
 end

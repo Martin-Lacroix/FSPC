@@ -19,19 +19,19 @@ Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.4
 Problem.Mesh.hchar = 1e-3
 Problem.Mesh.gammaFS = 0.4
-Problem.Mesh.addOnFS = false
+Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,0,0.205,0.14}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {}
 Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface','Reservoir'}
+Problem.Mesh.exclusionGroups = {}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -61,7 +61,7 @@ Problem.Material.rho = 1000
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'FracStep'
+Problem.Solver.id = 'PSPG'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -72,8 +72,8 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'Ax_f'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 

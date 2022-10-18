@@ -42,13 +42,14 @@ def getMetafor(input):
     
     # Material parameters
 
+    K = 1.3e6
     G = 2.4e6
     C1 = -1.2e6
     C2 = G/2.0-C1
 
     materset.define(1,w.MooneyRivlinHyperMaterial)
-    materset(1).put(w.RUBBER_PENAL,1.3e6)
     materset(1).put(w.MASS_DENSITY,1100)
+    materset(1).put(w.RUBBER_PENAL,K)
     materset(1).put(w.RUBBER_C1,C1)
     materset(1).put(w.RUBBER_C2,C2)
 

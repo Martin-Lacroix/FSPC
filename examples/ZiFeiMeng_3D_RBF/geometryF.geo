@@ -5,8 +5,11 @@ L2 = 0.1;
 W = 0.1;
 
 d = 0.003;
-eps = 2e-3;
+eps = 1e-3;
 hps = 1e-5;
+
+N = 30;
+M = 35;
 
 // Point List
 
@@ -103,15 +106,21 @@ Plane Surface(11) = {11};
 Plane Surface(12) = {12};
 Plane Surface(13) = {13};
 
+Transfinite Line{26} = N;
+Transfinite Line{27} = N;
+
+Transfinite Line{20} = M;
+Transfinite Line{25} = M;
+
 Surface Loop(1) = {1,2,3,4,5,9,10,11,12,13};
 Volume(1) = {1};
-Physical Volume("Fluid") = {1};
 
 // Physical Surfaces
 
 Physical Surface("Reservoir") = {2,6,7,8,9,10,11,12};
 Physical Surface("FreeSurface") = {13};
 Physical Surface("FSInterface") = {1};
+Physical Volume("Fluid") = {1};
 
 // Fluid Mesh Size
 

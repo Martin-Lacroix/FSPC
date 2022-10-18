@@ -1,10 +1,12 @@
-d = 0.05;
-
 R = 2.25;
 H = 3.75;
 B = 4.87;
 h = 2.5;
 b = 1.3;
+
+d = 0.05;
+N = 160;
+M = 80;
 
 // Points List
 
@@ -33,6 +35,10 @@ Line(7) = {7,1};
 Curve Loop(1) = {4,5,6,7};
 Plane Surface(1) = {1};
 Physical Surface("Fluid") = {1};
+
+Transfinite Line{1} = M;
+Transfinite Line{2} = M;
+Transfinite Line{3} = N;
 
 // Physical Boundaries
 

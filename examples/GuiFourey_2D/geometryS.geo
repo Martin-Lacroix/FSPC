@@ -1,6 +1,5 @@
 // Parameters
 
-d = 0.005;
 M = 200;
 N = 12;
 
@@ -9,10 +8,10 @@ HS = 0.05;
 
 // Points List
 
-Point(1) = {0,0,0,d};
-Point(2) = {L,0,0,d};
-Point(3) = {L,HS,0,d};
-Point(4) = {0,HS,0,d};
+Point(1) = {0,0,0};
+Point(2) = {L,0,0};
+Point(3) = {L,HS,0};
+Point(4) = {0,HS,0};
 
 // Lines List
 

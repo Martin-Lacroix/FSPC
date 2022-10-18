@@ -10,9 +10,11 @@ def getParam(path):
 
     # Algorithm parameters
 
-    param['RBF'] = 'GS'
-    param['radius'] = 0.02
-    param['interp'] = 'NM_RBF'
+    param['load'] = 'stress'
+
+    param['RBF'] = 'C0'
+    param['radius'] = 1
+    param['interp'] = 'RBF'
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
     param['maxIt'] = 25
@@ -20,8 +22,8 @@ def getParam(path):
 
     # Time Parameters
 
-    param['dt'] = 1e-3
+    param['dt'] = 5e-4
     param['dtWrite'] = 1e-3
-    param['tTot'] = 100
+    param['tTot'] = 10
 
     return param

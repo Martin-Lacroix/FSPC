@@ -10,8 +10,10 @@ def getParam(path):
     
     # Algorithm parameters
 
-    param['RBF'] = 'GS'
-    param['radius'] = 0.01
+    param['load'] = 'stress'
+
+    param['RBF'] = 'C0'
+    param['radius'] = 0.1
     param['interp'] = 'RBF'
     param['algo'] = 'IQN_MVJ'
     param['omega'] = 0.5
