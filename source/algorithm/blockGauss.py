@@ -1,5 +1,4 @@
 from .algorithm import Algorithm
-from .. import tools
 import numpy as np
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation

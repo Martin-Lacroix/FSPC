@@ -1,5 +1,4 @@
 from .algorithm import Algorithm
-from .. import tools
 import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Squares
