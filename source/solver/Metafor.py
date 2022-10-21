@@ -122,58 +122,58 @@ class Metafor(object):
 
     def getPosition(self):
 
-        pos = np.zeros((self.nbrNode,self.dim))
+        posVec = np.zeros((self.nbrNode,self.dim))
 
-        for i in range(self.dim):
-            for j in range(self.nbrNode):
+        for i,axe in enumerate(self.axe):
+            for j,position in enumerate(posVec):
 
                 node = self.FSI.getMeshPoint(j)
-                pos[j,i] += node.getValue(w.Field1D(self.axe[i],w.AB))
-                pos[j,i] += node.getValue(w.Field1D(self.axe[i],w.RE))
+                position[i] += node.getValue(w.Field1D(axe,w.AB))
+                position[i] += node.getValue(w.Field1D(axe,w.RE))
         
-        return pos
+        return posVec
 
     # Computes the nodal displacement vector
 
     def getDisplacement(self):
 
-        disp = np.zeros((self.nbrNode,self.dim))
+        dispVec = np.zeros((self.nbrNode,self.dim))
 
-        for i in range(self.dim):
-            for j in range(self.nbrNode):
+        for i,axe in enumerate(self.axe):
+            for j,disp in enumerate(dispVec):
 
                 node = self.FSI.getMeshPoint(j)
-                disp[j,i] = node.getValue(w.Field1D(self.axe[i],w.RE))
+                disp[i] = node.getValue(w.Field1D(axe,w.RE))
         
-        return disp
+        return dispVec
 
     # Computes the nodal velocity vector
 
     def getVelocity(self):
 
-        vel = np.zeros((self.nbrNode,self.dim))
+        velVec = np.zeros((self.nbrNode,self.dim))
 
-        for i in range(self.dim):
-            for j in range(self.nbrNode):
+        for i,axe in enumerate(self.axe):
+            for j,velocity in enumerate(velVec):
 
                 node = self.FSI.getMeshPoint(j)
-                vel[j,i] = node.getValue(w.Field1D(self.axe[i],w.GV))
+                velocity[i] = node.getValue(w.Field1D(axe,w.GV))
         
-        return vel
+        return velVec
 
     # Computes the nodal acceleration vector
 
     def getAcceleration(self):
 
-        acc = np.zeros((self.nbrNode,self.dim))
+        accVec = np.zeros((self.nbrNode,self.dim))
 
-        for i in range(self.dim):
-            for j in range(self.nbrNode):
+        for i,axe in enumerate(self.axe):
+            for j,acc in enumerate(accVec):
 
                 node = self.FSI.getMeshPoint(j)
-                acc[j,i] = node.getValue(w.Field1D(self.axe[i],w.GA))
+                acc[j,i] = node.getValue(w.Field1D(axe,w.GA))
         
-        return acc
+        return accVec
 
 # %% Other Functions
 

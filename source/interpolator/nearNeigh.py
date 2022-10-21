@@ -33,9 +33,9 @@ class NNS(Interpolator):
 
     def computeMapping(self,recvPos,position):
 
-        for i in range(self.nbrNode):
+        for i,pos in enumerate(position):
 
-            distance = np.linalg.norm(position[i]-recvPos,axis=1)
+            distance = np.linalg.norm(pos-recvPos,axis=1)
             index = np.argmin(distance)
             self.H[i,index] = 1
 
