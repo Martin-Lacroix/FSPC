@@ -56,6 +56,7 @@ class Metafor(object):
         loadingset = domain.getLoadingSet()
         self.tsm = self.metafor.getTimeStepManager()
         self.nbrNode = self.FSI.getNumberOfMeshPoints()
+        self.metafor.getDomain().build()
 
         # Creates the nodal load container
 
@@ -70,11 +71,6 @@ class Metafor(object):
                 load.append(NLoad(0,0,0,0))
                 fct = w.PythonOneParameterFunction(load[-1])
                 loadingset.define(node,w.Field1D(T,w.GF1),1,fct)
-
-        # Initialization of domain and output
-
-        self.metafor.getDomain().build()
-        self.save()
 
         # Manages time step restart functions
 

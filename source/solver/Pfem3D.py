@@ -54,6 +54,7 @@ class Pfem3D(object):
         self.problem.copySolution(self.prevSolution)
         self.mesh.getNodesIndex(self.group,self.FSI)
         self.mesh.setComputeNormalCurvature(True)
+        self.problem.displayParams()
         self.nbrNode = self.FSI.size()
 
         # Initializes the simulation data
@@ -63,11 +64,6 @@ class Pfem3D(object):
         self.reload = False
         self.factor = 1
         self.ok = True
-
-        # Prints the initial solution and stats
-
-        self.problem.displayParams()
-        self.problem.dump()
 
 # %% Run for Incompressible Flows
 

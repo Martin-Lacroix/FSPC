@@ -1,6 +1,8 @@
 from .. import tools
 import collections
 
+import numpy as np
+
 # %% Parent Algorithm Class
 
 class Algorithm(object):
@@ -16,10 +18,16 @@ class Algorithm(object):
         # Data from the param dictionary
 
         self.log = param['log']
-        self.totTime = param['tTot']
+        self.endTime = param['tEnd']
         self.iterMax = param['maxIt']
-        self.dtWrite = param['dtWrite']
 
+        # Make the time frame for saving results
+
+        dtWrite = param['dtWrite']
+        self.write = np.arange(dtWrite,self.endTime,dtWrite)
+        self.write = np.append(self.write,self.endTime).tolist()
+        self.write.append(np.inf)
+        
         # Initialize other simulation data
 
         self.verified = True
@@ -32,9 +40,11 @@ class Algorithm(object):
     def run(self,com):
 
         self.clock['Total Time'].start()
-        prevWrite = self.step.time
+        self.clock['Solver Save'].start()
+        self.log.exec(self.solver.save)
+        self.clock['Solver Save'].end()
         
-        while self.step.time < self.totTime:
+        while self.step.time < self.endTime:
 
             if com.rank == 1: self.logGen.printStep()
             if self.step.dt < 1e-9: raise Exception('Small time step')
@@ -52,7 +62,7 @@ class Algorithm(object):
             if com.rank == 1: self.interp.disp += dt*velocity
             self.verified = self.couplingAlgo(com)
 
-            # Restart the time step if fail
+            # Restart the time step the coupling fails
 
             if not self.verified:
 
@@ -66,18 +76,15 @@ class Algorithm(object):
             self.log.exec(self.solver.update)
             self.clock['Solver Update'].end()
 
-            # Write fluid and solid solution
-            
-            if self.step.time-prevWrite > self.dtWrite:
+            # Update the time and write the solution
+
+            self.step.update(self.verified)
+            if self.step.time >= self.write[0]:
 
                 self.clock['Solver Save'].start()
                 self.log.exec(self.solver.save)
                 self.clock['Solver Save'].end()
-                prevWrite = self.step.time
-
-            # Update the time step manager class
-
-            self.step.update(self.verified)
+                self.write.pop(0)
 
         # Ends the FSI simulation
 

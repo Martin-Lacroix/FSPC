@@ -1,19 +1,21 @@
 # Environment variables
 
 export CPU_PER_PROC=4
-export INPUT=examples/damNcomp_2D/input.py
-# export INPUT=examples/damNcomp_3D/input.py
-# export INPUT=examples/streamNcomp_2D/input.py
-# export INPUT=examples/carsherNcomp_2D/input.py
-# export INPUT=examples/staticNcomp_2D_RBF/input.py
-# export INPUT=examples/staticNcomp_3D_RBF/input.py
-# export INPUT=examples/MarcoLucio_2D_RBF/input.py
-# export INPUT=examples/MarcoLucio_3D_RBF/input.py
-export INPUT=examples/SimoneMeduri_2D_RBF/input.py
-# export INPUT=examples/ZiFeiMeng_2D_RBF/input.py
-# export INPUT=examples/ZiFeiMeng_3D_RBF/input.py
-# export INPUT=examples/GuiFourey_2D/input.py
-# export INPUT=examples/StefanTurek_2D_RBF/input.py
+
+export INPUT=examples/2D/elasticFunnel/input.py
+export INPUT=examples/2D/damBreak/input.py
+export INPUT=examples/2D/carsherWall/input.py
+export INPUT=examples/2D/hydroStatic/input.py
+export INPUT=examples/2D/freeStream/input.py
+export INPUT=examples/2D/rubberGate/input.py
+export INPUT=examples/2D/vonKarman/input.py
+export INPUT=examples/2D/flowDrivenDisk/input.py
+export INPUT=examples/2D/lockingPump/input.py
+
+export INPUT=examples/3D/crossFlow/input.py
+export INPUT=examples/3D/damBreak/input.py
+export INPUT=examples/3D/hydroStatic/input.py
+export INPUT=examples/3D/rubberGate/input.py
 
 # Clean output folder
 
