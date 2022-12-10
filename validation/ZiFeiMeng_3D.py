@@ -11,8 +11,7 @@ data = [np.loadtxt(folder+file).T for file in listdir(folder)]
 
 # %% Print the Mass
 
-workspace = os.getcwd()
-workspace += '/workspace/ZiFeiMeng_3D_RBF'
+workspace = os.getcwd()+'/workspace'
 os.chdir(workspace)
 
 # Reads the results
@@ -39,7 +38,7 @@ os.chdir(workspace)
 tag = tools.getIndex([0.1025,0.05,0])
 time,disp = tools.readNode(tag)
 resultsX = [time,disp[:,0]]
-resultsY = [time,disp[:,2]]
+resultsZ = [time,disp[:,2]]
 
 # Moves to main folder
 
@@ -51,9 +50,9 @@ os.chdir(workspace)
 plt.figure(2)
 plt.gca().set_title('Output Data')
 np.savetxt('output.dat',np.transpose(resultsX),fmt=['%.6f','%.6f'])
-np.savetxt('output.dat',np.transpose(resultsY),fmt=['%.6f','%.6f'])
+np.savetxt('output.dat',np.transpose(resultsZ),fmt=['%.6f','%.6f'])
 for curve in data: plt.plot(*curve)
 plt.plot(*resultsX,'k--')
-plt.plot(*resultsY,'k--')
+plt.plot(*resultsZ,'k--')
 plt.grid()
 plt.show()

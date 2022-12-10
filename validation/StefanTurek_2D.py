@@ -1,12 +1,12 @@
 from matplotlib import pyplot as plt
+from scipy import interpolate
 from Externals import tools
 import numpy as np
 import os
 
 # %% Print the Mass
 
-workspace = os.getcwd()
-workspace += '/workspace/StefanTurek_2D_RBF'
+workspace = os.getcwd()+'/workspace'
 os.chdir(workspace)
 
 # Reads the results
@@ -30,27 +30,33 @@ os.chdir(workspace)
 
 # Reads the results
 
-D = 0.1
+dt = 1e-3
 tag = tools.getIndex([0.6,0.2,0])
 time,disp = tools.readNode(tag)
-results = [time,disp[:,1]]
-disp = disp[:,1]
+
+# Quadratic piecewise interpolation
+
+interp = interpolate.interp1d(time,disp[:,1],kind='quadratic')
+time = np.arange(0,time[-1],dt)
+results = [time,interp(time)]
+disp = interp(time)
 
 # Moves to main folder
 
 workspace = os.path.split(workspace)[0]
 os.chdir(workspace)
 
-# Relative amplitude and Strouhal
+# Relative amplitude and frequency
 
-zero = np.zeros(time.shape)
-amplitude = (np.max(disp)-np.min(disp))/2
-period = tools.interpolated_intercepts(time,zero,disp)[0]
-period = period[-2]-period[-4]
-strouhal = D/period[0]
+A = (np.max(disp)-np.min(disp))/2
+fourier = np.fft.fft(disp)[range(len(disp)//2)]
+freq = np.arange(len(disp)//2)/time[-1]
+F = freq[np.argmax(abs(fourier))]
 
-print('Solid Amplitude =',amplitude)
-print('Strouhal Number =',strouhal)
+# Print some global results
+
+print('\nMaximum amplitude : {:.6f}'.format(A))
+print('Main frequency : {:.6f}\n'.format(F))
 
 # %% Save Results
 
@@ -58,5 +64,11 @@ plt.figure(1)
 plt.gca().set_title('Output Data')
 np.savetxt('output.dat',np.transpose(results),fmt=['%.6f','%.6f'])
 plt.plot(*results)
+plt.grid()
+plt.show()
+
+plt.figure(2)
+plt.gca().set_title('Fourier Transform')
+plt.plot(freq,abs(fourier))
 plt.grid()
 plt.show()

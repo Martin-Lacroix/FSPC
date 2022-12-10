@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from scipy import interpolate
 from Externals import tools
 import numpy as np
 import os
@@ -29,22 +30,45 @@ os.chdir(workspace)
 
 # Reads the results
 
-tag = tools.getIndex([0.5,0,0])
+dt = 1e-3
+tag = tools.getIndex([0.1,0.06,0])
 time,disp = tools.readNode(tag)
-results = [time,disp[:,1]]
-exact = -6.85e-5
+
+# Quadratic piecewise interpolation
+
+interp = interpolate.interp1d(time,disp[:,1],kind='quadratic')
+time = np.arange(0,time[-1],dt)
+results = [time,interp(time)]
+disp = interp(time)
 
 # Moves to main folder
 
 workspace = os.path.split(workspace)[0]
 os.chdir(workspace)
 
-# Save Results
+# Relative amplitude and frequency
 
-plt.figure(2)
+A = (np.max(disp)-np.min(disp))/2
+fourier = np.fft.fft(disp)[range(len(disp)//2)]
+freq = np.arange(len(disp)//2)/time[-1]
+F = freq[np.argmax(abs(fourier))]
+
+# Print some global results
+
+print('\nMaximum amplitude : {:.6f}'.format(A))
+print('Main frequency : {:.6f}\n'.format(F))
+
+# %% Save Results
+
+plt.figure(1)
 plt.gca().set_title('Output Data')
 np.savetxt('output.dat',np.transpose(results),fmt=['%.6f','%.6f'])
-plt.plot([0,time[-1]],[exact,exact])
-plt.plot(*results,'k--')
+plt.plot(*results)
+plt.grid()
+plt.show()
+
+plt.figure(2)
+plt.gca().set_title('Fourier Transform')
+plt.plot(freq,abs(fourier))
 plt.grid()
 plt.show()

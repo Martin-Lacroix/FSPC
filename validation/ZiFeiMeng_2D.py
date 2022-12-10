@@ -11,8 +11,7 @@ data = [np.loadtxt(folder+file).T for file in listdir(folder)]
 
 # %% Print the Mass
 
-workspace = os.getcwd()
-workspace += '/workspace/ZiFeiMeng_2D_RBF'
+workspace = os.getcwd()+'/workspace'
 os.chdir(workspace)
 
 # Reads the results
@@ -50,8 +49,8 @@ os.chdir(workspace)
 
 plt.figure(2)
 plt.gca().set_title('Output Data')
-np.savetxt('output.dat',np.transpose(resultsX),fmt=['%.6f','%.6f'])
-np.savetxt('output.dat',np.transpose(resultsY),fmt=['%.6f','%.6f'])
+np.savetxt('output_X.dat',np.transpose(resultsX),fmt=['%.6f','%.6f'])
+np.savetxt('output_Y.dat',np.transpose(resultsY),fmt=['%.6f','%.6f'])
 for curve in data: plt.plot(*curve)
 plt.plot(*resultsX,'k--')
 plt.plot(*resultsY,'k--')
