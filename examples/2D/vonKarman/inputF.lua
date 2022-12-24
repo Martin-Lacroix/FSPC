@@ -89,6 +89,7 @@ Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 Problem.Solver.MomContEq.BC['BorderFreeSlipEuler'] = true
+Problem.Solver.MomContEq.BC['one_epsFreeSlip'] = 1e5
 
 function Problem.IC:initStates(pos)
 	return {0,0,0}

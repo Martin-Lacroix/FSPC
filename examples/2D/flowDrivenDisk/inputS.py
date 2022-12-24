@@ -1,4 +1,4 @@
-import toolbox.gmsh as gmsh
+import toolbox.meshio as meshio
 import wrap as w
 import os
 
@@ -33,8 +33,7 @@ def getMetafor(input):
     # Imports the mesh
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
-    importer.verb = importer.writeLogs = False
+    importer = meshio.MeshioImport(mshFile,metafor)
     groups = importer.groups
     importer.execute()
     
@@ -100,20 +99,28 @@ def getMetafor(input):
     prp2.put(w.MATERIAL,2)
     app2.addProperty(prp2)
 
+    # Elements for surface traction
+
+    prp3 = w.ElementProperties(w.NodTraction2DElement)
+    load = w.NodLoadingInteraction(3)
+    load.push(groups['FSInterface'])
+    load.addProperty(prp3)
+    interactionset.add(load)
+
     # Contact properties
 
-    prp3 = w.ElementProperties(w.Contact2DElement)
-    prp3.put(w.AREAINCONTACT,w.AIC_ONCE)
-    prp3.put(w.MATERIAL,3)
+    prp4 = w.ElementProperties(w.Contact2DElement)
+    prp4.put(w.AREAINCONTACT,w.AIC_ONCE)
+    prp4.put(w.MATERIAL,3)
 
     # Defines the contact entities
 
-    ci = w.DdContactInteraction(3)
+    ci = w.DdContactInteraction(4)
     ci.setTool(groups['Master'])
     ci.setSmoothNormals(False)
     ci.push(groups['Slave'])
     ci.setSinglePass()
-    ci.addProperty(prp3)
+    ci.addProperty(prp4)
     interactionset.add(ci)
 
     # Boundary conditions
@@ -140,7 +147,9 @@ def getMetafor(input):
 
     # Parameters for FSPC
 
+    input['interaction'] = load
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = gmsh.GmshExport('metafor/solid.msh',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    input['exporter'].format = 'gmsh'
     return metafor

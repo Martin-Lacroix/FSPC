@@ -1,4 +1,4 @@
-import toolbox.gmsh as gmsh
+import toolbox.meshio as meshio
 import wrap as w
 import os
 
@@ -34,8 +34,7 @@ def getMetafor(input):
     # Imports the mesh
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
-    importer.verb = importer.writeLogs = False
+    importer = meshio.MeshioImport(mshFile,metafor)
     groups = importer.groups
     importer.execute()
     
@@ -76,28 +75,36 @@ def getMetafor(input):
     prp1.put(w.MATERIAL,1)
     app.addProperty(prp1)
 
+    # Elements for surface traction
+
+    prp2 = w.ElementProperties(w.NodTraction2DElement)
+    load = w.NodLoadingInteraction(2)
+    load.push(groups['FSInterface'])
+    load.addProperty(prp2)
+    interactionset.add(load)
+
     # Contact properties
 
-    prp2 = w.ElementProperties(w.Contact2DElement)
-    prp2.put(w.AREAINCONTACT,w.AIC_ONCE)
-    prp2.put(w.MATERIAL,2)
+    prp3 = w.ElementProperties(w.Contact2DElement)
+    prp3.put(w.AREAINCONTACT,w.AIC_ONCE)
+    prp3.put(w.MATERIAL,2)
 
     # Contact for ToolTop and Solid
 
-    ci1 = w.RdContactInteraction(2)
+    ci1 = w.RdContactInteraction(3)
     ci1.setTool(groups['ToolTop'])
     ci1.setSmoothNormals(False)
     ci1.push(groups['Solid'])
-    ci1.addProperty(prp2)
+    ci1.addProperty(prp3)
     interactionset.add(ci1)
 
     # Contact for ToolBot and Solid
 
-    ci2 = w.RdContactInteraction(3)
+    ci2 = w.RdContactInteraction(4)
     ci2.setTool(groups['ToolBot'])
     ci2.setSmoothNormals(False)
     ci2.push(groups['Solid'])
-    ci2.addProperty(prp2)
+    ci2.addProperty(prp3)
     interactionset.add(ci2)
 
     # Boundary conditions
@@ -126,7 +133,9 @@ def getMetafor(input):
 
     # Parameters for FSPC
 
+    input['interaction'] = load
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = gmsh.GmshExport('metafor/solid.msh',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    input['exporter'].format = 'gmsh'
     return metafor

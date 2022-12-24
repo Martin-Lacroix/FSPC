@@ -1,4 +1,4 @@
-from .interpolator import Interpolator
+from .Interpolator import Interpolator
 from ..toolbox import compute_time
 import numpy as np
 
@@ -11,26 +11,25 @@ class RBF(Interpolator):
         self.function = fun
         recvPos = np.zeros((self.recvNode,self.dim))
 
-        # Compute the FS mesh interpolation matrix
+        # Share the position vectors between solvers
 
         if com.rank == 0:
 
             com.Recv(recvPos,source=1)
             com.Send(self.solver.getPosition(),dest=1)
 
-            position = self.solver.getPosition()
-            self.computeMapping(recvPos,position)
-            com.send(np.transpose(self.H),dest=1)
-
         if com.rank == 1:
 
             com.Send(self.solver.getPosition(),dest=0)
             com.Recv(recvPos,source=0)
 
-            self.H = None
-            self.H = com.recv(self.H,source=0)
+        # Compute the FS mesh interpolation matrix
 
-# %% Mapping matrix from recvPos to position
+        position = self.solver.getPosition()
+        self.computeMapping(recvPos,position)
+
+
+# %% Mapping Matrix from RecvPos to Position
 
     @compute_time
     def computeMapping(self,recvPos,position):
@@ -67,40 +66,3 @@ class RBF(Interpolator):
     @compute_time
     def interpData(self,recvData):
         return self.H.dot(recvData)
-
-# %% Global Radial Basis Functions
-
-    def phiVS(self,eps):
-        return eps
-
-    def phiTPS(self,eps):
-        return (eps**2)*np.ma.log(eps)
-
-    def phiMQ(self,eps):
-        return np.sqrt(1+eps**2)
-
-    def phiIMQ(self,eps):
-        return 1/np.sqrt(1+eps**2)
-
-    def phiIQ(self,eps):
-        return 1/(1+eps**2)
-
-    def phiGS(self,eps):
-        return np.exp(-eps**2)
-
-# %% Compact Radial Basis Functions
-
-    def phiC0(self,eps):
-
-        eps = eps.clip(max=1)
-        return np.power(1-eps,2)
-
-    def phiC2(self,eps):
-
-        eps = eps.clip(max=1)
-        return np.power(1-eps,4)*(4*eps+1)
-
-    def phiC4(self,eps):
-
-        eps = eps.clip(max=1)
-        return np.power(1-eps,6)*(35*eps/3+6*eps+1)

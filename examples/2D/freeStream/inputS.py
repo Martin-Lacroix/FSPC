@@ -1,4 +1,4 @@
-import toolbox.gmsh as gmsh
+import toolbox.meshio as meshio
 import wrap as w
 import os
 
@@ -33,8 +33,7 @@ def getMetafor(input):
     # Imports the mesh
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
-    importer.verb = importer.writeLogs = False
+    importer = meshio.MeshioImport(mshFile,metafor)
     groups = importer.groups
     importer.execute()
 
@@ -58,6 +57,14 @@ def getMetafor(input):
     prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp.put(w.MATERIAL,1)
     app.addProperty(prp)
+
+    # Elements for surface traction
+
+    prp2 = w.ElementProperties(w.NodTraction2DElement)
+    load = w.NodLoadingInteraction(2)
+    load.push(groups['FSInterface'])
+    load.addProperty(prp2)
+    interactionset.add(load)
 
     # Boundary conditions
 
@@ -87,7 +94,9 @@ def getMetafor(input):
     
     # Parameters for FSPC
 
+    input['interaction'] = load
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = gmsh.GmshExport('metafor/solid.msh',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    input['exporter'].format = 'gmsh'
     return metafor

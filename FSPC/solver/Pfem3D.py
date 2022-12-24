@@ -189,7 +189,7 @@ class Pfem3D(object):
 
         vec = w.VectorArrayDouble3()
         load = np.zeros((self.nbrNode,self.dim))
-        self.solver.computeLoads(self.group,self.FSI,vec)
+        self.solver.computeTraction(self.group,self.FSI,vec)
         for i,array in enumerate(vec): load[i] = array[:self.dim]
         return -load
 

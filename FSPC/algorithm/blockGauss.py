@@ -1,5 +1,5 @@
 from ..toolbox import compute_time
-from .algorithm import Algorithm
+from .Algorithm import Algorithm
 import numpy as np
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation

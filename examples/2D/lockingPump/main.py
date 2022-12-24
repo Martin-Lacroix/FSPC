@@ -15,7 +15,7 @@ com = process.com
 # Configure the algorithm
 
 algorithm = FSPC.IQN_MVJ(solver,com)
-algorithm.interp = FSPC.NNS(solver,com)
+algorithm.interp = FSPC.KNN(solver,1,com)
 algorithm.converg = FSPC.Convergence(1e-6)
 algorithm.step = FSPC.TimeStep(1e-2)
 

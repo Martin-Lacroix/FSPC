@@ -4,25 +4,6 @@ import numpy as np
 import wrap as w
 import sys
 
-# %% Nodal Load class
-
-class NLoad(object):
-    def __init__(self,val1,t1,val2,t2):
-
-        self.t1 = t1
-        self.t2 = t2
-        self.val1 = val1
-        self.val2 = val2
-
-    def __call__(self,time):
-
-        return self.val1+(time-self.t1)/(self.t2-self.t1)*(self.val2-self.val1)
-
-    def nextstep(self):
-
-        self.t1 = self.t2
-        self.val1 = self.val2
-
 # %% Initializes the Solid Wraper
 
 class Metafor(object):
@@ -39,7 +20,9 @@ class Metafor(object):
 
         input = dict()
         self.metafor = module.getMetafor(input)
+        self.tsm = self.metafor.getTimeStepManager()
         domain = self.metafor.getDomain()
+        domain.build()
 
         # Sets the dimension of the mesh
 
@@ -63,24 +46,9 @@ class Metafor(object):
 
         self.FSI = input['FSInterface']
         self.exporter = input['exporter']
-        loadingset = domain.getLoadingSet()
-        self.tsm = self.metafor.getTimeStepManager()
+        self.interaction = input['interaction']
         self.nbrNode = self.FSI.getNumberOfMeshPoints()
-        self.metafor.getDomain().build()
-
-        # Creates the nodal load container
-
-        for i in range(self.nbrNode):
-            
-            load = list()
-            node = self.FSI.getMeshPoint(i)
-            self.Fnods[node.getNo()] = load
-
-            for T in self.axe:
-
-                load.append(NLoad(0,0,0,0))
-                fct = w.PythonOneParameterFunction(load[-1])
-                loadingset.define(node,w.Field1D(T,w.GF1),1,fct)
+        self.prevLoad = np.zeros((self.nbrNode,self.dim))
 
         # Manages time step restart functions
 
@@ -114,18 +82,17 @@ class Metafor(object):
 
 # %% Set Nodal Loads
 
-    def applyLoading(self,load,time):
+    def applyLoading(self,load):
+
+        mean = (self.prevLoad+load)/2
+        self.nextLoad = load.copy()
 
         for i in range(self.nbrNode):
 
-            node = self.FSI.getMeshPoint(i)
-            nodeLoad = self.Fnods[node.getNo()]
+            idx = self.FSI.getMeshPoint(i).getDBNo()
+            if self.dim == 3: self.interaction.setNodValue(idx,*mean[i])
+            else: self.interaction.setNodValue(idx,*mean[i],0)
 
-            for j in range(len(nodeLoad)):
-
-                nodeLoad[j].val2 = load[i,j]
-                nodeLoad[j].t2 = time
-        
 # %% Gets Nodal Values
 
     def getPosition(self):
@@ -188,12 +155,10 @@ class Metafor(object):
     @compute_time
     def update(self):
         
-        for nodeLoad in self.Fnods.values():
-            for i in range(self.dim): nodeLoad[i].nextstep()
-        
+        self.prevLoad = self.nextLoad.copy()
         self.metaFac.save(self.mfac)
         self.reload = False
-
+        
     @compute_time
     def save(self):
         self.exporter.execute()

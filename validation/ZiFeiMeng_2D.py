@@ -37,8 +37,7 @@ os.chdir(workspace)
 
 tag = tools.getIndex([0.1025,0,0])
 time,disp = tools.readNode(tag)
-resultsX = [time,disp[:,0]]
-resultsY = [time,disp[:,1]]
+results = [time,np.linalg.norm(disp,axis=1)]
 
 # Moves to main folder
 
@@ -49,10 +48,8 @@ os.chdir(workspace)
 
 plt.figure(2)
 plt.gca().set_title('Output Data')
-np.savetxt('output_X.dat',np.transpose(resultsX),fmt=['%.6f','%.6f'])
-np.savetxt('output_Y.dat',np.transpose(resultsY),fmt=['%.6f','%.6f'])
+np.savetxt('output.dat',np.transpose(results),fmt=['%.6f','%.6f'])
 for curve in data: plt.plot(*curve)
-plt.plot(*resultsX,'k--')
-plt.plot(*resultsY,'k--')
+plt.plot(*results,'k--')
 plt.grid()
 plt.show()

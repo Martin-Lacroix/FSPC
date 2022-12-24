@@ -1,5 +1,5 @@
 from ..toolbox import compute_time
-from .algorithm import Algorithm
+from .Algorithm import Algorithm
 import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Squares
