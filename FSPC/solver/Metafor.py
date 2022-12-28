@@ -30,11 +30,13 @@ class Metafor(object):
 
             self.dim = 2
             self.axe = [w.TX,w.TY]
+            self.qxe = [w.IF_FLUX_X,w.IF_FLUX_Y]
 
         elif domain.getGeometry().is3D():
             
             self.dim = 3
             self.axe = [w.TX,w.TY,w.TZ]
+            self.qxe = [w.IF_FLUX_X,w.IF_FLUX_Y,w.IF_FLUX_Z]
 
         # Defines some internal variables
 
@@ -93,7 +95,7 @@ class Metafor(object):
             if self.dim == 3: self.interaction.setNodValue(idx,*mean[i])
             else: self.interaction.setNodValue(idx,*mean[i],0)
 
-# %% Gets Nodal Values
+# %% Get Mechanical Nodal Values
 
     def getPosition(self):
 
@@ -149,6 +151,33 @@ class Metafor(object):
                 acc[j,i] = node.getValue(w.Field1D(axe,w.GA))
         
         return accVec
+
+# %% Get Thermal Nodal Values
+
+    def getTemperature(self):
+
+        tempVec = np.zeros(self.nbrNode)
+        
+        for i in range(self.nbrNode):
+
+            node = self.FSI.getMeshPoint(i)
+            tempVec[i] = node.getValue(w.Field1D(w.TO,w.RE))
+
+        return tempVec
+
+    # Computes the nodal heat flux vector
+
+    def getHeatFlux(self):
+
+        heatVec = np.zeros((self.nbrNode,self.dim))
+
+        for i,axe in enumerate(self.qxe):
+            for j,heat in enumerate(heatVec):
+
+                node = self.FSI.getMeshPoint(j)
+                heat[i] = w.IFNodalValueExtractor(node,axe).extract()[0]
+
+        return heatVec
 
 # %% Other Functions
 
