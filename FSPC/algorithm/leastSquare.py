@@ -1,4 +1,3 @@
-from ..toolbox import compute_time
 from .Algorithm import Algorithm
 import numpy as np
 
@@ -14,77 +13,108 @@ class IQN_ILS(Algorithm):
 
         verif = False
         self.iteration = 0
-        self.converg.epsilon = np.inf
         timeFrame = self.step.timeFrame()
+        self.resetConverg()
 
-        if com.rank == 1:
+        if (com.rank == 1) and self.convergM:
 
-            self.V = list()
-            self.W = list()
+            self.VM = list()
+            self.WM = list()
+
+        if (com.rank == 1) and self.convergT:
+
+            self.VT = list()
+            self.WT = list()
 
         while True:
 
             # Transfer and fluid solver call
 
-            self.transferDispSF(com)
+            self.transferDirSF(com)
             if com.rank == 0: verif = self.solver.run(*timeFrame)
             verif = com.scatter([verif,verif],root=0)
             if not verif: return False
 
             # Transfer and solid solver call
 
-            self.transferLoadFS(com)
+            self.transferNeuFS(com)
             if com.rank == 1: verif = self.solver.run(*timeFrame)
             verif = com.scatter([verif,verif],root=1)
             if not verif: return False
 
-            # Compute the mechanical residual
+            # Compute the coupling residual
 
             if com.rank == 1:
-            
-                self.residualDispS()
-                self.converg.update(self.residual)
-                self.printRes()
+                
+                self.computeResidual()
+                self.updateConverg()
                 self.relaxation()
             
             # Check the coupling converence
 
-            if com.rank == 1: verif = self.converg.isVerified()
+            if com.rank == 1: verif = self.isVerified()
             verif = com.scatter([verif,verif],root=1)
+            self.iteration += 1
 
             # End of the coupling iteration
 
             if verif: break
-            self.iteration += 1
-            if self.iteration > self.iterMax: return False
+            if self.iteration > self.maxIter: return False
 
         return True
 
-# %% IQN Relaxation of Solid Displacement
+# %% Relaxation of Solid Interface Displacement
 
-    @compute_time
-    def relaxation(self):
+    def relaxationM(self):
 
-            disp = self.solver.getDisplacement()
+        disp = self.solver.getDisplacement()
 
-            # Performs either BGS or IQN iteration
+        # Performs either BGS or IQN iteration
 
-            if self.iteration == 0:
-                self.interp.disp += self.omega*self.residual
+        if self.iteration == 0:
+            self.interp.disp += self.omega*self.resDisp
 
-            else:
+        else:
 
-                self.V.insert(0,np.concatenate((self.residual-self.prevResidual).T))
-                self.W.insert(0,np.concatenate((disp-self.prevDisp).T))
+            self.VM.insert(0,np.concatenate((self.resDisp-self.prevResM).T))
+            self.WM.insert(0,np.concatenate((disp-self.prevDisp).T))
 
-                # V and W are stored as transpose and list
+            # V and W are stored as transpose and list
 
-                R = np.concatenate(self.residual.T)
-                C = np.linalg.lstsq(np.transpose(self.V),-R,rcond=-1)[0]
-                correction = np.split(np.dot(np.transpose(self.W),C)+R,self.dim)
-                self.interp.disp += np.transpose(correction)
+            R = np.concatenate(self.resDisp.T)
+            C = np.linalg.lstsq(np.transpose(self.VM),-R,rcond=-1)[0]
+            correction = np.split(np.dot(np.transpose(self.WM),C)+R,self.dim)
+            self.interp.disp += np.transpose(correction)
 
-            # Updates the residuals and displacement
+        # Updates the residuals and displacement
 
-            self.prevDisp = disp.copy()
-            self.prevResidual = self.residual.copy()
+        self.prevDisp = np.copy(disp)
+        self.prevResM = np.copy(self.resDisp)
+
+# %% Relaxation of Solid Interface Temperature
+
+    def relaxationT(self):
+
+        temp = self.solver.getTemperature()
+
+        # Performs either BGS or IQN iteration
+
+        if self.iteration == 0:
+            self.interp.temp += self.omega*self.resTemp
+
+        else:
+
+            self.VT.insert(0,np.concatenate((self.resTemp-self.prevResT).T))
+            self.WT.insert(0,np.concatenate((temp-self.prevTemp).T))
+
+            # V and W are stored as transpose and list
+
+            R = np.concatenate(self.resTemp.T)
+            C = np.linalg.lstsq(np.transpose(self.VT),-R,rcond=-1)[0]
+            correction = np.split(np.dot(np.transpose(self.WT),C)+R,1)
+            self.interp.temp += np.transpose(correction)
+
+        # Updates the residuals and displacement
+
+        self.prevTemp = np.copy(temp)
+        self.prevResT = np.copy(self.resTemp)

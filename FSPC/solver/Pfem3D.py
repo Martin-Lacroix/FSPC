@@ -15,30 +15,16 @@ def read(path):
 
 class Pfem3D(object):
     def __init__(self,path):
-        
-        # Read data from the lua file
+
+        self.problem = w.getProblem(path)
+        self.autoRemesh = self.problem.hasAutoRemeshing()
+        ID = self.problem.getID()
+
+        # Read the input Lua file
 
         input = read(path)
-        self.ID = input['Problem.id']
         self.group = input['Problem.interface']
         self.maxFactor = int(input['Problem.maxFactor'])
-        self.autoRemesh = (input['Problem.autoRemeshing'] == 'true')
-
-        # Problem class and functions initialization
-
-        if self.ID == 'IncompNewtonNoT':
-
-            self.run = self.runIncomp
-            self.problem = w.ProbIncompNewton(path)
-            self.applyDispBC = self.applyDispIncomp
-
-        elif self.ID == 'WCompNewtonNoT':
-
-            self.run = self.runWcomp
-            self.problem = w.ProbWCompNewton(path)
-            self.applyDispBC = self.applyDispWcomp
-
-        else: raise Exception('Problem type not supported')
 
         # Stores the important objects and variables
 
@@ -48,32 +34,54 @@ class Pfem3D(object):
         self.dim = self.mesh.getDim()
         self.FSI = w.VectorInt()
 
+        # Problem-dependent function initialization
+
+        if ID in ('Boussinesq','IncompNewtonNoT'):
+
+            self.implicit = True
+            self.indexM = int(0)
+            self.indexT = int(self.dim+1)
+
+        elif ID in ('WCompNewtonNoT','WCBoussinesq'):
+            
+            self.implicit = False
+            self.indexM = int(self.dim+2)
+            self.indexT = int(2*self.dim+2)
+
+        else: raise Exception('Problem type not supported')
+
         # FSI data and stores the previous time step 
 
         self.problem.copySolution(self.prevSolution)
         self.mesh.getNodesIndex(self.group,self.FSI)
         self.mesh.setComputeNormalCurvature(True)
-        self.problem.displayParams()
         self.nbrNode = self.FSI.size()
+        self.problem.displayParams()
 
         # Initializes the simulation data
 
         self.disp = np.zeros((self.nbrNode,self.dim))
         self.initPos =  self.getPosition()
         self.reload = False
+        self.thermo = False
+        self.mecha = False
         self.factor = 1
         self.ok = True
 
-# %% Run for Incompressible Flows
+# %% Calculates One Time Step
 
     @write_logs
     @compute_time
-    def runIncomp(self,t1,t2):
+    def run(self,t1,t2):
 
         print('\nSolve ({:.5e}, {:.5e})'.format(t1,t2))
         print('----------------------------------')
+        if self.implicit: return self.runImplicit(t1,t2)
+        else: return self.runExplicit(t1,t2)
 
-        # The line order is important here
+    # Run for implicit integration scheme
+
+    def runImplicit(self,t1,t2):
 
         if not (self.reload and self.ok): self.factor //= 2
         self.factor = max(1,self.factor)
@@ -98,19 +106,11 @@ class Pfem3D(object):
                 self.resetSystem(t2-t1)
                 iteration = 0
 
-        print('PFEM3D: Successful run')
         return True
 
-# %% Run for Weakly Compressible Flows
+    # Run for explicit integration scheme
 
-    @write_logs
-    @compute_time
-    def runWcomp(self,t1,t2):
-
-        print('\nSolve ({:.5e}, {:.5e})'.format(t1,t2))
-        print('----------------------------------')
-
-        # Estimate the time step only once
+    def runExplicit(self,t1,t2):
         
         self.resetSystem(t2-t1)
         self.solver.computeNextDT()
@@ -128,43 +128,45 @@ class Pfem3D(object):
             self.solver.setTimeStep(dt)
             self.solver.solveOneTimeStep()
 
-        print('PFEM3D: Successful run')
         return True
 
-# %% Apply Boundary Conditions
+# %% Dirichlet Boundary Conditions
 
     def applyDisplacement(self,disp):
-        self.disp = disp.copy()
+        
+        self.disp = np.copy(disp)
+        self.mecha = True
 
-    # For implicit and incompressible flows
+    def applyTemperature(self,temp):
+        
+        self.temp = np.copy(temp)
+        self.thermo = True
 
-    def applyDispIncomp(self,distance,dt):
+    # Update and apply the nodal displacement
 
-        BC = (distance)/dt
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
-                self.mesh.setNodeState(k,i,BC[j,i])
-
-    # For explicit weakly compressive flows
-
-    def applyDispWcomp(self,distance,dt):
+    def applyDispBC(self,distance,dt):
 
         velocity = self.getVelocity()
-        BC = 2*(distance-velocity*dt)/(dt*dt)
-
-        # Update the FSI node states BC
+        if self.implicit: BC = (distance)/dt
+        else: BC = 2*(distance-velocity*dt)/(dt*dt)
 
         for i in range(self.dim):
-            idx = int(self.dim+2+i)
-
             for j,k in enumerate(self.FSI):
-                self.mesh.setNodeState(k,idx,BC[j,i])
+                self.mesh.setNodeState(k,self.indexM+i,BC[j,i])
 
+    # Update and apply the nodal temperatures
+
+    def applyTempBC(self,temp):
+
+        for i,k in enumerate(self.FSI):
+            self.mesh.setNodeState(k,self.indexT,temp[i,0])
+            
 # %% Return Nodal Values
 
     def getPosition(self):
 
-        pos = self.disp.copy()
+        pos = np.zeros((self.nbrNode,self.dim))
+
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
                 pos[j,i] = self.mesh.getNode(k).getCoordinate(i)
@@ -175,14 +177,15 @@ class Pfem3D(object):
 
     def getVelocity(self):
 
-        vel = self.disp.copy()
+        vel = np.zeros((self.nbrNode,self.dim))
+        
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
                 vel[j,i] = self.mesh.getNode(k).getState(i)
 
         return vel
         
-    # Computes the reaction nodal loads
+    # Mechanical boundary conditions
 
     @compute_time
     def getLoading(self):
@@ -193,13 +196,24 @@ class Pfem3D(object):
         for i,array in enumerate(vec): load[i] = array[:self.dim]
         return -load
 
+    # Thermal boundary conditions
+
+    @compute_time
+    def getHeatFlux(self):
+
+        vec = w.VectorArrayDouble3()
+        heat = np.zeros((self.nbrNode,self.dim))
+        self.solver.computeHeatFlux(self.group,self.FSI,vec)
+        for i,array in enumerate(vec): heat[i] = array[:self.dim]
+        return heat
+
 # %% Other Functions
 
     @compute_time
     def update(self):
 
         self.mesh.remesh(False)
-        if (self.ID == 'IncompNewtonNoT'): self.solver.precomputeMatrix()
+        if self.implicit: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
         self.reload = False
     
@@ -208,11 +222,12 @@ class Pfem3D(object):
     def resetSystem(self,dt):
 
         if self.reload: self.problem.loadSolution(self.prevSolution)
-        if self.autoRemesh and (self.ID == 'IncompNewtonNoT'):
-            if self.reload: self.solver.precomputeMatrix()
+        if self.autoRemesh and self.implicit and self.reload:
+            self.solver.precomputeMatrix()
 
         distance = self.disp-(self.getPosition()-self.initPos)
-        self.applyDispBC(distance,dt)
+        if self.mecha: self.applyDispBC(distance,dt)
+        if self.thermo: self.applyTempBC(self.temp)
         self.reload = True
 
     # Display the current simulation state
@@ -227,10 +242,8 @@ class Pfem3D(object):
     # Save the results or finalize
 
     @compute_time
-    def save(self):
-        self.problem.dump()
+    def save(self): self.problem.dump()
 
     @write_logs
-    def exit(self):
-        self.problem.displayTimeStats()
+    def exit(self): self.problem.displayTimeStats()
         

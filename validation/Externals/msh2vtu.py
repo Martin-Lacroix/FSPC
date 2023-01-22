@@ -1,3 +1,4 @@
+import numpy as np
 import meshio
 import os
 
@@ -17,12 +18,27 @@ for root,dirs,files in os.walk(workspace,topdown=False):
 for folder in folderList:
 
     os.chdir(folder)
-    for file in os.listdir():
+    file = os.listdir()
+    time = np.zeros(len(file))
 
-        name,extension = os.path.splitext(file)
+    # Sort the output files
+
+    for i,F in enumerate(file):
+
+        name,extension = os.path.splitext(F)
+        if extension == '.msh':
+            time[i] = float(name[name.index('_')+1:])
+
+    index = np.argsort(time)
+    file = [file[i] for i in index]
+
+    # Rename and convert the files
+
+    for i,F in enumerate(file):
+
+        name,extension = os.path.splitext(F)
         if extension == '.msh':
 
-            name = name[:15]
-            msh = meshio.read(file)
-            name = name.replace('.','')
+            msh = meshio.read(F)
+            name = 'file_'+str(i).rjust(6,'0')
             meshio.write(name+'.vtu',msh,file_format='vtu')

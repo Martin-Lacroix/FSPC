@@ -30,27 +30,37 @@ class Metafor(object):
 
             self.dim = 2
             self.axe = [w.TX,w.TY]
-            self.qxe = [w.IF_FLUX_X,w.IF_FLUX_Y]
 
         elif domain.getGeometry().is3D():
             
             self.dim = 3
             self.axe = [w.TX,w.TY,w.TZ]
-            self.qxe = [w.IF_FLUX_X,w.IF_FLUX_Y,w.IF_FLUX_Z]
 
         # Defines some internal variables
 
         self.Fnods = dict()
         self.neverRun = True
         self.reload = True
+        self.thermo = True
+        self.mecha = True
 
         # Defines some internal variables
 
         self.FSI = input['FSInterface']
         self.exporter = input['exporter']
-        self.interaction = input['interaction']
         self.nbrNode = self.FSI.getNumberOfMeshPoints()
-        self.prevLoad = np.zeros((self.nbrNode,self.dim))
+
+        # Mechanical and thermal interactions
+
+        try:
+            self.interacM = input['interacM']
+            self.prevLoad = np.zeros((self.nbrNode,self.dim))
+        except: self.mecha = False
+
+        try:
+            self.interacT = input['interacT']
+            self.prevHeat = np.zeros((self.nbrNode,self.dim))
+        except: self.thermo = False
 
         # Manages time step restart functions
 
@@ -87,110 +97,119 @@ class Metafor(object):
     def applyLoading(self,load):
 
         mean = (self.prevLoad+load)/2
-        self.nextLoad = load.copy()
+        self.nextLoad = np.copy(load)
 
         for i in range(self.nbrNode):
 
             idx = self.FSI.getMeshPoint(i).getDBNo()
-            if self.dim == 3: self.interaction.setNodValue(idx,*mean[i])
-            else: self.interaction.setNodValue(idx,*mean[i],0)
+            if self.dim == 3: self.interacM.setNodValue(idx,*mean[i])
+            else: self.interacM.setNodValue(idx,*mean[i],0)
 
-# %% Get Mechanical Nodal Values
+    def applyHeatFlux(self,heat):
+
+        mean = (self.prevHeat+heat)/2
+        self.nextHeat = np.copy(heat)
+
+        for i in range(self.nbrNode):
+
+            idx = self.FSI.getMeshPoint(i).getDBNo()
+            if self.dim == 3: self.interacT.setNodValue(idx,*mean[i])
+            else: self.interacT.setNodValue(idx,*mean[i],0)
+
+# %% Return Mechanical Nodal Values
 
     def getPosition(self):
 
-        posVec = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,self.dim))
 
         for i,axe in enumerate(self.axe):
-            for j,position in enumerate(posVec):
+            for j,data in enumerate(vector):
 
                 node = self.FSI.getMeshPoint(j)
-                position[i] += node.getValue(w.Field1D(axe,w.AB))
-                position[i] += node.getValue(w.Field1D(axe,w.RE))
+                data[i] += node.getValue(w.Field1D(axe,w.AB))
+                data[i] += node.getValue(w.Field1D(axe,w.RE))
         
-        return posVec
+        return vector
 
     # Computes the nodal displacement vector
 
     def getDisplacement(self):
 
-        dispVec = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,self.dim))
 
         for i,axe in enumerate(self.axe):
-            for j,disp in enumerate(dispVec):
+            for j,data in enumerate(vector):
 
                 node = self.FSI.getMeshPoint(j)
-                disp[i] = node.getValue(w.Field1D(axe,w.RE))
+                data[i] = node.getValue(w.Field1D(axe,w.RE))
         
-        return dispVec
+        return vector
 
     # Computes the nodal velocity vector
 
     def getVelocity(self):
 
-        velVec = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,self.dim))
 
         for i,axe in enumerate(self.axe):
-            for j,velocity in enumerate(velVec):
+            for j,data in enumerate(vector):
 
                 node = self.FSI.getMeshPoint(j)
-                velocity[i] = node.getValue(w.Field1D(axe,w.GV))
+                data[i] = node.getValue(w.Field1D(axe,w.GV))
         
-        return velVec
+        return vector
 
     # Computes the nodal acceleration vector
 
     def getAcceleration(self):
 
-        accVec = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,self.dim))
 
         for i,axe in enumerate(self.axe):
-            for j,acc in enumerate(accVec):
+            for j,data in enumerate(vector):
 
                 node = self.FSI.getMeshPoint(j)
-                acc[j,i] = node.getValue(w.Field1D(axe,w.GA))
+                data[j,i] = node.getValue(w.Field1D(axe,w.GA))
         
-        return accVec
+        return vector
 
-# %% Get Thermal Nodal Values
+# %% Return Thermal Nodal Values
 
     def getTemperature(self):
 
-        tempVec = np.zeros(self.nbrNode)
+        vector = np.zeros((self.nbrNode,1))
         
         for i in range(self.nbrNode):
 
             node = self.FSI.getMeshPoint(i)
-            tempVec[i] = node.getValue(w.Field1D(w.TO,w.RE))
+            vector[i,0] += node.getValue(w.Field1D(w.TO,w.AB))
+            vector[i,0] += node.getValue(w.Field1D(w.TO,w.RE))
 
-        return tempVec
+        return vector
 
-    # Computes the nodal heat flux vector
+    # Computes the nodal temperature velocity
 
-    def getHeatFlux(self):
+    def getTempVeloc(self):
 
-        heatVec = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,1))
 
-        for i,axe in enumerate(self.qxe):
-            for j,heat in enumerate(heatVec):
+        for i in range(self.nbrNode):
 
-                node = self.FSI.getMeshPoint(j)
-                heat[i] = w.IFNodalValueExtractor(node,axe).extract()[0]
-
-        return heatVec
+            node = self.FSI.getMeshPoint(i)
+            vector[i] = node.getValue(w.Field1D(w.TO,w.GV))
+        
+        return vector
 
 # %% Other Functions
 
     @compute_time
     def update(self):
         
-        self.prevLoad = self.nextLoad.copy()
+        if self.mecha: self.prevLoad = np.copy(self.nextLoad)
+        if self.thermo: self.prevHeat = np.copy(self.nextHeat)
         self.metaFac.save(self.mfac)
         self.reload = False
-        
-    @compute_time
-    def save(self):
-        self.exporter.execute()
 
-    def exit(self):
-        return
+    @compute_time
+    def save(self): self.exporter.execute()
+    def exit(self): return

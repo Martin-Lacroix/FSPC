@@ -1,6 +1,6 @@
 # Number of CPU and threads
 
-export NUN_THREADS=4
+export NUN_THREADS=8
 export CPU_PER_PROC=4
 
 # Path to the external library
@@ -19,6 +19,7 @@ export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 # export SCRIPT=${PWD}/examples/2D/freeStream/main.py
 # export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 # export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
+# export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
 export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
 # export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 

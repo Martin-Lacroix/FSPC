@@ -20,7 +20,6 @@ class Interpolator(object):
         if com.rank == 1:
             
             self.recvNode = com.recv(self.recvNode,source=0)
-            self.disp = np.zeros((self.nbrNode,self.dim))
             com.send(self.solver.nbrNode,dest=0)
 
 # %% Apply Actual Loading Fluid -> Solid
@@ -37,8 +36,8 @@ class Interpolator(object):
 
             # Print the transfered load in the log file
 
-            S = np.sum((np.linalg.norm(load,axis=1)))
-            F = np.sum((np.linalg.norm(recvLoad,axis=1)))
+            S = np.mean((np.linalg.norm(load,axis=1)))
+            F = np.mean((np.linalg.norm(recvLoad,axis=1)))
             print('Load F|S : {:.5e} - {:.5e}'.format(F,S))
 
 # %% Apply Predicted Displacement Solid -> Fluid
@@ -58,3 +57,40 @@ class Interpolator(object):
             S = np.mean((np.linalg.norm(disp,axis=1)))
             F = np.mean((np.linalg.norm(recvDisp,axis=1)))
             print('\nDisp S|F : {:.5e} - {:.5e}'.format(F,S))
+
+# %% Apply Actual Heat Flux Fluid -> Solid
+
+    def applyHeatFS(self,com):
+        
+        if com.rank == 1: recvHeat = np.zeros((self.recvNode,self.dim))
+        if com.rank == 0: com.Send(self.solver.getHeatFlux(),dest=1)
+        if com.rank == 1:
+            
+            com.Recv(recvHeat,source=0)
+            heat = self.interpData(recvHeat)
+            self.solver.applyHeatFlux(heat)
+
+            # Print the transfered load in the log file
+
+            S = np.mean((np.linalg.norm(heat,axis=1)))
+            F = np.mean((np.linalg.norm(recvHeat,axis=1)))
+            print('Flux F|S : {:.5e} - {:.5e}'.format(F,S))
+
+# %% Apply Predicted Temperature Solid -> Fluid
+
+    def applyTempSF(self,com):
+
+        if com.rank == 0: recvTemp = np.zeros((self.recvNode,1))
+        if com.rank == 1: com.Send(self.temp.copy(),dest=0)
+        if com.rank == 0:
+
+            com.Recv(recvTemp,source=1)
+            temp = self.interpData(recvTemp)
+            self.solver.applyTemperature(temp)
+
+            # Print the transfered load in the log file
+
+            S = np.mean((np.linalg.norm(temp,axis=1)))
+            F = np.mean((np.linalg.norm(recvTemp,axis=1)))
+            print('\nTemp S|F : {:.5e} - {:.5e}'.format(F,S))
+            
