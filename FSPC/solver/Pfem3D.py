@@ -39,14 +39,14 @@ class Pfem3D(object):
         if ID in ('Boussinesq','IncompNewtonNoT'):
 
             self.implicit = True
-            self.indexM = int(0)
             self.indexT = int(self.dim+1)
+            self.indexM = int(0)
 
         elif ID in ('WCompNewtonNoT','WCBoussinesq'):
             
             self.implicit = False
-            self.indexM = int(self.dim+2)
             self.indexT = int(2*self.dim+2)
+            self.indexM = int(self.dim+2)
 
         else: raise Exception('Problem type not supported')
 
