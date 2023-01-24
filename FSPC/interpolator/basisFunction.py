@@ -8,20 +8,20 @@ class RBF(Interpolator):
     def __init__(self,solver,fun,com):
         Interpolator.__init__(self,solver,com)
 
+        recvPos = None
         self.function = fun
-        recvPos = np.zeros((self.recvNode,self.dim))
 
         # Share the position vectors between solvers
 
         if com.rank == 0:
 
-            com.Recv(recvPos,source=1)
-            com.Send(self.solver.getPosition(),dest=1)
+            recvPos = com.recv(recvPos,source=1)
+            com.send(self.solver.getPosition(),dest=1)
 
         if com.rank == 1:
 
-            com.Send(self.solver.getPosition(),dest=0)
-            com.Recv(recvPos,source=0)
+            com.send(self.solver.getPosition(),dest=0)
+            recvPos = com.recv(recvPos,source=0)
 
         # Compute the FS mesh interpolation matrix
 
@@ -60,9 +60,3 @@ class RBF(Interpolator):
         try: self.H = np.linalg.lstsq(A.T,B.T,rcond=-1)[0].T
         except: self.H = np.linalg.solve(A.T,B.T).T
         self.H = self.H[:self.nbrNode,:self.recvNode]
-
-# %% Interpolate recvData and return the result
-
-    @compute_time
-    def interpData(self,recvData):
-        return self.H.dot(recvData)

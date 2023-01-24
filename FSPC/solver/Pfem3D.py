@@ -165,46 +165,44 @@ class Pfem3D(object):
 
     def getPosition(self):
 
-        pos = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,self.dim))
 
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
-                pos[j,i] = self.mesh.getNode(k).getCoordinate(i)
+                vector[j,i] = self.mesh.getNode(k).getCoordinate(i)
 
-        return pos
+        return vector
 
     # Computes the nodal velocity vector
 
     def getVelocity(self):
 
-        vel = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNode,self.dim))
         
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
-                vel[j,i] = self.mesh.getNode(k).getState(i)
+                vector[j,i] = self.mesh.getNode(k).getState(i)
 
-        return vel
+        return vector
         
     # Mechanical boundary conditions
 
     @compute_time
     def getLoading(self):
 
-        vec = w.VectorArrayDouble3()
-        load = np.zeros((self.nbrNode,self.dim))
-        self.solver.computeTraction(self.group,self.FSI,vec)
-        for i,array in enumerate(vec): load[i] = array[:self.dim]
-        return -load
+        vector = w.VectorVectorDouble()
+        self.solver.computeStress(self.group,self.FSI,vector)
+        load = np.copy(vector)
+        return load
 
     # Thermal boundary conditions
 
     @compute_time
     def getHeatFlux(self):
 
-        vec = w.VectorArrayDouble3()
-        heat = np.zeros((self.nbrNode,self.dim))
-        self.solver.computeHeatFlux(self.group,self.FSI,vec)
-        for i,array in enumerate(vec): heat[i] = array[:self.dim]
+        vector = w.VectorVectorDouble()
+        self.solver.computeHeatFlux(self.group,self.FSI,vector)
+        heat = np.copy(vector)
         return heat
 
 # %% Other Functions

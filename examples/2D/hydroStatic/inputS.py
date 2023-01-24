@@ -90,7 +90,7 @@ def getMetafor(input):
 
     # Parameters for FSPC
 
-    input['interaction'] = load
+    input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
     input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])

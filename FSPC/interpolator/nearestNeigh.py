@@ -9,21 +9,21 @@ class KNN(Interpolator):
     def __init__(self,solver,K,com):
         Interpolator.__init__(self,solver,com)
 
-        self.K = int(K)
-        recvPos = np.zeros((self.recvNode,self.dim))
+        recvPos = None
+        self.neigh = int(K)
         self.H = dok_matrix((self.nbrNode,self.recvNode),dtype=float)
 
         # Share the position vectors between solvers
 
         if com.rank == 0:
 
-            com.Recv(recvPos,source=1)
-            com.Send(self.solver.getPosition(),dest=1)
+            recvPos = com.recv(recvPos,source=1)
+            com.send(self.solver.getPosition(),dest=1)
 
         if com.rank == 1:
 
-            com.Send(self.solver.getPosition(),dest=0)
-            com.Recv(recvPos,source=0)
+            com.send(self.solver.getPosition(),dest=0)
+            recvPos = com.recv(recvPos,source=0)
 
         # Compute the FS mesh interpolation matrix
 
@@ -36,7 +36,7 @@ class KNN(Interpolator):
     @compute_time
     def computeMapping(self,recvPos,position):
 
-        if self.K == 1: self.search(recvPos,position)
+        if self.neigh == 1: self.search(recvPos,position)
         else: self.interp(recvPos,position)
 
     def search(self,recvPos,position):
@@ -52,19 +52,13 @@ class KNN(Interpolator):
         for i in range(self.nbrNode):
 
             distance = np.linalg.norm(position[i]-recvPos,axis=1)
-            index = np.argsort(distance)[:self.K]
-            weight = np.zeros(self.K)
+            index = np.argsort(distance)[:self.neigh]
+            weight = np.zeros(self.neigh)
             dist = distance[index]
 
-            for j in range(self.K):
+            for j in range(self.neigh):
 
                 val = [r for idx,r in enumerate(dist) if idx != j]
                 weight[j] = np.prod(val)
 
             self.H[i,index] = weight/np.sum(weight)
-
-# %% Interpolate recvData and return the result
-
-    @compute_time
-    def interpData(self,recvData):
-        return self.H.dot(recvData)

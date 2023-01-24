@@ -28,11 +28,13 @@ class Metafor(object):
 
         if domain.getGeometry().is2D():
 
+            length = 3
             self.dim = 2
             self.axe = [w.TX,w.TY]
 
         elif domain.getGeometry().is3D():
             
+            length = 6
             self.dim = 3
             self.axe = [w.TX,w.TY,w.TZ]
 
@@ -54,7 +56,7 @@ class Metafor(object):
 
         try:
             self.interacM = input['interacM']
-            self.prevLoad = np.zeros((self.nbrNode,self.dim))
+            self.prevLoad = np.zeros((self.nbrNode,length))
         except: self.mecha = False
 
         try:
@@ -96,25 +98,23 @@ class Metafor(object):
 
     def applyLoading(self,load):
 
-        mean = (self.prevLoad+load)/2
+        vector = (self.prevLoad+load)/2
         self.nextLoad = np.copy(load)
 
         for i in range(self.nbrNode):
 
             idx = self.FSI.getMeshPoint(i).getDBNo()
-            if self.dim == 3: self.interacM.setNodValue(idx,*mean[i])
-            else: self.interacM.setNodValue(idx,*mean[i],0)
+            self.interacM.setNodTensor(idx,*vector[i])
 
     def applyHeatFlux(self,heat):
 
-        mean = (self.prevHeat+heat)/2
+        vector = (self.prevHeat+heat)/2
         self.nextHeat = np.copy(heat)
 
         for i in range(self.nbrNode):
 
             idx = self.FSI.getMeshPoint(i).getDBNo()
-            if self.dim == 3: self.interacT.setNodValue(idx,*mean[i])
-            else: self.interacT.setNodValue(idx,*mean[i],0)
+            self.interacT.setNodVector(idx,*vector[i])
 
 # %% Return Mechanical Nodal Values
 

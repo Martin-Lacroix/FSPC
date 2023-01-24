@@ -1,3 +1,4 @@
+from ..toolbox import compute_time
 import numpy as np
 
 # %% Parent Interpolator Class
@@ -22,15 +23,21 @@ class Interpolator(object):
             self.recvNode = com.recv(self.recvNode,source=0)
             com.send(self.solver.nbrNode,dest=0)
 
+    # Interpolate recvData and return the result
+
+    @compute_time
+    def interpData(self,recvData):
+        return self.H.dot(recvData)
+
 # %% Apply Actual Loading Fluid -> Solid
 
     def applyLoadFS(self,com):
-        
-        if com.rank == 1: recvLoad = np.zeros((self.recvNode,self.dim))
-        if com.rank == 0: com.Send(self.solver.getLoading(),dest=1)
+
+        if com.rank == 0: com.send(self.solver.getLoading(),dest=1)
         if com.rank == 1:
 
-            com.Recv(recvLoad,source=0)
+            recvLoad = None
+            recvLoad = com.recv(recvLoad,source=0)
             load = self.interpData(recvLoad)
             self.solver.applyLoading(load)
 
@@ -44,11 +51,11 @@ class Interpolator(object):
 
     def applyDispSF(self,com):
 
-        if com.rank == 0: recvDisp = np.zeros((self.recvNode,self.dim))
-        if com.rank == 1: com.Send(self.disp.copy(),dest=0)
+        if com.rank == 1: com.send(self.disp.copy(),dest=0)
         if com.rank == 0:
 
-            com.Recv(recvDisp,source=1)
+            recvDisp = None
+            recvDisp = com.recv(recvDisp,source=1)
             disp = self.interpData(recvDisp)
             self.solver.applyDisplacement(disp)
 
@@ -62,11 +69,11 @@ class Interpolator(object):
 
     def applyHeatFS(self,com):
         
-        if com.rank == 1: recvHeat = np.zeros((self.recvNode,self.dim))
-        if com.rank == 0: com.Send(self.solver.getHeatFlux(),dest=1)
+        if com.rank == 0: com.send(self.solver.getHeatFlux(),dest=1)
         if com.rank == 1:
             
-            com.Recv(recvHeat,source=0)
+            recvHeat = None
+            recvHeat = com.recv(recvHeat,source=0)
             heat = self.interpData(recvHeat)
             self.solver.applyHeatFlux(heat)
 
@@ -80,11 +87,11 @@ class Interpolator(object):
 
     def applyTempSF(self,com):
 
-        if com.rank == 0: recvTemp = np.zeros((self.recvNode,1))
-        if com.rank == 1: com.Send(self.temp.copy(),dest=0)
+        if com.rank == 1: com.send(self.temp.copy(),dest=0)
         if com.rank == 0:
-
-            com.Recv(recvTemp,source=1)
+            
+            recvTemp = None
+            recvTemp = com.recv(recvTemp,source=1)
             temp = self.interpData(recvTemp)
             self.solver.applyTemperature(temp)
 

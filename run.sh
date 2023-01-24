@@ -19,8 +19,8 @@ export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 # export SCRIPT=${PWD}/examples/2D/freeStream/main.py
 # export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 # export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
-# export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
-export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
+export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
+# export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
 # export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
 # export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
