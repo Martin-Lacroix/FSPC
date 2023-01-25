@@ -78,7 +78,7 @@ def getMetafor(input):
     # Elements for surface traction
 
     prp2 = w.ElementProperties(w.NodTraction2DElement)
-    load = w.NodLoadingInteraction(2)
+    load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
     interactionset.add(load)
@@ -133,7 +133,7 @@ def getMetafor(input):
 
     # Parameters for FSPC
 
-    input['interaction'] = load
+    input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
     input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])

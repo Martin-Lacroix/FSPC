@@ -64,7 +64,7 @@ def getMetafor(input):
     # Elements for surface traction
 
     prp2 = w.ElementProperties(w.NodTraction2DElement)
-    load = w.NodLoadingInteraction(2)
+    load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
     interactionset.add(load)

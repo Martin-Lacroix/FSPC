@@ -64,10 +64,12 @@ class IQN_MVJ(Algorithm):
             if verif == True:
 
                 if (com.rank == 1) and self.convergM:
-                    self.JprevM = np.copy(self.JM)
+                    try: self.JprevM = np.copy(self.JM)
+                    except: pass
 
                 if (com.rank == 1) and self.convergT:
-                    self.JprevT = np.copy(self.JT)
+                    try: self.JprevT = np.copy(self.JT)
+                    except: pass
 
                 return True
 

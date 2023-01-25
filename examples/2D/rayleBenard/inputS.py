@@ -67,16 +67,10 @@ def getMetafor(input):
 
     # Elements for surface traction
 
-    prp2 = w.ElementProperties(w.NodTraction2DElement)
-    load = w.NodLoadingInteraction(2)
-    load.push(groups['FSInterface'])
-    load.addProperty(prp2)
-    interactionset.add(load)
-
-    prp3 = w.ElementProperties(w.NodTmFlux2DElement)
-    heat = w.NodLoadingInteraction(3)
+    prp2 = w.ElementProperties(w.NodHeatFlux2DElement)
+    heat = w.NodInteraction(2)
     heat.push(groups['FSInterface'])
-    heat.addProperty(prp3)
+    heat.addProperty(prp2)
     interactionset.add(heat)
 
     # Boundary conditions
@@ -121,7 +115,6 @@ def getMetafor(input):
     input['interacT'] = heat
     input['FSInterface'] = groups['FSInterface']
     input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
-    input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
     input['exporter'].addDataBaseField([w.TO])
     input['exporter'].format = 'gmsh'
     return metafor

@@ -1,4 +1,5 @@
 from ..toolbox import compute_time
+from mpi4py import MPI
 import numpy as np
 import sys
 
@@ -16,9 +17,11 @@ class Algorithm(object):
 # %% Runs the Fluid-Solid Coupling
 
     @compute_time
-    def simulate(self,com):
+    def simulate(self):
 
+        com = MPI.COMM_WORLD
         if com.rank == 1: self.initInterp()
+
         self.write = np.arange(self.dtWrite,self.endTime,self.dtWrite)
         self.write = np.append(self.write,self.endTime).tolist()
         self.write.append(np.inf)
@@ -28,10 +31,9 @@ class Algorithm(object):
         
         while self.step.time < self.endTime:
 
-            if self.step.dt < 1e-9: raise Exception('Small time step')
             if com.rank == 1: self.printStep()
             if com.rank == 1: self.predictor()
-
+            if self.step.dt < 1e-9: raise Exception('Small time step')
             self.verified = self.couplingAlgo(com)
 
             # Restart the time step the coupling fails

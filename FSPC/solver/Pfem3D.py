@@ -54,7 +54,6 @@ class Pfem3D(object):
 
         self.problem.copySolution(self.prevSolution)
         self.mesh.getNodesIndex(self.group,self.FSI)
-        self.mesh.setComputeNormalCurvature(True)
         self.nbrNode = self.FSI.size()
         self.problem.displayParams()
 

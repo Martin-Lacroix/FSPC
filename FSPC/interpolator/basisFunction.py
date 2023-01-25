@@ -1,15 +1,18 @@
 from .Interpolator import Interpolator
 from ..toolbox import compute_time
+from mpi4py import MPI
 import numpy as np
 
 # %% Mesh Interpolation with Radial Basis Functions
 
 class RBF(Interpolator):
-    def __init__(self,solver,fun,com):
-        Interpolator.__init__(self,solver,com)
+    def __init__(self,solver,fun):
+        Interpolator.__init__(self,solver)
 
         recvPos = None
         self.function = fun
+        self.nbrNode = self.solver.nbrNode
+        com = MPI.COMM_WORLD
 
         # Share the position vectors between solvers
 
@@ -34,7 +37,7 @@ class RBF(Interpolator):
     @compute_time
     def computeMapping(self,recvPos,position):
 
-        size = self.recvNode+self.dim+1
+        size = self.recvNode+self.solver.dim+1
         B = np.ones((self.nbrNode,size))
         A = np.zeros((size,size))
 

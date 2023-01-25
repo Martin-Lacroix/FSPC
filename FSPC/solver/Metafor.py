@@ -40,7 +40,6 @@ class Metafor(object):
 
         # Defines some internal variables
 
-        self.Fnods = dict()
         self.neverRun = True
         self.reload = True
         self.thermo = True
@@ -77,6 +76,8 @@ class Metafor(object):
     @write_logs
     @compute_time
     def run(self,t1,t2):
+
+        #raise Exception('END')
 
         if(self.neverRun):
 

@@ -1,17 +1,20 @@
 from .Interpolator import Interpolator
 from scipy.sparse import dok_matrix
 from ..toolbox import compute_time
+from mpi4py import MPI
 import numpy as np
 
 # %% Mesh Interpolation with K-Nearest Neighbours
 
 class KNN(Interpolator):
-    def __init__(self,solver,K,com):
-        Interpolator.__init__(self,solver,com)
+    def __init__(self,solver,K):
+        Interpolator.__init__(self,solver)
 
         recvPos = None
         self.neigh = int(K)
+        self.nbrNode = self.solver.nbrNode
         self.H = dok_matrix((self.nbrNode,self.recvNode),dtype=float)
+        com = MPI.COMM_WORLD
 
         # Share the position vectors between solvers
 
@@ -39,6 +42,8 @@ class KNN(Interpolator):
         if self.neigh == 1: self.search(recvPos,position)
         else: self.interp(recvPos,position)
 
+    # Nearest neighbour search if one neighbour
+
     def search(self,recvPos,position):
 
         for i in range(self.nbrNode):
@@ -46,6 +51,8 @@ class KNN(Interpolator):
             distance = np.linalg.norm(position[i]-recvPos,axis=1)
             index = np.argmin(distance)
             self.H[i,index] = 1
+
+    # Interpolate from the K nearest neighbours
 
     def interp(self,recvPos,position):
 

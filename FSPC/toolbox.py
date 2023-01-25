@@ -88,7 +88,6 @@ class TimeStep(object):
 class Process(object):
     def __init__(self):
 
-        self.com = MPI.COMM_WORLD
         self.rank = MPI.COMM_WORLD.rank
         self.redirect = fwkw.StdOutErr2Py()
 
@@ -109,10 +108,14 @@ class Process(object):
 
 # %% Print the Computation Times
 
-def printClock(com):
+def printClock():
 
     global clock
+    com = MPI.COMM_WORLD
+
     print('\n------------------------------------')
     print('Process {:.0f} : Time Stats'.format(com.rank))
     print('------------------------------------\n')
-    for I,T in clock.items(): print('{}{:.5f}'.format(I.ljust(20),T))
+    
+    for fun,time in clock.items():
+        print('{}{:.5f}'.format(fun.ljust(20),time))

@@ -1,14 +1,14 @@
 from ..toolbox import compute_time
+from mpi4py import MPI
 import numpy as np
 
 # %% Parent Interpolator Class
 
 class Interpolator(object):
-    def __init__(self,solver,com):
+    def __init__(self,solver):
 
+        com = MPI.COMM_WORLD
         self.solver = solver
-        self.dim = self.solver.dim
-        self.nbrNode = self.solver.nbrNode
         self.recvNode = None
 
         # Number of nodes from the other process
