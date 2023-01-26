@@ -20,12 +20,12 @@ Line(4) = {4,2};
 
 // Fluid Surface
 
-Curve Loop(2) = {-1,2,3,4};
-Plane Surface(2) = {2};
+Curve Loop(1) = {-1,2,3,4};
+Plane Surface(1) = {1};
 
 // Boundaries
 
-Physical Surface("Fluid") = {2};
+Physical Surface("Fluid") = {1};
 Physical Curve("FSInterface") = {1};
 Physical Curve("FreeSurface") = {3};
 Physical Curve("Wall") = {2,4};

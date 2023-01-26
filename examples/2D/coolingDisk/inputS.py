@@ -51,7 +51,7 @@ def getMetafor(input):
     materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.THERM_EXPANSION,0)
     materset(1).put(w.HEAT_CAPACITY,1)
-    materset(1).put(w.MASS_DENSITY,8e3)
+    materset(1).put(w.MASS_DENSITY,900)
     materset(1).put(w.POISSON_RATIO,0)
     materset(1).put(w.CONDUCTIVITY,10)
     materset(1).put(w.DISSIP_TE,0)
@@ -62,6 +62,7 @@ def getMetafor(input):
     prp1 = w.ElementProperties(w.TmVolume2DElement)
     prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_SRIPR)
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
+    prp1.put(w.GRAVITY_Y,-9.81)
     prp1.put(w.MATERIAL,1)
     app.addProperty(prp1)
 
@@ -73,17 +74,17 @@ def getMetafor(input):
     heat.addProperty(prp2)
     interactionset.add(heat)
 
+    # Elements for surface traction
+
+    prp3 = w.ElementProperties(w.NodTraction2DElement)
+    load = w.NodInteraction(3)
+    load.push(groups['FSInterface'])
+    load.addProperty(prp3)
+    interactionset.add(load)
+
     # Boundary conditions
-    
-    loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
 
-    loadingset.define(groups['FSInterface'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['FSInterface'],w.Field1D(w.TY,w.RE))
-
-    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),300)
-    initcondset.define(groups['Bottom'],w.Field1D(w.TO,w.AB),2e3)
-    loadingset.define(groups['Bottom'],w.Field1D(w.TO,w.RE),0,w.TOTAL_LOAD)
+    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),2000)
 
     # Mechanical and thermal time integration
 
@@ -113,6 +114,7 @@ def getMetafor(input):
     # Parameters for FSPC
 
     input['interacT'] = heat
+    input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
     input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
     input['exporter'].addDataBaseField([w.TO])

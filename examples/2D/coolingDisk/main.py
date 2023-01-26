@@ -1,5 +1,4 @@
 import os.path as path
-import numpy as np
 import FSPC
 
 # %% Paths to the input files
@@ -11,19 +10,19 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 process = FSPC.Process()
 solver = process.getSolver(pathF,pathS)
-RBF = lambda r: np.square(r)*np.ma.log(r)
 
 # Configure the algorithm
 
-algorithm = FSPC.IQN_MVJ(solver)
-algorithm.interp = FSPC.RBF(solver,RBF)
+algorithm = FSPC.IQN_ILS(solver)
+algorithm.interp = FSPC.KNN(solver,2)
 algorithm.convergM = FSPC.Convergence(1e-8)
-algorithm.step = FSPC.TimeStep(1e-3)
+algorithm.convergT = FSPC.Convergence(1e-8)
+algorithm.step = FSPC.TimeStep(1e-2)
 
-algorithm.endTime = 1
+algorithm.endTime = 20
 algorithm.omega = 0.5
 algorithm.maxIter = 25
-algorithm.dtWrite = 1e-2
+algorithm.dtWrite = 0.01
 
 # Start the FSPC simulation
 
