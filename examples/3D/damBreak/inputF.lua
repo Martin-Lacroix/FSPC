@@ -1,11 +1,10 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.id = 'IncompNewtonNoT'
-
 Problem.autoRemeshing = false
 Problem.verboseOutput = false
 Problem.simulationTime = math.huge
+Problem.id = 'IncompNewtonNoT'
 
 -- FSPC Parameters
 
@@ -18,13 +17,13 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.7
-Problem.Mesh.hchar = 0.03
+Problem.Mesh.hchar = 0.01
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = true
 Problem.Mesh.boundingBox = {0,0,0,1.1,0.3,0.4}
 Problem.Mesh.exclusionZones = {}
@@ -32,6 +31,7 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'Polytope'}
+Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -100,4 +100,10 @@ end
 
 function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
     return 0,0,0
+end
+
+function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+
+	local hchar = Problem.Mesh.hchar
+	return hchar+(dist)*0.4
 end

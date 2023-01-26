@@ -10,21 +10,21 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 process = FSPC.Process()
 solver = process.getSolver(pathF,pathS)
-com = process.com
 
 # Configure the algorithm
 
-algorithm = FSPC.IQN_MVJ(solver,com)
-algorithm.interp = FSPC.KNN(solver,1,com)
-algorithm.converg = FSPC.Convergence(1e-6)
+algorithm = FSPC.IQN_MVJ(solver)
+algorithm.interp = FSPC.KNN(solver,3)
+algorithm.convergM = FSPC.Convergence(1e-6)
 algorithm.step = FSPC.TimeStep(1e-3)
 
 algorithm.endTime = 2
+algorithm.endTime = 1e-2
 algorithm.omega = 0.5
-algorithm.iterMax = 10
+algorithm.maxIter = 10
 algorithm.dtWrite = 0.01
 
 # Start the FSPC simulation
 
-algorithm.simulate(com)
-FSPC.printClock(com)
+algorithm.simulate()
+FSPC.printClock()

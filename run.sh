@@ -23,8 +23,8 @@ export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
 export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
 export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
-# export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
-# export SCRIPT=${PWD}/examples/3D/damBreak/main.py
+export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
+export SCRIPT=${PWD}/examples/3D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
 # export SCRIPT=${PWD}/examples/3D/rubberGate/main.py
 

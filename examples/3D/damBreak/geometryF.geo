@@ -3,16 +3,16 @@ Ly = 0.3;
 Lz = 0.4;
 
 S = 0.6;
-Sx = 0.02;
+Sx = 0.03;
 Sy = 0.1;
 Sz = 0.2;
 
 Fx = 0.3;
 
-d = 0.03;
-N = 8;
-M = 5;
-P = 2;
+d = 0.01;
+N = 20;
+M = 10;
+P = 4;
 
 // Points List
 
@@ -150,4 +150,47 @@ Physical Surface("FSInterface") = {8,9,10,11,12};
 Physical Surface("Reservoir") = {1,3,4,5,7,13,15,16,17};
 Physical Surface("Polytope") = {7,8,9,10,11,12};
 
+// Distance from X
+
+Field[1] = MathEval;
+Field[1].F = "Max(0.4*(0.3-x),0.01)";
+Field[2] = MathEval;
+Field[2].F = "Max(0.4*x,0.01)";
+
+// Distance from Y
+
+Field[3] = MathEval;
+Field[3].F = "Max(0.4*(0.3-y),0.01)";
+Field[4] = MathEval;
+Field[4].F = "Max(0.4*y,0.01)";
+
+// Distance from Z
+
+Field[5] = MathEval;
+Field[5].F = "Max(0.4*(0.4-z),0.01)";
+Field[6] = MathEval;
+Field[6].F = "Max(0.4*z,0.01)";
+
+// Solid Mesh Box
+
+Field[7] = Box;
+Field[7].VIn = d;
+Field[7].VOut = 1;
+Field[7].XMin = S;
+Field[7].XMax = S+Sx;
+Field[7].YMin = (Ly-Sy)/2;
+Field[7].YMax = (Ly+Sy)/2;
+Field[7].ZMin = 0;
+Field[7].ZMax = Sz;
+
+// Makes the Mesh
+
+Field[8] = Min;
+Field[8].FieldsList = {1,2,3,4,5,6,7};
+Background Field = 8;
+
+Mesh.MeshSizeExtendFromBoundary = 0;
+Mesh.MeshSizeFromCurvature = 0;
+Mesh.MeshSizeFromPoints = 0;
+Mesh.Algorithm = 5;
 Mesh 3;

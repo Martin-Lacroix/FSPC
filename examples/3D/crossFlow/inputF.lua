@@ -2,7 +2,7 @@
 
 Problem = {}
 Problem.autoRemeshing = false
-Problem.verboseOutput = true
+Problem.verboseOutput = false
 Problem.simulationTime = math.huge
 Problem.id = 'IncompNewtonNoT'
 
@@ -14,7 +14,7 @@ Problem.maxFactor = 10
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.3
+Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 2e-3
@@ -89,7 +89,6 @@ Problem.Solver.MomContEq.bodyForce = {0,0,0}
 Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
--- Problem.Solver.MomContEq.BC['BottomFreeSlipEuler'] = true
 
 function Problem.IC:initStates(pos)
     return {0,0,0,0}
