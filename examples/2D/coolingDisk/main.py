@@ -1,5 +1,7 @@
 import os.path as path
+import numpy as np
 import FSPC
+import os
 
 # %% Paths to the input files
 
@@ -28,3 +30,16 @@ algorithm.dtWrite = 0.01
 
 algorithm.simulate()
 FSPC.printClock()
+
+# %% Post Procesing of Outputs
+
+if process.rank == 0: os.chdir('pfem')
+if process.rank == 1: os.chdir('metafor')
+
+fileList = os.listdir()
+time = [float(F[7:-4]) for F in fileList]
+
+for i,j in enumerate(np.argsort(time)):
+
+    output = 'output_'+str(i)+'.vtu'
+    os.rename(fileList[j],output)

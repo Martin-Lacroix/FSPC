@@ -135,7 +135,7 @@ def getMetafor(input):
 
     input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/output.vtu',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
-    input['exporter'].format = 'gmsh'
+    input['exporter'].format = 'vtu'
     return metafor

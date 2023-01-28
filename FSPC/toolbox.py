@@ -1,4 +1,5 @@
 from contextlib import redirect_stdout as stdout
+from contextlib import redirect_stderr as stderr
 from mpi4py import MPI
 import collections
 import numpy as np
@@ -16,8 +17,9 @@ def write_logs(func):
     def wrapper(*args,**kwargs):
 
         rank = str(MPI.COMM_WORLD.rank)
-        with open('solver_'+rank+'.dat','a') as file:
-            with stdout(file): result = func(*args,**kwargs)
+        with open('solver_'+rank+'.dat','a') as output:
+            with stderr(output), stdout(output):
+                result = func(*args,**kwargs)
         
         return result
     return wrapper

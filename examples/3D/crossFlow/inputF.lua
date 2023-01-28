@@ -41,7 +41,7 @@ Problem.Extractors = {}
 Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
-Problem.Extractors[0].outputFile = 'pfem/fluid.msh'
+Problem.Extractors[0].outputFile = 'pfem/output.msh'
 Problem.Extractors[0].whatToWrite = {'p','velocity'}
 Problem.Extractors[0].timeBetweenWriting = math.huge
 
@@ -107,10 +107,6 @@ function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
     end
 end
 
-function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
-    return 0,0,0
-end
-
 function Problem.Solver.MomContEq.BC:ReservoirVEuler(pos,t)
 
     local tmax = 0.1
@@ -124,8 +120,16 @@ function Problem.Solver.MomContEq.BC:ReservoirVEuler(pos,t)
     end
 end
 
+function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
+    return 0,0,0
+end
+
 function Problem.Solver.MomContEq.BC:BottomVEuler(pos,t)
 	return 0,0,0
+end
+
+function Problem.Solver.MomContEq.BC:OutletP(pos,t)
+	return 0
 end
 
 function Problem.Mesh:computeHcharFromDistance(pos,t,dist)

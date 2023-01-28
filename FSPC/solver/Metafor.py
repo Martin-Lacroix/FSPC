@@ -211,6 +211,7 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.reload = False
 
+    @write_logs
     @compute_time
     def save(self): self.exporter.execute()
     def exit(self): return

@@ -118,7 +118,7 @@ Physical Surface("Bottom") = {1,7};
 Physical Surface("Polytope") = {1,2,3,4,5,6};
 Physical Surface("FSInterface") = {2,3,4,5,6};
 Physical Surface("Reservoir") = {8,9,10};
-Physical Surface("FreeSurface") = {11};
+Physical Surface("Outlet") = {11};
 Physical Surface("Inlet") = {12};
 Physical Volume("Fluid") = {1};
 

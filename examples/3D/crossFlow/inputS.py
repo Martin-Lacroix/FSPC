@@ -49,14 +49,17 @@ def getMetafor(input):
     materset(1).put(w.ELASTIC_MODULUS,1.23e6)
     materset(1).put(w.POISSON_RATIO,0.3)
     materset(1).put(w.MASS_DENSITY,1030)
-
+    
     # Finite element properties
 
-    prp1 = w.ElementProperties(w.Volume3DElement)
-    prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp1.put(w.MATERIAL,1)
-    app.addProperty(prp1)
+    prp = w.ElementProperties(w.Volume3DElement)
+    prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_EAS)
+    prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
+    prp.put(w.TOTAL_LAGRANGIAN,True)
+    prp.put(w.GRAVITY_Z,-9.81)
+    prp.put(w.MATERIAL,1)
+    prp.put(w.PEAS,1e-9)
+    app.addProperty(prp)
 
     # Elements for surface traction
 
@@ -93,7 +96,7 @@ def getMetafor(input):
 
     input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/output.msh',metafor)
     input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
     input['exporter'].format = 'gmsh'
     return metafor

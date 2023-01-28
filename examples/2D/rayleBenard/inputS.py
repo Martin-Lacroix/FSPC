@@ -114,7 +114,7 @@ def getMetafor(input):
 
     input['interacT'] = heat
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = meshio.MeshioExport('metafor/solid.msh',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/output.msh',metafor)
     input['exporter'].addDataBaseField([w.TO])
     input['exporter'].format = 'gmsh'
     return metafor

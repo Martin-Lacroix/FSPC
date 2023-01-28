@@ -238,6 +238,7 @@ class Pfem3D(object):
 
     # Save the results or finalize
 
+    @write_logs
     @compute_time
     def save(self): self.problem.dump()
 
