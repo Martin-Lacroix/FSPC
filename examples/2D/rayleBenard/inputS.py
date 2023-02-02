@@ -39,7 +39,7 @@ def getMetafor(input):
     groups = importer.groups
     importer.execute()
 
-    # Defines the ball domain
+    # Defines the solid domain
 
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
