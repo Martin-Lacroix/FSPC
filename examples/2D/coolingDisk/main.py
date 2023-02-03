@@ -31,7 +31,7 @@ algorithm.dtWrite = 0.01
 algorithm.simulate()
 FSPC.printClock()
 
-# %% Post Procesing of Outputs
+# %% Post Procesing of Results
 
 if process.rank == 0: os.chdir('pfem')
 if process.rank == 1: os.chdir('metafor')

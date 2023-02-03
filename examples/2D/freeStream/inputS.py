@@ -60,7 +60,7 @@ def getMetafor(input):
 
     # Elements for surface traction
 
-    prp2 = w.ElementProperties(w.NodTraction2DElement)
+    prp2 = w.ElementProperties(w.NodStress2DElement)
     load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
@@ -70,10 +70,6 @@ def getMetafor(input):
 
     loadingset.define(groups['SolidBase'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['SolidBase'],w.Field1D(w.TY,w.RE))
-
-
-    #loadingset.define(groups['Solid'],w.Field1D(w.TX,w.RE))
-    #loadingset.define(groups['Solid'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 
