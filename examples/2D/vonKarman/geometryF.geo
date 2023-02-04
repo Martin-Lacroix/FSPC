@@ -88,4 +88,5 @@ Mesh.MeshSizeExtendFromBoundary = 0;
 Mesh.MeshSizeFromCurvature = 0;
 Mesh.MeshSizeFromPoints = 0;
 Mesh.Algorithm = 5;
+Mesh.Binary = 1;
 Mesh 2;

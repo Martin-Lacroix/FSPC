@@ -77,8 +77,6 @@ Curve Loop(1) = {1,2,3,4};
 Curve Loop(2) = {5,6,7,8,9,10,11,12};
 Curve Loop(3) = {13,14,15,16,17,18,19,20};
 Plane Surface(1) = {1};
-Plane Surface(2) = {2};
-Plane Surface(3) = {3};
 
 Transfinite Surface{1};
 Recombine Surface{1};
@@ -91,9 +89,9 @@ Transfinite Line{4} = N;
 // Boundaries
 
 Physical Surface("Solid") = {1};
-Physical Surface("Tool") = {2,3};
 Physical Curve("ToolBot") = {5,6,7,8,9,10,11,12};
 Physical Curve("ToolTop") = {13,14,15,16,17,18,19,20};
 Physical Curve("FSInterface") = {1,2,3,4};
 
+Mesh.Binary = 1;
 Mesh 2;

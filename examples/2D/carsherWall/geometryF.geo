@@ -110,4 +110,5 @@ Physical Curve("PolyBot") = {5,8,9,10};
 Physical Curve("FreeSurface") = {2};
 Physical Curve("Inlet") = {4};
 
+Mesh.Binary = 1;
 Mesh 2;

@@ -43,4 +43,5 @@ Physical Curve("FSInterface") = {7,8};
 Physical Curve("FreeSurface") = {3};
 Physical Curve("Wall") = {1,2,4,5,6};
 
+Mesh.Binary = 1;
 Mesh 2;

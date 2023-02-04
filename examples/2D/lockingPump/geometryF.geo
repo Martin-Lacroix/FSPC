@@ -1,4 +1,4 @@
-M = 0.05;
+U = 0.05;
 H = 0.13;
 T = 0.025;
 S = 0.005;
@@ -27,31 +27,31 @@ Point(11) = {-(K+T),-H,0,d};
 Point(12) = {-K,-H,0,d};
 
 Point(13) = {-(K+H-S),T+S,0,d};
-Point(14) = {-(K+H-S+M),T+S,0,d};
-Point(15) = {-(K+H-S+M),S,0,d};
+Point(14) = {-(K+H-S+U),T+S,0,d};
+Point(15) = {-(K+H-S+U),S,0,d};
 Point(16) = {-(K+H-S),S,0,d};
-Point(17) = {-(K+H-S+M),T/2+S,0,d};
+Point(17) = {-(K+H-S+U),T/2+S,0,d};
 Point(18) = {-(K+H-S),H,0,0,d};
 
 Point(19) = {K+T-(H-S),T+S,0,d};
-Point(20) = {K+T-(H-S+M),T+S,0,d};
-Point(21) = {K+T-(H-S+M),S,0,d};
+Point(20) = {K+T-(H-S+U),T+S,0,d};
+Point(21) = {K+T-(H-S+U),S,0,d};
 Point(22) = {K+T-(H-S),S,0,d};
-Point(23) = {K+T-(H-S+M),T/2+S,0,d};
+Point(23) = {K+T-(H-S+U),T/2+S,0,d};
 Point(24) = {K+T-(H-S),H,0,0,d};
 
 Point(25) = {-(K+H-S),-(T+S),0,d};
-Point(26) = {-(K+H-S+M),-(T+S),0,d};
-Point(27) = {-(K+H-S+M),-S,0,d};
+Point(26) = {-(K+H-S+U),-(T+S),0,d};
+Point(27) = {-(K+H-S+U),-S,0,d};
 Point(28) = {-(K+H-S),-S,0,d};
-Point(29) = {-(K+H-S+M),-(T/2+S),0,d};
+Point(29) = {-(K+H-S+U),-(T/2+S),0,d};
 Point(30) = {-(K+H-S),-H,0,0,d};
 
 Point(31) = {K+T-(H-S),-(T+S),0,d};
-Point(32) = {K+T-(H-S+M),-(T+S),0,d};
-Point(33) = {K+T-(H-S+M),-S,0,d};
+Point(32) = {K+T-(H-S+U),-(T+S),0,d};
+Point(33) = {K+T-(H-S+U),-S,0,d};
 Point(34) = {K+T-(H-S),-S,0,d};
-Point(35) = {K+T-(H-S+M),-(T/2+S),0,d};
+Point(35) = {K+T-(H-S+U),-(T/2+S),0,d};
 Point(36) = {K+T-(H-S),-H,0,0,d};
 
 // Lines List
@@ -123,4 +123,5 @@ Physical Curve("Poly2") = {4,11,12,13,14,15};
 Physical Curve("Poly3") = {6,21,22,23,24,25};
 Physical Curve("Poly4") = {9,26,27,28,29,30};
 
+Mesh.Binary = 1;
 Mesh 2;

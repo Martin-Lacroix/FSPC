@@ -77,4 +77,5 @@ Physical Surface("FSInterface") = {5};
 Physical Surface("FreeSurface") = {6};
 Physical Surface("Wall") = {1,2,3,4};
 
+Mesh.Binary = 1;
 Mesh 3;

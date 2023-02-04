@@ -27,4 +27,5 @@ Recombine Surface{1};
 Physical Surface("Solid") = {1};
 Physical Curve("FSInterface") = {1,2};
 
+Mesh.Binary = 1;
 Mesh 2;

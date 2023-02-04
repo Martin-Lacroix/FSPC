@@ -85,4 +85,5 @@ Physical Surface("FSInterface") = {6};
 Physical Surface("Side") = {3,4};
 Physical Surface("Base") = {1};
 
+Mesh.Binary = 1;
 Mesh 3;

@@ -39,4 +39,5 @@ Physical Surface("Solid") = {1};
 Physical Curve("FSInterface") = {1,2,3};
 Physical Curve("Clamped") = {4};
 
+Mesh.Binary = 1;
 Mesh 2;

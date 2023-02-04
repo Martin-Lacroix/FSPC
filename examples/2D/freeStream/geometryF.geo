@@ -60,4 +60,5 @@ Physical Curve("Reservoir") = {1,7,9};
 Physical Curve("Outlet") = {8};
 Physical Curve("Inlet") = {10};
 
+Mesh.Binary = 1;
 Mesh 2;

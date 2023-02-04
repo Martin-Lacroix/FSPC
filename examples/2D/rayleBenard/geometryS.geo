@@ -38,4 +38,5 @@ Physical Curve("FSInterface") = {3};
 Physical Curve("Clamped") = {2,4};
 Physical Curve("Bottom") = {1};
 
+Mesh.Binary = 1;
 Mesh 2;

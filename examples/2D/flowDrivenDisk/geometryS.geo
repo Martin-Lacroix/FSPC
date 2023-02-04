@@ -122,4 +122,5 @@ Physical Curve("Clamped") = {12,13};
 Physical Curve("Slave") = {Slave[]};
 Physical Curve("Master") = {25,26};
 
+Mesh.Binary = 1;
 Mesh 2;

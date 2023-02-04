@@ -124,4 +124,5 @@ Physical Curve("Polytope") = {23,24};
 Physical Curve("Outlet") = {30};
 Physical Curve("Inlet") = {27};
 
+Mesh.Binary = 1;
 Mesh 2;

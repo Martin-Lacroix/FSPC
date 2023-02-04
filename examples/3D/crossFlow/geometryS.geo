@@ -82,4 +82,5 @@ Physical Surface("FSInterface") = {2,3,4,5,6};
 Physical Surface("Clamped") = {1};
 Physical Volume("Solid") = {1};
 
+Mesh.Binary = 1;
 Mesh 3;

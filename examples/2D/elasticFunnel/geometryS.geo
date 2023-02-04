@@ -70,4 +70,5 @@ Physical Surface("Solid") = {1,2,3};
 Physical Curve("FSInterface") = {4,8,10};
 Physical Curve("SolidBase") = {1,7};
 
+Mesh.Binary = 1;
 Mesh 2;
