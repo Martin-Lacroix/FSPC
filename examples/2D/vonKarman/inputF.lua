@@ -14,12 +14,12 @@ Problem.maxFactor = 10
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.2
+Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.5
-Problem.Mesh.hchar = 1e-3
+Problem.Mesh.hchar = 5e-4
 Problem.Mesh.gammaFS = 0.5
-Problem.Mesh.addOnFS = false
+Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
