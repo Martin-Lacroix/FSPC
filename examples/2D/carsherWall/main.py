@@ -20,7 +20,7 @@ algorithm.interp = FSPC.KNN(solver,1)
 algorithm.convergM = FSPC.Convergence(1e-6)
 algorithm.step = FSPC.TimeStep(1e-3)
 
-algorithm.endTime = 2
+algorithm.endTime = 1
 algorithm.omega = 0.5
 algorithm.maxIter = 25
 algorithm.dtWrite = 0.01
