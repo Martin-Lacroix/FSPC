@@ -104,8 +104,8 @@ class Metafor(object):
 
         for i in range(self.nbrNode):
 
-            idx = self.FSI.getMeshPoint(i).getDBNo()
-            self.interacM.setNodTensor(idx,*vector[i])
+            node = self.FSI.getMeshPoint(i)
+            self.interacM.setNodTensor(node,*vector[i])
 
     def applyHeatFlux(self,heat):
 
@@ -114,8 +114,8 @@ class Metafor(object):
 
         for i in range(self.nbrNode):
 
-            idx = self.FSI.getMeshPoint(i).getDBNo()
-            self.interacT.setNodVector(idx,*vector[i])
+            node = self.FSI.getMeshPoint(i)
+            self.interacT.setNodVector(node,*vector[i])
 
 # %% Return Mechanical Nodal Values
 
