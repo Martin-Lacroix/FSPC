@@ -20,7 +20,6 @@ def getMetafor(input):
     domain = metafor.getDomain()
     tsm = metafor.getTimeStepManager()
     materset = domain.getMaterialSet()
-    loadingset = domain.getLoadingSet()
     tim = metafor.getThermalIterationManager()
     solvermanager = metafor.getSolverManager()
     interactionset = domain.getInteractionSet()
@@ -116,7 +115,7 @@ def getMetafor(input):
     input['interacT'] = heat
     input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = meshio.MeshioExport('metafor/output.vtu',metafor)
+    input['exporter'] = meshio.MeshioExport('metafor/output.msh',metafor)
     input['exporter'].addDataBaseField([w.TO])
-    input['exporter'].format = 'vtu'
+    input['exporter'].format = 'gmsh'
     return metafor
