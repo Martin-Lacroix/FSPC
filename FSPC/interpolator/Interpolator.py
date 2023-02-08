@@ -41,12 +41,6 @@ class Interpolator(object):
             load = self.interpData(recvLoad)
             self.solver.applyLoading(load)
 
-            # Print the transfered load in the log file
-
-            S = np.mean((np.linalg.norm(load,axis=1)))
-            F = np.mean((np.linalg.norm(recvLoad,axis=1)))
-            print('Load F|S : {:.5e} - {:.5e}'.format(F,S))
-
 # %% Apply Predicted Displacement Solid -> Fluid
 
     def applyDispSF(self,com):
@@ -58,12 +52,6 @@ class Interpolator(object):
             recvDisp = com.recv(recvDisp,source=1)
             disp = self.interpData(recvDisp)
             self.solver.applyDisplacement(disp)
-
-            # Print the transfered load in the log file
-
-            S = np.mean((np.linalg.norm(disp,axis=1)))
-            F = np.mean((np.linalg.norm(recvDisp,axis=1)))
-            print('\nDisp S|F : {:.5e} - {:.5e}'.format(F,S))
 
 # %% Apply Actual Heat Flux Fluid -> Solid
 
@@ -77,12 +65,6 @@ class Interpolator(object):
             heat = self.interpData(recvHeat)
             self.solver.applyHeatFlux(heat)
 
-            # Print the transfered load in the log file
-
-            S = np.mean((np.linalg.norm(heat,axis=1)))
-            F = np.mean((np.linalg.norm(recvHeat,axis=1)))
-            print('Flux F|S : {:.5e} - {:.5e}'.format(F,S))
-
 # %% Apply Predicted Temperature Solid -> Fluid
 
     def applyTempSF(self,com):
@@ -94,10 +76,4 @@ class Interpolator(object):
             recvTemp = com.recv(recvTemp,source=1)
             temp = self.interpData(recvTemp)
             self.solver.applyTemperature(temp)
-
-            # Print the transfered load in the log file
-
-            S = np.mean((np.linalg.norm(temp,axis=1)))
-            F = np.mean((np.linalg.norm(recvTemp,axis=1)))
-            print('\nTemp S|F : {:.5e} - {:.5e}'.format(F,S))
             
