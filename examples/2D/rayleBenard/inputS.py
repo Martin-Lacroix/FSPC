@@ -1,4 +1,4 @@
-import toolbox.meshio as meshio
+import toolbox.gmsh as gmsh
 import wrap as w
 import os
 
@@ -35,8 +35,9 @@ def getMetafor(input):
     # Imports the mesh
 
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
-    importer = meshio.MeshioImport(mshFile,metafor)
+    importer = gmsh.GmshImport(mshFile,domain)
     groups = importer.groups
+    importer.binary = True
     importer.execute()
 
     # Defines the solid domain
@@ -114,7 +115,7 @@ def getMetafor(input):
 
     input['interacT'] = heat
     input['FSInterface'] = groups['FSInterface']
-    input['exporter'] = meshio.MeshioExport('metafor/output.msh',metafor)
+    input['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     input['exporter'].addDataBaseField([w.TO])
-    input['exporter'].format = 'gmsh'
+    input['exporter'].binary = True
     return metafor
