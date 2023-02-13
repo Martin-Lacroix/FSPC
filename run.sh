@@ -12,12 +12,12 @@ export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 
 # Path to the Python script
 
-export SCRIPT=${PWD}/examples/2D/carsherWall/main.py
-export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
+export SCRIPT=${PWD}/examples/2D/bimetalStrip/main.py
+# export SCRIPT=${PWD}/examples/2D/carsherWall/main.py
+# export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
 # export SCRIPT=${PWD}/examples/2D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/2D/elasticFunnel/main.py
 # export SCRIPT=${PWD}/examples/2D/flowDrivenDisk/main.py
-# export SCRIPT=${PWD}/examples/2D/freeStream/main.py
 # export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 # export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
 # export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py

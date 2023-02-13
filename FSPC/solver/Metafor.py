@@ -1,4 +1,5 @@
 from ..toolbox import write_logs,compute_time
+from toolbox.fac import FacManager
 import importlib.util as util
 import numpy as np
 import wrap as w
@@ -63,6 +64,16 @@ class Metafor(object):
             self.prevHeat = np.zeros((self.nbrNode,self.dim))
         except: self.thermo = False
 
+        # Temporary fix for initializing the temperature !!!
+
+        dt = 1e-6
+        self.tsm.setInitialTime(0,dt)
+        self.tsm.setNextTime(dt,0,dt)
+        self.metafor.getTimeIntegration().integration()
+        loader = FacManager(self.metafor)
+        self.neverRun = False
+        loader.load(0)
+
         # Manages time step restart functions
 
         self.mfac = w.MemoryFac()
@@ -76,8 +87,6 @@ class Metafor(object):
     @write_logs
     @compute_time
     def run(self,t1,t2):
-
-        #raise Exception('END')
 
         if(self.neverRun):
 
@@ -129,7 +138,7 @@ class Metafor(object):
                 node = self.FSI.getMeshPoint(j)
                 data[i] += node.getValue(w.Field1D(axe,w.AB))
                 data[i] += node.getValue(w.Field1D(axe,w.RE))
-        
+
         return vector
 
     # Computes the nodal displacement vector

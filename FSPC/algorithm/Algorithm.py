@@ -22,9 +22,11 @@ class Algorithm(object):
         com = MPI.COMM_WORLD
         if com.rank == 1: self.initInterp()
 
+        # Need to find another method for this (counter) !!!
+
         self.write = np.arange(self.dtWrite,self.endTime,self.dtWrite)
         self.write = np.append(self.write,self.endTime).tolist()
-        self.write.append(np.inf)
+        self.write.append(np.inf) 
         self.solver.save()
 
         # Main loop of the FSI partitioned coupling
@@ -63,7 +65,7 @@ class Algorithm(object):
     def cancelStep(self):
 
         if self.convergM: self.interp.disp = np.copy(self.prevMech)
-        if self.convergT: self.interp.temp = np.copy(self.prevTemp)
+        if self.convergT: self.interp.temp = np.copy(self.prevTher)
 
     def predictor(self):
 

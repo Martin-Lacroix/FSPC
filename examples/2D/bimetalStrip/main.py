@@ -15,13 +15,15 @@ solver = process.getSolver(pathF,pathS)
 
 algorithm = FSPC.IQN_MVJ(solver)
 algorithm.interp = FSPC.KNN(solver,1)
-algorithm.convergM = FSPC.Convergence(1e-8)
-algorithm.step = FSPC.TimeStep(1e-2)
+algorithm.convergM = FSPC.Convergence(1e-6)
+algorithm.convergT = FSPC.Convergence(1e-6)
+algorithm.step = FSPC.TimeStep(1e-3)
 
-algorithm.endTime = 4
+#algorithm.endTime = 7e3
+algorithm.endTime = 1
 algorithm.omega = 0.5
 algorithm.maxIter = 25
-algorithm.dtWrite = 0.1
+algorithm.dtWrite = 100
 
 # Start the FSPC simulation
 
