@@ -3,9 +3,6 @@
 export NUN_THREADS=8
 export CPU_PER_PROC=4
 
-export NUN_THREADS=1
-export CPU_PER_PROC=1
-
 # Path to the external library
 
 export PYTHONPATH=${PWD}:${PYTHONPATH}

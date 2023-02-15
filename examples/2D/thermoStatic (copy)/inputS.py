@@ -49,18 +49,18 @@ def getMetafor(input):
     # Solid material parameters
 
     materset.define(1,w.TmElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1)
+    materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.THERM_EXPANSION,0)
-    materset(1).put(w.HEAT_CAPACITY,1)
-    materset(1).put(w.MASS_DENSITY,10)
+    materset(1).put(w.HEAT_CAPACITY,100)
+    materset(1).put(w.MASS_DENSITY,950)
     materset(1).put(w.POISSON_RATIO,0)
-    materset(1).put(w.CONDUCTIVITY,1)
+    materset(1).put(w.CONDUCTIVITY,5)
     materset(1).put(w.DISSIP_TE,0)
     materset(1).put(w.DISSIP_TQ,0)
 
     # Finite element properties
 
-    prp1 = w.ElementProperties(w.TmVolume2DElement)
+    prp1 = w.ElementProperties(w.TmTriangleVolume2DElement)
     prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_SRIPR)
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp1.put(w.MATERIAL,1)
@@ -76,7 +76,8 @@ def getMetafor(input):
 
     # Boundary conditions
 
-    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),2000)
+    initcondset.define(groups['FSInterface'],w.Field1D(w.TO,w.AB),180)
+    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),180)
     loadingset.define(groups['Solid'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['Solid'],w.Field1D(w.TY,w.RE))
 

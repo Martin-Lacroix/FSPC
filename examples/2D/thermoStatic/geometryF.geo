@@ -1,36 +1,45 @@
-L = 0.4;
-R = 0.1;
+L = 5;
+R = 2;
 
-d = 0.02;
-N = 20;
+d = 0.1;
+N = 51;
 
 // Points List
 
-Point(1) = {0,0,0,d};
-Point(2) = {0,L,0,d};
-Point(3) = {0,-L,0,d};
-Point(4) = {0,R,0,d};
-Point(5) = {0,-R,0,d};
+Point(1) = {-L,-L,0,d};
+Point(2) = {L,-L,0,d};
+Point(3) = {L,L,0,d};
+Point(4) = {-L,L,0,d};
+
+Point(5) = {-R,-R,0,d};
+Point(6) = {R,-R,0,d};
+Point(7) = {R,R,0,d};
+Point(8) = {-R,R,0,d};
 
 // Lines List
 
-Circle(1) = {2,1,3};
-Circle(2) = {3,1,2};
-Circle(3) = {4,1,5};
-Circle(4) = {5,1,4};
+Line(1) = {1,2};
+Line(2) = {2,3};
+Line(3) = {3,4};
+Line(4) = {4,1};
+
+Line(5) = {5,6};
+Line(6) = {6,7};
+Line(7) = {7,8};
+Line(8) = {8,5};
 
 // Fluid Surface
 
-Curve Loop(1) = {1,2};
-Curve Loop(2) = {3,4};
+Curve Loop(1) = {1,2,3,4};
+Curve Loop(2) = {5,6,7,8};
 Plane Surface(1) = {1,-2};
-Transfinite Line{3,4} = N;
+Transfinite Line{5:8} = N;
 
 // Boundaries
 
 Physical Surface("Fluid") = {1};
-Physical Curve("FSInterface") = {3,4};
-Physical Curve("Wall") = {1,2};
+Physical Curve("FSInterface") = {5,6,7,8};
+Physical Curve("Wall") = {1,2,3,4};
 
 Mesh.Binary = 1;
 Mesh 2;
