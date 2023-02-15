@@ -3,6 +3,9 @@
 export NUN_THREADS=8
 export CPU_PER_PROC=4
 
+export NUN_THREADS=1
+export CPU_PER_PROC=1
+
 # Path to the external library
 
 export PYTHONPATH=${PWD}:${PYTHONPATH}
@@ -15,14 +18,14 @@ export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 export SCRIPT=${PWD}/examples/2D/bimetalStrip/main.py
 export SCRIPT=${PWD}/examples/2D/carsherWall/main.py
 export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
-# export SCRIPT=${PWD}/examples/2D/damBreak/main.py
-# export SCRIPT=${PWD}/examples/2D/elasticFunnel/main.py
-# export SCRIPT=${PWD}/examples/2D/flowDrivenDisk/main.py
-# export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
-# export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
-# export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
-# export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
-# export SCRIPT=${PWD}/examples/2D/thermalStatic/main.py
+export SCRIPT=${PWD}/examples/2D/damBreak/main.py
+export SCRIPT=${PWD}/examples/2D/elasticFunnel/main.py
+export SCRIPT=${PWD}/examples/2D/flowDrivenDisk/main.py
+export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
+export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
+export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
+export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
+export SCRIPT=${PWD}/examples/2D/thermoStatic/main.py
 # export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
 # export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
