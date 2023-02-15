@@ -39,10 +39,12 @@ def getMetafor(input):
     importer.binary = True
     importer.execute()
 
-    # Defines the ball domain
+    # Defines the solid domain
 
     app = w.FieldApplicator(1)
-    app.push(groups['Solid'])
+    app.push(groups['Solid_1'])
+    app.push(groups['Solid_2'])
+    app.push(groups['Solid_3'])
     interactionset.add(app)
 
     # Solid material parameters
@@ -50,10 +52,10 @@ def getMetafor(input):
     materset.define(1,w.TmElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.THERM_EXPANSION,0)
-    materset(1).put(w.HEAT_CAPACITY,1)
-    materset(1).put(w.MASS_DENSITY,900)
+    materset(1).put(w.HEAT_CAPACITY,100)
+    materset(1).put(w.MASS_DENSITY,950)
     materset(1).put(w.POISSON_RATIO,0)
-    materset(1).put(w.CONDUCTIVITY,10)
+    materset(1).put(w.CONDUCTIVITY,5)
     materset(1).put(w.DISSIP_TE,0)
     materset(1).put(w.DISSIP_TQ,0)
 
@@ -82,9 +84,11 @@ def getMetafor(input):
     load.addProperty(prp3)
     interactionset.add(load)
 
-    # Boundary conditions
+    # Initial and boundary conditions
 
-    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),2000)
+    initcondset.define(groups['Solid_1'],w.Field1D(w.TO,w.AB),180)
+    initcondset.define(groups['Solid_2'],w.Field1D(w.TO,w.AB),200)
+    initcondset.define(groups['Solid_3'],w.Field1D(w.TO,w.AB),220)
 
     # Mechanical and thermal time integration
 

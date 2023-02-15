@@ -4,7 +4,7 @@ Problem = {}
 Problem.autoRemeshing = false
 Problem.verboseOutput = false
 Problem.simulationTime = math.huge
-Problem.id = 'Boussinesq'
+Problem.id = 'IncompNewtonT'
 
 -- FSPC Parameters
 
@@ -17,20 +17,21 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.02
+Problem.Mesh.hchar = 5e-3
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = false
+Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {0,0,1,10}
+Problem.Mesh.boundingBox = {0,0,0.9,1}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {}
+Problem.Mesh.exclusionGroups = {'Poly_1','Poly_2','Poly_3'}
+Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -53,19 +54,19 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 1e-3
+Problem.Material.mu = 5e-3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 Problem.Material.epsRad = 0
-Problem.Material.sigmaRad = 5.670374419e-8
+Problem.Material.sigmaRad = 0
 Problem.Material.R = 8.31446261815324
-Problem.Material.alphaLin = 69e-6
+Problem.Material.alphaLin = 0
 Problem.Material.DgammaDT = 0
-Problem.Material.Tinf = 300
-Problem.Material.Tr = 650
-Problem.Material.k = 0.6
-Problem.Material.cp = 1
-Problem.Material.h = 5
+Problem.Material.Tinf = 340
+Problem.Material.cp = 1000
+Problem.Material.Tr = 340
+Problem.Material.k = 20
+Problem.Material.h = 1
 
 -- Solver Parameters
 
@@ -99,7 +100,7 @@ Problem.Solver.HeatEq.nlAlgo = 'Picard'
 Problem.Solver.HeatEq.sparseSolverLib = 'MKL'
 
 Problem.Solver.HeatEq.maxIter = 25
-Problem.Solver.HeatEq.minRes = 1e-8
+Problem.Solver.HeatEq.minRes = 1e-6
 Problem.Solver.HeatEq.cgTolerance = 1e-9
 
 -- Heat Momentum Continuity BC
@@ -107,18 +108,35 @@ Problem.Solver.HeatEq.cgTolerance = 1e-9
 Problem.IC = {}
 Problem.Solver.HeatEq.BC = {}
 Problem.Solver.MomContEq.BC = {}
-Problem.Solver.HeatEq.BC['FreeSurfaceQh'] = true
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
+Problem.Solver.HeatEq.BC['Poly_1TExt'] = true
+Problem.Solver.HeatEq.BC['Poly_2TExt'] = true
+Problem.Solver.HeatEq.BC['Poly_3TExt'] = true
+
+Problem.Solver.MomContEq.BC['Poly_1VExt'] = true
+Problem.Solver.MomContEq.BC['Poly_2VExt'] = true
+Problem.Solver.MomContEq.BC['Poly_3VExt'] = true
+
 function Problem.IC:initStates(pos)
-	return {0,0,0,300}
+	return {0,0,0,340}
 end
 
 function Problem.Solver.MomContEq.BC:WallV(pos,initPos,state,t)
 	return 0,0
 end
 
-function Problem.Solver.HeatEq.BC:WallT(pos,initPos,state,t)
-    return 300
+function Problem.Solver.HeatEq.BC:WallQ(pos,initPos,state,t)
+    return 0,0
+end
+
+function Problem.Solver.HeatEq.BC:FreeSurfaceQ(pos,initPos,state,t)
+    return 0,0
+end
+
+function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+
+	local hchar = Problem.Mesh.hchar
+	return hchar+dist*0.1
 end

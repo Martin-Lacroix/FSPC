@@ -42,78 +42,48 @@ def getMetafor(input):
 
     # Defines the ball domain
 
-    app1 = w.FieldApplicator(1)
-    app1.push(groups['Copper'])
-    interactionset.add(app1)
+    app = w.FieldApplicator(1)
+    app.push(groups['Solid'])
+    interactionset.add(app)
 
-    app2 = w.FieldApplicator(2)
-    app2.push(groups['Iron'])
-    interactionset.add(app2)
-
-    # Copper material parameters
+    # Solid material parameters
 
     materset.define(1,w.TmElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1.1e11)
-    materset(1).put(w.THERM_EXPANSION,17.6e-6)
-    materset(1).put(w.HEAT_CAPACITY,385)
-    materset(1).put(w.MASS_DENSITY,8960)
-    materset(1).put(w.POISSON_RATIO,0.343)
-    materset(1).put(w.CONDUCTIVITY,413)
+    materset(1).put(w.ELASTIC_MODULUS,1e7)
+    materset(1).put(w.THERM_EXPANSION,0)
+    materset(1).put(w.HEAT_CAPACITY,100)
+    materset(1).put(w.MASS_DENSITY,950)
+    materset(1).put(w.POISSON_RATIO,0)
+    materset(1).put(w.CONDUCTIVITY,5)
     materset(1).put(w.DISSIP_TE,0)
     materset(1).put(w.DISSIP_TQ,0)
 
-    # Iron material parameters
-
-    materset.define(2,w.TmElastHypoMaterial)
-    materset(2).put(w.ELASTIC_MODULUS,2e11)
-    materset(2).put(w.THERM_EXPANSION,12.2e-6)
-    materset(2).put(w.HEAT_CAPACITY,450)
-    materset(2).put(w.MASS_DENSITY,7874)
-    materset(2).put(w.POISSON_RATIO,0.291)
-    materset(2).put(w.CONDUCTIVITY,94)
-    materset(2).put(w.DISSIP_TE,0)
-    materset(2).put(w.DISSIP_TQ,0)
-
     # Finite element properties
 
-    prp1 = w.ElementProperties(w.TmVolume2DElement)
+    prp1 = w.ElementProperties(w.TmTriangleVolume2DElement)
     prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_SRIPR)
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp1.put(w.MATERIAL,1)
-    app1.addProperty(prp1)
-
-    prp2 = w.ElementProperties(w.TmVolume2DElement)
-    prp2.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_SRIPR)
-    prp2.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp2.put(w.MATERIAL,2)
-    app2.addProperty(prp2)
+    app.addProperty(prp1)
 
     # Elements for surface heat flux
 
-    prp3 = w.ElementProperties(w.NodHeatFlux2DElement)
-    heat = w.NodInteraction(3)
+    prp2 = w.ElementProperties(w.NodHeatFlux2DElement)
+    heat = w.NodInteraction(2)
     heat.push(groups['FSInterface'])
-    heat.addProperty(prp3)
+    heat.addProperty(prp2)
     interactionset.add(heat)
-
-    # Elements for surface traction
-
-    prp4 = w.ElementProperties(w.NodStress2DElement)
-    load = w.NodInteraction(4)
-    load.push(groups['FSInterface'])
-    load.addProperty(prp4)
-    interactionset.add(load)
 
     # Boundary conditions
 
-    loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
-    initcondset.define(groups['Iron'],w.Field1D(w.TO,w.AB),293.15)
-    initcondset.define(groups['Copper'],w.Field1D(w.TO,w.AB),293.15)
+    initcondset.define(groups['FSInterface'],w.Field1D(w.TO,w.AB),180)
+    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),180)
+    loadingset.define(groups['Solid'],w.Field1D(w.TX,w.RE))
+    loadingset.define(groups['Solid'],w.Field1D(w.TY,w.RE))
 
     # Mechanical and thermal time integration
 
-    ti_M = w.AlphaGeneralizedTimeIntegration(metafor)
+    ti_M = w.QuasiStaticTimeIntegration(metafor)
     ti_T = w.TrapezoidalThermalTimeIntegration(metafor)
 
     ti = w.StaggeredTmTimeIntegration(metafor)
@@ -124,10 +94,10 @@ def getMetafor(input):
     # Mechanical and thermal iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-4)
+    mim.setResidualTolerance(1e-6)
 
     tim.setMaxNbOfIterations(25)
-    tim.setResidualTolerance(1e-4)
+    tim.setResidualTolerance(1e-6)
 
     # Time step iterations
     
@@ -139,10 +109,8 @@ def getMetafor(input):
     # Parameters for FSPC
 
     input['interacT'] = heat
-    input['interacM'] = load
     input['FSInterface'] = groups['FSInterface']
     input['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
-    input['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
     input['exporter'].addDataBaseField([w.TO])
     input['exporter'].binary = True
     return metafor

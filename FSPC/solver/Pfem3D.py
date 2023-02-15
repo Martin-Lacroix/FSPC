@@ -18,7 +18,7 @@ class Pfem3D(object):
 
         self.problem = w.getProblem(path)
         self.autoRemesh = self.problem.hasAutoRemeshing()
-        ID = self.problem.getID()
+        problemID = self.problem.getID()
 
         # Read the input Lua file
 
@@ -36,20 +36,18 @@ class Pfem3D(object):
 
         # Problem-dependent function initialization
 
-        if ID in ('Boussinesq','IncompNewtonNoT'):
+        if problemID[:2] == 'WC':
 
-            self.implicit = True
-            self.indexT = int(self.dim+1)
-            self.indexM = int(0)
-
-        elif ID in ('WCompNewtonNoT','WCBoussinesq'):
-            
             self.implicit = False
             self.indexT = int(2*self.dim+2)
             self.indexM = int(self.dim+2)
 
-        else: raise Exception('Problem type not supported')
-
+        else:
+            
+            self.implicit = True
+            self.indexT = int(self.dim+1)
+            self.indexM = int(0)
+            
         # FSI data and stores the previous time step 
 
         self.problem.copySolution(self.prevSolution)
