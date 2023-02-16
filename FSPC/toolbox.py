@@ -37,7 +37,7 @@ def compute_time(func):
         return result
     return wrapper
 
-# %% Displacement Norm Criterion
+# %% Interface Data Norm Criterion
 
 class Convergence(object):
     def __init__(self,tol):
@@ -59,7 +59,7 @@ class Convergence(object):
         if self.epsilon < self.tol: return True
         else: return False
 
-# %% Time and Step Manager
+# %% Coupling Time Step Manager
 
 class TimeStep(object):
     def __init__(self,dt):

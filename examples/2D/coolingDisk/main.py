@@ -1,7 +1,5 @@
 import os.path as path
-import numpy as np
 import FSPC
-import os
 
 # %% Paths to the input files
 

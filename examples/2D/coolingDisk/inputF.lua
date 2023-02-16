@@ -17,7 +17,7 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 5e-3
+Problem.Mesh.hchar = 0.25/33
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
@@ -31,7 +31,6 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'Poly_1','Poly_2','Poly_3'}
-Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -133,10 +132,4 @@ end
 
 function Problem.Solver.HeatEq.BC:FreeSurfaceQ(pos,initPos,state,t)
     return 0,0
-end
-
-function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
-
-	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.1
 end

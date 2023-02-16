@@ -4,10 +4,8 @@ HS = 0.03;
 R = 0.025;
 C = 0.2;
 
-d = 0.005;
-N = 180;
-M = 50;
-P = 32;
+d = HF/33;
+N = 13;
 
 // Points List
 
@@ -52,14 +50,7 @@ Circle(12) = {15,13,14};
 
 Curve Loop(1) = {-1,2,3,4};
 Plane Surface(1) = {1};
-
-// Transfinite Line{1} = N;
-Transfinite Line{3} = N;
-// Transfinite Line{2} = M;
-// Transfinite Line{4} = M;
-
-
-Transfinite Line{7:12} = P;
+Transfinite Line{7:12} = N;
 
 // Boundaries
 
@@ -73,15 +64,5 @@ Physical Curve("Wall") = {1,2,4,5,6};
 Physical Curve("FreeSurface") = {3};
 Physical Curve("FSInterface") = {7,8,9,10,11,12};
 
-// Makes the Mesh
-
-Field[1] = MathEval;
-Field[1].F = "Max(0.1*(0.25-y),0.005)";
-Background Field = 1;
-
-Mesh.MeshSizeExtendFromBoundary = 0;
-Mesh.MeshSizeFromCurvature = 0;
-Mesh.MeshSizeFromPoints = 0;
-Mesh.Algorithm = 5;
 Mesh.Binary = 1;
 Mesh 2;
