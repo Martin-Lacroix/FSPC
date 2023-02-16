@@ -1,4 +1,5 @@
 import toolbox.gmsh as gmsh
+import numpy as np
 import wrap as w
 import os
 
@@ -74,17 +75,25 @@ def getMetafor(input):
     heat.addProperty(prp2)
     interactionset.add(heat)
 
-    # Boundary conditions
-    
-    loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
+    # Top heat flux boundary conditions
 
-    loadingset.define(groups['FSInterface'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['FSInterface'],w.Field1D(w.TY,w.RE))
+    fun = lambda x : np.exp(-np.square(x-0.5)/np.square(0.1)/2)
+    F = w.PythonOneParameterFunction(fun)
+
+    prp3 = w.ElementProperties(w.TmHeatFlux2DElement)
+    prp3.put(w.HEATEL_VALUE,1e3)
+    prp3.depend(w.HEATEL_VALUE,F,w.Field1D(w.TX,w.AB))
+
+    inter = w.HeatInteraction(3)
+    inter.push(groups['Top'])
+    inter.addProperty(prp3)
+    interactionset.add(inter)
+
+    # Other boundary conditions
 
     initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),300)
-    initcondset.define(groups['Bottom'],w.Field1D(w.TO,w.AB),2e3)
-    loadingset.define(groups['Bottom'],w.Field1D(w.TO,w.RE),0,w.TOTAL_LOAD)
+    loadingset.define(groups['FSInterface'],w.Field1D(w.TX,w.RE))
+    loadingset.define(groups['FSInterface'],w.Field1D(w.TY,w.RE))
 
     # Mechanical and thermal time integration
 

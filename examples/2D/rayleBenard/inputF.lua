@@ -4,7 +4,7 @@ Problem = {}
 Problem.autoRemeshing = false
 Problem.verboseOutput = false
 Problem.simulationTime = math.huge
-Problem.id = 'Boussinesq'
+Problem.id = 'Conduction'
 
 -- FSPC Parameters
 
@@ -41,7 +41,7 @@ Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
 Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'T','velocity'}
+Problem.Extractors[0].whatToWrite = {'T'}
 Problem.Extractors[0].timeBetweenWriting = math.huge
 
 Problem.Extractors[1] = {}
@@ -79,18 +79,6 @@ Problem.Solver.coeffDTDecrease = math.huge
 Problem.Solver.coeffDTincrease = math.huge
 Problem.Solver.solveHeatFirst = true
 
--- Momentum Continuity Equation
-
-Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'Ax_f'
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
-
-Problem.Solver.MomContEq.pExt = 0
-Problem.Solver.MomContEq.maxIter = 25
-Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.bodyForce = {0,-9.81}
-
 -- Heat Equation
 
 Problem.Solver.HeatEq = {}
@@ -106,27 +94,12 @@ Problem.Solver.HeatEq.cgTolerance = 1e-9
 
 Problem.IC = {}
 Problem.Solver.HeatEq.BC = {}
-Problem.Solver.MomContEq.BC = {}
-Problem.Solver.HeatEq.BC['FreeSurfaceQh'] = true
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 function Problem.IC:initStates(pos)
-	return {0,0,0,300}
-end
-
-function Problem.Solver.MomContEq.BC:WallV(pos,initPos,state,t) 
-	return 0,0
+	return {300}
 end
 
 function Problem.Solver.HeatEq.BC:WallQ(pos,initPos,state,t) 
     return 0,0
-end
-
-function Problem.Solver.MomContEq.BC:TopV(pos,initPos,state,t) 
-	return 0,0
-end
-
-function Problem.Solver.HeatEq.BC:TopT(pos,initPos,state,t) 
-    return 290
 end

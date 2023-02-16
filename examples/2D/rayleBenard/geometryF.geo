@@ -1,15 +1,15 @@
 L = 1;
 HF = 0.2;
-HS = 0.1;
 
 d = 0.01;
+N = 101;
 
 // Points List
 
-Point(1) = {L,HS,0,d};
-Point(2) = {0,HS,0,d};
-Point(3) = {L,HS+HF,0,d};
-Point(4) = {0,HS+HF,0,d};
+Point(1) = {L,0,0,d};
+Point(2) = {0,0,0,d};
+Point(3) = {L,HF,0,d};
+Point(4) = {0,HF,0,d};
 
 // Lines List
 
@@ -22,13 +22,13 @@ Line(4) = {4,2};
 
 Curve Loop(2) = {-1,2,3,4};
 Plane Surface(2) = {2};
+Transfinite Line{3} = N;
 
 // Boundaries
 
 Physical Surface("Fluid") = {2};
-Physical Curve("FSInterface") = {1};
-Physical Curve("Wall") = {2,4};
-Physical Curve("Top") = {3};
+Physical Curve("FSInterface") = {3};
+Physical Curve("Wall") = {1,2,4};
 
 Mesh.Binary = 1;
 Mesh 2;

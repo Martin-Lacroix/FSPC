@@ -34,13 +34,18 @@ class Pfem3D(object):
         self.dim = self.mesh.getDim()
         self.FSI = w.VectorInt()
 
-        # Problem-dependent function initialization
+        # We must add a getter in PFEM3D for this !!!
 
         if problemID[:2] == 'WC':
 
             self.implicit = False
             self.indexT = int(2*self.dim+2)
             self.indexM = int(self.dim+2)
+
+        elif problemID == 'Conduction':
+
+            self.implicit = True
+            self.indexT = int(0)
 
         else:
             
