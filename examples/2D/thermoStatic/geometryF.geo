@@ -41,5 +41,18 @@ Physical Surface("Fluid") = {1};
 Physical Curve("FSInterface") = {5,6,7,8};
 Physical Curve("Wall") = {1,2,3,4};
 
+// Fluid Mesh Size
+
+Field[1] = Distance;
+Field[1].CurvesList = {5,6,7,8};
+
+Field[2] = MathEval;
+Field[2].F = Sprintf("%g+F1*0.05",d);
+Background Field = 2;
+
+Mesh.MeshSizeExtendFromBoundary = 0;
+Mesh.MeshSizeFromCurvature = 0;
+Mesh.MeshSizeFromPoints = 0;
+Mesh.Algorithm = 5;
 Mesh.Binary = 1;
 Mesh 2;

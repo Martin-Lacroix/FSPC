@@ -14,7 +14,7 @@ Problem.maxFactor = 10
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.2
+Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.1
@@ -31,6 +31,7 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'FSInterface'}
+Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -125,4 +126,10 @@ end
 
 function Problem.Solver.HeatEq.BC:WallQ(pos,initPos,state,t)
     return 0,0
+end
+
+function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+
+	local hchar = Problem.Mesh.hchar
+	return hchar+dist*0.05
 end
