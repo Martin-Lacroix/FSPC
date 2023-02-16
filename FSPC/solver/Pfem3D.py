@@ -25,6 +25,8 @@ class Pfem3D(object):
         input = read(path)
         self.group = input['Problem.interface']
         self.maxFactor = int(input['Problem.maxFactor'])
+        if problemID[:2] == 'WC': self.implicit = False
+        else: self.implicit = True
 
         # Stores the important objects and variables
 
@@ -33,25 +35,6 @@ class Pfem3D(object):
         self.mesh = self.problem.getMesh()
         self.dim = self.mesh.getDim()
         self.FSI = w.VectorInt()
-
-        # We must add a getter in PFEM3D for this !!!
-
-        if problemID[:2] == 'WC':
-
-            self.implicit = False
-            self.indexT = int(2*self.dim+2)
-            self.indexM = int(self.dim+2)
-
-        elif problemID == 'Conduction':
-
-            self.implicit = True
-            self.indexT = int(0)
-
-        else:
-            
-            self.implicit = True
-            self.indexT = int(self.dim+1)
-            self.indexM = int(0)
             
         # FSI data and stores the previous time step 
 
@@ -148,20 +131,23 @@ class Pfem3D(object):
 
     def applyDispBC(self,distance,dt):
 
-        velocity = self.getVelocity()
-        if self.implicit: BC = (distance)/dt
-        else: BC = 2*(distance-velocity*dt)/(dt*dt)
+        if self.implicit:
 
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
-                self.mesh.setNodeState(k,self.indexM+i,BC[j,i])
+            BC = w.VectorVectorDouble(distance/dt)
+            self.solver.setVelocity(self.FSI,BC)
+
+        else:
+
+            BC = 2*(distance-self.getVelocity()*dt)
+            BC = w.VectorVectorDouble(BC/np.square(dt))
+            self.solver.setAcceleration(self.FSI,BC)
 
     # Update and apply the nodal temperatures
 
     def applyTempBC(self,temp):
 
-        for i,k in enumerate(self.FSI):
-            self.mesh.setNodeState(k,self.indexT,temp[i,0])
+        BC = w.VectorDouble(temp.flatten())
+        self.solver.setTemperature(self.FSI,BC)
             
 # %% Return Nodal Values
 
