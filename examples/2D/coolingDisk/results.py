@@ -75,16 +75,16 @@ os.chdir('workspace/metafor')
 
 fileList = os.listdir()
 time = [float(F[7:-4]) for F in fileList]
-value = np.zeros((3,len(fileList),3))
+value = np.zeros((3,len(fileList)))
 index = np.argsort(time)
 
 for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
-    _,tags,nodeData,_,_ = gmsh.view.getModelData(1,i)
-    value[0][i] = nodeData[192][0]
-    value[1][i] = nodeData[277][0]
-    value[2][i] = nodeData[362][0]
+    tags,nodeVal = gmsh.view.getModelData(1,i)[1:3]
+    value[0][i] = nodeVal[192][0]
+    value[1][i] = nodeVal[277][0]
+    value[2][i] = nodeVal[362][0]
 
 gmsh.finalize()
 time = np.sort(time)

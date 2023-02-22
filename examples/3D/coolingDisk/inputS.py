@@ -51,7 +51,7 @@ def getMetafor(input):
     materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.THERM_EXPANSION,0)
     materset(1).put(w.HEAT_CAPACITY,400)
-    materset(1).put(w.MASS_DENSITY,950)
+    materset(1).put(w.MASS_DENSITY,600)
     materset(1).put(w.CONDUCTIVITY,500)
     materset(1).put(w.POISSON_RATIO,0)
     materset(1).put(w.DISSIP_TE,0)
