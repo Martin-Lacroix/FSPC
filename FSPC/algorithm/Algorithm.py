@@ -1,6 +1,7 @@
 from ..toolbox import compute_time
 from mpi4py import MPI
 import numpy as np
+import math
 import sys
 
 # %% Parent Algorithm Class
@@ -21,12 +22,7 @@ class Algorithm(object):
 
         com = MPI.COMM_WORLD
         if com.rank == 1: self.initInterp()
-
-        # Need to find another method for this (counter) !!!
-
-        self.write = np.arange(self.dtWrite,self.endTime,self.dtWrite)
-        self.write = np.append(self.write,self.endTime).tolist()
-        self.write.append(np.inf) 
+        next = self.dtWrite
         self.solver.save()
 
         # Main loop of the FSI partitioned coupling
@@ -50,10 +46,10 @@ class Algorithm(object):
 
             self.solver.update()
             self.step.update(self.verified)
-            if self.step.time >= self.write[0]:
 
-                self.solver.save()
-                self.write.pop(0)
+            if self.step.time >= next: self.solver.save()
+            next = math.floor(self.step.time/self.dtWrite)
+            next = (next+1)*self.dtWrite
 
         # Ends the FSI simulation
 

@@ -41,8 +41,7 @@ def getMetafor(input):
     # Defines the solid domain
 
     app1 = w.FieldApplicator(1)
-    app1.push(groups['Right'])
-    app1.push(groups['Left'])
+    app1.push(groups['Wall'])
     interactionset.add(app1)
 
     # Defines the ball domain
@@ -55,34 +54,37 @@ def getMetafor(input):
 
     E = 200
     v = 0.3
-    G = E/(2*(1+v))
+    C = E/(1+v)
     K = E/(3*(1-2*v))
 
-    materset.define(1,w.NeoHookeanHyperPk2Material)
+    materset.define(1,w.NeoHookeanHyperMaterial)
     materset(1).put(w.MASS_DENSITY,1e-6)
-    materset(1).put(w.HYPER_K0,K)
-    materset(1).put(w.HYPER_G0,G)
+    materset(1).put(w.RUBBER_PENAL,K)
+    materset(1).put(w.RUBBER_C1,C)
 
     # Ball material parameters
 
     E = 100
     v = 0.3
-    G = E/(2*(1+v))
+    C = E/(1+v)
     K = E/(3*(1-2*v))
 
-    materset.define(2,w.NeoHookeanHyperPk2Material)
+    materset.define(2,w.NeoHookeanHyperMaterial)
     materset(2).put(w.MASS_DENSITY,1e-6)
-    materset(2).put(w.HYPER_K0,K)
-    materset(2).put(w.HYPER_G0,G)
+    materset(2).put(w.RUBBER_PENAL,K)
+    materset(2).put(w.RUBBER_C1,C)
 
     # Contact parameters
 
+    penalty = 1e4
+    friction = 0.15
+
     materset.define(3,w.CoulombContactMaterial)
-    materset(3).put(w.COEF_FROT_DYN,0.15)
-    materset(3).put(w.COEF_FROT_STA,0.15)
-    materset(3).put(w.PEN_NORMALE,1e3)
-    materset(3).put(w.PEN_TANGENT,1e3)
-    materset(3).put(w.PROF_CONT,0.06)
+    materset(3).put(w.PEN_TANGENT,friction*penalty)
+    materset(3).put(w.COEF_FROT_DYN,friction)
+    materset(3).put(w.COEF_FROT_STA,friction)
+    materset(3).put(w.PEN_NORMALE,penalty)
+    materset(3).put(w.PROF_CONT,0.1)
     
     # Volume solid properties
 
@@ -137,7 +139,7 @@ def getMetafor(input):
     # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-6)
+    mim.setResidualTolerance(1e-4)
 
     # Time step iterations
     

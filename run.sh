@@ -16,15 +16,15 @@ export SCRIPT=${PWD}/examples/2D/carsherWall/main.py
 export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
 export SCRIPT=${PWD}/examples/2D/damBreak/main.py
 export SCRIPT=${PWD}/examples/2D/elasticFunnel/main.py
-export SCRIPT=${PWD}/examples/2D/flowDrivenDisk/main.py
-export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
-export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
-export SCRIPT=${PWD}/examples/2D/rayleBenard/main.py
-export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
-export SCRIPT=${PWD}/examples/2D/thermoStatic/main.py
-export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
+export SCRIPT=${PWD}/examples/2D/flowContact/main.py
+# export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
+# export SCRIPT=${PWD}/examples/2D/lockingPump/main.py
+# export SCRIPT=${PWD}/examples/2D/pureConduction/main.py
+# export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
+# export SCRIPT=${PWD}/examples/2D/thermoStatic/main.py
+# export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
-export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
+# export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
 # export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
 # export SCRIPT=${PWD}/examples/3D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
@@ -41,4 +41,4 @@ cd workspace
 export MKL_NUM_THREADS=${NUN_THREADS}
 export OMP_NUM_THREADS=${NUN_THREADS}
 export OPTION="-map-by node:PE=${CPU_PER_PROC}"
-mpiexec ${OPTION} -n 2 python ${SCRIPT} -k ${NUN_THREADS}
+mpiexec ${OPTION} -n 2 python ${SCRIPT} -k ${NUN_THREADS} 2>&1 | tee workspace.txt
