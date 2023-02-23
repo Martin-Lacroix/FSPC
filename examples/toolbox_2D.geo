@@ -23,17 +23,17 @@ Macro Quad_Circle
 
     // Points List
 
-    p[0] = newp; Point(p[0]) = {x,y,0,d};
-    p[1] = newp; Point(p[1]) = {x,y-R,0,d};
+    p[0] = newp; Point(p[0]) = {x,y,0};
+    p[1] = newp; Point(p[1]) = {x,y-R,0};
 
-    p[2] = newp; Point(p[2]) = {x+R,y,0,d};
-    p[3] = newp; Point(p[3]) = {x,y+R,0,d};
-    p[4] = newp; Point(p[4]) = {x-R,y,0,d};
+    p[2] = newp; Point(p[2]) = {x+R,y,0};
+    p[3] = newp; Point(p[3]) = {x,y+R,0};
+    p[4] = newp; Point(p[4]) = {x-R,y,0};
 
-    p[5] = newp; Point(p[5]) = {x,y-RR,0,d};
-    p[6] = newp; Point(p[6]) = {x+RR,y,0,d};
-    p[7] = newp; Point(p[7]) = {x,y+RR,0,d};
-    p[8] = newp; Point(p[8]) = {x-RR,y,0,d};
+    p[5] = newp; Point(p[5]) = {x,y-RR,0};
+    p[6] = newp; Point(p[6]) = {x+RR,y,0};
+    p[7] = newp; Point(p[7]) = {x,y+RR,0};
+    p[8] = newp; Point(p[8]) = {x-RR,y,0};
 
     // Lines List
 
@@ -55,10 +55,10 @@ Macro Quad_Circle
     // Surface List
 
     k[0] = newcl; Curve Loop(k[0]) = {l[0],l[1],l[2],l[3]};
-    k[1] = newcl; Curve Loop(k[1]) = {l[4],c[0],-l[5],-l[0]};
-    k[2] = newcl; Curve Loop(k[2]) = {l[5],c[1],-l[6],-l[1]};
-    k[3] = newcl; Curve Loop(k[3]) = {l[6],c[2],-l[7],-l[2]};
-    k[4] = newcl; Curve Loop(k[4]) = {l[7],c[3],-l[4],-l[3]};
+    k[1] = newcl; Curve Loop(k[1]) = {l[4],c[0],l[5],l[0]};
+    k[2] = newcl; Curve Loop(k[2]) = {l[5],c[1],l[6],l[1]};
+    k[3] = newcl; Curve Loop(k[3]) = {l[6],c[2],l[7],l[2]};
+    k[4] = newcl; Curve Loop(k[4]) = {l[7],c[3],l[4],l[3]};
 
     s[0] = news; Plane Surface(s[0]) = {k[0]};
     s[1] = news; Plane Surface(s[1]) = {k[1]};
@@ -112,10 +112,10 @@ Macro Quad_Square
 
     // Points List
 
-    p[0] = newp; Point(p[0]) = {x-L/2,y-H/2,0,d};
-    p[1] = newp; Point(p[1]) = {x+L/2,y-H/2,0,d};
-    p[2] = newp; Point(p[2]) = {x+L/2,y+H/2,0,d};
-    p[3] = newp; Point(p[3]) = {x-L/2,y+H/2,0,d};
+    p[0] = newp; Point(p[0]) = {x-L/2,y-H/2,0};
+    p[1] = newp; Point(p[1]) = {x+L/2,y-H/2,0};
+    p[2] = newp; Point(p[2]) = {x+L/2,y+H/2,0};
+    p[3] = newp; Point(p[3]) = {x-L/2,y+H/2,0};
 
     // Lines List
 
