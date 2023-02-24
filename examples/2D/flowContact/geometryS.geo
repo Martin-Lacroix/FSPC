@@ -11,17 +11,14 @@ R = 0.25;
 y = -0.125;
 
 Call Tri_Peigne;
-s2 = Rotate {{0,0,1},{0,0,0},Pi} {Duplicata{Surface{s[0]};}};
-s1 = s[0];
+Rotate{{0,0,1},{0,0,0},Pi}{Duplicata{Surface{14};}};
 
 // Make the Circle
 
 x = 0;
 R = 0.375;
 y = 1.875;
-
 Call Tri_Circle;
-s3 = s[0];
 
 // Physical Boundary
 
@@ -44,7 +41,6 @@ Background Field = 2;
 Mesh.MeshSizeExtendFromBoundary = 0;
 Mesh.RecombinationAlgorithm = 0;
 Mesh.SubdivisionAlgorithm = 1;
-Mesh.MeshSizeFromPoints = 0;
 Mesh.RecombineAll = 1;
 Mesh.Algorithm = 6;
 

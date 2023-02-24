@@ -54,25 +54,25 @@ def getMetafor(input):
 
     E = 200
     v = 0.3
-    C = E/(1+v)
+    G = E/(2*(1+v))
     K = E/(3*(1-2*v))
 
-    materset.define(1,w.NeoHookeanHyperMaterial)
+    materset.define(1,w.NeoHookeanHyperPk2Material)
     materset(1).put(w.MASS_DENSITY,1e-6)
-    materset(1).put(w.RUBBER_PENAL,K)
-    materset(1).put(w.RUBBER_C1,C)
+    materset(1).put(w.HYPER_K0,K)
+    materset(1).put(w.HYPER_G0,G)
 
     # Ball material parameters
 
     E = 100
     v = 0.3
-    C = E/(1+v)
+    G = E/(2*(1+v))
     K = E/(3*(1-2*v))
 
-    materset.define(2,w.NeoHookeanHyperMaterial)
+    materset.define(2,w.NeoHookeanHyperPk2Material)
     materset(2).put(w.MASS_DENSITY,1e-6)
-    materset(2).put(w.RUBBER_PENAL,K)
-    materset(2).put(w.RUBBER_C1,C)
+    materset(2).put(w.HYPER_K0,K)
+    materset(2).put(w.HYPER_G0,G)
 
     # Contact parameters
 

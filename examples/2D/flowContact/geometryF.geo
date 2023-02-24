@@ -20,8 +20,7 @@ R = 0.25;
 y = -0.125;
 
 Call Tri_Peigne;
-s3 = Rotate {{0,0,1},{0,0,0},Pi} {Duplicata{Surface{s[0]};}};
-s2 = s[0];
+Rotate{{0,0,1},{0,0,0},Pi}{Duplicata{Surface{s[0]};}};
 
 // Make the Circle
 
@@ -30,13 +29,12 @@ R = 0.375;
 y = 1.875;
 
 Call Tri_Circle;
-s4 = s[0];
 
 // Remove the Solid
 
-BooleanDifference{Surface{s1};Delete;}{Surface{s2};Delete;}
-BooleanDifference{Surface{s1};Delete;}{Surface{s3};Delete;}
-BooleanDifference{Surface{s1};Delete;}{Surface{s4};Delete;}
+BooleanDifference{Surface{6};Delete;}{Surface{20};Delete;}
+BooleanDifference{Surface{6};Delete;}{Surface{21};Delete;}
+BooleanDifference{Surface{6};Delete;}{Surface{33};Delete;}
 
 // Physical Boundary
 
@@ -57,5 +55,4 @@ Field[2].F = Sprintf("%g+F1*0.1",d);
 Background Field = 2;
 
 Mesh.MeshSizeExtendFromBoundary = 0;
-Mesh.MeshSizeFromPoints = 0;
 Mesh 2;

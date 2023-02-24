@@ -90,23 +90,14 @@ def getMetafor(input):
     prp3.put(w.AREAINCONTACT,w.AIC_ONCE)
     prp3.put(w.MATERIAL,2)
 
-    # Contact for ToolTop and Solid
+    # Contact for Tool and Solid
 
-    ci1 = w.RdContactInteraction(3)
-    ci1.setTool(groups['ToolTop'])
-    ci1.setSmoothNormals(False)
-    ci1.push(groups['Solid'])
-    ci1.addProperty(prp3)
-    interactionset.add(ci1)
-
-    # Contact for ToolBot and Solid
-
-    ci2 = w.RdContactInteraction(4)
-    ci2.setTool(groups['ToolBot'])
-    ci2.setSmoothNormals(False)
-    ci2.push(groups['Solid'])
-    ci2.addProperty(prp3)
-    interactionset.add(ci2)
+    ci = w.RdContactInteraction(3)
+    ci.setTool(groups['ToolSurf'])
+    ci.setSmoothNormals(False)
+    ci.push(groups['Solid'])
+    ci.addProperty(prp3)
+    interactionset.add(ci)
 
     # Boundary conditions
 

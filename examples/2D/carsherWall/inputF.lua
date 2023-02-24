@@ -25,12 +25,12 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {0,0,1.64,0.6}
+Problem.Mesh.boundingBox = {0,-0.3,1.74,0.3}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'PolyTop','PolyBot','FSInterface'}
+Problem.Mesh.exclusionGroups = {'FSInterface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -114,7 +114,7 @@ function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
 	local vmax = 5
 	local tmax = 0.5
 	local vt = (t/tmax)*vmax
-	local r = math.abs(pos[2]-0.25)
+	local r = math.abs(pos[2])
 	local R = 0.05
 
 	if (t<tmax) then

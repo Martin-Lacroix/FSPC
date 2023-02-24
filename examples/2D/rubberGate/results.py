@@ -129,7 +129,7 @@ index = np.argsort(time)
 for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
-    coord[i] = gmsh.model.mesh.getNode(124)[0]
+    coord[i] = gmsh.model.mesh.getNode(6)[0]
 
 gmsh.finalize()
 disp = np.linalg.norm(coord-coord[0],axis=1)

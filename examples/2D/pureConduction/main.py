@@ -14,7 +14,7 @@ solver = process.getSolver(pathF,pathS)
 # Configure the algorithm
 
 algorithm = FSPC.IQN_MVJ(solver)
-algorithm.interp = FSPC.KNN(solver,1)
+algorithm.interp = FSPC.KNN(solver,2)
 algorithm.convergT = FSPC.Convergence(1e-8)
 algorithm.step = FSPC.TimeStep(1e-1)
 
