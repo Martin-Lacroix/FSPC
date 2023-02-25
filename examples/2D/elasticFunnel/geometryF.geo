@@ -4,7 +4,6 @@ x = 0;
 y = 5;
 R = 2.25;
 d = 0.05;
-N = 160;
 
 // New Structure Part
 
@@ -14,8 +13,8 @@ p = newp; Point(p) = {R,3.75,0,d};
 l = newl; Line(l) = {3,1};
 l = newl; Line(l) = {4,2};
 
-Transfinite Line{c} = N;
-Transfinite Line{2,3} = Ceil(N/2);
+Transfinite Line{c} = 161;
+Transfinite Line{2,3} = 80;
 
 // Make the Trapez
 

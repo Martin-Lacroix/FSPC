@@ -25,7 +25,7 @@ c = newc; Circle(c) = {5,9,2};
 k = newcl; Curve Loop(k) = {14,1,13,7};
 s = news; Plane Surface(s) = {k};
 
-Transfinite Line{13,14} = 2*N;
+Transfinite Line{13,14} = 161;
 Transfinite Surface{s};
 
 // Physical Boundary

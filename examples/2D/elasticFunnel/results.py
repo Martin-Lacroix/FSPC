@@ -319,7 +319,7 @@ index = np.argsort(time)
 for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
-    coord[i] = gmsh.model.mesh.getNode(411)[0]
+    coord[i] = gmsh.model.mesh.getNode(412)[0]
 
 gmsh.finalize()
 disp = (coord-coord[0])[:,1]
