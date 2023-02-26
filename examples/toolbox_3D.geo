@@ -6,6 +6,94 @@ Macro Reset_All
 
 Return
 
+// Make a Non-Meshed Square
+
+Macro Hole_Square
+
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
+
+    v[0] = newreg; Box(v[0]) = {x-L/2,y-W/2,z-H/2,L,W,H};
+    MeshSize{PointsOf{Volume{v[0]};}} = d;
+    Delete{Volume{v[0]};}
+
+Return
+
+// Make a Triangle-Meshed Square
+
+Macro Tri_Square
+
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
+
+    v[0] = newreg; Box(v[0]) = {x-L/2,y-W/2,z-H/2,L,W,H};
+    MeshSize{PointsOf{Volume{v[0]};}} = d;
+
+Return
+
+// Make a Quad-Meshed Square
+
+Macro Quad_Square
+
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
+
+    // Point List
+
+    p[0] = newp; Point(p[0]) = {x-L/2,y-W/2,z-H/2};
+    p[1] = newp; Point(p[1]) = {x+L/2,y-W/2,z-H/2};
+    p[2] = newp; Point(p[2]) = {x+L/2,y+W/2,z-H/2};
+    p[3] = newp; Point(p[3]) = {x-L/2,y+W/2,z-H/2};
+    p[4] = newp; Point(p[4]) = {x-L/2,y-W/2,z+H/2};
+    p[5] = newp; Point(p[5]) = {x+L/2,y-W/2,z+H/2};
+    p[6] = newp; Point(p[6]) = {x+L/2,y+W/2,z+H/2};
+    p[7] = newp; Point(p[7]) = {x-L/2,y+W/2,z+H/2};
+
+    // Line List
+
+    l[0] = newl; Line(l[0]) = {p[1],p[0]};
+    l[1] = newl; Line(l[1]) = {p[1],p[2]};
+    l[2] = newl; Line(l[2]) = {p[2],p[3]};
+    l[3] = newl; Line(l[3]) = {p[3],p[0]};
+    l[4] = newl; Line(l[4]) = {p[4],p[5]};
+    l[5] = newl; Line(l[5]) = {p[5],p[6]};
+    l[6] = newl; Line(l[6]) = {p[6],p[7]};
+    l[7] = newl; Line(l[7]) = {p[7],p[4]};
+    l[8] = newl; Line(l[8]) = {p[0],p[4]};
+    l[9] = newl; Line(l[9]) = {p[1],p[5]};
+    l[10] = newl; Line(l[10]) = {p[2],p[6]};
+    l[11] = newl; Line(l[11]) = {p[3],p[7]};
+
+    // Mesh of the Solid
+
+    k[0] = newcl; Curve Loop(k[0]) = {l[0],l[1],l[2],l[3]};
+    k[1] = newcl; Curve Loop(k[1]) = {l[4],l[5],l[6],l[7]};
+    k[2] = newcl; Curve Loop(k[2]) = {l[9],l[4],l[8],l[0]};
+    k[3] = newcl; Curve Loop(k[3]) = {l[2],l[11],l[6],l[10]};
+    k[4] = newcl; Curve Loop(k[4]) = {l[1],l[10],l[5],l[9]};
+    k[5] = newcl; Curve Loop(k[5]) = {l[3],l[8],l[7],l[11]};
+
+    For j In {0:5}
+
+        s[j] = news; Plane Surface(s[j]) = {k[j]};
+        Transfinite Surface{s[j]};
+        Recombine Surface{s[j]};
+
+    EndFor
+
+    // Mesh Generation
+
+    r[0] = newsl; Surface Loop(r[0]) = {s[]};
+    v[0] = newv; Volume(v[0]) = {r[0]};
+
+    Transfinite Line{l[0],l[2],l[4],l[6]} = P;
+    Transfinite Line{l[1],l[3],l[5],l[7]} = M;
+    Transfinite Line{l[8]:l[11]} = N;
+    Transfinite Volume(v[0]);
+    Recombine Volume(v[0]);
+
+Return
+
 // Make a Non-Meshed Sphere
 
 Macro Hole_Sphere
@@ -13,9 +101,9 @@ Macro Hole_Sphere
     Call Reset_All;
     SetFactory("OpenCASCADE");
 
-    s[0] = newreg; Sphere(s[0]) = {x,y,z,R};
-    MeshSize{PointsOf{Surface{s[0]};}} = d;
-    Delete{Volume{s[0]};}
+    v[0] = newreg; Sphere(v[0]) = {x,y,z,R};
+    MeshSize{PointsOf{Surface{v[0]};}} = d;
+    Delete{Volume{v[0]};}
 
 Return
 
@@ -26,8 +114,8 @@ Macro Tri_Sphere
     Call Reset_All;
     SetFactory("OpenCASCADE");
 
-    s[0] = newreg; Sphere(s[0]) = {x,y,z,R};
-    MeshSize{PointsOf{Surface{s[0]};}} = d;
+    v[0] = newreg; Sphere(v[0]) = {x,y,z,R};
+    MeshSize{PointsOf{Volume{v[0]};}} = d;
 
 Return
 

@@ -25,7 +25,7 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = true
-Problem.Mesh.boundingBox = {0,0,0,1.1,0.3,0.4}
+Problem.Mesh.boundingBox = {0,-0.15,0,1.1,0.15,0.4}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'

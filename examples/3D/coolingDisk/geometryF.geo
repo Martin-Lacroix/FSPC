@@ -29,8 +29,6 @@ p = newp; Point(p) = {R,0,L,d};
 p = newp; Point(p) = {-R,0,L,d};
 p = newp; Point(p) = {0,R,L,d};
 
-// Line List
-
 c = newl; Line(c) = {9,15};
 c = newl; Line(c) = {10,16};
 c = newl; Line(c) = {11,17};
@@ -40,17 +38,15 @@ c = newl; Circle(c) = {15,13,17};
 c = newl; Circle(c) = {17,13,16};
 c = newl; Circle(c) = {16,13,14};
 
-// Surface Mesh
+k1 = newcl; Curve Loop(k1) = {9,30,34,33};
+k2 = newcl; Curve Loop(k2) = {10,32,35,30};
+k3 = newcl; Curve Loop(k3) = {11,31,36,32};
+k4 = newcl; Curve Loop(k4) = {8,33,37,31};
 
-k = newcl; Curve Loop(k) = {9,30,34,33};
-k = newcl; Curve Loop(k) = {10,32,35,30};
-k = newcl; Curve Loop(k) = {11,31,36,32};
-k = newcl; Curve Loop(k) = {8,33,37,31};
-
-s = news; BSpline Surface(s) = {38};
-s = news; BSpline Surface(s) = {39};
-s = news; BSpline Surface(s) = {40};
-s = news; BSpline Surface(s) = {41};
+s = news; BSpline Surface(s) = {k1};
+s = news; BSpline Surface(s) = {k2};
+s = news; BSpline Surface(s) = {k3};
+s = news; BSpline Surface(s) = {k4};
 
 // Physical Surface
 
