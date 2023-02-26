@@ -1,4 +1,5 @@
 Include "../../toolbox_2D.geo";
+SetFactory("OpenCASCADE");
 
 d = 0.05;
 N = 70;
@@ -43,5 +44,5 @@ Mesh.RecombinationAlgorithm = 0;
 Mesh.SubdivisionAlgorithm = 1;
 Mesh.RecombineAll = 1;
 Mesh.Algorithm = 6;
-
+Mesh.Binary = 1;
 Mesh 2;

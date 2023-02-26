@@ -1,4 +1,5 @@
 Include "../../toolbox_2D.geo";
+SetFactory("OpenCASCADE");
 
 L = 0.005;
 eps = 1e-5;
@@ -18,4 +19,5 @@ Physical Surface("Solid") = {6};
 Physical Curve("FSInterface") = {4};
 Physical Curve("SolidBase") = {3};
 
+Mesh.Binary = 1;
 Mesh 2;

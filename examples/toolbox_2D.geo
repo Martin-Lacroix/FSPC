@@ -1,12 +1,18 @@
-SetFactory("OpenCASCADE");
-Mesh.Binary = 1;
+Macro Reset_All
+
+    k[] = {}; s[] = {};
+    p[] = {}; l[] = {}; c[] = {};
+
+Return
 
 // Make a Non-Meshed Circle
 
 Macro Hole_Circle
 
-    k[] = {}; c[] = {};
-    c[0] = newc; Circle(c[0]) = {x,y,0,R};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
+
+    c[0] = newl; Circle(c[0]) = {x,y,0,R};
     k[0] = newcl; Curve Loop(k[0]) = {c[0]};
     Transfinite Line{c[]} = N;
     
@@ -16,8 +22,10 @@ Return
 
 Macro Tri_Circle
 
-    k[] = {}; s[] = {}; c[] = {};
-    c[0] = newc; Circle(c[0]) = {x,y,0,R};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
+    
+    c[0] = newl; Circle(c[0]) = {x,y,0,R};
     k[0] = newcl; Curve Loop(k[0]) = {c[0]};
     s[0] = news; Plane Surface(s[0]) = {k[0]};
     Transfinite Line{c[]} = N;
@@ -29,8 +37,8 @@ Return
 Macro Quad_Circle
 
     RR = 0.6*R;
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {}; c[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
 
@@ -46,10 +54,10 @@ Macro Quad_Circle
 
     // Lines List
 
-    c[0] = newc; Circle(c[0]) = {p[1],p[0],p[2]};
-    c[1] = newc; Circle(c[1]) = {p[2],p[0],p[3]};
-    c[2] = newc; Circle(c[2]) = {p[3],p[0],p[4]};
-    c[3] = newc; Circle(c[3]) = {p[4],p[0],p[1]};
+    c[0] = newl; Circle(c[0]) = {p[1],p[0],p[2]};
+    c[1] = newl; Circle(c[1]) = {p[2],p[0],p[3]};
+    c[2] = newl; Circle(c[2]) = {p[3],p[0],p[4]};
+    c[3] = newl; Circle(c[3]) = {p[4],p[0],p[1]};
 
     l[0] = newl; Line(l[0]) = {p[5],p[6]};
     l[1] = newl; Line(l[1]) = {p[6],p[7]};
@@ -87,8 +95,8 @@ Return
 
 Macro Hole_Square
 
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
 
@@ -111,8 +119,8 @@ Return
 
 Macro Tri_Square
 
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
 
@@ -139,8 +147,8 @@ Return
 
 Macro Quad_Square
 
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
 
@@ -173,8 +181,8 @@ Return
 
 Macro Tri_Trapez
 
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
 
@@ -202,8 +210,8 @@ Return
 Macro Tri_Peigne
 
     LL = 5*L/6;
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {}; c[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
     
@@ -254,8 +262,8 @@ Return
 
 Macro Tri_Tool
 
-    k[] = {}; s[] = {};
-    p[] = {}; l[] = {};
+    Call Reset_All;
+    SetFactory("OpenCASCADE");
 
     // Points List
     

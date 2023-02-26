@@ -1,4 +1,5 @@
 Include "../../toolbox_2D.geo";
+SetFactory("OpenCASCADE");
 
 C1 = 0.28;
 C2 = 0.82;
@@ -57,4 +58,5 @@ Physical Curve("FreeSurface") = {2};
 Physical Curve("Inlet") = {4};
 
 Mesh.MeshSizeMax = d;
+Mesh.Binary = 1;
 Mesh 2;

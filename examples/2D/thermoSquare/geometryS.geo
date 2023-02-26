@@ -1,4 +1,5 @@
 Include "../../toolbox_2D.geo";
+SetFactory("OpenCASCADE");
 
 x = 0;
 y = 0;
@@ -16,4 +17,5 @@ Call Quad_Square;
 Physical Surface("Solid") = {6};
 Physical Curve("FSInterface") = {1,2,3,4};
 
+Mesh.Binary = 1;
 Mesh 2;

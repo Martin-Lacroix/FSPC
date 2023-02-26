@@ -1,4 +1,5 @@
 Include "../../toolbox_2D.geo";
+SetFactory("OpenCASCADE");
 
 x = 0;
 y = 0;
@@ -33,4 +34,5 @@ Field[2].F = Sprintf("%g+F1*0.05",d);
 Background Field = 2;
 
 Mesh.MeshSizeExtendFromBoundary = 0;
+Mesh.Binary = 1;
 Mesh 2;
