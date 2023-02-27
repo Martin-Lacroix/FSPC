@@ -25,9 +25,8 @@ for folder in folderList:
 
     for i,F in enumerate(file):
 
-        name,extension = os.path.splitext(F)
-        if extension == '.msh':
-            time[i] = float(name[name.index('_')+1:])
+        fileName = os.path.splitext(F)[0]
+        time[i] = float(fileName[fileName.index('_')+1:])
 
     index = np.argsort(time)
     file = [file[i] for i in index]
@@ -36,9 +35,6 @@ for folder in folderList:
 
     for i,F in enumerate(file):
 
-        name,extension = os.path.splitext(F)
-        if extension == '.msh':
-
-            msh = meshio.read(F)
-            name = 'file_'+str(i)
-            meshio.write(name+'.vtu',msh,file_format='vtu')
+        msh = meshio.gmsh.read(F)
+        fileName = 'file_'+str(i)+'.vtu'
+        meshio.write(fileName,msh,file_format='vtu')

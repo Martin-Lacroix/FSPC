@@ -101,10 +101,8 @@ def getMetafor(input):
 
     # Boundary conditions
 
-    loadingset.define(groups['ToolTop'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['ToolTop'],w.Field1D(w.TY,w.RE))
-    loadingset.define(groups['ToolBot'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['ToolBot'],w.Field1D(w.TY,w.RE))
+    loadingset.define(groups['Tool'],w.Field1D(w.TX,w.RE))
+    loadingset.define(groups['Tool'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 
