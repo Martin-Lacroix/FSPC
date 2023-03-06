@@ -110,18 +110,18 @@ Problem.Solver.MomContEq.BC = {}
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {0,0,0,0,340}
 end
 
-function Problem.Solver.MomContEq.BC:WallV(pos,initPos,state,t)
+function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
 	return 0,0,0
 end
 
-function Problem.Solver.HeatEq.BC:WallQ(pos,initPos,state,t)
+function Problem.Solver.HeatEq.BC.WallQ(x,y,z,t)
     return 0,0,0
 end
 
-function Problem.Solver.HeatEq.BC:FreeSurfaceQ(pos,initPos,state,t)
+function Problem.Solver.HeatEq.BC.FreeSurfaceQ(x,y,z,t)
     return 0,0,0
 end

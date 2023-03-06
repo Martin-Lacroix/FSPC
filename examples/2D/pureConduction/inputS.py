@@ -77,7 +77,7 @@ def getMetafor(input):
 
     # Top heat flux boundary conditions
 
-    fun = lambda x : np.exp(-np.square(x)/np.square(0.1)/2)
+    fun = lambda x : np.exp(-np.square(x-0.5)/np.square(0.1)/2)
     F = w.PythonOneParameterFunction(fun)
 
     prp3 = w.ElementProperties(w.TmHeatFlux2DElement)

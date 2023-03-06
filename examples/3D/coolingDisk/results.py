@@ -50,7 +50,7 @@ for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
     tags,nodeVal = gmsh.view.getModelData(1,i)[1:3]
-    value[i] = nodeVal[5094][0]
+    value[i] = nodeVal[628][0]
 
 gmsh.finalize()
 time = np.sort(time)

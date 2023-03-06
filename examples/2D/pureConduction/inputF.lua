@@ -25,7 +25,7 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {-0.5,0,0.5,0.2}
+Problem.Mesh.boundingBox = {0,-10,1,1}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
@@ -96,10 +96,10 @@ Problem.IC = {}
 Problem.Solver.HeatEq.BC = {}
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {300}
 end
 
-function Problem.Solver.HeatEq.BC:WallQ(pos,initPos,state,t) 
+function Problem.Solver.HeatEq.BC.WallQ(x,y,z,t) 
     return 0,0
 end

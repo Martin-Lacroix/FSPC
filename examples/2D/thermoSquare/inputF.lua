@@ -112,23 +112,23 @@ Problem.Solver.HeatEq.BC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {0,0,0,1000}
 end
 
-function Problem.Solver.MomContEq.BC:WallV(pos,initPos,state,t)
+function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC:FSInterfaceV(pos,initPos,state,t)
+function Problem.Solver.MomContEq.BC.FSInterfaceV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.HeatEq.BC:WallQ(pos,initPos,state,t)
+function Problem.Solver.HeatEq.BC.WallQ(x,y,z,t)
     return 0,0
 end
 
-function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
 
 	local hchar = Problem.Mesh.hchar
 	return hchar+dist*0.05

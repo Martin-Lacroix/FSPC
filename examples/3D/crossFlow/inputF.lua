@@ -25,7 +25,7 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = true
-Problem.Mesh.boundingBox = {0,-0.125,0,0.35,0.125,0.4}
+Problem.Mesh.boundingBox = {0,0,0,0.35,0.25,0.4}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
@@ -90,11 +90,11 @@ Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
     return {0,0,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
+function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
 
     local tmax = 0.1
     local vmax = 0.5
@@ -107,7 +107,7 @@ function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
     end
 end
 
-function Problem.Solver.MomContEq.BC:ReservoirVEuler(pos,t)
+function Problem.Solver.MomContEq.BC.WallVEuler(x,y,z,t)
 
     local tmax = 0.1
     local vmax = 0.5
@@ -120,19 +120,19 @@ function Problem.Solver.MomContEq.BC:ReservoirVEuler(pos,t)
     end
 end
 
-function Problem.Solver.MomContEq.BC:PolytopeV(pos,t)
+function Problem.Solver.MomContEq.BC.PolytopeV(x,y,z,t)
     return 0,0,0
 end
 
-function Problem.Solver.MomContEq.BC:BottomVEuler(pos,t)
+function Problem.Solver.MomContEq.BC.BottomVEuler(x,y,z,t)
 	return 0,0,0
 end
 
-function Problem.Solver.MomContEq.BC:OutletP(pos,t)
+function Problem.Solver.MomContEq.BC.OutletP(x,y,z,t)
 	return 0
 end
 
-function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
 
 	local hchar = Problem.Mesh.hchar
 	return hchar+(dist)*0.1

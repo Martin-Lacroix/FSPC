@@ -14,12 +14,12 @@ Problem.maxFactor = 100
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1e3
+Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.02
+Problem.Mesh.hchar = 0.06
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = true
+Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
@@ -31,7 +31,6 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -86,37 +85,35 @@ Problem.Solver.MomEq.BC = {}
 Problem.Solver.ContEq.BC = {}
 Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {0,0,0,Problem.Material.rhoStar,0,0}
 end
 
-function Problem.Solver.MomEq.BC:ReservoirV(pos,t)
+function Problem.Solver.MomEq.BC.ReservoirV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomEq.BC:PolytopeV(pos,t)
+function Problem.Solver.MomEq.BC.PolytopeV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomEq.BC:OutletP(pos,t)
+function Problem.Solver.MomEq.BC.OutletP(x,y,z,t)
 	return 0
 end
 
-function Problem.Solver.MomEq.BC:InletVEuler(pos,t)
+function Problem.Solver.MomEq.BC.InletVEuler(x,y,z,t)
 
 	local amax = -4e5
 	local tmax = 2.5e-4
-	local r = math.abs(pos[1])
+	local r = math.abs(x)
+	local R = 1
 
 	if (t<tmax) then
-		return 0,amax*(1-r^2)
+
+		local a = amax*(1-(r*r)/(R*R))
+		return 0,a
+
 	else
 		return 0,0
 	end
-end
-
-function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
-
-	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.1
 end

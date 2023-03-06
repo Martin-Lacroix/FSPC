@@ -25,7 +25,7 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = true
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {0,-0.3,1.74,0.3}
+Problem.Mesh.boundingBox = {0,0.04,1.56,0.6}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
@@ -89,32 +89,20 @@ Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {0,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:BorderV(pos,t)
+function Problem.Solver.MomContEq.BC.BorderV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC:MasterV(pos,t)
-	return 0,0
-end
-
-function Problem.Solver.MomContEq.BC:PolyTopV(pos,t)
-	return 0,0
-end
-
-function Problem.Solver.MomContEq.BC:PolyBotV(pos,t)
-	return 0,0
-end
-
-function Problem.Solver.MomContEq.BC:InletVEuler(pos,t)
+function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
 
 	local vmax = 5
 	local tmax = 0.5
 	local vt = (t/tmax)*vmax
-	local r = math.abs(pos[2])
+	local r = math.abs(y-0.25)
 	local R = 0.05
 
 	if (t<tmax) then

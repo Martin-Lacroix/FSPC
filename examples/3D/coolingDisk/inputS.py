@@ -59,7 +59,7 @@ def getMetafor(input):
 
     # Finite element properties
 
-    prp1 = w.ElementProperties(w.TmVolume3DElement)
+    prp1 = w.ElementProperties(w.TmTetraVolume3DElement)
     prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_SRIPR)
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp1.put(w.GRAVITY_Z,-9.81)
@@ -68,7 +68,7 @@ def getMetafor(input):
 
     # Elements for surface heat flux
 
-    prp2 = w.ElementProperties(w.NodHeatFlux3DElement)
+    prp2 = w.ElementProperties(w.NodTriangleHeatFlux3DElement)
     heat = w.NodInteraction(2)
     heat.push(groups['FSInterface'])
     heat.addProperty(prp2)
@@ -76,7 +76,7 @@ def getMetafor(input):
 
     # Elements for surface traction
 
-    prp3 = w.ElementProperties(w.NodStress3DElement)
+    prp3 = w.ElementProperties(w.NodTriangleStress3DElement)
     load = w.NodInteraction(3)
     load.push(groups['FSInterface'])
     load.addProperty(prp3)

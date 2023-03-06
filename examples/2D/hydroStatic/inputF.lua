@@ -25,7 +25,7 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {-0.5,-10,0.5,1}
+Problem.Mesh.boundingBox = {0,-10,1,1}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
@@ -86,10 +86,10 @@ Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {0,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:WallV(pos,t)
+function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
 	return 0,0
 end

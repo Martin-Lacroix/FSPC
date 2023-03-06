@@ -90,15 +90,15 @@ Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
     return {0,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
+function Problem.Solver.MomContEq.BC.ReservoirV(x,y,z,t)
     return 0,0
 end
 
-function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
 
 	local hchar = Problem.Mesh.hchar
 	return hchar+dist*0.2

@@ -41,7 +41,7 @@ def getMetafor(input):
     # Defines the solid domain
 
     app1 = w.FieldApplicator(1)
-    app1.push(groups['Wall'])
+    app1.push(groups['Border'])
     interactionset.add(app1)
 
     # Defines the ball domain
@@ -76,19 +76,16 @@ def getMetafor(input):
 
     # Contact parameters
 
-    penalty = 1e4
-    friction = 0.15
-
     materset.define(3,w.CoulombContactMaterial)
-    materset(3).put(w.PEN_TANGENT,friction*penalty)
-    materset(3).put(w.COEF_FROT_DYN,friction)
-    materset(3).put(w.COEF_FROT_STA,friction)
-    materset(3).put(w.PEN_NORMALE,penalty)
-    materset(3).put(w.PROF_CONT,0.1)
+    materset(3).put(w.COEF_FROT_DYN,0.15)
+    materset(3).put(w.COEF_FROT_STA,0.15)
+    materset(3).put(w.PEN_NORMALE,1e3)
+    materset(3).put(w.PEN_TANGENT,1e3)
+    materset(3).put(w.PROF_CONT,0.06)
     
     # Volume solid properties
 
-    prp1 = w.ElementProperties(w.Volume2DElement)
+    prp1 = w.ElementProperties(w.TriangleVolume2DElement)
     prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp1.put(w.MATERIAL,1)
@@ -96,7 +93,7 @@ def getMetafor(input):
 
     # Volume ball properties
 
-    prp2 = w.ElementProperties(w.Volume2DElement)
+    prp2 = w.ElementProperties(w.TriangleVolume2DElement)
     prp2.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp2.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp2.put(w.MATERIAL,2)
@@ -139,7 +136,7 @@ def getMetafor(input):
     # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-4)
+    mim.setResidualTolerance(1e-6)
 
     # Time step iterations
     

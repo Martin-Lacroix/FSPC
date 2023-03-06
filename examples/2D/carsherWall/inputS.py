@@ -93,7 +93,7 @@ def getMetafor(input):
     # Contact for Tool and Solid
 
     ci = w.RdContactInteraction(3)
-    ci.setTool(groups['ToolSurf'])
+    ci.setTool(groups['Contact'])
     ci.setSmoothNormals(False)
     ci.push(groups['Solid'])
     ci.addProperty(prp3)
@@ -101,8 +101,8 @@ def getMetafor(input):
 
     # Boundary conditions
 
-    loadingset.define(groups['Tool'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Tool'],w.Field1D(w.TY,w.RE))
+    loadingset.define(groups['Contact'],w.Field1D(w.TX,w.RE))
+    loadingset.define(groups['Contact'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 

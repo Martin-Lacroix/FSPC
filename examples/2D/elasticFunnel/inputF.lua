@@ -90,28 +90,28 @@ Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC:initStates(pos)
+function Problem.IC.initStates(x,y,z)
 	return {0,0,0}
 end
 
-function Problem.Solver.MomContEq.BC:ReservoirV(pos,t)
+function Problem.Solver.MomContEq.BC.ReservoirV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC:PolyLV(pos,t)
+function Problem.Solver.MomContEq.BC.PolyLV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC:PolyRV(pos,t)
+function Problem.Solver.MomContEq.BC.PolyRV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC:SolidBaseV(pos,t)
+function Problem.Solver.MomContEq.BC.SolidBaseV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Mesh:computeHcharFromDistance(pos,t,dist)
+function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
 
 	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.1
+	return hchar+dist*0.3
 end
