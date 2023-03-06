@@ -76,12 +76,15 @@ def getMetafor(input):
 
     # Contact parameters
 
+    penalty = 1e4
+    friction = 0.15
+
     materset.define(3,w.CoulombContactMaterial)
-    materset(3).put(w.COEF_FROT_DYN,0.15)
-    materset(3).put(w.COEF_FROT_STA,0.15)
-    materset(3).put(w.PEN_NORMALE,1e3)
-    materset(3).put(w.PEN_TANGENT,1e3)
-    materset(3).put(w.PROF_CONT,0.06)
+    materset(3).put(w.PEN_TANGENT,friction*penalty)
+    materset(3).put(w.COEF_FROT_DYN,friction)
+    materset(3).put(w.COEF_FROT_STA,friction)
+    materset(3).put(w.PEN_NORMALE,penalty)
+    materset(3).put(w.PROF_CONT,0.1)
     
     # Volume solid properties
 
@@ -136,7 +139,7 @@ def getMetafor(input):
     # Mechanical iterations
 
     mim.setMaxNbOfIterations(25)
-    mim.setResidualTolerance(1e-6)
+    mim.setResidualTolerance(1e-4)
 
     # Time step iterations
     
