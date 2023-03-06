@@ -4,14 +4,10 @@ import os
 
 # %% Main Code
 
-folderList = list()
 workspace = os.getcwd()
-workspace = os.path.join(workspace,'workspace')
-
-# Lists the folders in workspace
-
-for root,dirs,files in os.walk(workspace,topdown=False):
-    for name in dirs: folderList.append(os.path.join(root,name))
+folderList = ['metafor','pfem']
+workspace = os.path.join(workspace,'workspace/')
+folderList = [workspace+F for F in folderList]
 
 # Loops over all the msh files
 
@@ -35,6 +31,7 @@ for folder in folderList:
 
     for i,F in enumerate(file):
 
+        if 'msh' not in F: break
         msh = meshio.gmsh.read(F)
-        fileName = 'file_'+str(i)+'.vtu'
+        fileName = 'convert_'+str(i)+'.vtu'
         meshio.write(fileName,msh,file_format='vtu')
