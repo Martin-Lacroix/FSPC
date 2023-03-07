@@ -41,10 +41,9 @@ class Metafor(object):
 
         # Defines some internal variables
 
-        self.neverRun = True
+        self.mecha = True
         self.reload = True
         self.thermo = True
-        self.mecha = True
 
         # Defines some internal variables
 
@@ -64,14 +63,13 @@ class Metafor(object):
             self.prevHeat = np.zeros((self.nbrNode,self.dim))
         except: self.thermo = False
 
-        # Temporary fix for initializing the temperature !!!
+        # Fix for initializing the nodal data
 
         dt = 1e-6
         self.tsm.setInitialTime(0,dt)
         self.tsm.setNextTime(dt,0,dt)
         self.metafor.getTimeIntegration().integration()
         loader = FacManager(self.metafor)
-        self.neverRun = False
         loader.load(0)
 
         # Manages time step restart functions
@@ -88,19 +86,9 @@ class Metafor(object):
     @compute_time
     def run(self,t1,t2):
 
-        if(self.neverRun):
-
-            self.tsm.setInitialTime(t1,t2-t1)
-            self.tsm.setNextTime(t2,0,t2-t1)
-            ok = self.metafor.getTimeIntegration().integration()
-            self.neverRun = False
-
-        else:
-
-            if self.reload: self.tsm.removeLastStage()
-            self.tsm.setNextTime(t2,0,t2-t1)
-            ok = self.metafor.getTimeIntegration().restart(self.mfac)
-
+        if self.reload: self.tsm.removeLastStage()
+        self.tsm.setNextTime(t2,0,t2-t1)
+        ok = self.metafor.getTimeIntegration().restart(self.mfac)
         self.reload = True
         return ok
 
