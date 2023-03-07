@@ -44,9 +44,6 @@ class Metafor(object):
         self.mecha = True
         self.reload = True
         self.thermo = True
-
-        # Defines some internal variables
-
         self.FSI = input['FSInterface']
         self.exporter = input['exporter']
         self.nbrNode = self.FSI.getNumberOfMeshPoints()
