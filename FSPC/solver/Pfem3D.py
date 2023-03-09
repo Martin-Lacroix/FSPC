@@ -85,7 +85,6 @@ class Pfem3D(object):
 
             if not self.ok:
 
-                print('PFEM3D: Problem occured\n')
                 if 2*self.factor > self.maxFactor: return False
                 self.factor = 2*self.factor
                 self.resetSystem(t2-t1)
