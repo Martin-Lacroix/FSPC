@@ -18,12 +18,11 @@ RBF = lambda r: np.square(r)*np.ma.log(r)
 algorithm = FSPC.IQN_ILS(solver)
 algorithm.interp = FSPC.RBF(solver,RBF)
 algorithm.convergM = FSPC.Convergence(1e-8)
-algorithm.step = FSPC.TimeStep(1e-2)
+algorithm.step = FSPC.TimeStep(1e-2,0.05)
 
 algorithm.endTime = 20
 algorithm.omega = 0.5
 algorithm.maxIter = 25
-algorithm.dtWrite = 0.05
 
 # Start the FSPC simulation
 

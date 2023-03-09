@@ -22,7 +22,6 @@ class Algorithm(object):
 
         com = MPI.COMM_WORLD
         if com.rank == 1: self.initInterp()
-        next = self.dtWrite
         self.solver.save()
 
         # Main loop of the FSI partitioned coupling
@@ -46,10 +45,7 @@ class Algorithm(object):
 
             self.solver.update()
             self.step.update(self.verified)
-
-            if self.step.time >= next: self.solver.save()
-            next = math.floor(self.step.time/self.dtWrite)
-            next = (next+1)*self.dtWrite
+            if self.step.mustSave(): self.solver.save()
 
         # Ends the FSI simulation
 

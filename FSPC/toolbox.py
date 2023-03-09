@@ -3,7 +3,7 @@ from contextlib import redirect_stderr as stderr
 from mpi4py import MPI
 import collections
 import numpy as np
-import time
+import math, time
 import fwkw
 
 # Dictionary of computation time
@@ -62,28 +62,35 @@ class Convergence(object):
 # %% Coupling Time Step Manager
 
 class TimeStep(object):
-    def __init__(self,dt):
+    def __init__(self,dt,dtSave):
 
         self.time = 0
         self.factor = int(2)
         self.max = self.dt = dt
-
-    # Return the curent time frame
+        self.next = self.dtSave = dtSave
 
     def timeFrame(self):
         return self.time,self.time+self.dt
+
+    # Update and return if save is required
+
+    def mustSave(self):
+
+        output = (self.time >= self.next)
+        next = math.floor(self.time/self.dtSave)
+        self.next = (next+1)*self.dtSave
+        return output
         
-    # Update the time step
+    # Update the coupling time step
 
     def update(self,verified):
 
-        if verified:
+        if not verified: self.dt /= self.factor
+        elif verified == True:
 
             self.time += self.dt
-            self.dt = self.factor**(1/7)*self.dt
+            self.dt = math.pow(self.factor,1/7)*self.dt
             if self.dt > self.max: self.dt = self.max
-
-        else: self.dt = self.dt/self.factor
 
 # %% MPI Process and Solvers
 
