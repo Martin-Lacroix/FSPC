@@ -17,7 +17,7 @@ D2 = 1.25
 HB = 0.75+H+5*R
 RB = 0.375
 
-d = 0.05
+d = 0.02
 
 # %% Points List
 
@@ -121,6 +121,15 @@ q.append(sh.occ.addLine(p[37],p[0]))
 c.append(sh.occ.addCircleArc(p[34],p[35],p[36]))
 c.append(sh.occ.addCircleArc(p[36],p[35],p[34]))
 
+# Closing polytope line
+
+L = sh.occ.addLine(p[0],p[1])
+R = sh.occ.addLine(p[17],p[18])
+
+sh.occ.synchronize()
+sh.mesh.setTransfiniteCurve(L,1)
+sh.mesh.setTransfiniteCurve(R,1)
+
 # %% Fluid Surface
 
 k = list()
@@ -133,11 +142,16 @@ sh.occ.synchronize()
 # %% Physical Boundary
 
 sh.addPhysicalGroup(2,[s],name='Fluid')
-sh.addPhysicalGroup(1,h+q,name='Reservoir')
+sh.addPhysicalGroup(1,[q[1]],name='FreeSurface')
+sh.addPhysicalGroup(1,[h[0],h[2],q[0],q[2]],name='Wall')
 sh.addPhysicalGroup(1,l+r+c,name='FSInterface')
-sh.addPhysicalGroup(1,[q[1]],name='Outlet')
 sh.addPhysicalGroup(1,[h[1]],name='Inlet')
-sh.addPhysicalGroup(1,c,name='Polytope')
+
+# Polytope boundary
+
+sh.addPhysicalGroup(1,c,name='Poly')
+sh.addPhysicalGroup(1,l+[L],name='PolyL')
+sh.addPhysicalGroup(1,r+[R],name='PolyR')
 
 # %% Save the Mesh
 

@@ -17,7 +17,7 @@ D2 = 1.25
 HB = 0.75+H+5*R
 RB = 0.375
 
-d = 0.05
+d = 0.03
 
 # %% Points List
 
@@ -120,6 +120,8 @@ k.append(sh.occ.addCurveLoop(c))
 for a in k: s.append(sh.occ.addPlaneSurface([a]))
 sh.occ.synchronize()
 
+gmsh.model.mesh.setAlgorithm(2,s[0],8)
+gmsh.model.mesh.setAlgorithm(2,s[1],8)
 gmsh.model.mesh.setReverse(2,s[2])
 sh.occ.synchronize()
 
@@ -132,10 +134,14 @@ sh.addPhysicalGroup(1,[l[11],h[0]],name='Clamped')
 sh.addPhysicalGroup(1,l[:11]+h[1:],name='Master')
 sh.addPhysicalGroup(1,c,name='Slave')
 
+
 # %% Save the Mesh
 
-sh.mesh.generate(2)
+gmsh.option.setNumber('Mesh.RecombineAll',1)
+gmsh.option.setNumber('Mesh.Algorithm',11)
 gmsh.option.setNumber('Mesh.Binary',1)
+
+sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')
 gmsh.fltk.run()
 gmsh.finalize()

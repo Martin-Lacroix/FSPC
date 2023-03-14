@@ -19,15 +19,15 @@ def Quad_Circle(x):
     A = 0.6*R
     p = list()
 
-    p.append(sh.occ.addPoint(x,HS,0))
-    p.append(sh.occ.addPoint(x,HS-R,0))
-    p.append(sh.occ.addPoint(x+R,HS,0))
-    p.append(sh.occ.addPoint(x,HS+R,0))
-    p.append(sh.occ.addPoint(x-R,HS,0))
-    p.append(sh.occ.addPoint(x,HS-A,0))
-    p.append(sh.occ.addPoint(x+A,HS,0))
-    p.append(sh.occ.addPoint(x,HS+A,0))
-    p.append(sh.occ.addPoint(x-A,HS,0))
+    p.append(sh.occ.addPoint(x,HF+HS,0))
+    p.append(sh.occ.addPoint(x,HF+HS-R,0))
+    p.append(sh.occ.addPoint(x+R,HF+HS,0))
+    p.append(sh.occ.addPoint(x,HF+HS+R,0))
+    p.append(sh.occ.addPoint(x-R,HF+HS,0))
+    p.append(sh.occ.addPoint(x,HF+HS-A,0))
+    p.append(sh.occ.addPoint(x+A,HF+HS,0))
+    p.append(sh.occ.addPoint(x,HF+HS+A,0))
+    p.append(sh.occ.addPoint(x-A,HF+HS,0))
 
     # Lines List
 

@@ -14,12 +14,12 @@ Problem.maxFactor = 100
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.2
+Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.05
+Problem.Mesh.hchar = 0.02
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = false
+Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
@@ -30,7 +30,7 @@ Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'Polytope'}
+Problem.Mesh.exclusionGroups = {'Poly','PolyL','PolyR'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -89,16 +89,20 @@ function Problem.IC.initStates(x,y,z)
 	return {0,0,0,Problem.Material.rhoStar,0,0}
 end
 
-function Problem.Solver.MomEq.BC.ReservoirV(x,y,z,t)
+function Problem.Solver.MomEq.BC.WallV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomEq.BC.PolytopeV(x,y,z,t)
+function Problem.Solver.MomEq.BC.PolyV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomEq.BC.OutletP(x,y,z,t)
-	return 0
+function Problem.Solver.MomEq.BC.PolyLV(x,y,z,t)
+	return 0,0
+end
+
+function Problem.Solver.MomEq.BC.PolyRV(x,y,z,t)
+	return 0,0
 end
 
 function Problem.Solver.MomEq.BC.InletVEuler(x,y,z,t)

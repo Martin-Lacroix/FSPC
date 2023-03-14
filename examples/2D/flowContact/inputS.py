@@ -88,7 +88,7 @@ def getMetafor(input):
     
     # Volume solid properties
 
-    prp1 = w.ElementProperties(w.TriangleVolume2DElement)
+    prp1 = w.ElementProperties(w.Volume2DElement)
     prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp1.put(w.MATERIAL,1)
@@ -96,7 +96,7 @@ def getMetafor(input):
 
     # Volume ball properties
 
-    prp2 = w.ElementProperties(w.TriangleVolume2DElement)
+    prp2 = w.ElementProperties(w.Volume2DElement)
     prp2.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp2.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp2.put(w.MATERIAL,2)
