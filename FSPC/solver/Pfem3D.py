@@ -57,6 +57,10 @@ class Pfem3D(object):
 
 # %% Calculate One Time Step
 
+    # To do : Not restart from (t1) if fail
+    # To do : Try self.factor = 1 at every run
+    # To do : Think about self.autoremeshing = true
+
     @write_logs
     @compute_time
     def run(self,t1,t2):
@@ -158,8 +162,7 @@ class Pfem3D(object):
 
         vector = w.VectorVectorDouble()
         self.solver.computeStress(self.group,self.FSI,vector)
-        load = np.copy(vector)
-        return load
+        return np.copy(vector)
 
     # Thermal boundary conditions
 
@@ -168,8 +171,7 @@ class Pfem3D(object):
 
         vector = w.VectorVectorDouble()
         self.solver.computeHeatFlux(self.group,self.FSI,vector)
-        heat = np.copy(vector)
-        return heat
+        return np.copy(vector)
 
 # %% Other Functions
 
