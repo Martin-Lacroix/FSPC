@@ -113,20 +113,19 @@ class Pfem3D(object):
 # %% Dirichlet Boundary Conditions
 
     def applyDisplacement(self,disp,dt):
-
-        if self.implicit: BC = (disp-self.disp)/dt
-        else: BC = 2*((disp-self.disp)/dt-self.vel)/dt
+        
+        BC = (disp-self.disp)/dt
+        if not self.implicit: BC = 2*(BC-self.vel)/dt
 
         for i,vector in enumerate(BC):
-            self.BC[i][:self.dim] = vector
+            for j,val in enumerate(vector): self.BC[i][j] = val
 
-    # Update and apply the nodal temperatures
+    # Update the Dirichlet nodal temperature
 
     def applyTemperature(self,temp):
 
-        BC = temp.flatten()
-        for i,vector in enumerate(BC):
-            self.BC[i][self.size-1] = vector
+        for i,vector in enumerate(temp):
+            self.BC[i][self.size-1] = vector[0]
             
 # %% Return Nodal Values
 
