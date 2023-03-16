@@ -1,5 +1,4 @@
 from ..toolbox import write_logs,compute_time
-from toolbox.fac import FacManager
 import importlib.util as util
 import numpy as np
 import wrap as w
@@ -154,20 +153,6 @@ class Metafor(object):
 
                 node = self.FSI.getMeshPoint(j)
                 data[i] = node.getValue(w.Field1D(axe,w.GV))
-        
-        return vector
-
-    # Computes the nodal acceleration vector
-
-    def getAcceleration(self):
-
-        vector = np.zeros((self.nbrNode,self.dim))
-
-        for i,axe in enumerate(self.axe):
-            for j,data in enumerate(vector):
-
-                node = self.FSI.getMeshPoint(j)
-                data[j,i] = node.getValue(w.Field1D(axe,w.GA))
         
         return vector
 

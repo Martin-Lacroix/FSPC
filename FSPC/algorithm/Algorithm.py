@@ -116,7 +116,7 @@ class Algorithm(object):
 
     def transferDirSF(self,com):
 
-        if self.convergM: self.interp.applyDispSF(com)
+        if self.convergM: self.interp.applyDispSF(self.step.dt,com)
         if self.convergT: self.interp.applyTempSF(com)
 
     # Transfer Neumann data Fluid to Solid

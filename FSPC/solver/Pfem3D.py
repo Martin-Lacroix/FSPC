@@ -2,65 +2,66 @@ from ..toolbox import write_logs,compute_time
 import pfem3Dw as w
 import numpy as np
 
-# %% Read Data From the Lua File
-
-def read(path):
-
-    with open(path,'r') as file: text = file.read()
-    text = text.replace('"','').replace("'",'').replace(' ','')
-    text = [x.split('=') for x in text.splitlines() if '=' in x]
-    return dict(text)
-
 # %% Initializes the Fluid Wraper
 
 class Pfem3D(object):
     def __init__(self,path):
 
+        mecha = w.getLuaBool(path,'Problem','mecha')
+        thermo =  w.getLuaBool(path,'Problem','thermo')
+        self.group = w.getLuaString(path,'Problem','interface')
+        self.maxFactor = w.getLuaInt(path,'Problem','maxFactor')
+
+        # Incompressible or weakly compressible solver
+
         self.problem = w.getProblem(path)
-        self.autoRemesh = self.problem.hasAutoRemeshing()
-        problemID = self.problem.getID()
-
-        # Read the input Lua file
-
-        input = read(path)
-        self.group = input['Problem.interface']
-        self.maxFactor = int(input['Problem.maxFactor'])
-        if problemID[:2] == 'WC': self.implicit = False
+        problemType = self.problem.getID()
+        if 'WC' in problemType: self.implicit = False
         else: self.implicit = True
 
-        # Stores the important objects and variables
+        # Store the important objects and variables
 
-        self.solver = self.problem.getSolver()
-        self.prevSolution = w.SolutionData()
-        self.mesh = self.problem.getMesh()
-        self.dim = self.mesh.getDim()
         self.FSI = w.VectorInt()
-            
-        # FSI data and stores the previous time step 
-
-        self.problem.copySolution(self.prevSolution)
+        self.mesh = self.problem.getMesh()
         self.mesh.getNodesIndex(self.group,self.FSI)
+        self.autoRemesh = self.problem.hasAutoRemeshing()
+        self.solver = self.problem.getSolver()
         self.nbrNode = self.FSI.size()
+
+        # Initialize the boundary conditions
+
+        self.BC = list()
+        self.dim = self.mesh.getDim()
+        self.size = int(thermo)+int(self.dim*mecha)
+
+        for i in self.FSI:
+
+            vector = w.VectorDouble(self.size)
+            self.mesh.getNode(i).setExtState(vector)
+            self.BC.append(vector)
+
+        # Save mesh after initializing the BC pointer
+
+        self.prevSolution = w.SolutionData()
+        self.problem.copySolution(self.prevSolution)
         self.problem.displayParams()
 
-        # Initializes the simulation data
+        # Store temporary simulation variables
 
         self.disp = np.zeros((self.nbrNode,self.dim))
-        self.initPos =  self.getPosition()
+        self.initPos = self.getPosition()
+        self.vel = self.getVelocity()
         self.reload = False
-        self.thermo = False
-        self.mecha = False
         self.factor = 1
         self.ok = True
 
-# %% Calculates One Time Step
+# %% Calculate One Time Step
 
     @write_logs
     @compute_time
     def run(self,t1,t2):
-
-        print('\nSolve ({:.5e}, {:.5e})'.format(t1,t2))
-        print('----------------------------------')
+        
+        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
         if self.implicit: return self.runImplicit(t1,t2)
         else: return self.runExplicit(t1,t2)
 
@@ -70,25 +71,22 @@ class Pfem3D(object):
 
         if not (self.reload and self.ok): self.factor //= 2
         self.factor = max(1,self.factor)
-        self.resetSystem(t2-t1)
-        iteration = 0
+        self.resetSystem()
 
         # Main solving loop for the FSPC time step
 
-        while iteration < self.factor:
+        while self.iteration < self.factor:
             
-            iteration += 1
+            self.iteration += 1
             dt = (t2-t1)/self.factor
             self.solver.setTimeStep(dt)
-            self.timeStats(dt+self.problem.getCurrentSimTime(),dt)
             self.ok = self.solver.solveOneTimeStep()
 
             if not self.ok:
 
                 if 2*self.factor > self.maxFactor: return False
                 self.factor = 2*self.factor
-                self.resetSystem(t2-t1)
-                iteration = 0
+                self.resetSystem()
 
         return True
 
@@ -96,19 +94,17 @@ class Pfem3D(object):
 
     def runExplicit(self,t1,t2):
         
-        self.resetSystem(t2-t1)
+        self.resetSystem()
         self.solver.computeNextDT()
         self.factor = int((t2-t1)/self.solver.getTimeStep())
         if self.factor > self.maxFactor: return False
         dt = (t2-t1)/self.factor
-        self.timeStats(t2,dt)
-        iteration = 0
 
         # Main solving loop for the FSPC time step
 
-        while iteration < self.factor:
+        while self.iteration < self.factor:
     
-            iteration += 1
+            self.iteration += 1
             self.solver.setTimeStep(dt)
             self.solver.solveOneTimeStep()
 
@@ -116,43 +112,27 @@ class Pfem3D(object):
 
 # %% Dirichlet Boundary Conditions
 
-    def applyDisplacement(self,disp):
-        
-        self.disp = np.copy(disp)
-        self.mecha = True
+    def applyDisplacement(self,disp,dt):
 
-    def applyTemperature(self,temp):
-        
-        self.temp = np.copy(temp)
-        self.thermo = True
+        if self.implicit: BC = (disp-self.disp)/dt
+        else: BC = 2*((disp-self.disp)/dt-self.vel)/dt
 
-    # Update and apply the nodal displacement
-
-    def applyDispBC(self,distance,dt):
-
-        if self.implicit:
-
-            BC = w.VectorVectorDouble(distance/dt)
-            self.solver.setVelocity(self.FSI,BC)
-
-        else:
-
-            BC = 2*(distance-self.getVelocity()*dt)
-            BC = w.VectorVectorDouble(BC/np.square(dt))
-            self.solver.setAcceleration(self.FSI,BC)
+        for i,vector in enumerate(BC):
+            self.BC[i][:self.dim] = vector
 
     # Update and apply the nodal temperatures
 
-    def applyTempBC(self,temp):
+    def applyTemperature(self,temp):
 
-        BC = w.VectorDouble(temp.flatten())
-        self.solver.setTemperature(self.FSI,BC)
+        BC = temp.flatten()
+        for i,vector in enumerate(BC):
+            self.BC[i][self.size-1] = vector
             
 # %% Return Nodal Values
 
     def getPosition(self):
 
-        vector = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros(self.disp.shape)
 
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -164,7 +144,7 @@ class Pfem3D(object):
 
     def getVelocity(self):
 
-        vector = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros(self.disp.shape)
         
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -200,29 +180,20 @@ class Pfem3D(object):
         self.mesh.remesh(False)
         if self.implicit: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
+        self.disp = self.getPosition()-self.initPos
+        self.vel = self.getVelocity()
         self.reload = False
     
     # Prepare to solve one time step
 
-    def resetSystem(self,dt):
+    def resetSystem(self):
 
         if self.reload: self.problem.loadSolution(self.prevSolution)
         if self.autoRemesh and self.implicit and self.reload:
             self.solver.precomputeMatrix()
 
-        distance = self.disp-(self.getPosition()-self.initPos)
-        if self.mecha: self.applyDispBC(distance,dt)
-        if self.thermo: self.applyTempBC(self.temp)
+        self.iteration = 0
         self.reload = True
-
-    # Display the current simulation state
-
-    def timeStats(self,time,dt):
-
-        start = self.problem.getCurrentSimTime()
-        print('t1 = {:.5e} - dt = {:.3e}'.format(start,dt))
-        print('t2 = {:.5e} - factor = {:.0f}'.format(time,self.factor))
-        print('----------------------------------')
 
     # Save the results or finalize
 

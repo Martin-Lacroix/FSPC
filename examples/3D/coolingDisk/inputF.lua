@@ -1,8 +1,8 @@
 -- Problem Parameters
 
 Problem = {}
+Problem.verboseOutput = true
 Problem.autoRemeshing = false
-Problem.verboseOutput = false
 Problem.simulationTime = math.huge
 Problem.id = 'IncompNewtonT'
 
@@ -10,6 +10,8 @@ Problem.id = 'IncompNewtonT'
 
 Problem.interface = 'FSInterface'
 Problem.maxFactor = 10
+Problem.thermo = true
+Problem.mecha = true
 
 -- Mesh Parameters
 
