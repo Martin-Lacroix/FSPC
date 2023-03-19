@@ -16,15 +16,24 @@ class Pfem3D(object):
 
         self.problem = w.getProblem(path)
         problemType = self.problem.getID()
-        if 'WC' in problemType: self.implicit = False
-        else: self.implicit = True
+        autoRemesh = self.problem.hasAutoRemeshing()
+        if autoRemesh: raise Exception('Disable auto remeshing')
+
+        if 'WC' in problemType:
+            
+            self.implicit = False
+            self.run = lambda t1,t2: self.runExplicit(t1,t2)
+
+        else:
+            
+            self.implicit = True
+            self.run = lambda t1,t2: self.runImplicit(t1,t2)
 
         # Store the important objects and variables
 
         self.FSI = w.VectorInt()
         self.mesh = self.problem.getMesh()
         self.mesh.getNodesIndex(self.group,self.FSI)
-        self.autoRemesh = self.problem.hasAutoRemeshing()
         self.solver = self.problem.getSolver()
         self.nbrNode = self.FSI.size()
 
@@ -51,64 +60,55 @@ class Pfem3D(object):
         self.disp = np.zeros((self.nbrNode,self.dim))
         self.initPos = self.getPosition()
         self.vel = self.getVelocity()
-        self.reload = False
-        self.factor = 1
-        self.ok = True
 
-# %% Calculate One Time Step
-
-    # To do : Not restart from (t1) if fail
-    # To do : Try self.factor = 1 at every run
-    # To do : Think about self.autoremeshing = true
+# %% Run for implicit integration scheme
 
     @write_logs
     @compute_time
-    def run(self,t1,t2):
-        
-        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
-        if self.implicit: return self.runImplicit(t1,t2)
-        else: return self.runExplicit(t1,t2)
-
-    # Run for implicit integration scheme
-
     def runImplicit(self,t1,t2):
 
-        if not (self.reload and self.ok): self.factor //= 2
-        self.factor = max(1,self.factor)
-        self.resetSystem()
+        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
+        self.problem.loadSolution(self.prevSolution)
+        dt = float(t2-t1)
+        count = int(1)
 
-        # Main solving loop for the FSPC time step
+        # Main solving loop for the fluid simulation
 
-        while self.iteration < self.factor:
+        while count > 0:
             
-            self.iteration += 1
-            dt = (t2-t1)/self.factor
             self.solver.setTimeStep(dt)
-            self.ok = self.solver.solveOneTimeStep()
+            if not self.solver.solveOneTimeStep():
+                
+                dt = float(dt/2)
+                count = np.multiply(2,count)
+                if dt < (t2-t1)/self.maxFactor: return False
+                continue
 
-            if not self.ok:
-
-                if 2*self.factor > self.maxFactor: return False
-                self.factor = 2*self.factor
-                self.resetSystem()
-
+            count = count-1
         return True
 
-    # Run for explicit integration scheme
+# %% Run for explicit integration scheme
 
+    @write_logs
+    @compute_time
     def runExplicit(self,t1,t2):
-        
-        self.resetSystem()
+
+        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
+        self.problem.loadSolution(self.prevSolution)
+        iteration = 0
+
+        # Estimate the time step for stability
+
         self.solver.computeNextDT()
-        self.factor = int((t2-t1)/self.solver.getTimeStep())
-        if self.factor > self.maxFactor: return False
-        dt = (t2-t1)/self.factor
+        factor = int((t2-t1)/self.solver.getTimeStep())
+        if factor > self.maxFactor: return False
+        dt = (t2-t1)/factor
 
-        # Main solving loop for the FSPC time step
+        # Main solving loop for the fluid simulation
 
-        while self.iteration < self.factor:
+        while iteration < factor:
     
-            self.iteration += 1
+            iteration += 1
             self.solver.setTimeStep(dt)
             self.solver.solveOneTimeStep()
 
@@ -183,18 +183,6 @@ class Pfem3D(object):
         self.problem.copySolution(self.prevSolution)
         self.disp = self.getPosition()-self.initPos
         self.vel = self.getVelocity()
-        self.reload = False
-    
-    # Prepare to solve one time step
-
-    def resetSystem(self):
-
-        if self.reload: self.problem.loadSolution(self.prevSolution)
-        if self.autoRemesh and self.implicit and self.reload:
-            self.solver.precomputeMatrix()
-
-        self.iteration = 0
-        self.reload = True
 
     # Save the results or finalize
 
