@@ -5,8 +5,8 @@ gmsh.initialize()
 # %% Parameters
 
 R = 2
-d = 0.1
-N = 51
+d = 0.05
+N = 101
 
 # %% Points List
 
@@ -28,7 +28,7 @@ l.append(sh.occ.addLine(p[3],p[0]))
 
 # %% Solid Surface
 
-k = sh.occ.addCurveLoop([l[0],l[1],l[2],l[3]])
+k = sh.occ.addCurveLoop(l)
 s = sh.occ.addPlaneSurface([k])
 sh.occ.synchronize()
 

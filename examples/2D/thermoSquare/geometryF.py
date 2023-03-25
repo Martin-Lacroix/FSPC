@@ -6,8 +6,8 @@ gmsh.initialize()
 
 L = 5
 R = 2
-d = 0.1
-N = 51
+d = 0.05
+N = 101
 
 # %% Points List
 
@@ -62,7 +62,7 @@ sh.addPhysicalGroup(1,l,name='Wall')
 
 def meshSize(dim,tag,x,y,z,lc):
 
-    F = 0.05
+    F = 0.1
     size = list()
     size.append(max(d+F*(abs(x)-R),d))
     size.append(max(d+F*(abs(y)-R),d))
