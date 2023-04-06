@@ -1,23 +1,22 @@
-from ..toolbox import write_logs,compute_time
+from ..Toolbox import write_logs,compute_time
 import pfem3Dw as w
 import numpy as np
+import gmsh
 
 # %% Initializes the Fluid Wraper
 
 class Pfem3D(object):
     def __init__(self,path):
 
-        mecha = w.getLuaBool(path,'Problem','mecha')
-        thermo =  w.getLuaBool(path,'Problem','thermo')
-        self.group = w.getLuaString(path,'Problem','interface')
-        self.maxFactor = w.getLuaInt(path,'Problem','maxFactor')
+        mecha = w.getProblemBool(path,'mecha')
+        thermo =  w.getProblemBool(path,'thermo')
+        self.group = w.getProblemString(path,'interface')
+        self.maxFactor = w.getProblemInt(path,'maxFactor')
 
         # Incompressible or weakly compressible solver
 
         self.problem = w.getProblem(path)
         problemType = self.problem.getID()
-        autoRemesh = self.problem.hasAutoRemeshing()
-        if autoRemesh: raise Exception('Disable auto remeshing')
 
         if 'WC' in problemType:
             
@@ -192,4 +191,46 @@ class Pfem3D(object):
 
     @write_logs
     def exit(self): self.problem.displayTimeStats()
-        
+
+# %% FSI Facets Relative to Each Node
+
+    @compute_time
+    def getFacets(self):
+
+        self.mesh.checkInitGmsh()
+        file = self.mesh.getInfos().mshFile
+        gmsh.open(file)
+
+        # Find the tag of FSInterface physical group
+
+        for data in gmsh.model.getPhysicalGroups():
+            group = gmsh.model.getPhysicalName(*data)
+            if self.group == group: physical = data
+
+        faceList = list()
+        entity = gmsh.model.getEntitiesForPhysicalGroup(*physical)
+
+        # Node with coordinates and elements of the interface
+
+        for tag in entity:
+            faceList.append(gmsh.model.mesh.getElements(physical[0],tag)[2])
+
+        faceList = np.ravel(np.concatenate(faceList,axis=1))
+        nodeTags,coord = gmsh.model.mesh.getNodesForPhysicalGroup(*physical)
+        coord = np.reshape(coord,(len(nodeTags),3))[:,:self.dim]
+        gmsh.finalize()
+
+        # Make the tag to index vector converter
+
+        index = np.zeros(int(max(nodeTags))+1,dtype=int)-1
+        for i,tag in enumerate(nodeTags): index[tag] = i
+
+        for i,tag in enumerate(faceList):
+
+            position = coord[index[tag]]
+            distance = np.linalg.norm(position-self.initPos,axis=1)
+            idx = np.argmin(distance)
+            faceList[i] = idx
+
+        faceList = np.reshape(faceList,(-1,self.dim))
+        return faceList

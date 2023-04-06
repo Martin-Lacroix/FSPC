@@ -3,7 +3,7 @@ import numpy as np
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation
 
-class BGS_ADR(Algorithm):
+class BGS(Algorithm):
     def __init__(self,solver):
         Algorithm.__init__(self,solver)
 

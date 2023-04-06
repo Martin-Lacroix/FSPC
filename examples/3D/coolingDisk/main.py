@@ -13,7 +13,7 @@ solver = process.getSolver(pathF,pathS)
 
 # Configure the algorithm
 
-algorithm = FSPC.IQN_ILS(solver)
+algorithm = FSPC.ILS(solver)
 algorithm.interp = FSPC.KNN(solver,4)
 algorithm.convergM = FSPC.Convergence(1e-8)
 algorithm.convergT = FSPC.Convergence(1e-6)

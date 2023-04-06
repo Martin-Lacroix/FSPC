@@ -1,4 +1,4 @@
-from ..toolbox import write_logs,compute_time
+from ..Toolbox import write_logs,compute_time
 import importlib.util as util
 import numpy as np
 import wrap as w
@@ -197,3 +197,33 @@ class Metafor(object):
     @compute_time
     def save(self): self.exporter.execute()
     def exit(self): return
+
+# %% FSI Facets Relative to Each Node
+
+    @compute_time
+    def getFacets(self):
+
+        nbrList = np.zeros(self.nbrNode,dtype=int)
+        if self.mecha: elemSet = self.interacM.getElementSet()
+        else: elemSet = self.interacT.getElementSet()
+
+        # Store the node indices from Metafor
+
+        faceList = list()
+        for i in range(self.nbrNode):
+            nbrList[i] = self.FSI.getMeshPoint(i).getNo()
+
+        # Facet nodes and store their FSI indices
+
+        for i in range(elemSet.size()):
+            
+            faceList.append(list())
+            element = elemSet.getElement(i).getMyMesh()
+
+            for j in range(element.getNbOfDownPoints()):
+
+                ref = element.getDownPoint(j).getNo()
+                index = np.argwhere(nbrList == ref).item()
+                faceList[-1].append(index)
+
+        return np.array(faceList)

@@ -1,6 +1,5 @@
-from ..toolbox import compute_time
+from ..Toolbox import compute_time
 from mpi4py import MPI
-import numpy as np
 
 # %% Parent Interpolator Class
 
@@ -9,19 +8,21 @@ class Interpolator(object):
 
         com = MPI.COMM_WORLD
         self.solver = solver
-        self.recvNode = None
+        self.recvPos = None
 
-        # Number of nodes from the other process
+        # Share the position vectors between solvers
 
         if com.rank == 0:
 
-            com.send(self.solver.nbrNode,dest=1)
-            self.recvNode = com.recv(self.recvNode,source=1)
+            self.recvPos = com.recv(self.recvPos,source=1)
+            com.send(self.solver.getPosition(),dest=1)
+            self.recvNode = self.recvPos.shape[0]
 
         if com.rank == 1:
-            
-            self.recvNode = com.recv(self.recvNode,source=0)
-            com.send(self.solver.nbrNode,dest=0)
+
+            com.send(self.solver.getPosition(),dest=0)
+            self.recvPos = com.recv(self.recvPos,source=0)
+            self.recvNode = self.recvPos.shape[0]
 
     # Interpolate recvData and return the result
 

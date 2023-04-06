@@ -3,7 +3,7 @@ import numpy as np
 
 # %% Interface Quasi-Newton with Multi-Vector Jacobian
 
-class IQN_MVJ(Algorithm):
+class MVJ(Algorithm):
     def __init__(self,solver):
         Algorithm.__init__(self,solver)
 

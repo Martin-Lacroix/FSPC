@@ -1,7 +1,6 @@
-from ..toolbox import compute_time
+from ..Toolbox import compute_time
 from mpi4py import MPI
 import numpy as np
-import math
 import sys
 
 # %% Parent Algorithm Class

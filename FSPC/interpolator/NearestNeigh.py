@@ -1,7 +1,6 @@
 from .Interpolator import Interpolator
 from scipy.sparse import dok_matrix
-from ..toolbox import compute_time
-from mpi4py import MPI
+from ..Toolbox import compute_time
 import numpy as np
 
 # %% Mesh Interpolation with K-Nearest Neighbours
@@ -10,60 +9,46 @@ class KNN(Interpolator):
     def __init__(self,solver,K):
         Interpolator.__init__(self,solver)
 
-        recvPos = None
-        self.neigh = int(K)
+        self.K = int(K)
         self.nbrNode = self.solver.nbrNode
         self.H = dok_matrix((self.nbrNode,self.recvNode),dtype=float)
-        com = MPI.COMM_WORLD
-
-        # Share the position vectors between solvers
-
-        if com.rank == 0:
-
-            recvPos = com.recv(recvPos,source=1)
-            com.send(self.solver.getPosition(),dest=1)
-
-        if com.rank == 1:
-
-            com.send(self.solver.getPosition(),dest=0)
-            recvPos = com.recv(recvPos,source=0)
 
         # Compute the FS mesh interpolation matrix
 
         position = self.solver.getPosition()
-        self.computeMapping(recvPos,position)
+        self.computeMapping(position)
         self.H = self.H.tocsr()
 
 # %% Mapping Matrix from RecvPos to Position
 
     @compute_time
-    def computeMapping(self,recvPos,position):
+    def computeMapping(self,pos):
 
-        if self.neigh == 1: self.search(recvPos,position)
-        else: self.interp(recvPos,position)
+        if self.K == 1: self.search(pos)
+        else: self.interpolate(pos)
 
     # Nearest neighbour search if one neighbour
 
-    def search(self,recvPos,position):
+    def search(self,pos):
 
         for i in range(self.nbrNode):
 
-            distance = np.linalg.norm(position[i]-recvPos,axis=1)
+            distance = np.linalg.norm(pos[i]-self.recvPos,axis=1)
             index = np.argmin(distance)
             self.H[i,index] = 1
 
     # Interpolate from the K nearest neighbours
 
-    def interp(self,recvPos,position):
+    def interpolate(self,pos):
 
         for i in range(self.nbrNode):
 
-            distance = np.linalg.norm(position[i]-recvPos,axis=1)
-            index = np.argsort(distance)[:self.neigh]
-            weight = np.zeros(self.neigh)
+            distance = np.linalg.norm(pos[i]-self.recvPos,axis=1)
+            index = np.argsort(distance)[:self.K]
+            weight = np.zeros(self.K)
             dist = distance[index]
 
-            for j in range(self.neigh):
+            for j in range(self.K):
 
                 val = [r for idx,r in enumerate(dist) if idx != j]
                 weight[j] = np.prod(val)

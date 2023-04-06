@@ -15,7 +15,7 @@ RBF = lambda r: np.square(r)*np.ma.log(r)
 
 # Configure the algorithm
 
-algorithm = FSPC.IQN_ILS(solver)
+algorithm = FSPC.ILS(solver)
 algorithm.interp = FSPC.RBF(solver,RBF)
 algorithm.convergM = FSPC.Convergence(1e-8)
 algorithm.step = FSPC.TimeStep(1e-2,0.05)
