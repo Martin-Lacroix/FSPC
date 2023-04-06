@@ -20,10 +20,10 @@ export SCRIPT=${PWD}/examples/2D/flowContact/main.py
 export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 export SCRIPT=${PWD}/examples/2D/pureConduction/main.py
 export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
-# export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
+export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
 
-# export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
-# export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
+export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
+export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
 # export SCRIPT=${PWD}/examples/3D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
 
