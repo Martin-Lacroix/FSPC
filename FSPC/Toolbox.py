@@ -66,7 +66,7 @@ class TimeStep(object):
 
         self.time = 0
         self.factor = int(2)
-        self.max = self.dt = dt
+        self.maximum = self.dt = dt
         self.next = self.dtSave = dtSave
 
     def timeFrame(self):
@@ -86,18 +86,18 @@ class TimeStep(object):
     def update(self,verified):
 
         if not verified: self.dt /= self.factor
-        elif verified == True:
+        else:
 
             self.time += self.dt
             self.dt = math.pow(self.factor,1/7)*self.dt
-            if self.dt > self.max: self.dt = self.max
+            self.dt = min(self.dt,self.maximum)
 
 # %% MPI Process and Solvers
 
 class Process(object):
     def __init__(self):
 
-        self.rank = MPI.COMM_WORLD.rank
+        self.com = MPI.COMM_WORLD
         self.redirect = fwkw.StdOutErr2Py()
 
     # Import and initialize the solvers
@@ -105,12 +105,12 @@ class Process(object):
     @write_logs
     def getSolver(self,pathF,pathS):
 
-        if self.rank == 0:
+        if self.com.rank == 0:
 
             from .solver.Pfem3D import Pfem3D
             return Pfem3D(pathF)
 
-        if self.rank == 1:
+        if self.com.rank == 1:
 
             from .solver.Metafor import Metafor
             return Metafor(pathS)
@@ -120,10 +120,10 @@ class Process(object):
 def printClock():
 
     global clock
-    com = MPI.COMM_WORLD
+    rank = MPI.COMM_WORLD.rank
 
     print('\n------------------------------------')
-    print('Process {:.0f} : Time Stats'.format(com.rank))
+    print('Process {:.0f} : Time Stats'.format(rank))
     print('------------------------------------\n')
     
     for fun,time in clock.items():
