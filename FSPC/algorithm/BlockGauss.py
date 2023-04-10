@@ -80,7 +80,7 @@ class BGS(Algorithm):
 
         self.omegaM = min(self.omegaM,1)
         self.omegaM = max(self.omegaM,0)
-        self.prevResDisp = self.resDisp.copy()
+        self.prevResDisp = np.copy(self.resDisp)
         return self.omegaM
 
 # %% Relaxation of Solid Interface Temperature
@@ -110,5 +110,5 @@ class BGS(Algorithm):
 
         self.omegaT = min(self.omegaT,1)
         self.omegaT = max(self.omegaT,0)
-        self.prevResTemp = self.resTemp.copy()
+        self.prevResTemp = np.copy(self.resTemp)
         return self.omegaT

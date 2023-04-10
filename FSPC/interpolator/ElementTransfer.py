@@ -12,7 +12,6 @@ class ETM(Interpolator):
         Interpolator.__init__(self,solver)
 
         self.K = int(K)
-        recvFacet = None
         self.nbrNode = self.solver.nbrNode
         self.H = dok_matrix((self.nbrNode,self.recvNode),dtype=float)
         com = MPI.COMM_WORLD
@@ -23,14 +22,14 @@ class ETM(Interpolator):
         position = self.solver.getPosition()
 
         if com.rank == 0:
-
-            com.send(facet.copy(),dest=1)
-            recvFacet = com.recv(recvFacet,source=1)
+            
+            com.send(facet,1,tag=7)
+            recvFacet = com.recv(source=1,tag=8)
 
         if com.rank == 1:
 
-            recvFacet = com.recv(recvFacet,source=0)
-            com.send(facet.copy(),dest=0)
+            recvFacet = com.recv(source=0,tag=7)
+            com.send(facet,0,tag=8)
 
         # Compute the FS mesh interpolation matrix
 
