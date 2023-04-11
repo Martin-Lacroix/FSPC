@@ -1,7 +1,9 @@
+from scipy import interpolate
 import os.path as path
 from mpi4py import MPI
 import numpy as np
 import collections
+import pickle
 import FSPC
 import gmsh
 
@@ -19,11 +21,29 @@ class TEST(FSPC.ETM):
         self.interp['KNN'] = FSPC.KNN(solver,2)
         self.interp['RBF'] = FSPC.RBF(solver,RBF)
 
+        self.error = dict()
+        for key in self.interp.keys(): self.error[key] = list()
+        solver.exit = self.printResult
         self.makeCurvIndex(com)
 
     def applyLoadFS(self,com):
+        
+        nbr = 100
+        error = dict()
+        curvPos = np.linspace(0,max(self.curvPos),nbr)
+        curvLoad,recvPos,recvLoad = self.getCurvLoad(com)
 
-        self.getCurvLoad(com)
+        if com.rank == 0:
+
+            fun = interpolate.interp1d(self.curvPos,curvLoad['Fluid'],kind='linear')
+            den = np.trapz(np.square(fun(curvPos)),curvPos)
+            reference = fun(curvPos)
+
+            for key,val in recvLoad.items():
+
+                fun = interpolate.interp1d(recvPos,val,kind='linear')
+                error = np.trapz(np.square(fun(curvPos)-reference),curvPos)
+                self.error[key].append(error/den)
 
         return FSPC.ETM.applyLoadFS(self,com)
 
@@ -116,8 +136,6 @@ class TEST(FSPC.ETM):
             recvLoad = dict()
             recvPos = com.recv(source=1,tag=12)
             for key in self.interp.keys():
-                
-                recvLoad[key] = None
                 recvLoad[key] = com.recv(source=1,tag=13)
 
         if com.rank == 1:
@@ -127,3 +145,26 @@ class TEST(FSPC.ETM):
                 com.send(curvLoad[key],0,tag=13)
         
         return curvLoad,recvPos,recvLoad
+
+# %% Save the Current Result
+
+    def printResult(self):
+
+        out = dict()
+        com = MPI.COMM_WORLD
+        curvLoad,recvPos,recvLoad = self.getCurvLoad(com)
+
+        if com.rank == 0:
+
+            for key,val in self.error.items():
+                self.error[key] = np.mean(val)
+        
+            # Save the result into a pickle
+
+            out['recvPos'] = recvPos
+            out['error'] = self.error
+            out['recvLoad'] = recvLoad
+            out['curvLoad'] = curvLoad
+            out['curvPos'] = self.curvPos
+
+            pickle.dump(out,open('out.pickle','wb'))
