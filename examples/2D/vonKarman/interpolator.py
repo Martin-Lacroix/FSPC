@@ -28,7 +28,7 @@ class TEST(FSPC.ETM):
 
     def applyLoadFS(self,com):
         
-        nbr = 100
+        nbr = 1000
         error = dict()
         curvPos = np.linspace(0,max(self.curvPos),nbr)
         curvLoad,recvPos,recvLoad = self.getCurvLoad(com)

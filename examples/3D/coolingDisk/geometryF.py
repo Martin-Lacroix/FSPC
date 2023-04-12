@@ -10,7 +10,6 @@ HF = 0.05
 RF = 0.1
 
 d = 3.7e-3
-N = 7
 
 # %% Points List
 
