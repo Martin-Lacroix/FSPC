@@ -1,11 +1,7 @@
-from matplotlib import pyplot as plt
+from interpolator import TEST
 import os.path as path
 import numpy as np
 import FSPC
-import sys
-
-
-from interpolator import TEST
 
 # %% Paths to the input files
 
