@@ -11,6 +11,6 @@ from .algorithm.MultiVector import MVJ
 
 # Import the mesh interpolation methods
 
+from .interpolator.ElemTransfer import ETM
 from .interpolator.NearestNeigh import KNN
 from .interpolator.BasisFunction import RBF
-from .interpolator.ElementTransfer import ETM

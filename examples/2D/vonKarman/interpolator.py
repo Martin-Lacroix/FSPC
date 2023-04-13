@@ -17,7 +17,7 @@ class TEST(FSPC.ETM):
         com = MPI.COMM_WORLD
 
         self.interp = dict()
-        self.interp['ETM'] = FSPC.ETM(solver,4)
+        self.interp['ETM'] = FSPC.ETM(solver,9)
         self.interp['KNN'] = FSPC.KNN(solver,2)
         self.interp['RBF'] = FSPC.RBF(solver,RBF)
 
@@ -122,11 +122,11 @@ class TEST(FSPC.ETM):
             for key in self.interp.keys(): 
                 curvLoad[key] = self.interp[key].interpData(recvLoad)
 
-        # get the loading from fluid solver
+        # The norm is nor correct if (+|-) loads
 
         for key,val in curvLoad.items():
 
-            val = np.linalg.norm(val,axis=1)
+            val = np.mean(val,axis=1)
             curvLoad[key] = val[self.curvIdx]
 
         # Send the solid data to the fluid
@@ -168,3 +168,4 @@ class TEST(FSPC.ETM):
             out['curvPos'] = self.curvPos
 
             pickle.dump(out,open('out.pickle','wb'))
+            

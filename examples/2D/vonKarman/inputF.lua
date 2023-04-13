@@ -18,14 +18,14 @@ Problem.mecha = true
 Problem.Mesh = {}
 Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.7
-Problem.Mesh.gamma = 0.4
+Problem.Mesh.gamma = 0.9
 Problem.Mesh.hchar = 0.03
-Problem.Mesh.gammaFS = 0.4
+Problem.Mesh.gammaFS = 0.9
 Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = true
+Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,0,1,0.41}
 Problem.Mesh.exclusionZones = {}
@@ -102,6 +102,10 @@ end
 
 function Problem.Solver.MomContEq.BC.PolytopeV(x,y,z,t)
     return 0,0
+end
+
+function Problem.Solver.MomContEq.BC.OutletP(x,y,z,t)
+    return 0
 end
 
 function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)

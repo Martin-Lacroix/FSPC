@@ -13,8 +13,10 @@ CY = 0.2
 BX = 0.6
 BH = 0.01
 
+BH = 0.005
+
 d = 0.03
-N = 13
+N = 15
 M = 2
 
 # %% Points List
@@ -68,7 +70,7 @@ sh.mesh.setTransfiniteCurve(r[2],N)
 
 sh.addPhysicalGroup(2,[s],name='Fluid')
 sh.addPhysicalGroup(1,r,name='FSInterface')
-sh.addPhysicalGroup(1,[l[1]],name='FreeSurface')
+sh.addPhysicalGroup(1,[l[1]],name='Outlet')
 sh.addPhysicalGroup(1,[l[0],l[2]]+h,name='Wall')
 sh.addPhysicalGroup(1,[l[3]],name='Inlet')
 sh.addPhysicalGroup(1,h+r,name='Polytope')

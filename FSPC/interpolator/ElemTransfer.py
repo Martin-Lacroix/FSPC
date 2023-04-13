@@ -47,7 +47,7 @@ class ETM(Interpolator):
         if recvFacet.shape[1] == 3: fun = Triangle()
         if recvFacet.shape[1] == 4: fun = Quadrangle()
 
-        for i,pos in enumerate(pos):
+        for i,node in enumerate(pos):
 
             parList = list()
             dist = np.zeros(facetList[i].size)
@@ -55,14 +55,14 @@ class ETM(Interpolator):
             for j,k in enumerate(facetList[i]):
 
                 facetNodePos = self.recvPos[recvFacet[k]]
-                param,dist[j] = fun.projection(facetNodePos,pos)
+                param,dist[j] = fun.projection(facetNodePos,node)
                 parList.append(param)
 
             # Store the closest projection in the H matrix
 
             idx = np.argmin(dist)
-            node = recvFacet[facetList[i][idx]]
-            for j,k in enumerate(node): self.H[i,k] = fun[j](parList[idx])
+            facet = recvFacet[facetList[i][idx]]
+            for j,k in enumerate(facet): self.H[i,k] = fun[j](parList[idx])
 
 # %% Closest Facets to the Current Position
 

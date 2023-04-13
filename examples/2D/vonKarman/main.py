@@ -18,9 +18,9 @@ initPos = solver.getPosition()
 # Configure the algorithm
 
 algorithm = FSPC.MVJ(solver)
-algorithm.interp = TEST(solver,4)
+algorithm.interp = TEST(solver,9)
 algorithm.convergM = FSPC.Convergence(1e-6)
-algorithm.step = FSPC.TimeStep(1e-2,1e-2)
+algorithm.step = FSPC.TimeStep(2e-3,1e-2)
 
 algorithm.endTime = 5
 algorithm.omega = 0.5
