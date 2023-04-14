@@ -1,31 +1,65 @@
 from matplotlib import pyplot as plt
+import matplotlib
 import pickle
 import os
 
-# %% Print the Current Result
+# %% Read the Output File
 
-print('\n')
 os.chdir('workspace')
 out = pickle.load(open('out.pickle','rb'))
-for key,val in out['error'].items(): print(key,':',val)
-print('\n')
-
-# Plot a graph of the saved result
 
 color = dict()
-color['KNN'] = 'firebrick'
-color['RBF'] = 'darkorange'
-color['ETM'] = 'forestgreen'
+color['ETM'] = '#a5be6b'
+color['RBF'] = '#127dd8'
+color['KNN'] = '#b46478'
 
-plt.figure(1)
+font = {'size':14}
+matplotlib.rc('font',**font)
+
+# %% Print the Current Result
+
+width = 2
+fig,ax = plt.subplots(1,figsize=[10,5])
 
 for key,val in out['recvLoad'].items(): 
-    plt.plot(out['recvPos'],val,'--',label=key,color=color[key])
-    plt.plot(out['recvPos'],val,'.',markersize=7,color=color[key])
+    plt.plot(out['recvPos'],val,label=key,color=color[key])
 
 for key,val in out['curvLoad'].items():
-    plt.plot(out['curvPos'],val,label=key,color='black')
+    plt.plot(out['curvPos'],val,'--',label=key,color='black')
+    plt.plot(out['curvPos'],val,'o',markersize=7,color='black',mfc='none')
 
-plt.legend()
+plt.legend(loc='upper left')
+plt.ylabel('Stress Tensor $\sigma_{\,11}$ (Pa)')
+plt.xlabel('Interafce Curvilinear Position')
 plt.grid()
+plt.show()
+
+# %% Print the Current Result
+
+width = 2
+fig,ax = plt.subplots(1,figsize=[10,5])
+ax.set_yticklabels([])
+
+for key,val in out['recvLoad'].items(): 
+    plt.plot(out['recvPos'],val,label=key,color=color[key])
+
+for key,val in out['curvLoad'].items():
+    plt.plot(out['curvPos'],val,'--',label=key,color='black')
+    plt.plot(out['curvPos'],val,'o',markersize=7,color='black',mfc='none')
+
+plt.legend(loc='lower left')
+plt.xlabel('Interafce Curvilinear Position')
+plt.grid()
+plt.show()
+
+# %% Print the Current Result
+
+width = 0.4
+key = list(out['error'].keys())
+val = list(out['error'].values())
+
+fig,ax = plt.subplots(1,figsize=[9,4])
+plt.bar(key,val,color=color.values(),width=width,log=1,zorder=3)
+plt.ylabel('Average Error on $\sigma_{\,11}$ [-]')
+ax.grid(zorder=0)
 plt.show()

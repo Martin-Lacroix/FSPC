@@ -18,8 +18,8 @@ class TEST(FSPC.ETM):
 
         self.interp = dict()
         self.interp['ETM'] = FSPC.ETM(solver,9)
-        self.interp['KNN'] = FSPC.KNN(solver,2)
         self.interp['RBF'] = FSPC.RBF(solver,RBF)
+        self.interp['KNN'] = FSPC.KNN(solver,2)
 
         self.error = dict()
         for key in self.interp.keys(): self.error[key] = list()
@@ -122,12 +122,10 @@ class TEST(FSPC.ETM):
             for key in self.interp.keys(): 
                 curvLoad[key] = self.interp[key].interpData(recvLoad)
 
-        # The norm is nor correct if (+|-) loads
+        # Val[i] = stress tensor [xx,yy,xy]
 
         for key,val in curvLoad.items():
-
-            val = np.mean(val,axis=1)
-            curvLoad[key] = val[self.curvIdx]
+            curvLoad[key] = val[self.curvIdx,1]
 
         # Send the solid data to the fluid
 
