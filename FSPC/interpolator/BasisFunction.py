@@ -34,12 +34,12 @@ class RBF(Interpolator):
 
         # Fill the matrices A,B using the basis function
 
-        for i,recvPos in enumerate(self.recvPos):
+        for i,position in enumerate(self.recvPos):
             
-            rad = np.linalg.norm(recvPos-self.recvPos,axis=1)
+            rad = np.linalg.norm(position-self.recvPos,axis=1)
             A[i,:self.recvNode] = self.function(rad)
 
-            rad = np.linalg.norm(pos-recvPos,axis=1)
+            rad = np.linalg.norm(pos-position,axis=1)
             B[:,i] = self.function(rad)
 
         # Compute the interpolation H matrix
