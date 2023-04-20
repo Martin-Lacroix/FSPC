@@ -4,7 +4,7 @@ Problem = {}
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
-Problem.id = 'IncompNewtonT'
+Problem.id = 'Boussinesq'
 
 -- FSPC Parameters
 

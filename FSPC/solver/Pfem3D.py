@@ -21,12 +21,12 @@ class Pfem3D(object):
         if 'WC' in problemType:
             
             self.implicit = False
-            self.run = lambda t1,t2: self.runExplicit(t1,t2)
+            self.run = self.runExplicit
 
         else:
             
             self.implicit = True
-            self.run = lambda t1,t2: self.runImplicit(t1,t2)
+            self.run = self.runImplicit
 
         # Store the important objects and variables
 
