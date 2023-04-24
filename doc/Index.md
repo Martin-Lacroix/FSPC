@@ -84,7 +84,7 @@ Additional variables must be initialized in order to run an FSI simulation:
 The interpolator manages the data transfer between the two solvers. If the fluid and solid meshes are matching at the interface, the k-nearest neighbours with `k = 1` is advised.
 
 ```python
-    algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbour interpolator
+    algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbours interpolator
     algorithm.interp = FSPC.RBF(solver,fun)         # Radial basis function interpolator
     algorithm.interp = FSPC.ETM(solver,nElem)       # Direct element transfer method
 ```
