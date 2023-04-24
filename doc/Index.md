@@ -5,7 +5,7 @@
 FSPC provides some classes able to perform FSI simulation by partitioned coupling of a fluid and a structural solver. Currently, only PFEM3D and the Metafor solvers are supported. Moreover, FSPC uses MPI for the communication between the two solvers, each of them relying on a single process. FSPC assumes that the solvers are available in your path.
 
 ```python
-    import FSPC
+    import FSPC                                     # Import the FSPC library
     process = FSPC.Process()                        # Initialize the MPI process
     solver = process.getSolver(pathF,pathS)         # Return the solver wrapper
 ```
@@ -84,9 +84,9 @@ Additional variables must be initialized in order to run an FSI simulation:
 The interpolator manages the data transfer between the two solvers. If the fluid and solid meshes are matching at the interface, the k-nearest neighbours with `k = 1` is advised.
 
 ```python
-    algorithm.interp = FSPC.KNN(solver,k)           # k-nearest neighbour interpolator
-    algorithm.interp = FSPC.RBF(solver,fun)         # radial basis function interpolator
-    algorithm.interp = FSPC.ETM(solver,nElem)       # direct element transfer method
+    algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbour interpolator
+    algorithm.interp = FSPC.RBF(solver,fun)         # Radial basis function interpolator
+    algorithm.interp = FSPC.ETM(solver,nElem)       # Direct element transfer method
 ```
 
 | Input             | Type                      | Description                                     |
@@ -104,6 +104,6 @@ The interpolator manages the data transfer between the two solvers. If the fluid
 Once the algorithm class has been initialized, the FSI simulation can be started with the `simulate` function. It is also possible to print the time stats at the end:
 
 ```python
-    algorithm.simulate()        # run the FSI simulation
-    FSPC.printClock()           # print the final time stats
+    algorithm.simulate()        # Run the FSI simulation
+    FSPC.printClock()           # Print the final time stats
 ```
