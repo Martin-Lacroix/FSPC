@@ -21,20 +21,21 @@ class Metafor(object):
         input = dict()
         self.metafor = module.getMetafor(input)
         self.tsm = self.metafor.getTimeStepManager()
-        domain = self.metafor.getDomain()
-        domain.build()
+        geometry = self.metafor.getDomain().getGeometry()
+        self.metafor.getDomain().build()
 
         # Sets the dimension of the mesh
 
-        if domain.getGeometry().is2D():
+        if geometry.is2D():
 
-            length = 3
             self.dim = 2
             self.axe = [w.TX,w.TY]
+            if geometry.isAxisymmetric(): size = 4
+            else: size = 3
 
-        elif domain.getGeometry().is3D():
+        elif geometry.is3D():
             
-            length = 6
+            size = 6
             self.dim = 3
             self.axe = [w.TX,w.TY,w.TZ]
 
@@ -53,7 +54,7 @@ class Metafor(object):
 
         try:
             self.interacM = input['interacM']
-            self.prevLoad = np.zeros((self.nbrNode,length))
+            self.prevLoad = np.zeros((self.nbrNode,size))
         except: self.mecha = False
 
         try:

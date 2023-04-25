@@ -7,7 +7,7 @@ export CPU_PER_PROC=4
 
 export PYTHONPATH=${PWD}:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../Metafor/oo_meta:${PYTHONPATH}
-export PYTHONPATH=${PWD}/../Metafor/build/bin:${PYTHONPATH}
+export PYTHONPATH=${PWD}/../Metafor/oo_metaB/bin:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 
 # Path to the Python script
@@ -20,8 +20,9 @@ export SCRIPT=${PWD}/examples/2D/flowContact/main.py
 export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 export SCRIPT=${PWD}/examples/2D/pureConduction/main.py
 export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
-export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
-export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
+export SCRIPT=${PWD}/examples/2D/staticAxisym/main.py
+# export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
+# export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
 # export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
 # export SCRIPT=${PWD}/examples/3D/crossFlow/main.py

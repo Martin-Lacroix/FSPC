@@ -66,7 +66,7 @@ Additional variables must be initialized in order to run an FSI simulation:
 ```python
     algorithm.omega = omega             # Gauss Seidel relaxation parameter
     algorithm.maxIter = maxIter         # Maximum number of FSI iterations
-    algorithm.endTime = endTime         # Physical final simulation time
+    algorithm.endTime = endTime         # Final physical simulation time
 ```
 
 | Input             | Type                      | Description                               |
