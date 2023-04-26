@@ -6,13 +6,6 @@ Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
 Problem.id = 'WCompNewtonNoT'
 
--- FSPC Parameters
-
-Problem.interface = 'FSInterface'
-Problem.maxFactor = 100
-Problem.thermo = false
-Problem.mecha = true
-
 -- Mesh Parameters
 
 Problem.Mesh = {}

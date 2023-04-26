@@ -129,20 +129,6 @@ class Metafor(object):
 
         return vector
 
-    # Computes the nodal displacement vector
-
-    def getDisplacement(self):
-
-        vector = np.zeros((self.nbrNode,self.dim))
-
-        for i,axe in enumerate(self.axe):
-            for j,data in enumerate(vector):
-
-                node = self.FSI.getMeshPoint(j)
-                data[i] = node.getValue(w.Field1D(axe,w.RE))
-        
-        return vector
-
     # Computes the nodal velocity vector
 
     def getVelocity(self):

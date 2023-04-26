@@ -55,7 +55,7 @@ class Algorithm(object):
 
     def cancelStep(self):
 
-        if self.convergM: self.interp.disp = np.copy(self.prevMech)
+        if self.convergM: self.interp.pos = np.copy(self.prevMech)
         if self.convergT: self.interp.temp = np.copy(self.prevTher)
 
     def predictor(self):
@@ -69,10 +69,10 @@ class Algorithm(object):
 
         if self.verified:
             
-            self.prevMech = np.copy(self.interp.disp)
+            self.prevMech = np.copy(self.interp.pos)
             self.rateMech = self.solver.getVelocity()
 
-        self.interp.disp += dt*self.rateMech
+        self.interp.pos += dt*self.rateMech
 
     # Thermal solution predictor
 
@@ -89,7 +89,7 @@ class Algorithm(object):
 
     def initInterp(self):
 
-        if self.convergM: self.interp.disp = self.solver.getDisplacement()
+        if self.convergM: self.interp.pos = self.solver.getPosition()
         if self.convergT: self.interp.temp = self.solver.getTemperature()
 
     @compute_time
@@ -104,8 +104,8 @@ class Algorithm(object):
     def computeResidual(self):
         
         if self.convergM:
-            disp = self.solver.getDisplacement()
-            self.resDisp = disp-self.interp.disp
+            pos = self.solver.getPosition()
+            self.resPos = pos-self.interp.pos
 
         if self.convergT:
             temp = self.solver.getTemperature()
@@ -134,7 +134,7 @@ class Algorithm(object):
 
     def updateConverg(self):
 
-        if self.convergM: self.convergM.update(self.resDisp)
+        if self.convergM: self.convergM.update(self.resPos)
         if self.convergT: self.convergT.update(self.resTemp)
 
     def isVerified(self):

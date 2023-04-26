@@ -67,29 +67,29 @@ class ILS(Algorithm):
 
     def relaxationM(self):
 
-        disp = self.solver.getDisplacement()
+        pos = self.solver.getPosition()
 
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            self.interp.disp += self.omega*self.resDisp
+            self.interp.pos += self.omega*self.resPos
 
         else:
 
-            self.VM.insert(0,np.concatenate((self.resDisp-self.prevResM).T))
-            self.WM.insert(0,np.concatenate((disp-self.prevDisp).T))
+            self.VM.insert(0,np.concatenate((self.resPos-self.prevResM).T))
+            self.WM.insert(0,np.concatenate((pos-self.prevPos).T))
 
             # V and W are stored as transpose and list
 
-            R = np.concatenate(self.resDisp.T)
+            R = np.concatenate(self.resPos.T)
             C = np.linalg.lstsq(np.transpose(self.VM),-R,rcond=-1)[0]
             correction = np.split(np.dot(np.transpose(self.WM),C)+R,self.dim)
-            self.interp.disp += np.transpose(correction)
+            self.interp.pos += np.transpose(correction)
 
         # Updates the residuals and displacement
 
-        self.prevDisp = np.copy(disp)
-        self.prevResM = np.copy(self.resDisp)
+        self.prevPos = np.copy(pos)
+        self.prevResM = np.copy(self.resPos)
 
 # %% Relaxation of Solid Interface Temperature
 

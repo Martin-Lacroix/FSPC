@@ -8,11 +8,6 @@ import gmsh
 class Pfem3D(object):
     def __init__(self,path):
 
-        mecha = w.getProblemBool(path,'mecha')
-        thermo =  w.getProblemBool(path,'thermo')
-        self.group = w.getProblemString(path,'interface')
-        self.maxFactor = w.getProblemInt(path,'maxFactor')
-
         # Incompressible or weakly compressible solver
 
         self.problem = w.getProblem(path)
@@ -32,19 +27,18 @@ class Pfem3D(object):
 
         self.FSI = w.VectorInt()
         self.mesh = self.problem.getMesh()
-        self.mesh.getNodesIndex(self.group,self.FSI)
+        self.mesh.getNodesIndex('FSInterface',self.FSI)
         self.solver = self.problem.getSolver()
-        self.nbrNode = self.FSI.size()
 
         # Initialize the boundary conditions
 
         self.BC = list()
         self.dim = self.mesh.getDim()
-        self.size = int(thermo)+int(self.dim*mecha)
+        self.nbrNode = self.FSI.size()
 
         for i in self.FSI:
 
-            vector = w.VectorDouble(self.size)
+            vector = w.VectorDouble(self.dim+1)
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 
@@ -56,8 +50,7 @@ class Pfem3D(object):
 
         # Store temporary simulation variables
 
-        self.disp = np.zeros((self.nbrNode,self.dim))
-        self.initPos = self.getPosition()
+        self.pos = self.getPosition()
         self.vel = self.getVelocity()
 
 # %% Run for implicit integration scheme
@@ -80,7 +73,7 @@ class Pfem3D(object):
                 
                 dt = float(dt/2)
                 count = np.multiply(2,count)
-                if dt < (t2-t1)/self.maxFactor: return False
+                if dt < (t2-t1)/10: return False
                 continue
 
             count = count-1
@@ -100,7 +93,7 @@ class Pfem3D(object):
 
         self.solver.computeNextDT()
         factor = int((t2-t1)/self.solver.getTimeStep())
-        if factor > self.maxFactor: return False
+        if factor > 100: return False
         dt = (t2-t1)/factor
 
         # Main solving loop for the fluid simulation
@@ -115,9 +108,9 @@ class Pfem3D(object):
 
 # %% Dirichlet Boundary Conditions
 
-    def applyDisplacement(self,disp,dt):
-        
-        BC = (disp-self.disp)/dt
+    def applyPosition(self,pos,dt):
+
+        BC = (pos-self.pos)/dt
         if not self.implicit: BC = 2*(BC-self.vel)/dt
 
         for i,vector in enumerate(BC):
@@ -128,13 +121,13 @@ class Pfem3D(object):
     def applyTemperature(self,temp):
 
         for i,vector in enumerate(temp):
-            self.BC[i][self.size-1] = vector[0]
+            self.BC[i][self.dim] = vector[0]
             
 # %% Return Nodal Values
 
     def getPosition(self):
 
-        vector = np.zeros(self.disp.shape)
+        vector = np.zeros((self.nbrNode,self.dim))
 
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -146,7 +139,7 @@ class Pfem3D(object):
 
     def getVelocity(self):
 
-        vector = np.zeros(self.disp.shape)
+        vector = np.zeros((self.nbrNode,self.dim))
         
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -160,7 +153,7 @@ class Pfem3D(object):
     def getLoading(self):
 
         vector = w.VectorVectorDouble()
-        self.solver.computeStress(self.group,self.FSI,vector)
+        self.solver.computeStress('FSInterface',self.FSI,vector)
         return np.copy(vector)
 
     # Thermal boundary conditions
@@ -169,7 +162,7 @@ class Pfem3D(object):
     def getHeatFlux(self):
 
         vector = w.VectorVectorDouble()
-        self.solver.computeHeatFlux(self.group,self.FSI,vector)
+        self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
         return np.copy(vector)
 
 # %% Other Functions
@@ -180,7 +173,7 @@ class Pfem3D(object):
         self.mesh.remesh(False)
         if self.implicit: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
-        self.disp = self.getPosition()-self.initPos
+        self.pos = self.getPosition()
         self.vel = self.getVelocity()
 
     # Save the results or finalize
@@ -205,7 +198,7 @@ class Pfem3D(object):
 
         for data in gmsh.model.getPhysicalGroups():
             group = gmsh.model.getPhysicalName(*data)
-            if self.group == group: physical = data
+            if 'FSInterface' == group: physical = data
 
         faceList = list()
         entity = gmsh.model.getEntitiesForPhysicalGroup(*physical)
@@ -224,11 +217,12 @@ class Pfem3D(object):
 
         index = np.zeros(int(max(nodeTags))+1,dtype=int)-1
         for i,tag in enumerate(nodeTags): index[tag] = i
+        vectorPos = self.getPosition()
 
         for i,tag in enumerate(faceList):
 
             position = coord[index[tag]]
-            distance = np.linalg.norm(position-self.initPos,axis=1)
+            distance = np.linalg.norm(position-vectorPos,axis=1)
             idx = np.argmin(distance)
             faceList[i] = idx
 

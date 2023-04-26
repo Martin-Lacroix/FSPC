@@ -43,11 +43,11 @@ class Interpolator(object):
 
     def applyDispSF(self,dt,com):
 
-        if com.rank == 1: com.send(self.disp,0,tag=4)
+        if com.rank == 1: com.send(self.pos,0,tag=4)
         if com.rank == 0:
 
-            disp = com.recv(source=1,tag=4)
-            self.solver.applyDisplacement(self.interpData(disp),dt)
+            pos = com.recv(source=1,tag=4)
+            self.solver.applyPosition(self.interpData(pos),dt)
 
 # %% Apply Actual Heat Flux Fluid -> Solid
 

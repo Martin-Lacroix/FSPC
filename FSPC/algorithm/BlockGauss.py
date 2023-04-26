@@ -57,9 +57,9 @@ class BGS(Algorithm):
 
     def relaxationM(self):
 
-        if self.aitken: correction = self.getOmegaM()*self.resDisp
-        else: correction = self.omega*self.resDisp
-        self.interp.disp += correction
+        if self.aitken: correction = self.getOmegaM()*self.resPos
+        else: correction = self.omega*self.resPos
+        self.interp.pos += correction
 
     # Compute omega with Aitken relaxation
 
@@ -70,8 +70,8 @@ class BGS(Algorithm):
 
         else:
 
-            dRes = self.resDisp-self.prevResDisp
-            prodRes = np.sum(dRes*self.prevResDisp)
+            dRes = self.resPos-self.prevResPos
+            prodRes = np.sum(dRes*self.prevResPos)
             dResNormSqr = np.sum(np.linalg.norm(dRes,axis=0)**2)
             if dResNormSqr != 0: self.omegaM *= -prodRes/dResNormSqr
             else: self.omegaM = 0
@@ -80,7 +80,7 @@ class BGS(Algorithm):
 
         self.omegaM = min(self.omegaM,1)
         self.omegaM = max(self.omegaM,0)
-        self.prevResDisp = np.copy(self.resDisp)
+        self.prevResPos = np.copy(self.resPos)
         return self.omegaM
 
 # %% Relaxation of Solid Interface Temperature

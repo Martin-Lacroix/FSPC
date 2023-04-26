@@ -81,7 +81,7 @@ class MVJ(Algorithm):
 
     def relaxationM(self):
 
-            disp = self.solver.getDisplacement()
+            pos = self.solver.getPosition()
 
             # Performs either BGS or IQN iteration
 
@@ -89,19 +89,19 @@ class MVJ(Algorithm):
 
                 size = self.solver.nbrNode*self.dim
                 self.JprevM = np.zeros((size,size))
-                self.interp.disp += self.omega*self.resDisp
+                self.interp.pos += self.omega*self.resPos
 
             elif self.iteration == 0:
 
-                R = np.concatenate(self.resDisp.T)
+                R = np.concatenate(self.resPos.T)
                 correction = np.split(np.dot(self.JprevM,-R)+R,self.dim)
-                self.interp.disp += np.transpose(correction)
+                self.interp.pos += np.transpose(correction)
 
             else:
 
-                self.VM.insert(0,np.concatenate((self.resDisp-self.prevResM).T))
-                self.WM.insert(0,np.concatenate((disp-self.prevDisp).T))
-                R = np.concatenate(self.resDisp.T)
+                self.VM.insert(0,np.concatenate((self.resPos-self.prevResM).T))
+                self.WM.insert(0,np.concatenate((pos-self.prevPos).T))
+                R = np.concatenate(self.resPos.T)
                 V = np.transpose(self.VM)
                 W = np.transpose(self.WM)
 
@@ -110,12 +110,12 @@ class MVJ(Algorithm):
                 X = np.transpose(W-np.dot(self.JprevM,V))
                 self.JM = self.JprevM+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
                 correction = np.split(np.dot(self.JM,-R)+R,self.dim)
-                self.interp.disp += np.transpose(correction)
+                self.interp.pos += np.transpose(correction)
 
             # Updates the residuals and displacement
 
-            self.prevDisp = np.copy(disp)
-            self.prevResM = np.copy(self.resDisp)
+            self.prevPos = np.copy(pos)
+            self.prevResM = np.copy(self.resPos)
 
 # %% Relaxation of Solid Interface Displacement
 
