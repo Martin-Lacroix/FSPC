@@ -11,9 +11,7 @@ class Pfem3D(object):
         # Incompressible or weakly compressible solver
 
         self.problem = w.getProblem(path)
-        problemType = self.problem.getID()
-
-        if 'WC' in problemType:
+        if 'WC' in self.problem.getID():
             
             self.implicit = False
             self.run = self.runExplicit
