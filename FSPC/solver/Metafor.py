@@ -41,9 +41,7 @@ class Metafor(object):
 
         # Defines some internal variables
 
-        self.mecha = True
         self.reload = True
-        self.thermo = True
         self.neverRun = True
         self.FSI = input['FSInterface']
         self.exporter = input['exporter']
@@ -55,12 +53,12 @@ class Metafor(object):
         try:
             self.interacM = input['interacM']
             self.prevLoad = np.zeros((self.nbrNode,size))
-        except: self.mecha = False
+        except: self.interacM = None
 
         try:
             self.interacT = input['interacT']
             self.prevHeat = np.zeros((self.nbrNode,self.dim))
-        except: self.thermo = False
+        except: self.interacT = None
 
         # Manages time step restart functions
 
@@ -175,8 +173,8 @@ class Metafor(object):
     @compute_time
     def update(self):
         
-        if self.mecha: self.prevLoad = np.copy(self.nextLoad)
-        if self.thermo: self.prevHeat = np.copy(self.nextHeat)
+        if self.interacM: self.prevLoad = np.copy(self.nextLoad)
+        if self.interacT: self.prevHeat = np.copy(self.nextHeat)
         self.metaFac.save(self.mfac)
         self.reload = False
 
@@ -191,7 +189,7 @@ class Metafor(object):
     def getFacets(self):
 
         nbrList = np.zeros(self.nbrNode,dtype=int)
-        if self.mecha: elemSet = self.interacM.getElementSet()
+        if self.interacM: elemSet = self.interacM.getElementSet()
         else: elemSet = self.interacT.getElementSet()
 
         # Store the node indices from Metafor

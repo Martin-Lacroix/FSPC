@@ -15,11 +15,13 @@ class Pfem3D(object):
             
             self.implicit = False
             self.run = self.runExplicit
+            self.maxDivision = 10
 
         else:
             
             self.implicit = True
             self.run = self.runImplicit
+            self.maxDivision = 100
 
         # Store the important objects and variables
 
@@ -71,7 +73,7 @@ class Pfem3D(object):
                 
                 dt = float(dt/2)
                 count = np.multiply(2,count)
-                if dt < (t2-t1)/10: return False
+                if dt < (t2-t1)/self.maxDivision: return False
                 continue
 
             count = count-1
@@ -90,13 +92,13 @@ class Pfem3D(object):
         # Estimate the time step for stability
 
         self.solver.computeNextDT()
-        factor = int((t2-t1)/self.solver.getTimeStep())
-        if factor > 100: return False
-        dt = (t2-t1)/factor
+        division = int((t2-t1)/self.solver.getTimeStep())
+        if division > self.maxDivision: return False
+        dt = (t2-t1)/division
 
         # Main solving loop for the fluid simulation
 
-        while iteration < factor:
+        while iteration < division:
     
             iteration += 1
             self.solver.setTimeStep(dt)
