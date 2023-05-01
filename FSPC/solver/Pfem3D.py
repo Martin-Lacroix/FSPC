@@ -190,7 +190,8 @@ class Pfem3D(object):
     @compute_time
     def getFacets(self):
 
-        self.mesh.checkInitGmsh()
+        if not gmsh.isInitialized(): gmsh.initialize()
+        gmsh.option.setNumber('General.Terminal',0)
         file = self.mesh.getInfos().mshFile
         gmsh.open(file)
 
