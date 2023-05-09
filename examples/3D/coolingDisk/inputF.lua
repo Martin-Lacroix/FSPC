@@ -65,7 +65,7 @@ Problem.Material.h = 1
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.id = 'FracStep'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -77,13 +77,16 @@ Problem.Solver.solveHeatFirst = true
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
+Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
+Problem.Solver.MomContEq.cgTolerance = 1e-8
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Heat Equation
