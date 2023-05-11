@@ -19,7 +19,7 @@ export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
 # export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
 # export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
-# export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
+export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
 # export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
 # export SCRIPT=${PWD}/examples/3D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
@@ -32,7 +32,7 @@ cd workspace
 
 # Runs the code
 
-export CPU_PER_PROC=8
+export CPU_PER_PROC=4
 export MKL_NUM_THREADS=${CPU_PER_PROC}
 export OMP_NUM_THREADS=${CPU_PER_PROC}
 export OPTION="-map-by node:PE=${CPU_PER_PROC} --bind-to core:overload-allowed"
