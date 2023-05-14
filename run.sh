@@ -1,3 +1,11 @@
+# Experimental Gmsh
+
+# export GMSH_DIR=/mnt/Data/Devs/Gmsh/build/bin
+# export PYTHONPATH=${GMSH_DIR}/lib:${PYTHONPATH}
+# export INCLUDE=${GMSH_DIR}/include:${INCLUDE}
+# export PATH=${GMSH_DIR}/bin:${PATH}
+# export LIB=${GMSH_DIR}/lib:${LIB}
+
 # Path to the external library
 
 export PYTHONPATH=${PWD}:${PYTHONPATH}
@@ -15,12 +23,12 @@ export SCRIPT=${PWD}/examples/2D/flowContact/main.py
 export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 export SCRIPT=${PWD}/examples/2D/pureConduction/main.py
 export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
-# export SCRIPT=${PWD}/examples/2D/staticAxisym/main.py
-# export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
-# export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
+export SCRIPT=${PWD}/examples/2D/staticAxisym/main.py
+export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
+export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
 export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
-# export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
+export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
 # export SCRIPT=${PWD}/examples/3D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
 
