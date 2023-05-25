@@ -83,7 +83,7 @@ Problem.Solver.HeatEq.sparseSolver = 'CG'
 
 Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-8
-Problem.Solver.HeatEq.cgTolerance = 1e-9
+Problem.Solver.HeatEq.cgTolerance = 1e-16
 
 -- Heat Momentum Continuity BC
 

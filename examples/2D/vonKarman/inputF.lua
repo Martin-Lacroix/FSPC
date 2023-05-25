@@ -12,7 +12,7 @@ Problem.Mesh = {}
 Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.9
-Problem.Mesh.hchar = 0.03
+Problem.Mesh.hchar = 4e-3
 Problem.Mesh.gammaFS = 0.9
 Problem.Mesh.addOnFS = true
 Problem.Mesh.minAspectRatio = 1e-2
@@ -20,7 +20,7 @@ Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {0,0,1,0.41}
+Problem.Mesh.boundingBox = {0,0,15,0.41}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
@@ -69,14 +69,13 @@ Problem.Solver.coeffDTincrease = math.huge
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.sparseSolverPstep = 'LLT'
-Problem.Solver.MomContEq.sparseSolverLibPstep = 'MKL'
+Problem.Solver.MomContEq.sparseSolverPstep = 'CG'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.cgTolerance = 1e-12
+Problem.Solver.MomContEq.cgTolerance = 1e-16
 Problem.Solver.MomContEq.bodyForce = {0,0}
 
 -- Momentum Continuity BC
@@ -103,14 +102,14 @@ end
 
 function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
 
-    local ubar = 2
+    local vbar = 1
     local tmax = 2
-    local uy = 6*ubar*(y/0.1681)*(0.41-y)
+    local H = 0.41/2
+    local vx = 1.5*vbar*y*(2*H-y)/(H*H)
 
 	if (t<tmax) then
-    return uy*(1-math.cos(math.pi*t/2))/2,0
-
+        return vx*(1-math.cos(math.pi*t/2))/2,0
     else
-        return uy,0
+        return vx,0
     end
 end

@@ -5,7 +5,7 @@ gmsh.initialize()
 
 # %% Parameters
 
-L = 1
+L = 1.5
 H = 0.41
 R = 0.05
 CX = 0.2
@@ -13,11 +13,9 @@ CY = 0.2
 BX = 0.6
 BH = 0.01
 
-BH = 0.005
-
-d = 0.03
-N = 15
-M = 2
+d = 0.004
+N = 88
+M = 6
 
 # %% Points List
 

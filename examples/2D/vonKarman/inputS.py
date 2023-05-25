@@ -43,8 +43,8 @@ def getMetafor(input):
     # Material parameters
 
     materset.define(1,w.ElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,5.6e6)
-    materset(1).put(w.MASS_DENSITY,1000)
+    materset(1).put(w.ELASTIC_MODULUS,1.4e6)
+    materset(1).put(w.MASS_DENSITY,10000)
     materset(1).put(w.POISSON_RATIO,0.4)
     
     # Finite element properties
