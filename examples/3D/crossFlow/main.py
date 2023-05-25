@@ -21,6 +21,7 @@ algorithm.convergM = FSPC.Convergence(1e-6)
 algorithm.step = FSPC.TimeStep(5e-4,0.01)
 
 algorithm.endTime = 2
+algorithm.endTime = 0.002
 algorithm.omega = 0.5
 algorithm.maxIter = 10
 

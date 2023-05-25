@@ -79,7 +79,6 @@ Problem.Solver.solveHeatFirst = true
 Problem.Solver.HeatEq = {}
 Problem.Solver.HeatEq.residual = 'Ax_f'
 Problem.Solver.HeatEq.nlAlgo = 'Picard'
-Problem.Solver.HeatEq.sparseSolverLib = 'MKL'
 Problem.Solver.HeatEq.sparseSolver = 'CG'
 
 Problem.Solver.HeatEq.maxIter = 25
