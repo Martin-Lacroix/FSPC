@@ -2,10 +2,9 @@
 
 <br />
 
-FSPC should be used as a Python package. The latter provides some classes able to perform FSI simulation by partitioned coupling of a fluid and a structural solver. Currently, only PFEM3D and Metafor are supported. Moreover, FSPC uses MPI for the communication between the two solvers, each of them relying on a single process, and assumes that the solvers are available in your path. An example of how to run your Python `script.py` with 4 CPU per process:
+FSPC provides some classes able to perform FSI simulation by partitioned coupling of a fluid (PFEM) and a structural (Metafor) solver. This package uses MPI for the communication between them, and assumes that the solvers are available in your path. An example of how to run your Python script with FSPC is provided bellow.
 
 ```sh
-    export CPU_PER_PROC=4
     export OPTION="-map-by node:PE=${CPU_PER_PROC}"
     mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC}
 ```
