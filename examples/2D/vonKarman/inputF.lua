@@ -67,10 +67,10 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
 Problem.Solver.MomContEq.residual = 'U_P'
-Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
-Problem.Solver.MomContEq.PStepSparseSolver = 'CG'
+Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.sparseSolverPstep = 'LLT'
+Problem.Solver.MomContEq.sparseSolverLibPStep = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25

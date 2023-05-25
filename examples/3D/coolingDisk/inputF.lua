@@ -79,8 +79,6 @@ Problem.Solver.solveHeatFirst = true
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
-Problem.Solver.MomContEq.PStepSparseSolver = 'LLT'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
@@ -94,7 +92,6 @@ Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 Problem.Solver.HeatEq = {}
 Problem.Solver.HeatEq.residual = 'Ax_f'
 Problem.Solver.HeatEq.nlAlgo = 'Picard'
-Problem.Solver.HeatEq.sparseSolverLib = 'MKL'
 Problem.Solver.HeatEq.sparseSolver = 'CG'
 
 Problem.Solver.HeatEq.maxIter = 25
