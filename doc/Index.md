@@ -7,12 +7,13 @@ FSPC should be used as a Python package. The latter provides some classes able t
 ```sh
     export CPU_PER_PROC=4
     export OPTION="-map-by node:PE=${CPU_PER_PROC}"
-    mpiexec ${OPTION} -n 2 python3 script.py -k ${CPU_PER_PROC}
+    mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC}
 ```
 
-<br />
-
-## 1. Solver Class
+| Input               | Type           | Description                                   |
+|---------------------|----------------|-----------------------------------------------|
+| *CPU_PER_PROC*      | *int*          | *number of CPU per MPI process*               |
+| *SCRIPT*            | *string*       | *path to the Python script to be run*         |
 
 <br />
 
@@ -30,10 +31,6 @@ The first step is to import the package and create the `Process` class. The latt
 |-------------------|-------------------|-----------------------------------------------|
 | *pathF*           | *string*          | *input file path for the fluid solver*        |
 | *pathS*           | *string*          | *input file path for the solid solver*        |
-
-<br />
-
-## 2. Algorithm Class
 
 <br />
 
@@ -83,10 +80,6 @@ The tolerance has the dimension of the Dirichlet condition exchanged between the
 
 <br />
 
-## 3. Interpolator Class
-
-<br />
-
 The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. If the fluid and solid meshes are matching at the interface, the k-nearest neighbours with `k = 1` is advised. For complex interface geometries, the `ETM` is the most robust algoritm.
 
 ```python
@@ -100,10 +93,6 @@ The `Interpolator` class manages the data transfer between the two interface mes
 | *k*               | *int*                     | *number of nearest neighbours*                  |
 | *fun*             | *function*                | *radial basis function for nodal distance*      |
 | *nElem*           | *int*                     | *number of projection checking*                 |
-
-<br />
-
-## 4. Start Simulation
 
 <br />
 
