@@ -1,13 +1,29 @@
-# <img src="Python.svg" width="60"/> Initialization
+# <img src="Python.svg" width="60"/> FSPC Main Script
 
 <br />
 
-FSPC provides some classes able to perform FSI simulation by partitioned coupling of a fluid and a structural solver. Currently, only PFEM3D and the Metafor solvers are supported. Moreover, FSPC uses MPI for the communication between the two solvers, each of them relying on a single process. FSPC assumes that the solvers are available in your path.
+FSPC should be used as a Python package. The latter provides some classes able to perform FSI simulation by partitioned coupling of a fluid and a structural solver. Currently, only PFEM3D and Metafor are supported. Moreover, FSPC uses MPI for the communication between the two solvers, each of them relying on a single process, and assumes that the solvers are available in your path. An example of how to run your Python `script.py` with 4 CPU per process:
+
+```sh
+    export CPU_PER_PROC=4
+    export OPTION="-map-by node:PE=${CPU_PER_PROC}"
+    mpiexec ${OPTION} -n 2 python3 script.py -k ${CPU_PER_PROC}
+```
+
+<br />
+
+## 1. Solver Class
+
+<br />
+
+The first step is to import the package and create the `Process` class. The latter initializes MPI for Python and provides a method to initialize the external solver wrappers with their respective input files. At that point, the script is run on two MPI processes. The returned `Solver` class corresponds to the fluid wrapper on the rank 0 and to the solid wrapper on the rank 1.
 
 ```python
-    import FSPC                                     # Import the FSPC library
-    process = FSPC.Process()                        # Initialize the MPI process
-    solver = process.getSolver(pathF,pathS)         # Return the solver wrapper
+    import FSPC                                 # Import the FSPC library
+    process = FSPC.Process()                    # Initialize the MPI process
+    solver = process.getSolver(pathF,pathS)     # Return the solver wrapper
+    communicator = process.com                  # MPI world communication class
+    rank = process.com.rank                     # Rank of the current process
 ```
 
 | Input             | Type              | Description                                   |
@@ -17,26 +33,16 @@ FSPC provides some classes able to perform FSI simulation by partitioned couplin
 
 <br />
 
-The solver variable is the fluid wrapper on the rank 0 and the solid wrapper on the rank 1. This rank as well as the MPI communicators can be obtained by:
-
-```python
-    communicator = process.com      # MPI world communication class
-    rank = process.com.rank         # Rank of the current process
-```
+## 2. Algorithm Class
 
 <br />
 
-# <img src="Python.svg" width="60"/> Algorithm Class
-
-<br />
-
-
-Different algorithm classes are available in FSPC. Each of them require the solver previously obtained by the process class:
+Different Algorithm classes are available in FSPC. The simplest one is the Block Gauss–Seidel `BGS` method, the two interface quasi-Newton methods are called Inverse Least Square `ILS` and Multi-Vector Jacobian `MVJ`. Each of them requires the solver previously obtained by the Process class.
 
 ```python
-    algorithm = FSPC.BGS(solver)        # Block-Gauss Seidel with Aitken dynamic relexation
-    algorithm = FSPC.ILS(solver)        # Interface quasi-Newton with inverse least squares 
-    algorithm = FSPC.MVJ(solver)        # Interface quasi-Newton with multi-vector Jacobian
+    algorithm = FSPC.BGS(solver)    # Block-Gauss Seidel with Aitken dynamic relexation
+    algorithm = FSPC.ILS(solver)    # Interface quasi-Newton with inverse least squares 
+    algorithm = FSPC.MVJ(solver)    # Interface quasi-Newton with multi-vector Jacobian
 ```
 
 | Input             | Type                      | Description                               |
@@ -45,7 +51,7 @@ Different algorithm classes are available in FSPC. Each of them require the solv
 
 <br />
 
-The convergence and the time step are managed by individual classes. The type of coupling is defined by the presence of the associated class such that `convergM` enables mechanical coupling and `convergT` enables thermal coupling.
+The convergence and the time step are managed by the `Convergence` and the `TimeStep` classes respectively. The latter should be given to the `Algorithm` as presented bellow. It is important to note that the type of coupling is enabled by the creation of the associated class such that `convergM` enables the mechanical coupling and `convergT` enables the thermal coupling.
 
 ```python
     algorithm.convergM = FSPC.Convergence(tol)      # Mechanical convergence class
@@ -57,11 +63,11 @@ The convergence and the time step are managed by individual classes. The type of
 |-------------------|---------------------------|--------------------------------------------|
 | *tol*             | *float*                   | *tolerance for the FSI iterations*         |
 | *dtSave*          | *float*                   | *time step for saving on the disk*         |
-| *dt*              | *float*                   | *initial time coupling time step*          |
+| *dt*              | *float*                   | *initial coupling time step*          |
 
 <br />
 
-Additional variables must be initialized in order to run an FSI simulation:
+The tolerance has the dimension of the Dirichlet condition exchanged between the solver, so a position for the mechanical coupling and a temperature for the thermal coupling. The initial time step is also the maximum allowed time step. Finally, additional variables must be initialized in order to run an FSI simulation:
 
 ```python
     algorithm.omega = omega             # Gauss Seidel relaxation parameter
@@ -77,11 +83,11 @@ Additional variables must be initialized in order to run an FSI simulation:
 
 <br />
 
-# <img src="Python.svg" width="60"/> Interpolator Class
+## 3. Interpolator Class
 
 <br />
 
-The interpolator manages the data transfer between the two solvers. If the fluid and solid meshes are matching at the interface, the k-nearest neighbours with `k = 1` is advised.
+The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. If the fluid and solid meshes are matching at the interface, the k-nearest neighbours with `k = 1` is advised. For complex interface geometries, the `ETM` is the most robust algoritm.
 
 ```python
     algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbours interpolator
@@ -97,13 +103,29 @@ The interpolator manages the data transfer between the two solvers. If the fluid
 
 <br />
 
-# <img src="Python.svg" width="60"/> Simulation Run
+## 4. Start Simulation
 
 <br />
 
-Once the algorithm class has been initialized, the FSI simulation can be started with the `simulate` function. It is also possible to print the time stats at the end:
+Once the algorithm class has been initialized, the FSI simulation can be started with the `simulate` function provided by the `ALgorithm` class. The latter will fail if the parameters presented previously have not been correctly initialized. It is also possible to print the time stats at the end of the run and compare the computation time for the fluid and the solid parts.
 
 ```python
     algorithm.simulate()        # Run the FSI simulation
     FSPC.printClock()           # Print the final time stats
 ```
+
+<br />
+
+# <img src="Python.svg" width="60"/> Metafor File
+
+<br />
+
+Empty
+
+<br />
+
+# <img src="Python.svg" width="60"/> PFEM3D File
+
+<br />
+
+Empty

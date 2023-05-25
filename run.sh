@@ -19,13 +19,13 @@ export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 # export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
 # export SCRIPT=${PWD}/examples/2D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/2D/elasticFunnel/main.py
-# export SCRIPT=${PWD}/examples/2D/flowContact/main.py
+export SCRIPT=${PWD}/examples/2D/flowContact/main.py
 # export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
 # export SCRIPT=${PWD}/examples/2D/pureConduction/main.py
 # export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
 # export SCRIPT=${PWD}/examples/2D/staticAxisym/main.py
 # export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
-export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
+# export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
 
 # export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
 # export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
@@ -44,4 +44,4 @@ export CPU_PER_PROC=4
 export MKL_NUM_THREADS=${CPU_PER_PROC}
 export OMP_NUM_THREADS=${CPU_PER_PROC}
 export OPTION="-map-by node:PE=${CPU_PER_PROC} --bind-to core:overload-allowed"
-mpiexec ${OPTION} -n 2 python ${SCRIPT} -k ${CPU_PER_PROC} 2>&1 | tee workspace.txt
+mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC} 2>&1 | tee workspace.txt

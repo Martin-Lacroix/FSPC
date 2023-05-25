@@ -15,13 +15,13 @@ class Pfem3D(object):
             
             self.implicit = False
             self.run = self.runExplicit
-            self.maxDivision = 10
+            self.maxDivision = 100
 
         else:
             
             self.implicit = True
             self.run = self.runImplicit
-            self.maxDivision = 100
+            self.maxDivision = 10
 
         # Store the important objects and variables
 
