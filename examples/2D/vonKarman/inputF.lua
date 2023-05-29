@@ -13,14 +13,14 @@ Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.9
 Problem.Mesh.hchar = 4e-3
-Problem.Mesh.gammaFS = 0.9
+Problem.Mesh.gammaFS = 0.3
 Problem.Mesh.addOnFS = true
-Problem.Mesh.minAspectRatio = 1e-2
+Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
 Problem.Mesh.laplacianSmoothingBoundaries = false
-Problem.Mesh.boundingBox = {0,0,15,0.41}
+Problem.Mesh.boundingBox = {0,0,1.5,0.41}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.remeshAlgo = 'GMSH'
