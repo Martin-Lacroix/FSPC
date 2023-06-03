@@ -19,7 +19,7 @@ initPos = solver.getPosition()
 
 algorithm = FSPC.MVJ(solver)
 # algorithm.interp = TEST(solver,9)
-algorithm.interp = FSPC.KNN(solver,1)
+algorithm.interp = FSPC.ETM(solver,9)
 algorithm.convergM = FSPC.Convergence(1e-6)
 algorithm.step = FSPC.TimeStep(1e-3,1e-2)
 

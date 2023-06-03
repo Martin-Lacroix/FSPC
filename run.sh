@@ -43,5 +43,5 @@ cd workspace
 export CPU_PER_PROC=4
 export MKL_NUM_THREADS=${CPU_PER_PROC}
 export OMP_NUM_THREADS=${CPU_PER_PROC}
-export OPTION="-map-by node:PE=${CPU_PER_PROC} --bind-to core:overload-allowed"
+export OPTION="-map-by node:PE=${CPU_PER_PROC}"
 mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC} 2>&1 | tee workspace.txt

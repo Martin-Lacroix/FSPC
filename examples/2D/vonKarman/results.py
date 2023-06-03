@@ -1,48 +1,35 @@
 from matplotlib import pyplot as plt
-import matplotlib
-import pickle
+import numpy as np
+import gmsh
 import os
 
-# %% Read the Output File
+data = list()
 
-os.chdir('workspace')
-out = pickle.load(open('out.pickle','rb'))
+# %% Post Procesing of Results
 
-color = dict()
-color['ETM'] = '#a5be6b'
-color['RBF'] = '#127dd8'
-color['KNN'] = '#b46478'
+gmsh.initialize()
+gmsh.option.setNumber('General.Terminal',0)
+os.chdir('workspace/metafor')
 
-font = {'size':16}
-matplotlib.rc('font',**font)
-plt.rcParams["font.family"] = ["Latin Modern Roman"]
+# Extract the data from the mesh file
 
-# %% Print the Current Result
+fileList = os.listdir()
+time = [float(F[7:-4]) for F in fileList]
+coord = np.zeros((len(fileList),3))
+index = np.argsort(time)
 
-width = 2
-fig,ax = plt.subplots(1,figsize=[10,5])
+for i,j in enumerate(index):
 
-for key,val in out['recvLoad'].items(): 
-    plt.plot(out['recvPos'],val,label=key,color=color[key])
+    gmsh.open(fileList[j])
+    coord[i] = gmsh.model.mesh.getNode(106)[0]
 
-for key,val in out['curvLoad'].items():
-    plt.plot(out['curvPos'],val,'--',label=key,color='black')
-    plt.plot(out['curvPos'],val,'o',markersize=7,color='black',mfc='none')
+gmsh.finalize()
+disp = (coord-coord[0])[:,1]
+time = np.sort(time)
 
-plt.legend(loc='upper left')
-plt.ylabel('Stress Tensor $\sigma_{\,11}$ (Pa)')
-plt.xlabel('Interface Curvilinear Position')
+# Plot the solid displacement
+
+# for D in data: plt.plot(*np.transpose(D))
+plt.plot(time,disp,'k--')
 plt.grid()
-plt.show()
-
-# %% Print the Current Result
-
-width = 0.4
-key = list(out['error'].keys())
-val = list(out['error'].values())
-
-fig,ax = plt.subplots(1,figsize=[9,4])
-plt.bar(key,val,color=color.values(),width=width,log=1,zorder=3)
-plt.ylabel('Average Error on $\sigma_{\,11}$ [-]')
-ax.grid(zorder=0)
 plt.show()

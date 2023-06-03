@@ -26,7 +26,7 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.localHcharGroups = {}
+Problem.Mesh.localHcharGroups = {'Polytope','Wall','Inlet'}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
@@ -112,4 +112,10 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
     else
         return vx,0
     end
+end
+
+function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
+
+	local hchar = Problem.Mesh.hchar
+	return hchar+dist*0.1
 end
