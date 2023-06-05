@@ -7,8 +7,8 @@ FSPC provides some classes able to perform FSI simulation by partitioned couplin
 <br />
 
 ```sh
-    export OPTION="-map-by node:PE=${CPU_PER_PROC}"
-    mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC}
+export OPTION="-map-by node:PE=${CPU_PER_PROC}"
+mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC}
 ```
 
 | Input               | Type           | Description                                   |
@@ -23,11 +23,11 @@ The first step is to import the package and create the `Process` class. The latt
 <br />
 
 ```python
-    import FSPC                                 # Import the FSPC library
-    process = FSPC.Process()                    # Initialize the MPI process
-    solver = process.getSolver(pathF,pathS)     # Return the solver wrapper
-    communicator = process.com                  # MPI world communication class
-    rank = process.com.rank                     # Rank of the current process
+import FSPC                                 # Import the FSPC library
+process = FSPC.Process()                    # Initialize the MPI process
+solver = process.getSolver(pathF,pathS)     # Return the solver wrapper
+communicator = process.com                  # MPI world communication class
+rank = process.com.rank                     # Rank of the current process
 ```
 
 | Input             | Type              | Description                                   |
@@ -42,9 +42,9 @@ Different Algorithm classes are available in FSPC. The simplest one is the Block
 <br />
 
 ```python
-    algorithm = FSPC.BGS(solver)    # Block-Gauss Seidel with Aitken dynamic relexation
-    algorithm = FSPC.ILS(solver)    # Interface quasi-Newton with inverse least squares 
-    algorithm = FSPC.MVJ(solver)    # Interface quasi-Newton with multi-vector Jacobian
+algorithm = FSPC.BGS(solver)    # Block-Gauss Seidel with Aitken dynamic relexation
+algorithm = FSPC.ILS(solver)    # Interface quasi-Newton with inverse least squares 
+algorithm = FSPC.MVJ(solver)    # Interface quasi-Newton with multi-vector Jacobian
 ```
 
 | Input             | Type                      | Description                               |
@@ -59,9 +59,9 @@ The convergence and the time step are managed by the `Convergence` and the `Time
 <br />
 
 ```python
-    algorithm.convergM = FSPC.Convergence(tol)      # Mechanical convergence class
-    algorithm.convergT = FSPC.Convergence(tol)      # Thermal convergence class
-    algorithm.step = FSPC.TimeStep(dt,dtSave)       # Time step manager class
+algorithm.convergM = FSPC.Convergence(tol)      # Mechanical convergence class
+algorithm.convergT = FSPC.Convergence(tol)      # Thermal convergence class
+algorithm.step = FSPC.TimeStep(dt,dtSave)       # Time step manager class
 ```
 
 | Input             | Type                      | Description                                |
@@ -77,9 +77,9 @@ The tolerance has the dimension of the Dirichlet condition exchanged between the
 <br />
 
 ```python
-    algorithm.omega = omega             # Gauss Seidel relaxation parameter
-    algorithm.maxIter = maxIter         # Maximum number of FSI iterations
-    algorithm.endTime = endTime         # Final physical simulation time
+algorithm.omega = omega             # Gauss Seidel relaxation parameter
+algorithm.maxIter = maxIter         # Maximum number of FSI iterations
+algorithm.endTime = endTime         # Final physical simulation time
 ```
 
 | Input             | Type                      | Description                               |
@@ -95,9 +95,9 @@ The `Interpolator` class manages the data transfer between the two interface mes
 <br />
 
 ```python
-    algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbours interpolator
-    algorithm.interp = FSPC.RBF(solver,fun)         # Radial basis function interpolator
-    algorithm.interp = FSPC.ETM(solver,nElem)       # Direct element transfer method
+algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbours interpolator
+algorithm.interp = FSPC.RBF(solver,fun)         # Radial basis function interpolator
+algorithm.interp = FSPC.ETM(solver,nElem)       # Direct element transfer method
 ```
 
 | Input             | Type                      | Description                                     |
@@ -113,8 +113,8 @@ Once the algorithm class has been initialized, the FSI simulation can be started
 <br />
 
 ```python
-    algorithm.simulate()        # Run the FSI simulation
-    FSPC.printClock()           # Print the final time stats
+algorithm.simulate()        # Run the FSI simulation
+FSPC.printClock()           # Print the final time stats
 ```
 
 <br />
@@ -128,8 +128,8 @@ The input file for the fluid solver is the standard Lua for [PFEM3D](https://git
 <br />
 
 ```lua
-    Problem.autoRemeshing = false       -- Disable the automatic remeshing
-    Problem.Solver.adaptDT = true       -- Enable adaptive time step
+Problem.autoRemeshing = false       -- Disable the automatic remeshing
+Problem.Solver.adaptDT = true       -- Enable adaptive time step
 ```
 
 <br />
@@ -139,9 +139,9 @@ In order to enable the FSI coupling, it is mandatory to give the name `FSInterfa
 <br />
 
 ```lua
-    Problem.Mesh.mshFile = 'geometry.msh'                       -- Load the fluid mesh
-    Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true          -- Enable thermal coupling
-    Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true       -- Enable mechanical coupling
+Problem.Mesh.mshFile = 'geometry.msh'                       -- Load the fluid mesh
+Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true          -- Enable thermal coupling
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true       -- Enable mechanical coupling
 ```
 
 <br />
@@ -150,14 +150,14 @@ In order to enable the FSI coupling, it is mandatory to give the name `FSInterfa
 
 <br />
 
-The input file for the solid solver is the standard Python for [Metafor](https://metafor.ltas.ulg.ac.be/). Because FSPC manages the time step and simulation time, the functions `tsm.setInitialTime` and `tsm.setNextTime` must be discarded from your Metafor input file, but all other functions can be used safely. Moreover, FSPC has only been tested with Gmsh import.
+The input file for the solid solver is the standard Python for [Metafor](http://metafor.ltas.ulg.ac.be/dokuwiki/). Because FSPC manages the time step and simulation time, the functions `tsm.setInitialTime` and `tsm.setNextTime` must be discarded from your Metafor input file, but all other functions can be used safely. Moreover, FSPC has only been tested with Gmsh import.
 
 <br />
 
 ```python
-    import toolbox.gmsh as gmsh                             # Import the Gmsh toolbox
-    importer = gmsh.GmshImport('geometry.msh',domain)       # Load the mesh file
-    importer.execute()                                      # Translate the mesh into Metafor
+import toolbox.gmsh as gmsh                             # Import the Gmsh toolbox
+importer = gmsh.GmshImport('geometry.msh',domain)       # Load the mesh file
+importer.execute()                                      # Translate the mesh into Metafor
 ```
 
 <br />
@@ -167,8 +167,8 @@ The object `domain` refers to the Metafor domain. The name of the physical group
 <br />
 
 ```python
-    groups = importer.groups                            # Dict of all physical groups in Gmsh
-    param['FSInterface'] = groups['myInterface']        # myInterace is the FSI physical group
+groups = importer.groups                            # Dict of all physical groups in Gmsh
+param['FSInterface'] = groups['myInterface']        # myInterace is the FSI physical group
 ```
 
 <br />
@@ -178,17 +178,17 @@ The FSI coupling is performed with the help of a nodal interaction allowing to d
 <br />
 
 ```python
-    prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction boundary element
-    load = NodInteraction(1)                            # Object of mechanical interaction
-    load.push(groups['FSInterface'])                    # Add the nodes from the FS interface
-    load.addProperty(prp)                               # Add the element poroperty in interaction
+prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction boundary element
+load = NodInteraction(1)                            # Object of mechanical interaction
+load.push(groups['FSInterface'])                    # Add the nodes from the FS interface
+load.addProperty(prp)                               # Add the element poroperty in interaction
 ```
 
 ```python
-    prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction boundary element
-    heat = NodInteraction(2)                            # Object of thermal interaction
-    heat.push(groups['FSInterface'])                    # Add the nodes from the FS interface
-    heat.addProperty(prp)                               # Add the element poroperty in interaction
+prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction boundary element
+heat = NodInteraction(2)                            # Object of thermal interaction
+heat.push(groups['FSInterface'])                    # Add the nodes from the FS interface
+heat.addProperty(prp)                               # Add the element poroperty in interaction
 ```
 
 <br />
@@ -198,8 +198,8 @@ The resulting nodal interactions must be provided to FSPC through the parameter 
 <br />
 
 ```python
-    param['interacT'] = heat        # Send the heat interaction to FSPC
-    param['interacM'] = load        # Send the mechanical interaction to FSPC
+param['interacT'] = heat        # Send the heat interaction to FSPC
+param['interacM'] = load        # Send the mechanical interaction to FSPC
 ```
 
 <br />
@@ -209,7 +209,7 @@ Finally, the user may define an exporter class that will be called by FSPC to wr
 <br />
 
 ```python
-    param['exporter'] = gmsh.GmshExport('output.msh',metafor)       # Create the Gmsh exporter class
-    param['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
-    param['exporter'].addDataBaseField([TO])                        # Add the temperature field
+param['exporter'] = gmsh.GmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+param['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
+param['exporter'].addDataBaseField([TO])                        # Add the temperature field
 ```
