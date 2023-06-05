@@ -150,4 +150,66 @@ In order to enable the FSI coupling, it is mandatory to give the name `FSInterfa
 
 <br />
 
-Empty
+The input file for the solid solver is the standard Python for [Metafor](https://metafor.ltas.ulg.ac.be/). Because FSPC manages the time step and simulation time, the functions `tsm.setInitialTime` and `tsm.setNextTime` must be discarded from your Metafor input file, but all other functions can be used safely. Moreover, FSPC has only been tested with Gmsh import.
+
+<br />
+
+```python
+    import toolbox.gmsh as gmsh                             # Import the Gmsh toolbox
+    importer = gmsh.GmshImport('geometry.msh',domain)       # Load the mesh file
+    importer.execute()                                      # Translate the mesh into Metafor
+```
+
+<br />
+
+The object `domain` refers to the Metafor domain. The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSInterface` entry of the parameter dictionary retrieved from `getMetafor(param)`. An example with the Gmsh importer:
+
+<br />
+
+```python
+    groups = importer.groups                            # Dict of all physical groups in Gmsh
+    param['FSInterface'] = groups['myInterface']        # myInterace is the FSI physical group
+```
+
+<br />
+
+The FSI coupling is performed with the help of a nodal interaction allowing to dynamically set a Dirichlet condition on the corresponding nodes. Note that each interaction must be specified independently for each type of element. Moreover, thermal and mechanical interaction classes are stored in different objects. 
+
+<br />
+
+```python
+    prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction boundary element
+    load = NodInteraction(1)                            # Object of mechanical interaction
+    load.push(groups['FSInterface'])                    # Add the nodes from the FS interface
+    load.addProperty(prp)                               # Add the element poroperty in interaction
+```
+
+```python
+    prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction boundary element
+    heat = NodInteraction(2)                            # Object of thermal interaction
+    heat.push(groups['FSInterface'])                    # Add the nodes from the FS interface
+    heat.addProperty(prp)                               # Add the element poroperty in interaction
+```
+
+<br />
+
+The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `convergM` is defined in FSPC, the algorithm will look for `load` in Metafor and if `convergT` is defined, it will look for the corresponding `heat` interaction.
+
+<br />
+
+```python
+    param['interacT'] = heat        # Send the heat interaction to FSPC
+    param['interacM'] = load        # Send the mechanical interaction to FSPC
+```
+
+<br />
+
+Finally, the user may define an exporter class that will be called by FSPC to write the current state of the solution on the disk. This class must contain an `execute` function that should be callable during the simulation. Metafor already contains a built-in class with such method, allowing to export the current solution in a Gmsh file.
+
+<br />
+
+```python
+    param['exporter'] = gmsh.GmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+    param['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
+    param['exporter'].addDataBaseField([TO])                        # Add the temperature field
+```

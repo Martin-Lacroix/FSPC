@@ -18,8 +18,8 @@ class Metafor(object):
 
         # Actually initialize Metafor from file
 
-        input = dict()
-        self.metafor = module.getMetafor(input)
+        param = dict()
+        self.metafor = module.getMetafor(param)
         self.tsm = self.metafor.getTimeStepManager()
         geometry = self.metafor.getDomain().getGeometry()
         self.metafor.getDomain().build()
@@ -43,20 +43,20 @@ class Metafor(object):
 
         self.reload = True
         self.neverRun = True
-        self.FSI = input['FSInterface']
-        self.exporter = input['exporter']
+        self.FSI = param['FSInterface']
+        self.exporter = param['exporter']
         self.nbrNode = self.FSI.getNumberOfMeshPoints()
         self.metafor.getInitialConditionSet().update(0)
 
         # Mechanical and thermal interactions
 
         try:
-            self.interacM = input['interacM']
+            self.interacM = param['interacM']
             self.prevLoad = np.zeros((self.nbrNode,size))
         except: self.interacM = None
 
         try:
-            self.interacT = input['interacT']
+            self.interacT = param['interacT']
             self.prevHeat = np.zeros((self.nbrNode,self.dim))
         except: self.interacT = None
 
