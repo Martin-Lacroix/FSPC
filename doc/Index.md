@@ -117,12 +117,12 @@ The input file for the fluid solver is the standard Lua for [PFEM3D](https://git
 
 <br />
 
-Simulation results indicated in `Problem.Extractor` are written on the disk according to `dtSave` from FSPC, the latter overwrites the `timeBetweenWriting` variable defined in the Lua file. The type of output must be indicated in the Lua file. In order to enable the FSI coupling, it is mandatory to give the name `FSInterface` to the physical group representing your fluid-structure interface in Gmsh, and activate the external boundary conditions on this interface. Note that thermal and mechanical coupling must be enabled separately in their respective equations.
+In order to enable the FSI coupling, it is mandatory to give the name `FSInterface` to the physical group representing your fluid-structure interface in Gmsh, and activate the external boundary conditions on this interface. This allows FSPC to dynamically enforce a Dirichlet condition on the nodes of this physical group.
 
 ```lua
-    Problem.Mesh.mshFile = 'geometry.msh'
-    Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
-    Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+    Problem.Mesh.mshFile = 'geometry.msh'                       -- Load the fluid mesh
+    Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true          -- Enable thermal coupling
+    Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true       -- Enable mechanical coupling
 ```
 
 <br />
