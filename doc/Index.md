@@ -1,4 +1,4 @@
-# <img src="Python.svg" width="60"/> FSPC Main Script
+# <img src="Python.svg" width="60"/> Main Script
 
 <br />
 
@@ -104,15 +104,30 @@ Once the algorithm class has been initialized, the FSI simulation can be started
 
 <br />
 
-# <img src="Python.svg" width="60"/> Metafor File
-
-<br />
-
-Empty
-
-<br />
-
 # <img src="Python.svg" width="60"/> PFEM3D File
+
+<br />
+
+The input file for the fluid solver is the standard Lua for [PFEM3D](https://github.com/ImperatorS79/PFEM3D). Because the time step and total simulation time are controlled by FSPC, the related variables in `Problem.Solver` are not used. However, the parameter `adaptDT` must be set to `true` for allowing an adaptive time step on the fluid side. It is also recommended disabling the automatic remeshing because FSPC is already performing a remeshing at the end of each coupling time step. Indeed, performing intermediate remeshing may slow down the FSI convergence.
+
+```lua
+    Problem.autoRemeshing = false       -- Disable the automatic remeshing
+    Problem.Solver.adaptDT = true       -- Enable adaptive time step
+```
+
+<br />
+
+Simulation results indicated in `Problem.Extractor` are written on the disk according to `dtSave` from FSPC, the latter overwrites the `timeBetweenWriting` variable defined in the Lua file. The type of output must be indicated in the Lua file. In order to enable the FSI coupling, it is mandatory to give the name `FSInterface` to the physical group representing your fluid-structure interface in Gmsh, and activate the external boundary conditions on this interface. Note that thermal and mechanical coupling must be enabled separately in their respective equations.
+
+```lua
+    Problem.Mesh.mshFile = 'geometry.msh'
+    Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
+    Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+```
+
+<br />
+
+# <img src="Python.svg" width="60"/> Metafor File
 
 <br />
 
