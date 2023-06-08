@@ -15,7 +15,7 @@ class Pfem3D(object):
             
             self.implicit = False
             self.run = self.runExplicit
-            self.maxDivision = 100
+            self.maxDivision = 200
 
         else:
             
