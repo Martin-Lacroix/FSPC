@@ -36,7 +36,6 @@ def getMetafor(param):
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
     importer = gmsh.GmshImport(mshFile,domain)
     groups = importer.groups
-    importer.binary = True
     importer.execute()
     
     # Defines the solid domain
@@ -127,5 +126,4 @@ def getMetafor(param):
     param['FSInterface'] = groups['FSInterface']
     param['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     param['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
-    param['exporter'].binary = True
     return metafor

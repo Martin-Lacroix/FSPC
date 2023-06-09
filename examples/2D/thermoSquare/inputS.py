@@ -37,7 +37,6 @@ def getMetafor(param):
     mshFile = os.path.join(os.path.dirname(__file__),'geometryS.msh')
     importer = gmsh.GmshImport(mshFile,domain)
     groups = importer.groups
-    importer.binary = True
     importer.execute()
 
     # Defines the ball domain
@@ -111,5 +110,4 @@ def getMetafor(param):
     param['FSInterface'] = groups['FSInterface']
     param['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     param['exporter'].addDataBaseField([w.TO])
-    param['exporter'].binary = True
     return metafor
