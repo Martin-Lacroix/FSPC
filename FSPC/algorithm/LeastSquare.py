@@ -26,7 +26,7 @@ class ILS(Algorithm):
             self.VT = list()
             self.WT = list()
 
-        while True:
+        while self.iteration < self.maxIter:
 
             # Transfer and fluid solver call
 
@@ -54,14 +54,13 @@ class ILS(Algorithm):
 
             if com.rank == 1: verif = self.isVerified()
             verif = com.scatter([verif,verif],root=1)
-            self.iteration += 1
 
             # End of the coupling iteration
 
-            if verif: break
-            if self.iteration > self.maxIter: return False
-
-        return True
+            self.iteration += 1
+            if verif: return True
+            
+        return False
 
 # %% Relaxation of Solid Interface Displacement
 

@@ -8,6 +8,8 @@ class MVJ(Algorithm):
         Algorithm.__init__(self,solver)
 
         self.makeBGS = True
+        self.hasJM = False
+        self.hasJT = False
 
 # %% Coupling at Each Time Step
 
@@ -28,7 +30,7 @@ class MVJ(Algorithm):
             self.VT = list()
             self.WT = list()
 
-        while True:
+        while self.iteration < self.maxIter:
 
             # Transfer and fluid solver call
             
@@ -60,22 +62,14 @@ class MVJ(Algorithm):
 
             # End of the coupling iteration
 
-            self.makeBGS = False
             if verif == True:
-
-                if (com.rank == 1) and self.convergM:
-                    try: self.JprevM = np.copy(self.JM)
-                    except: pass
-
-                if (com.rank == 1) and self.convergT:
-                    try: self.JprevT = np.copy(self.JT)
-                    except: pass
-
+                 
+                if self.hasJM: self.JprevM = np.copy(self.JM)
+                if self.hasJT: self.JprevT = np.copy(self.JT)
                 return True
 
-            if self.iteration > self.maxIter:
-                self.makeBGS = True
-                return False
+        self.makeBGS = True
+        return False
 
 # %% Relaxation of Solid Interface Displacement
 
@@ -86,7 +80,8 @@ class MVJ(Algorithm):
             # Performs either BGS or IQN iteration
 
             if self.makeBGS:
-
+                
+                self.makeBGS = False
                 size = self.solver.nbrNode*self.dim
                 self.JprevM = np.zeros((size,size))
                 self.interp.pos += self.omega*self.resPos
@@ -111,6 +106,7 @@ class MVJ(Algorithm):
                 self.JM = self.JprevM+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
                 correction = np.split(np.dot(self.JM,-R)+R,self.dim)
                 self.interp.pos += np.transpose(correction)
+                self.hasJM = True
 
             # Updates the residuals and displacement
 
@@ -127,6 +123,7 @@ class MVJ(Algorithm):
 
             if self.makeBGS:
                 
+                self.makeBGS = False
                 size = self.solver.nbrNode
                 self.JprevT = np.zeros((size,size))
                 self.interp.temp += self.omega*self.resTemp
@@ -151,6 +148,7 @@ class MVJ(Algorithm):
                 self.JT = self.JprevT+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
                 correction = np.split(np.dot(self.JT,-R)+R,1)
                 self.interp.temp += np.transpose(correction)
+                self.hasJT = True
 
             # Updates the residuals and displacement
 

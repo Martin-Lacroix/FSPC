@@ -16,7 +16,7 @@ class BGS(Algorithm):
         timeFrame = self.step.timeFrame()
         self.resetConverg()
 
-        while True:
+        while self.iteration < self.maxIter:
 
             # Transfer and fluid solver call
 
@@ -47,11 +47,10 @@ class BGS(Algorithm):
 
             # End of the coupling iteration
 
-            if verif: break
             self.iteration += 1
-            if self.iteration > self.maxIter: return False
+            if verif: return True
         
-        return True
+        return False
 
 # %% Relaxation of Solid Interface Displacement
 
@@ -112,3 +111,4 @@ class BGS(Algorithm):
         self.omegaT = max(self.omegaT,0)
         self.prevResTemp = np.copy(self.resTemp)
         return self.omegaT
+    
