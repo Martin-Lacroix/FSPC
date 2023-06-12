@@ -1,4 +1,4 @@
-from ..Toolbox import compute_time
+from .. import Toolbox as tb
 from mpi4py import MPI
 
 # %% Parent Interpolator Class
@@ -25,7 +25,7 @@ class Interpolator(object):
 
     # Interpolate recvData and return the result
 
-    @compute_time
+    @tb.compute_time
     def interpData(self,recvData):
         return self.H.dot(recvData)
 

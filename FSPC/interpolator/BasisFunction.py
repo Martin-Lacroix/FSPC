@@ -1,5 +1,5 @@
 from .Interpolator import Interpolator
-from ..Toolbox import compute_time
+from .. import Toolbox as tb
 import numpy as np
 
 # %% Mesh Interpolation with Radial Basis Functions
@@ -18,7 +18,7 @@ class RBF(Interpolator):
 
 # %% Mapping Matrix from RecvPos to Position
 
-    @compute_time
+    @tb.compute_time
     def computeMapping(self,pos):
 
         size = self.recvNode+self.solver.dim+1

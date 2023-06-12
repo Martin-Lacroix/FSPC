@@ -1,4 +1,4 @@
-from ..Toolbox import write_logs,compute_time
+from .. import Toolbox as tb
 import pfem3Dw as w
 import numpy as np
 import gmsh
@@ -55,8 +55,8 @@ class Pfem3D(object):
 
 # %% Run for implicit integration scheme
 
-    @write_logs
-    @compute_time
+    @tb.write_logs
+    @tb.compute_time
     def runImplicit(self,t1,t2):
 
         print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
@@ -81,8 +81,8 @@ class Pfem3D(object):
 
 # %% Run for explicit integration scheme
 
-    @write_logs
-    @compute_time
+    @tb.write_logs
+    @tb.compute_time
     def runExplicit(self,t1,t2):
 
         print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
@@ -149,7 +149,7 @@ class Pfem3D(object):
         
     # Mechanical boundary conditions
 
-    @compute_time
+    @tb.compute_time
     def getLoading(self):
 
         vector = w.VectorVectorDouble()
@@ -158,7 +158,7 @@ class Pfem3D(object):
 
     # Thermal boundary conditions
 
-    @compute_time
+    @tb.compute_time
     def getHeatFlux(self):
 
         vector = w.VectorVectorDouble()
@@ -167,7 +167,7 @@ class Pfem3D(object):
 
 # %% Other Functions
 
-    @compute_time
+    @tb.compute_time
     def update(self):
 
         self.mesh.remesh(False)
@@ -178,16 +178,16 @@ class Pfem3D(object):
 
     # Save the results or finalize
 
-    @write_logs
-    @compute_time
+    @tb.write_logs
+    @tb.compute_time
     def save(self): self.problem.dump()
 
-    @write_logs
+    @tb.write_logs
     def exit(self): self.problem.displayTimeStats()
 
 # %% FSI Facets Relative to Each Node
 
-    @compute_time
+    @tb.compute_time
     def getFacets(self):
 
         if not gmsh.isInitialized(): gmsh.initialize()

@@ -1,4 +1,4 @@
-from ..Toolbox import compute_time
+from .. import Toolbox as tb
 from mpi4py import MPI
 import numpy as np
 import sys
@@ -16,7 +16,7 @@ class Algorithm(object):
 
 # %% Runs the Fluid-Solid Coupling
 
-    @compute_time
+    @tb.compute_time
     def simulate(self):
 
         com = MPI.COMM_WORLD
@@ -92,7 +92,7 @@ class Algorithm(object):
         if self.convergM: self.interp.pos = self.solver.getPosition()
         if self.convergT: self.interp.temp = self.solver.getTemperature()
 
-    @compute_time
+    @tb.compute_time
     def relaxation(self):
 
         if self.convergM: self.relaxationM()

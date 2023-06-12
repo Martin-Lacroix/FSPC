@@ -1,7 +1,6 @@
-from ..ShapeFunction import Line,Triangle,Quadrangle
 from .Interpolator import Interpolator
-from scipy.sparse import dok_matrix
-from ..Toolbox import compute_time
+from .. import ShapeFunction as sf
+from .. import Toolbox as tb
 from mpi4py import MPI
 import numpy as np
 
@@ -13,7 +12,9 @@ class ETM(Interpolator):
 
         self.K = int(K)
         self.nbrNode = self.solver.nbrNode
-        self.H = dok_matrix((self.nbrNode,self.recvNode),dtype=float)
+
+        from scipy.sparse import dok_matrix
+        self.H = dok_matrix((self.nbrNode,self.recvNode))
         com = MPI.COMM_WORLD
 
         # Share the facet vectors between solvers
@@ -38,14 +39,14 @@ class ETM(Interpolator):
 
 # %% Mapping Matrix from RecvPos to Position
 
-    @compute_time
+    @tb.compute_time
     def computeMapping(self,recvFacet,pos):
 
         facetList = self.getCloseFacets(pos,recvFacet)
 
-        if recvFacet.shape[1] == 2: fun = Line()
-        if recvFacet.shape[1] == 3: fun = Triangle()
-        if recvFacet.shape[1] == 4: fun = Quadrangle()
+        if recvFacet.shape[1] == 2: fun = sf.Line()
+        if recvFacet.shape[1] == 3: fun = sf.Triangle()
+        if recvFacet.shape[1] == 4: fun = sf.Quadrangle()
 
         for i,node in enumerate(pos):
 
@@ -68,7 +69,8 @@ class ETM(Interpolator):
 
     def getCloseFacets(self,pos,recvFacet):
         
-        result = np.zeros((self.nbrNode,self.K),dtype=int)
+        result = np.zeros((self.solver.nbrNode,self.K),int)
+
         for i,node in enumerate(pos):
             
             facetPosition = np.mean(self.recvPos[recvFacet],axis=1)

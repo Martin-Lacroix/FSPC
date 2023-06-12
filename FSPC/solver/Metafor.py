@@ -1,5 +1,5 @@
-from ..Toolbox import write_logs,compute_time
 import importlib.util as util
+from .. import Toolbox as tb
 import numpy as np
 import wrap as w
 import sys
@@ -70,8 +70,8 @@ class Metafor(object):
 
 # %% Calculates One Time Step
     
-    @write_logs
-    @compute_time
+    @tb.write_logs
+    @tb.compute_time
     def run(self,t1,t2):
 
         if(self.neverRun):
@@ -170,7 +170,7 @@ class Metafor(object):
 
 # %% Other Functions
 
-    @compute_time
+    @tb.compute_time
     def update(self):
         
         if self.interacM: self.prevLoad = np.copy(self.nextLoad)
@@ -178,14 +178,14 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.reload = False
 
-    @write_logs
-    @compute_time
+    @tb.write_logs
+    @tb.compute_time
     def save(self): self.exporter.execute()
     def exit(self): return
 
 # %% FSI Facets Relative to Each Node
 
-    @compute_time
+    @tb.compute_time
     def getFacets(self):
 
         nbrList = np.zeros(self.nbrNode,dtype=int)

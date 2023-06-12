@@ -1,6 +1,5 @@
 from .Interpolator import Interpolator
-from scipy.sparse import dok_matrix
-from ..Toolbox import compute_time
+from .. import Toolbox as tb
 import numpy as np
 
 # %% Mesh Interpolation with K-Nearest Neighbours
@@ -11,7 +10,9 @@ class KNN(Interpolator):
 
         self.K = int(K)
         self.nbrNode = self.solver.nbrNode
-        self.H = dok_matrix((self.nbrNode,self.recvNode),dtype=float)
+
+        from scipy.sparse import dok_matrix
+        self.H = dok_matrix((self.nbrNode,self.recvNode))
 
         # Compute the FS mesh interpolation matrix
 
@@ -21,7 +22,7 @@ class KNN(Interpolator):
 
 # %% Mapping Matrix from RecvPos to Position
 
-    @compute_time
+    @tb.compute_time
     def computeMapping(self,pos):
 
         if self.K == 1: self.search(pos)
