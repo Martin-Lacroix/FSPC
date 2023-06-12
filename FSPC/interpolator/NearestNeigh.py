@@ -1,4 +1,5 @@
 from .Interpolator import Interpolator
+from scipy.sparse import dok_matrix
 from .. import Toolbox as tb
 import numpy as np
 
@@ -10,8 +11,6 @@ class KNN(Interpolator):
 
         self.K = int(K)
         self.nbrNode = self.solver.nbrNode
-
-        from scipy.sparse import dok_matrix
         self.H = dok_matrix((self.nbrNode,self.recvNode))
 
         # Compute the FS mesh interpolation matrix

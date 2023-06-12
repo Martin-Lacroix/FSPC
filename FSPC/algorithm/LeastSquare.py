@@ -1,3 +1,4 @@
+from mpi4py.MPI import COMM_WORLD as CW
 from .Algorithm import Algorithm
 import numpy as np
 
@@ -9,19 +10,19 @@ class ILS(Algorithm):
 
 # %% Coupling at Each Time Step
 
-    def couplingAlgo(self,com):
+    def couplingAlgo(self):
 
         verif = False
         self.iteration = 0
         timeFrame = self.step.timeFrame()
         self.resetConverg()
 
-        if (com.rank == 1) and self.convergM:
+        if (CW.rank == 1) and self.convergM:
 
             self.VM = list()
             self.WM = list()
 
-        if (com.rank == 1) and self.convergT:
+        if (CW.rank == 1) and self.convergT:
 
             self.VT = list()
             self.WT = list()
@@ -30,21 +31,21 @@ class ILS(Algorithm):
 
             # Transfer and fluid solver call
 
-            self.transferDirSF(com)
-            if com.rank == 0: verif = self.solver.run(*timeFrame)
-            verif = com.scatter([verif,verif],root=0)
+            self.transferDirichletSF()
+            if CW.rank == 0: verif = self.solver.run(*timeFrame)
+            verif = CW.scatter([verif,verif],root=0)
             if not verif: return False
 
             # Transfer and solid solver call
 
-            self.transferNeuFS(com)
-            if com.rank == 1: verif = self.solver.run(*timeFrame)
-            verif = com.scatter([verif,verif],root=1)
+            self.transferNeumannFS()
+            if CW.rank == 1: verif = self.solver.run(*timeFrame)
+            verif = CW.scatter([verif,verif],root=1)
             if not verif: return False
 
             # Compute the coupling residual
 
-            if com.rank == 1:
+            if CW.rank == 1:
                 
                 self.computeResidual()
                 self.updateConverg()
@@ -52,8 +53,8 @@ class ILS(Algorithm):
             
             # Check the coupling converence
 
-            if com.rank == 1: verif = self.isVerified()
-            verif = com.scatter([verif,verif],root=1)
+            if CW.rank == 1: verif = self.isVerified()
+            verif = CW.scatter([verif,verif],root=1)
 
             # End of the coupling iteration
 

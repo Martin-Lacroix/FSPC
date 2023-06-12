@@ -1,7 +1,8 @@
+from mpi4py.MPI import COMM_WORLD as CW
 from .Interpolator import Interpolator
+from scipy.sparse import dok_matrix
 from .. import ShapeFunction as sf
 from .. import Toolbox as tb
-from mpi4py import MPI
 import numpy as np
 
 # %% Mesh Interpolation with Element Transfer Method
@@ -12,25 +13,22 @@ class ETM(Interpolator):
 
         self.K = int(K)
         self.nbrNode = self.solver.nbrNode
-
-        from scipy.sparse import dok_matrix
         self.H = dok_matrix((self.nbrNode,self.recvNode))
-        com = MPI.COMM_WORLD
 
         # Share the facet vectors between solvers
 
         facet = self.solver.getFacets()
         position = self.solver.getPosition()
 
-        if com.rank == 0:
+        if CW.rank == 0:
             
-            com.send(facet,1,tag=7)
-            recvFacet = com.recv(source=1,tag=8)
+            CW.send(facet,1,tag=7)
+            recvFacet = CW.recv(source=1,tag=8)
 
-        if com.rank == 1:
+        if CW.rank == 1:
 
-            recvFacet = com.recv(source=0,tag=7)
-            com.send(facet,0,tag=8)
+            recvFacet = CW.recv(source=0,tag=7)
+            CW.send(facet,0,tag=8)
 
         # Compute the FS mesh interpolation matrix
 

@@ -26,8 +26,7 @@ The first step is to import the package and create the `Process` class. The latt
 import FSPC                                 # Import the FSPC library
 process = FSPC.Process()                    # Initialize the MPI process
 solver = process.getSolver(pathF,pathS)     # Return the solver wrapper
-communicator = process.com                  # MPI world communication class
-rank = process.com.rank                     # Rank of the current process
+rank = process.rank                         # Rank of the current process
 ```
 
 | Input             | Type              | Description                                   |
@@ -123,7 +122,7 @@ FSPC.printClock()           # Print the final time stats
 
 <br />
 
-The input file for the fluid solver is the standard Lua for [PFEM3D](https://github.com/ImperatorS79/PFEM3D). Because the time step and total simulation time are controlled by FSPC, the related variables in `Problem.Solver` are not used. It is also recommended setting the parameter `adaptDT` to `true` and disabling the automatic remeshing because FSPC is already performing a remeshing at the end of each coupling time step.
+The input file for the fluid solver is the standard Lua for [PFEM3D](https://github.CW/ImperatorS79/PFEM3D). Because the time step and total simulation time are controlled by FSPC, the related variables in `Problem.Solver` are not used. It is also recommended setting the parameter `adaptDT` to `true` and disabling the automatic remeshing because FSPC is already performing a remeshing at the end of each coupling time step.
 
 <br />
 

@@ -1,6 +1,6 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
-from mpi4py import MPI
+from mpi4py.MPI import COMM_WORLD as CW
 import collections
 import numpy as np
 import math, time
@@ -16,7 +16,7 @@ clock = collections.defaultdict(float)
 def write_logs(func):
     def wrapper(*args,**kwargs):
 
-        rank = str(MPI.COMM_WORLD.rank)
+        rank = str(CW.rank)
         with open('solver_'+rank+'.dat','a') as output:
             with stderr(output), stdout(output):
                 result = func(*args,**kwargs)
@@ -97,7 +97,7 @@ class TimeStep(object):
 class Process(object):
     def __init__(self):
 
-        self.com = MPI.COMM_WORLD
+        self.rank = CW.rank
         self.redirect = fwkw.StdOutErr2Py()
 
     # Import and initialize the solvers
@@ -105,12 +105,12 @@ class Process(object):
     @write_logs
     def getSolver(self,pathF,pathS):
 
-        if self.com.rank == 0:
+        if self.rank == 0:
 
             from .solver.Pfem3D import Pfem3D
             return Pfem3D(pathF)
 
-        if self.com.rank == 1:
+        if self.rank == 1:
 
             from .solver.Metafor import Metafor
             return Metafor(pathS)
@@ -120,10 +120,8 @@ class Process(object):
 def printClock():
 
     global clock
-    rank = MPI.COMM_WORLD.rank
-
     print('\n------------------------------------')
-    print('Process {:.0f} : Time Stats'.format(rank))
+    print('Process {:.0f} : Time Stats'.format(CW.rank))
     print('------------------------------------\n')
     
     for fun,time in clock.items():

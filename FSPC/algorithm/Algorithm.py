@@ -1,5 +1,5 @@
+from mpi4py.MPI import COMM_WORLD as CW
 from .. import Toolbox as tb
-from mpi4py import MPI
 import numpy as np
 import sys
 
@@ -19,25 +19,23 @@ class Algorithm(object):
     @tb.compute_time
     def simulate(self):
 
-        com = MPI.COMM_WORLD
-        if com.rank == 1: self.initInterp()
+        if CW.rank == 1: self.initInterp()
         self.solver.save()
 
         # Main loop of the FSI partitioned coupling
         
         while self.step.time < self.endTime:
 
-            if com.rank == 1: self.printStep()
-            if com.rank == 1: self.predictorStep()
-            if self.step.dt < 1e-9: raise Exception('Small time step')
-            self.verified = self.couplingAlgo(com)
+            if CW.rank == 1: self.printStep()
+            if CW.rank == 1: self.predictorStep()
+            self.verified = self.couplingAlgo()
 
             # Restart the time step the coupling fails
 
             if not self.verified:
 
-                if com.rank == 1: self.cancelStep()
-                self.step.update(self.verified)
+                if CW.rank == 1: self.cancelStep()
+                self.step.update(False)
                 continue
 
             # Update the solvers for the next time step
@@ -48,7 +46,7 @@ class Algorithm(object):
 
         # Ends the FSI simulation
 
-        com.Barrier()
+        CW.Barrier()
         self.solver.exit()
 
 # %% Predictor for the Next Solution
@@ -62,6 +60,7 @@ class Algorithm(object):
 
         if self.convergM: self.predictorM(self.step.dt)
         if self.convergT: self.predictorT(self.step.dt)
+        if self.step.dt < 1e-9: raise Exception('Small time step')
 
     # Mechanical solution predictor
 
@@ -113,17 +112,17 @@ class Algorithm(object):
 
     # Transfer Dirichlet data Solid to Fluid
 
-    def transferDirSF(self,com):
+    def transferDirichletSF(self):
 
-        if self.convergM: self.interp.applyDispSF(self.step.dt,com)
-        if self.convergT: self.interp.applyTempSF(com)
+        if self.convergM: self.interp.applyDispSF(self.step.dt)
+        if self.convergT: self.interp.applyTempSF()
 
     # Transfer Neumann data Fluid to Solid
 
-    def transferNeuFS(self,com):
+    def transferNeumannFS(self):
 
-        if self.convergM: self.interp.applyLoadFS(com)
-        if self.convergT: self.interp.applyHeatFS(com)
+        if self.convergM: self.interp.applyLoadFS()
+        if self.convergT: self.interp.applyHeatFS()
 
 # %% Verification of Convergence
 

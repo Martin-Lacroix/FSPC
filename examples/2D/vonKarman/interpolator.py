@@ -1,6 +1,6 @@
+from mpi4py.MPI import COMM_WORLD as CW
 from scipy import interpolate
 import os.path as path
-from mpi4py import MPI
 import numpy as np
 import collections
 import pickle
@@ -14,7 +14,6 @@ class TEST(FSPC.ETM):
         FSPC.ETM.__init__(self,solver,K)
         
         RBF = lambda r: np.square(r)*np.ma.log(r)
-        com = MPI.COMM_WORLD
 
         self.interp = dict()
         self.interp['ETM'] = FSPC.ETM(solver,9)
@@ -24,16 +23,16 @@ class TEST(FSPC.ETM):
         self.error = dict()
         for key in self.interp.keys(): self.error[key] = list()
         solver.exit = self.printResult
-        self.makeCurvIndex(com)
+        self.makeCurvIndex()
 
-    def applyLoadFS(self,com):
+    def applyLoadFS(self):
         
         nbr = 1000
         error = dict()
         curvPos = np.linspace(0,max(self.curvPos),nbr)
-        curvLoad,recvPos,recvLoad = self.getCurvLoad(com)
+        curvLoad,recvPos,recvLoad = self.getCurvLoad()
 
-        if com.rank == 0:
+        if CW.rank == 0:
 
             fun = interpolate.interp1d(self.curvPos,curvLoad['Fluid'],kind='linear')
             den = np.trapz(np.square(fun(curvPos)),curvPos)
@@ -45,16 +44,16 @@ class TEST(FSPC.ETM):
                 error = np.trapz(np.square(fun(curvPos)-reference),curvPos)
                 self.error[key].append(error/den)
 
-        return FSPC.ETM.applyLoadFS(self,com)
+        return FSPC.ETM.applyLoadFS(self)
 
 # %% Get Curvilinear Indices
 
-    def makeCurvIndex(self,com):
+    def makeCurvIndex(self):
 
-        if com.rank == 0:
+        if CW.rank == 0:
             mesh = path.dirname(__file__)+'/geometryF.msh'
 
-        if com.rank == 1:
+        if CW.rank == 1:
             mesh = path.dirname(__file__)+'/geometryS.msh'
 
         # Open the original mesh file
@@ -106,19 +105,19 @@ class TEST(FSPC.ETM):
 
 # %% Last Fluid-Solid Interpolation
 
-    def getCurvLoad(self,com):
+    def getCurvLoad(self):
 
         recvPos = None
         curvLoad = dict()
 
-        if com.rank == 0:
+        if CW.rank == 0:
 
             curvLoad['Fluid'] = self.solver.getLoading()
-            com.send(curvLoad['Fluid'],1,tag=11)
+            CW.send(curvLoad['Fluid'],1,tag=11)
 
-        if com.rank == 1:
+        if CW.rank == 1:
             
-            recvLoad = com.recv(source=0,tag=11) 
+            recvLoad = CW.recv(source=0,tag=11) 
             for key in self.interp.keys(): 
                 curvLoad[key] = self.interp[key].interpData(recvLoad)
 
@@ -129,18 +128,18 @@ class TEST(FSPC.ETM):
 
         # Send the solid data to the fluid
 
-        if com.rank == 0:
+        if CW.rank == 0:
 
             recvLoad = dict()
-            recvPos = com.recv(source=1,tag=12)
+            recvPos = CW.recv(source=1,tag=12)
             for key in self.interp.keys():
-                recvLoad[key] = com.recv(source=1,tag=13)
+                recvLoad[key] = CW.recv(source=1,tag=13)
 
-        if com.rank == 1:
+        if CW.rank == 1:
 
-            com.send(self.curvPos,0,tag=12)
+            CW.send(self.curvPos,0,tag=12)
             for key in self.interp.keys():
-                com.send(curvLoad[key],0,tag=13)
+                CW.send(curvLoad[key],0,tag=13)
         
         return curvLoad,recvPos,recvLoad
 
@@ -149,10 +148,9 @@ class TEST(FSPC.ETM):
     def printResult(self):
 
         out = dict()
-        com = MPI.COMM_WORLD
-        curvLoad,recvPos,recvLoad = self.getCurvLoad(com)
+        curvLoad,recvPos,recvLoad = self.getCurvLoad()
 
-        if com.rank == 0:
+        if CW.rank == 0:
 
             for key,val in self.error.items():
                 self.error[key] = np.mean(val)
