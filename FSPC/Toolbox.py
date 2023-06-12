@@ -65,8 +65,8 @@ class TimeStep(object):
     def __init__(self,dt,dtSave):
 
         self.time = 0
-        self.factor = int(2)
-        self.maximum = self.dt = dt
+        self.division = int(2)
+        self.maxDt = self.dt = dt
         self.next = self.dtSave = dtSave
 
     def timeFrame(self):
@@ -85,12 +85,12 @@ class TimeStep(object):
 
     def update(self,verified):
 
-        if not verified: self.dt /= self.factor
+        if not verified: self.dt /= self.division
         else:
 
             self.time += self.dt
-            self.dt = math.pow(self.factor,1/7)*self.dt
-            self.dt = min(self.dt,self.maximum)
+            self.dt = math.pow(self.division,1/7)*self.dt
+            self.dt = min(self.dt,self.maxDt)
 
 # %% MPI Process and Solvers
 
