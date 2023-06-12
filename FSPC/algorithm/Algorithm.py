@@ -28,7 +28,7 @@ class Algorithm(object):
         while self.step.time < self.endTime:
 
             if com.rank == 1: self.printStep()
-            if com.rank == 1: self.predictor()
+            if com.rank == 1: self.predictorStep()
             if self.step.dt < 1e-9: raise Exception('Small time step')
             self.verified = self.couplingAlgo(com)
 
@@ -58,7 +58,7 @@ class Algorithm(object):
         if self.convergM: self.interp.pos = np.copy(self.prevMech)
         if self.convergT: self.interp.temp = np.copy(self.prevTher)
 
-    def predictor(self):
+    def predictorStep(self):
 
         if self.convergM: self.predictorM(self.step.dt)
         if self.convergT: self.predictorT(self.step.dt)
