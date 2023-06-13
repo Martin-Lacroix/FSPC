@@ -10,7 +10,7 @@ class MVJ(Algorithm):
         
         self.solver.dim = self.solver.dim
         self.makeBGS = True
-        self.hasJM = False
+        self.hasJP = False
         self.hasJT = False
 
 # %% Coupling at Each Time Step
@@ -24,8 +24,8 @@ class MVJ(Algorithm):
 
         if (CW.rank == 1) and self.convergM:
 
-            self.VM = list()
-            self.WM = list()
+            self.VP = list()
+            self.WP = list()
 
         if (CW.rank == 1) and self.convergT:
 
@@ -66,7 +66,7 @@ class MVJ(Algorithm):
 
             if verif == True:
                  
-                if self.hasJM: self.JprevM = np.copy(self.JM)
+                if self.hasJP: self.JprevP = np.copy(self.JP)
                 if self.hasJT: self.JprevT = np.copy(self.JT)
                 return True
 
@@ -77,82 +77,88 @@ class MVJ(Algorithm):
 
     def relaxationM(self):
 
-            pos = self.solver.getPosition()
+        pos = self.solver.getPosition()
 
-            # Performs either BGS or IQN iteration
+        # Performs either BGS or IQN iteration
 
-            if self.makeBGS:
-                
-                self.interp.pos += self.omega*self.resPos
-                size = self.solver.nbrNode*self.solver.dim
-                self.JprevM = np.zeros((size,size))
-                self.makeBGS = False
+        if self.makeBGS:
 
-            elif self.iteration == 0:
+            self.interp.pos += self.omega*self.resP
+            size = self.solver.nbrNode*self.solver.dim
+            self.JprevP = np.zeros((size,size))
+            self.makeBGS = False
 
-                R = np.concatenate(self.resPos.T)
-                delta = np.split(np.dot(self.JprevM,-R)+R,self.solver.dim)
-                self.interp.pos += np.transpose(delta)
+        elif self.iteration == 0:
 
-            else:
+            R = np.hstack(-self.resP.T)
+            delta = np.split(np.dot(self.JprevP,R)-R,self.solver.dim)
+            self.interp.pos += np.transpose(delta)
 
-                self.VM.insert(0,np.concatenate((self.resPos-self.prevResM).T))
-                self.WM.insert(0,np.concatenate((pos-self.prevPos).T))
-                R = np.concatenate(self.resPos.T)
-                V = np.transpose(self.VM)
-                W = np.transpose(self.WM)
+        else:
 
-                # Computes the inverse Jacobian and new displacement
+            self.VP.insert(0,np.hstack(self.resP.T-self.prevResP.T))
+            self.WP.insert(0,np.hstack(pos.T-self.prevPos.T))
 
-                X = np.transpose(W-np.dot(self.JprevM,V))
-                self.JM = self.JprevM+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
-                delta = np.split(np.dot(self.JM,-R)+R,self.solver.dim)
-                self.interp.pos += np.transpose(delta)
-                self.hasJM = True
+            # V and W are stored as transpose and list
 
-            # Updates the residuals and displacement
+            R = np.hstack(-self.resP.T)
+            V = np.transpose(self.VP)
+            W = np.transpose(self.WP)
 
-            self.prevPos = np.copy(pos)
-            self.prevResM = np.copy(self.resPos)
+            # Computes the inverse Jacobian and new displacement
+
+            X = np.transpose(W-np.dot(self.JprevP,V))
+            self.JP = self.JprevP+np.linalg.lstsq(V.T,X,-1)[0].T
+            delta = np.split(np.dot(self.JP,R)-R,self.solver.dim)
+            self.interp.pos += np.transpose(delta)
+            self.hasJP = True
+
+        # Updates the residuals and displacement
+
+        self.prevPos = np.copy(pos)
+        self.prevResP = np.copy(self.resP)
 
 # %% Relaxation of Solid Interface Displacement
 
     def relaxationT(self):
 
-            temp = self.solver.getTemperature()
+        temp = self.solver.getTemperature()
 
-            # Performs either BGS or IQN iteration
+        # Performs either BGS or IQN iteration
 
-            if self.makeBGS:
-                
-                self.makeBGS = False
-                size = self.solver.nbrNode
-                self.JprevT = np.zeros((size,size))
-                self.interp.temp += self.omega*self.resTemp
+        if self.makeBGS:
 
-            elif self.iteration == 0:
+            self.makeBGS = False
+            size = self.solver.nbrNode
+            self.JprevT = np.zeros((size,size))
+            self.interp.temp += self.omega*self.resT
 
-                R = np.concatenate(self.resTemp.T)
-                delta = np.split(np.dot(self.JprevT,-R)+R,1)
-                self.interp.temp += np.transpose(delta)
+        elif self.iteration == 0:
 
-            else:
+            R = np.hstack(-self.resT.T)
+            delta = np.split(np.dot(self.JprevT,R)-R,1)
+            self.interp.temp += np.transpose(delta)
 
-                self.VT.insert(0,np.concatenate((self.resTemp-self.prevResT).T))
-                self.WT.insert(0,np.concatenate((temp-self.prevTemp).T))
-                R = np.concatenate(self.resTemp.T)
-                V = np.transpose(self.VT)
-                W = np.transpose(self.WT)
+        else:
 
-                # Computes the inverse Jacobian and new displacement
+            self.VT.insert(0,np.hstack((self.resT-self.prevResT).T))
+            self.WT.insert(0,np.hstack((temp-self.prevTemp).T))
 
-                X = np.transpose(W-np.dot(self.JprevT,V))
-                self.JT = self.JprevT+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
-                delta = np.split(np.dot(self.JT,-R)+R,1)
-                self.interp.temp += np.transpose(delta)
-                self.hasJT = True
+            # V and W are stored as transpose and list
 
-            # Updates the residuals and displacement
+            R = np.hstack(-self.resT.T)
+            V = np.transpose(self.VT)
+            W = np.transpose(self.WT)
 
-            self.prevTemp = np.copy(temp)
-            self.prevResT = np.copy(self.resTemp)
+            # Computes the inverse Jacobian and new displacement
+
+            X = np.transpose(W-np.dot(self.JprevT,V))
+            self.JT = self.JprevT+np.linalg.lstsq(V.T,X,-1)[0].T
+            delta = np.split(np.dot(self.JT,R)-R,1)
+            self.interp.temp += np.transpose(delta)
+            self.hasJT = True
+
+        # Updates the residuals and displacement
+
+        self.prevTemp = np.copy(temp)
+        self.prevResT = np.copy(self.resT)

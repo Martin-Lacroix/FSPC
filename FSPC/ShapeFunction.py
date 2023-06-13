@@ -30,7 +30,7 @@ class Line(ShapeFunction):
 
         A = [node[1]/2-node[0]/2]
         B = np.array(pos-(node[0]+node[1])/2)
-        param = np.linalg.lstsq(np.transpose(A),B,rcond=-1)[0]
+        param = np.linalg.lstsq(np.transpose(A),B,-1)[0]
         dist = np.linalg.norm(self.getPosition(node,param)-pos)
 
         # Check if the projection is in the element
@@ -54,7 +54,7 @@ class Triangle(ShapeFunction):
 
         B = np.array(pos-node[0])
         A = [node[1]-node[0],node[2]-node[0]]
-        param = np.linalg.lstsq(np.transpose(A),B,rcond=-1)[0]
+        param = np.linalg.lstsq(np.transpose(A),B,-1)[0]
         dist = np.linalg.norm(self.getPosition(node,param)-pos)
 
         # Check if the projection is in the element
@@ -86,7 +86,7 @@ class Quadrangle(ShapeFunction):
             F = 4*(self.getPosition(node,param)-pos)
             J[0] = node[0]*(y-1)+node[1]*(1-y)+node[2]*(1+y)-node[3]*(1+y)
             J[1] = node[0]*(x-1)-node[1]*(1+x)+node[2]*(1+x)+node[3]*(1-x)
-            res = np.linalg.lstsq(np.transpose(J),F,rcond=-1)[0]
+            res = np.linalg.lstsq(np.transpose(J),F,-1)[0]
 
             param = param-res
             if all(abs(res)<1e-12): break

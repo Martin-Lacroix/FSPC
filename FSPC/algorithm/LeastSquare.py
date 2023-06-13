@@ -19,8 +19,8 @@ class ILS(Algorithm):
 
         if (CW.rank == 1) and self.convergM:
 
-            self.VM = list()
-            self.WM = list()
+            self.VP = list()
+            self.WP = list()
 
         if (CW.rank == 1) and self.convergT:
 
@@ -72,26 +72,25 @@ class ILS(Algorithm):
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            self.interp.pos += self.omega*self.resPos
+            self.interp.pos += self.omega*self.resP
 
         else:
 
-            self.VM.insert(0,np.concatenate((self.resPos-self.prevResM).T))
-            self.WM.insert(0,np.concatenate((pos-self.prevPos).T))
+            self.VP.insert(0,np.hstack((self.resP-self.prevResP).T))
+            self.WP.insert(0,np.hstack((pos-self.prevPos).T))
 
             # V and W are stored as transpose and list
 
-            R = np.concatenate(self.resPos.T)
-            C = np.linalg.lstsq(np.transpose(self.VM),-R,rcond=-1)[0]
-
-            correction = np.dot(np.transpose(self.WM),C)+R
-            correction = np.split(correction,self.solver.dim)
-            self.interp.pos += np.transpose(correction)
+            R = np.hstack(-self.resP.T)
+            C = np.linalg.lstsq(np.transpose(self.VP),R,-1)[0]
+            delta = np.dot(np.transpose(self.WP),C)-R
+            delta = np.split(delta,self.solver.dim)
+            self.interp.pos += np.transpose(delta)
 
         # Updates the residuals and displacement
 
         self.prevPos = np.copy(pos)
-        self.prevResM = np.copy(self.resPos)
+        self.prevResP = np.copy(self.resP)
 
 # %% Relaxation of Solid Interface Temperature
 
@@ -102,21 +101,21 @@ class ILS(Algorithm):
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            self.interp.temp += self.omega*self.resTemp
+            self.interp.temp += self.omega*self.resT
 
         else:
 
-            self.VT.insert(0,np.concatenate((self.resTemp-self.prevResT).T))
-            self.WT.insert(0,np.concatenate((temp-self.prevTemp).T))
+            self.VT.insert(0,np.hstack((self.resT-self.prevResT).T))
+            self.WT.insert(0,np.hstack((temp-self.prevTemp).T))
 
             # V and W are stored as transpose and list
 
-            R = np.concatenate(self.resTemp.T)
-            C = np.linalg.lstsq(np.transpose(self.VT),-R,rcond=-1)[0]
-            correction = np.split(np.dot(np.transpose(self.WT),C)+R,1)
-            self.interp.temp += np.transpose(correction)
+            R = np.hstack(-self.resT.T)
+            C = np.linalg.lstsq(np.transpose(self.VT),R,-1)[0]
+            delta = np.split(np.dot(np.transpose(self.WT),C)-R,1)
+            self.interp.temp += np.transpose(delta)
 
         # Updates the residuals and displacement
 
         self.prevTemp = np.copy(temp)
-        self.prevResT = np.copy(self.resTemp)
+        self.prevResT = np.copy(self.resT)

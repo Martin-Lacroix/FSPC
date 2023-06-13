@@ -102,11 +102,11 @@ class Algorithm(object):
         
         if self.convergM:
             pos = self.solver.getPosition()
-            self.resPos = pos-self.interp.pos
+            self.resP = pos-self.interp.pos
 
         if self.convergT:
             temp = self.solver.getTemperature()
-            self.resTemp = temp-self.interp.temp
+            self.resT = temp-self.interp.temp
 
     # Transfer Dirichlet data Solid to Fluid
 
@@ -131,8 +131,8 @@ class Algorithm(object):
 
     def updateConverg(self):
 
-        if self.convergM: self.convergM.update(self.resPos)
-        if self.convergT: self.convergT.update(self.resTemp)
+        if self.convergM: self.convergM.update(self.resP)
+        if self.convergT: self.convergT.update(self.resT)
 
     def isVerified(self):
 

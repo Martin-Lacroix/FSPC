@@ -44,7 +44,7 @@ class RBF(Interpolator):
 
         # Compute the interpolation H matrix
 
-        try: self.H = np.linalg.lstsq(A.T,B.T,rcond=-1)[0].T
+        try: self.H = np.linalg.lstsq(A.T,B.T,-1)[0].T
         except: self.H = np.linalg.solve(A.T,B.T).T
         self.H = self.H[:self.nbrNode,:self.recvNode]
 

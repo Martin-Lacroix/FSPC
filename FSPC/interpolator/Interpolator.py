@@ -7,6 +7,7 @@ class Interpolator(object):
     def __init__(self,solver):
 
         self.solver = solver
+        self.H = tb.Undefined()
 
         # Share the position vectors between solvers
 
