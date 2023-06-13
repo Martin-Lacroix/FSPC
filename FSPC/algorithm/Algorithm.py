@@ -65,10 +65,10 @@ class Algorithm(object):
         if self.verified:
             
             self.prevMech = np.copy(self.interp.pos)
-            self.gradMech = self.solver.getVelocity()
+            self.rateMech = self.solver.getVelocity()
 
         else: self.interp.pos = np.copy(self.prevMech)
-        self.interp.pos += self.step.dt*self.gradMech
+        self.interp.pos += self.step.dt*self.rateMech
 
     # Thermal solution predictor
 
@@ -77,10 +77,10 @@ class Algorithm(object):
         if self.verified:
             
             self.prevTher = np.copy(self.interp.temp)
-            self.gradTher = self.solver.getTempVeloc()
+            self.rateTher = self.solver.getTempVeloc()
 
         else: self.interp.temp = np.copy(self.prevTher)
-        self.interp.temp += self.step.dt*self.gradTher
+        self.interp.temp += self.step.dt*self.rateTher
 
 # %% Initialization and Relaxation
 
