@@ -7,7 +7,8 @@ import numpy as np
 class MVJ(Algorithm):
     def __init__(self,solver):
         Algorithm.__init__(self,solver)
-
+        
+        self.solver.dim = self.solver.dim
         self.makeBGS = True
         self.hasJM = False
         self.hasJT = False
@@ -82,16 +83,16 @@ class MVJ(Algorithm):
 
             if self.makeBGS:
                 
-                self.makeBGS = False
-                size = self.solver.nbrNode*self.dim
-                self.JprevM = np.zeros((size,size))
                 self.interp.pos += self.omega*self.resPos
+                size = self.solver.nbrNode*self.solver.dim
+                self.JprevM = np.zeros((size,size))
+                self.makeBGS = False
 
             elif self.iteration == 0:
 
                 R = np.concatenate(self.resPos.T)
-                correction = np.split(np.dot(self.JprevM,-R)+R,self.dim)
-                self.interp.pos += np.transpose(correction)
+                delta = np.split(np.dot(self.JprevM,-R)+R,self.solver.dim)
+                self.interp.pos += np.transpose(delta)
 
             else:
 
@@ -105,8 +106,8 @@ class MVJ(Algorithm):
 
                 X = np.transpose(W-np.dot(self.JprevM,V))
                 self.JM = self.JprevM+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
-                correction = np.split(np.dot(self.JM,-R)+R,self.dim)
-                self.interp.pos += np.transpose(correction)
+                delta = np.split(np.dot(self.JM,-R)+R,self.solver.dim)
+                self.interp.pos += np.transpose(delta)
                 self.hasJM = True
 
             # Updates the residuals and displacement
@@ -132,8 +133,8 @@ class MVJ(Algorithm):
             elif self.iteration == 0:
 
                 R = np.concatenate(self.resTemp.T)
-                correction = np.split(np.dot(self.JprevT,-R)+R,1)
-                self.interp.temp += np.transpose(correction)
+                delta = np.split(np.dot(self.JprevT,-R)+R,1)
+                self.interp.temp += np.transpose(delta)
 
             else:
 
@@ -147,8 +148,8 @@ class MVJ(Algorithm):
 
                 X = np.transpose(W-np.dot(self.JprevT,V))
                 self.JT = self.JprevT+np.linalg.lstsq(V.T,X,rcond=-1)[0].T
-                correction = np.split(np.dot(self.JT,-R)+R,1)
-                self.interp.temp += np.transpose(correction)
+                delta = np.split(np.dot(self.JT,-R)+R,1)
+                self.interp.temp += np.transpose(delta)
                 self.hasJT = True
 
             # Updates the residuals and displacement

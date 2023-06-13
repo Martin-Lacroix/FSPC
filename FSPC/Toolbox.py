@@ -6,10 +6,17 @@ import numpy as np
 import math, time
 import fwkw
 
-# Dictionary of computation time
+# %% Clock Dictionary and Empty Class
 
 global clock
 clock = collections.defaultdict(float)
+
+class Undefined(object):
+    def __getattribute__(self,_):
+        raise Exception('The class has not been defined')
+    
+    def __bool__(self):
+        return False
 
 # %% Define Decorator Functions
 
@@ -65,6 +72,7 @@ class TimeStep(object):
     def __init__(self,dt,dtSave):
 
         self.time = 0
+        self.minDt = 1e-9
         self.division = int(2)
         self.maxDt = self.dt = dt
         self.next = self.dtSave = dtSave
@@ -85,7 +93,12 @@ class TimeStep(object):
 
     def update(self,verified):
 
-        if not verified: self.dt /= self.division
+        if not verified:
+            
+            self.dt /= self.division
+            if self.dt < self.minDt:
+                raise Exception('Reached minimal time step')
+
         else:
 
             self.time += self.dt

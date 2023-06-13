@@ -10,9 +10,12 @@ class Algorithm(object):
 
         self.solver = solver
         self.verified = True
-        self.convergM = None
-        self.convergT = None
-        self.dim = self.solver.dim
+
+        self.convergM = tb.Undefined()
+        self.convergT = tb.Undefined()
+
+    def couplingAlgo():
+        raise Exception('No coupling algorithm defined')
 
 # %% Runs the Fluid-Solid Coupling
 
@@ -27,15 +30,14 @@ class Algorithm(object):
         while self.step.time < self.endTime:
 
             if CW.rank == 1: self.printStep()
-            if CW.rank == 1: self.predictorStep()
+            if CW.rank == 1: self.computePredictor()
             self.verified = self.couplingAlgo()
 
             # Restart the time step the coupling fails
 
             if not self.verified:
 
-                if CW.rank == 1: self.cancelStep()
-                self.step.update(False)
+                self.step.update(self.verified)
                 continue
 
             # Update the solvers for the next time step
@@ -51,38 +53,34 @@ class Algorithm(object):
 
 # %% Predictor for the Next Solution
 
-    def cancelStep(self):
+    def computePredictor(self):
 
-        if self.convergM: self.interp.pos = np.copy(self.prevMech)
-        if self.convergT: self.interp.temp = np.copy(self.prevTher)
-
-    def predictorStep(self):
-
-        if self.convergM: self.predictorM(self.step.dt)
-        if self.convergT: self.predictorT(self.step.dt)
-        if self.step.dt < 1e-9: raise Exception('Small time step')
+        if self.convergM: self.predictorM()
+        if self.convergT: self.predictorT()
 
     # Mechanical solution predictor
 
-    def predictorM(self,dt):
+    def predictorM(self):
 
         if self.verified:
             
             self.prevMech = np.copy(self.interp.pos)
             self.rateMech = self.solver.getVelocity()
 
-        self.interp.pos += dt*self.rateMech
+        else: self.interp.pos = np.copy(self.prevMech)
+        self.interp.pos += self.step.dt*self.rateMech
 
     # Thermal solution predictor
 
-    def predictorT(self,dt):
+    def predictorT(self):
 
         if self.verified:
             
             self.prevTher = np.copy(self.interp.temp)
             self.rateTher = self.solver.getTempVeloc()
 
-        self.interp.temp += dt*self.rateTher
+        else: self.interp.temp = np.copy(self.prevTher)
+        self.interp.temp += self.step.dt*self.rateTher
 
 # %% Initialization and Relaxation
 

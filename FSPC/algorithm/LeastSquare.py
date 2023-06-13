@@ -83,7 +83,9 @@ class ILS(Algorithm):
 
             R = np.concatenate(self.resPos.T)
             C = np.linalg.lstsq(np.transpose(self.VM),-R,rcond=-1)[0]
-            correction = np.split(np.dot(np.transpose(self.WM),C)+R,self.dim)
+
+            correction = np.dot(np.transpose(self.WM),C)+R
+            correction = np.split(correction,self.solver.dim)
             self.interp.pos += np.transpose(correction)
 
         # Updates the residuals and displacement
