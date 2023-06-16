@@ -13,7 +13,7 @@ export PYTHONPATH=${PWD}/../Metafor/oo_meta:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../Metafor/oo_metaB/bin:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 
-# Path to the Python script 2D
+# Path to the Python script
 
 # export SCRIPT=${PWD}/examples/2D/carsherWall/main.py
 # export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
