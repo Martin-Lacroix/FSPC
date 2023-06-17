@@ -37,14 +37,14 @@ class Algorithm(object):
 
             if not self.verified:
 
-                self.step.update(self.verified)
+                self.step.updateTime(self.verified)
                 continue
 
             # Update the solvers for the next time step
 
             self.solver.update()
-            self.step.update(self.verified)
-            if self.step.mustSave(): self.solver.save()
+            self.step.updateTime(self.verified)
+            self.step.updateSave(self.solver)
 
         # Ends the FSI simulation
 

@@ -18,7 +18,7 @@ class Undefined(object):
     def __bool__(self):
         return False
 
-# %% Define Decorator Functions
+# %% Define Some Decorator Functions
 
 def write_logs(func):
     def wrapper(*args,**kwargs):
@@ -80,18 +80,17 @@ class TimeStep(object):
     def timeFrame(self):
         return self.time,self.time+self.dt
 
-    # Update and return if save is required
+    # Update save time and export results if needed
 
-    def mustSave(self):
+    def updateSave(self,solver):
 
-        output = (self.time >= self.next)
+        if self.time >= self.next: solver.save()
         next = math.floor(self.time/self.dtSave)
         self.next = (next+1)*self.dtSave
-        return output
-        
+
     # Update the coupling time step
 
-    def update(self,verified):
+    def updateTime(self,verified):
 
         if not verified:
             
