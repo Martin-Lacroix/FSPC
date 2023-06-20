@@ -1,7 +1,6 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from .Algorithm import Algorithm
 from .. import Toolbox as tb
-from .. import Manager as mg
 import numpy as np
 
 # %% Block-Gauss Seidel with Aitken Dynamic Relaxation
@@ -23,14 +22,14 @@ class BGS(Algorithm):
             # Transfer and fluid solver call
 
             self.transferDirichletSF()
-            if CW.rank == 0: verif = mg.solver.run()
+            if CW.rank == 0: verif = tb.solver.run()
             verif = CW.scatter([verif,verif],root=0)
             if not verif: return False
 
             # Transfer and solid solver call
 
             self.transferNeumannFS()
-            if CW.rank == 1: verif = mg.solver.run()
+            if CW.rank == 1: verif = tb.solver.run()
             verif = CW.scatter([verif,verif],root=1)
             if not verif: return False
 
@@ -59,7 +58,7 @@ class BGS(Algorithm):
 
         if self.aitken: correction = self.getOmegaP()*self.resP
         else: correction = self.omega*self.resP
-        mg.interp.pos += correction
+        tb.interp.pos += correction
 
     # Compute omega with Aitken relaxation
 
@@ -91,7 +90,7 @@ class BGS(Algorithm):
 
         if self.aitken: correction = self.getOmegaT()*self.resT
         else: correction = self.omega*self.resT
-        mg.interp.temp += correction
+        tb.interp.temp += correction
 
     # Compute omega with Aitken relaxation
 

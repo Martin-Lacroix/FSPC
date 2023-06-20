@@ -1,6 +1,5 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from .. import Toolbox as tb
-from .. import Manager as mg
 import numpy as np
 
 # %% Parent Interpolator Class
@@ -15,12 +14,12 @@ class Interpolator(object):
         if CW.rank == 0:
 
             self.recvPos = CW.recv(source=1,tag=1)
-            CW.send(mg.solver.getPosition(),1,tag=2)
+            CW.send(tb.solver.getPosition(),1,tag=2)
             self.recvNode = self.recvPos.shape[0]
 
         if CW.rank == 1:
 
-            CW.send(mg.solver.getPosition(),0,tag=1)
+            CW.send(tb.solver.getPosition(),0,tag=1)
             self.recvPos = CW.recv(source=0,tag=2)
             self.recvNode = self.recvPos.shape[0]
 
@@ -33,19 +32,19 @@ class Interpolator(object):
     @tb.only_solid
     def initInterpolator(self):
 
-        if mg.convMecha: self.pos = mg.solver.getPosition()
-        if mg.convTherm: self.temp = mg.solver.getTemperature()
+        if tb.convMecha: self.pos = tb.solver.getPosition()
+        if tb.convTherm: self.temp = tb.solver.getTemperature()
 
 # %% Apply Actual Loading on Solid
 
     @tb.only_mecha
     def applyLoadFS(self):
 
-        if CW.rank == 0: CW.send(mg.solver.getLoading(),1,tag=3)
+        if CW.rank == 0: CW.send(tb.solver.getLoading(),1,tag=3)
         if CW.rank == 1:
 
             load = CW.recv(source=0,tag=3)
-            mg.solver.applyLoading(self.interpData(load))
+            tb.solver.applyLoading(self.interpData(load))
 
 # Apply predicted displacement on fluid
 
@@ -56,18 +55,18 @@ class Interpolator(object):
         if CW.rank == 0:
 
             pos = CW.recv(source=1,tag=4)
-            mg.solver.applyPosition(self.interpData(pos))
+            tb.solver.applyPosition(self.interpData(pos))
 
 # Apply actual heat flux on solid
 
     @tb.only_therm
     def applyHeatFS(self):
 
-        if CW.rank == 0: CW.send(mg.solver.getHeatFlux(),1,tag=5)
+        if CW.rank == 0: CW.send(tb.solver.getHeatFlux(),1,tag=5)
         if CW.rank == 1:
             
             heat = CW.recv(source=0,tag=5)
-            mg.solver.applyHeatFlux(self.interpData(heat))
+            tb.solver.applyHeatFlux(self.interpData(heat))
 
 # Apply predicted temperature on fluid
 
@@ -78,7 +77,7 @@ class Interpolator(object):
         if CW.rank == 0:
             
             temp = CW.recv(source=1,tag=6)
-            mg.solver.applyTemperature(self.interpData(temp))
+            tb.solver.applyTemperature(self.interpData(temp))
 
 # %% Predict the Solution for Next Time Step
 
@@ -88,10 +87,10 @@ class Interpolator(object):
         if verified:
             
             self.prevPos = np.copy(self.pos)
-            self.ratePos = mg.solver.getVelocity()
+            self.ratePos = tb.solver.getVelocity()
 
         else: self.pos = np.copy(self.prevPos)
-        self.pos += mg.step.dt*self.ratePos
+        self.pos += tb.step.dt*self.ratePos
 
     # Predictor for the temparature coupling
 
@@ -101,8 +100,8 @@ class Interpolator(object):
         if verified:
             
             self.prevTemp = np.copy(self.temp)
-            self.rateTemp = mg.solver.getTempVeloc()
+            self.rateTemp = tb.solver.getTempVeloc()
 
         else: self.temp = np.copy(self.prevTemp)
-        self.temp += mg.step.dt*self.rateTemp
+        self.temp += tb.step.dt*self.rateTemp
             

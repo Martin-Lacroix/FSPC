@@ -1,7 +1,6 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from .Algorithm import Algorithm
 from .. import Toolbox as tb
-from .. import Manager as mg
 import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Square
@@ -18,12 +17,12 @@ class ILS(Algorithm):
         self.iteration = 0
         self.resetConverg()
 
-        if (CW.rank == 1) and mg.convMecha:
+        if (CW.rank == 1) and tb.convMecha:
 
             self.VP = list()
             self.WP = list()
 
-        if (CW.rank == 1) and mg.convTherm:
+        if (CW.rank == 1) and tb.convTherm:
 
             self.VT = list()
             self.WT = list()
@@ -33,14 +32,14 @@ class ILS(Algorithm):
             # Transfer and fluid solver call
 
             self.transferDirichletSF()
-            if CW.rank == 0: verif = mg.solver.run()
+            if CW.rank == 0: verif = tb.solver.run()
             verif = CW.scatter([verif,verif],root=0)
             if not verif: return False
 
             # Transfer and solid solver call
 
             self.transferNeumannFS()
-            if CW.rank == 1: verif = mg.solver.run()
+            if CW.rank == 1: verif = tb.solver.run()
             verif = CW.scatter([verif,verif],root=1)
             if not verif: return False
 
@@ -67,12 +66,12 @@ class ILS(Algorithm):
     @tb.only_mecha
     def relaxationM(self):
 
-        pos = mg.solver.getPosition()
+        pos = tb.solver.getPosition()
 
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            mg.interp.pos += self.omega*self.resP
+            tb.interp.pos += self.omega*self.resP
 
         else:
 
@@ -84,8 +83,8 @@ class ILS(Algorithm):
             R = np.hstack(-self.resP.T)
             C = np.linalg.lstsq(np.transpose(self.VP),R,-1)[0]
             delta = np.dot(np.transpose(self.WP),C)-R
-            delta = np.split(delta,mg.solver.dim)
-            mg.interp.pos += np.transpose(delta)
+            delta = np.split(delta,tb.solver.dim)
+            tb.interp.pos += np.transpose(delta)
 
         # Updates the residuals and displacement
 
@@ -97,12 +96,12 @@ class ILS(Algorithm):
     @tb.only_therm
     def relaxationT(self):
 
-        temp = mg.solver.getTemperature()
+        temp = tb.solver.getTemperature()
 
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            mg.interp.temp += self.omega*self.resT
+            tb.interp.temp += self.omega*self.resT
 
         else:
 
@@ -114,7 +113,7 @@ class ILS(Algorithm):
             R = np.hstack(-self.resT.T)
             C = np.linalg.lstsq(np.transpose(self.VT),R,-1)[0]
             delta = np.split(np.dot(np.transpose(self.WT),C)-R,1)
-            mg.interp.temp += np.transpose(delta)
+            tb.interp.temp += np.transpose(delta)
 
         # Updates the residuals and displacement
 

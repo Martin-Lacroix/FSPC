@@ -1,11 +1,41 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
 from mpi4py.MPI import COMM_WORLD as CW
-from . import Manager as mg
+from . import Manager as ma
 import collections,time
 import fwkw
 
-# %% Define Some Global Variables
+# %% Empty Class Raising Exception
+
+class Empty(object):
+
+    def __setattr__(self,*_):
+        raise Exception('The class has not been defined')
+
+    def __getattribute__(self,_):
+        raise Exception('The class has not been defined')
+    
+    def __bool__(self):
+        return False
+
+# %% Initialize the Global Variables
+
+global step
+step = Empty()
+
+global interp
+interp = Empty()
+
+global solver
+solver = Empty()
+
+global convMecha
+convMecha = Empty()
+
+global convTherm
+convTherm = Empty()
+
+# Convert solver prints to Python
 
 global redirect
 redirect = fwkw.StdOutErr2Py()
@@ -13,7 +43,7 @@ redirect = fwkw.StdOutErr2Py()
 global clock
 clock = collections.defaultdict(float)
 
-# %% Print the Output in Log File
+# %% Define Some Decorator Functions
 
 def write_logs(func):
     def wrapper(*args,**kwargs):
@@ -39,7 +69,7 @@ def compute_time(func):
         return result
     return wrapper
 
-# %% Only Accessed by Rank 0 Fluid Solver
+# Only accessed by the fluid solver
 
 def only_fluid(func):
     def wrapper(*args,**kwargs):
@@ -50,7 +80,7 @@ def only_fluid(func):
         return result
     return wrapper
 
-# Only accessed by rank 1 solid solver
+# Only accessed by the solid solver
 
 def only_solid(func):
     def wrapper(*args,**kwargs):
@@ -61,12 +91,13 @@ def only_solid(func):
         return result
     return wrapper
 
-# %% Only Accessed when Mechanical Coupling
+# Only accessed when mechanical coupling
 
 def only_mecha(func):
     def wrapper(*args,**kwargs):
 
-        if mg.convMecha: result = func(*args,**kwargs)
+        global convMecha
+        if convMecha: result = func(*args,**kwargs)
         else: result = None
 
         return result
@@ -77,26 +108,51 @@ def only_mecha(func):
 def only_therm(func):
     def wrapper(*args,**kwargs):
 
-        if mg.convTherm: result = func(*args,**kwargs)
+        global convTherm
+        if convTherm: result = func(*args,**kwargs)
         else: result = None
 
         return result
     return wrapper
 
+# %% Initialize the Global Class
+
+def setStep(dt,dtSave):
+
+    global step
+    step = ma.TimeStep(dt,dtSave)
+
+def setInterp(interpolator,*arg):
+
+    global interp
+    interp = interpolator(*arg)
+
+def setConvMecha(tol):
+
+    global convMecha
+    convMecha = ma.Convergence(tol)
+
+def setConvTherm(tol):
+
+    global convTherm
+    convTherm = ma.Convergence(tol)
+
 # %% Import and initialize the solvers
 
 @write_logs
-def getSolver(pathF,pathS):
+def setSolver(pathF,pathS):
+
+    global solver
 
     if CW.rank == 0:
 
         from .solver.Pfem3D import Pfem3D
-        return Pfem3D(pathF)
+        solver = Pfem3D(pathF)
 
     if CW.rank == 1:
 
         from .solver.Metafor import Metafor
-        return Metafor(pathS)
+        solver = Metafor(pathS)
 
 # %% Print the Computation Times
 

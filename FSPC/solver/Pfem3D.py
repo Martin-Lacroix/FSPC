@@ -1,5 +1,4 @@
 from .. import Toolbox as tb
-from .. import Manager as mg
 import pfem3Dw as w
 import numpy as np
 import gmsh
@@ -60,8 +59,8 @@ class Pfem3D(object):
     @tb.compute_time
     def runImplicit(self):
 
-        dt = mg.step.dt
-        t2 = mg.step.nexTime()
+        dt = tb.step.dt
+        t2 = tb.step.nexTime()
         print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
 
         self.problem.loadSolution(self.prevSolution)
@@ -76,7 +75,7 @@ class Pfem3D(object):
                 
                 dt = float(dt/2)
                 count = np.multiply(2,count)
-                if dt < mg.step.dt/self.maxDivision: return False
+                if dt < tb.step.dt/self.maxDivision: return False
                 continue
 
             count = count-1
@@ -88,8 +87,8 @@ class Pfem3D(object):
     @tb.compute_time
     def runExplicit(self):
 
-        dt = mg.step.dt
-        t2 = mg.step.nexTime()
+        dt = tb.step.dt
+        t2 = tb.step.nexTime()
         print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
 
         self.problem.loadSolution(self.prevSolution)
@@ -116,8 +115,8 @@ class Pfem3D(object):
 
     def applyPosition(self,pos):
 
-        BC = (pos-self.pos)/mg.step.dt
-        if not self.implicit: BC = 2*(BC-self.vel)/mg.step.dt
+        BC = (pos-self.pos)/tb.step.dt
+        if not self.implicit: BC = 2*(BC-self.vel)/tb.step.dt
 
         for i,vector in enumerate(BC):
             for j,val in enumerate(vector): self.BC[i][j] = val

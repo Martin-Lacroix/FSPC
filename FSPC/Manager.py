@@ -1,26 +1,6 @@
 import numpy as np
 import math
 
-# %% Empty Class that Raise Exception
-
-class Empty(object):
-    def __getattribute__(self,_):
-        raise Exception('The class has not been defined')
-    
-    def __bool__(self):
-        return False
-    
-# %% Initialize FSPC Class Container
-
-step = Empty()
-solver = Empty()
-interp = Empty()
-
-# Mechanical and thermal convergence
-
-convMecha = Empty()
-convTherm = Empty()
-
 # %% Coupling Time Step Manager
 
 class TimeStep(object):

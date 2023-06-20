@@ -8,11 +8,11 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 # %% Initialize the Manager Module
 
-FSPC.Manager.step = FSPC.TimeStep(1e-2,0.01)
-FSPC.Manager.convMecha = FSPC.Convergence(1e-8)
-FSPC.Manager.convTherm = FSPC.Convergence(1e-6)
-FSPC.Manager.solver = FSPC.getSolver(pathF,pathS)
-FSPC.Manager.interp = FSPC.KNN(2)
+FSPC.setStep(1e-2,0.01)
+FSPC.setConvMecha(1e-8)
+FSPC.setConvTherm(1e-6)
+FSPC.setSolver(pathF,pathS)
+FSPC.setInterp(FSPC.KNN,2)
 
 # Configure the algorithm
 

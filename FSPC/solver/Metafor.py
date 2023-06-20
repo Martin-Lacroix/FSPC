@@ -1,6 +1,5 @@
 import importlib.util as util
 from .. import Toolbox as tb
-from .. import Manager as mg
 import numpy as np
 import wrap as w
 import sys
@@ -51,12 +50,12 @@ class Metafor(object):
 
         # Mechanical and thermal interactions
 
-        if mg.convMecha:
+        if tb.convMecha:
 
             self.interacM = param['interacM']
             self.prevLoad = np.zeros((self.nbrNode,size))
 
-        if mg.convTherm:
+        if tb.convTherm:
             
             self.interacT = param['interacT']
             self.prevHeat = np.zeros((self.nbrNode,self.dim))
@@ -77,15 +76,15 @@ class Metafor(object):
 
         if(self.neverRun):
 
-            self.tsm.setInitialTime(mg.step.time,mg.step.dt)
-            self.tsm.setNextTime(mg.step.nexTime(),0,mg.step.dt)
+            self.tsm.setInitialTime(tb.step.time,tb.step.dt)
+            self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
             ok = self.metafor.getTimeIntegration().integration()
             self.neverRun = False
 
         else:
 
             if self.reload: self.tsm.removeLastStage()
-            self.tsm.setNextTime(mg.step.nexTime(),0,mg.step.dt)
+            self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
             ok = self.metafor.getTimeIntegration().restart(self.mfac)
 
         self.reload = True
@@ -174,8 +173,8 @@ class Metafor(object):
     @tb.compute_time
     def update(self):
         
-        if mg.convMecha: self.prevLoad = np.copy(self.nextLoad)
-        if mg.convTherm: self.prevHeat = np.copy(self.nextHeat)
+        if tb.convMecha: self.prevLoad = np.copy(self.nextLoad)
+        if tb.convTherm: self.prevHeat = np.copy(self.nextHeat)
         self.metaFac.save(self.mfac)
         self.reload = False
 

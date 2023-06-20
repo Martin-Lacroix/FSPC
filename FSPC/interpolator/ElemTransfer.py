@@ -3,7 +3,6 @@ from .Interpolator import Interpolator
 from scipy.sparse import dok_matrix
 from .. import ShapeFunction as sf
 from .. import Toolbox as tb
-from .. import Manager as mg
 import numpy as np
 
 # %% Mesh Interpolation with Element Transfer Method
@@ -13,13 +12,13 @@ class ETM(Interpolator):
         Interpolator.__init__(self)
 
         self.K = int(K)
-        self.nbrNode = mg.solver.nbrNode
+        self.nbrNode = tb.solver.nbrNode
         self.H = dok_matrix((self.nbrNode,self.recvNode))
 
         # Share the facet vectors between solvers
 
-        facet = mg.solver.getFacets()
-        position = mg.solver.getPosition()
+        facet = tb.solver.getFacets()
+        position = tb.solver.getPosition()
 
         if CW.rank == 0:
             
@@ -68,7 +67,7 @@ class ETM(Interpolator):
 
     def getCloseFacets(self,pos,recvFacet):
         
-        result = np.zeros((mg.solver.nbrNode,self.K),int)
+        result = np.zeros((tb.solver.nbrNode,self.K),int)
 
         for i,node in enumerate(pos):
             
