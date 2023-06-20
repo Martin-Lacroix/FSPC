@@ -1,12 +1,14 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from .Algorithm import Algorithm
+from .. import Toolbox as tb
+from .. import Manager as mg
 import numpy as np
 
 # %% Interface Quasi-Newton with Inverse Least Square
 
 class ILS(Algorithm):
-    def __init__(self,solver):
-        Algorithm.__init__(self,solver)
+    def __init__(self):
+        Algorithm.__init__(self)
 
 # %% Coupling at Each Time Step
 
@@ -14,15 +16,14 @@ class ILS(Algorithm):
 
         verif = False
         self.iteration = 0
-        timeFrame = self.step.timeFrame()
         self.resetConverg()
 
-        if (CW.rank == 1) and self.convergM:
+        if (CW.rank == 1) and mg.convMecha:
 
             self.VP = list()
             self.WP = list()
 
-        if (CW.rank == 1) and self.convergT:
+        if (CW.rank == 1) and mg.convTherm:
 
             self.VT = list()
             self.WT = list()
@@ -32,28 +33,26 @@ class ILS(Algorithm):
             # Transfer and fluid solver call
 
             self.transferDirichletSF()
-            if CW.rank == 0: verif = self.solver.run(*timeFrame)
+            if CW.rank == 0: verif = mg.solver.run()
             verif = CW.scatter([verif,verif],root=0)
             if not verif: return False
 
             # Transfer and solid solver call
 
             self.transferNeumannFS()
-            if CW.rank == 1: verif = self.solver.run(*timeFrame)
+            if CW.rank == 1: verif = mg.solver.run()
             verif = CW.scatter([verif,verif],root=1)
             if not verif: return False
 
             # Compute the coupling residual
 
-            if CW.rank == 1:
-                
-                self.computeResidual()
-                self.updateConverg()
-                self.relaxation()
+            self.computeResidual()
+            self.updateConverg()
+            self.relaxation()
             
             # Check the coupling converence
 
-            if CW.rank == 1: verif = self.isVerified()
+            verif = self.verified()
             verif = CW.scatter([verif,verif],root=1)
 
             # End of the coupling iteration
@@ -64,15 +63,16 @@ class ILS(Algorithm):
         return False
 
 # %% Relaxation of Solid Interface Displacement
-
+    
+    @tb.only_mecha
     def relaxationM(self):
 
-        pos = self.solver.getPosition()
+        pos = mg.solver.getPosition()
 
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            self.interp.pos += self.omega*self.resP
+            mg.interp.pos += self.omega*self.resP
 
         else:
 
@@ -84,8 +84,8 @@ class ILS(Algorithm):
             R = np.hstack(-self.resP.T)
             C = np.linalg.lstsq(np.transpose(self.VP),R,-1)[0]
             delta = np.dot(np.transpose(self.WP),C)-R
-            delta = np.split(delta,self.solver.dim)
-            self.interp.pos += np.transpose(delta)
+            delta = np.split(delta,mg.solver.dim)
+            mg.interp.pos += np.transpose(delta)
 
         # Updates the residuals and displacement
 
@@ -94,14 +94,15 @@ class ILS(Algorithm):
 
 # %% Relaxation of Solid Interface Temperature
 
+    @tb.only_therm
     def relaxationT(self):
 
-        temp = self.solver.getTemperature()
+        temp = mg.solver.getTemperature()
 
         # Performs either BGS or IQN iteration
 
         if self.iteration == 0:
-            self.interp.temp += self.omega*self.resT
+            mg.interp.temp += self.omega*self.resT
 
         else:
 
@@ -113,7 +114,7 @@ class ILS(Algorithm):
             R = np.hstack(-self.resT.T)
             C = np.linalg.lstsq(np.transpose(self.VT),R,-1)[0]
             delta = np.split(np.dot(np.transpose(self.WT),C)-R,1)
-            self.interp.temp += np.transpose(delta)
+            mg.interp.temp += np.transpose(delta)
 
         # Updates the residuals and displacement
 

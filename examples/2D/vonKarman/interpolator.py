@@ -15,13 +15,13 @@ class TEST(FSPC.ETM):
         
         RBF = lambda r: np.square(r)*np.ma.log(r)
 
-        self.interp = dict()
-        self.interp['ETM'] = FSPC.ETM(solver,9)
-        self.interp['RBF'] = FSPC.RBF(solver,RBF)
-        self.interp['KNN'] = FSPC.KNN(solver,2)
+        mg.interp = dict()
+        mg.interp['ETM'] = FSPC.ETM(solver,9)
+        mg.interp['RBF'] = FSPC.RBF(solver,RBF)
+        mg.interp['KNN'] = FSPC.KNN(solver,2)
 
         self.error = dict()
-        for key in self.interp.keys(): self.error[key] = list()
+        for key in mg.interp.keys(): self.error[key] = list()
         solver.exit = self.printResult
         self.makeCurvIndex()
 
@@ -67,7 +67,7 @@ class TEST(FSPC.ETM):
 
         # Node with coordinates and elements of the interface
 
-        initPos = self.solver.getPosition()
+        initPos = mg.solver.getPosition()
         myDict = collections.defaultdict(list)
         entity = gmsh.model.getEntitiesForPhysicalGroup(*physical)
 
@@ -98,7 +98,7 @@ class TEST(FSPC.ETM):
         # Compute the new curvilinear coordinates
 
         position = initPos[myDict['index']]
-        self.curvPos = np.zeros(self.solver.nbrNode)
+        self.curvPos = np.zeros(mg.solver.nbrNode)
         diff = np.linalg.norm(np.diff(position,axis=0),axis=1)
         for i in range(diff.size): self.curvPos[i+1] = self.curvPos[i]+diff[i]
         self.curvIdx = myDict['index']
@@ -112,14 +112,14 @@ class TEST(FSPC.ETM):
 
         if CW.rank == 0:
 
-            curvLoad['Fluid'] = self.solver.getLoading()
+            curvLoad['Fluid'] = mg.solver.getLoading()
             CW.send(curvLoad['Fluid'],1,tag=11)
 
         if CW.rank == 1:
             
             recvLoad = CW.recv(source=0,tag=11) 
-            for key in self.interp.keys(): 
-                curvLoad[key] = self.interp[key].interpData(recvLoad)
+            for key in mg.interp.keys(): 
+                curvLoad[key] = mg.interp[key].interpData(recvLoad)
 
         # Val[i] = stress tensor [xx,yy,xy]
 
@@ -132,13 +132,13 @@ class TEST(FSPC.ETM):
 
             recvLoad = dict()
             recvPos = CW.recv(source=1,tag=12)
-            for key in self.interp.keys():
+            for key in mg.interp.keys():
                 recvLoad[key] = CW.recv(source=1,tag=13)
 
         if CW.rank == 1:
 
             CW.send(self.curvPos,0,tag=12)
-            for key in self.interp.keys():
+            for key in mg.interp.keys():
                 CW.send(curvLoad[key],0,tag=13)
         
         return curvLoad,recvPos,recvLoad

@@ -1,7 +1,11 @@
-from .Toolbox import Process
-from .Toolbox import TimeStep
+from .Toolbox import getSolver
 from .Toolbox import printClock
-from .Toolbox import Convergence
+
+# Import time step and convergence manager
+
+from . import Manager
+from .Manager import TimeStep
+from .Manager import Convergence
 
 # Import the partitioned coupling algorithms
 

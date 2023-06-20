@@ -1,18 +1,11 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from .. import Toolbox as tb
+from .. import Manager as mg
 import numpy as np
-import sys
 
 # %% Parent Algorithm Class
 
 class Algorithm(object):
-    def __init__(self,solver):
-
-        self.solver = solver
-        self.verified = True
-
-        self.convergM = tb.Undefined()
-        self.convergT = tb.Undefined()
 
     def couplingAlgo():
         raise Exception('No coupling algorithm defined')
@@ -22,147 +15,120 @@ class Algorithm(object):
     @tb.compute_time
     def simulate(self):
 
-        if CW.rank == 1: self.initInterp()
-        self.solver.save()
+        mg.solver.save()
+        verified = True
 
         # Main loop of the FSI partitioned coupling
         
-        while self.step.time < self.endTime:
+        while mg.step.time < self.endTime:
 
-            if CW.rank == 1: self.printStep()
-            if CW.rank == 1: self.computePredictor()
-            self.verified = self.couplingAlgo()
+            self.showTimeStep()
+            self.computePredictor(verified)
+            verified = self.couplingAlgo()
 
             # Restart the time step the coupling fails
 
-            if not self.verified:
+            if not verified:
 
-                self.step.updateTime(self.verified)
+                mg.step.updateTime(verified)
                 continue
 
             # Update the solvers for the next time step
 
-            self.solver.update()
-            self.step.updateTime(self.verified)
-            self.step.updateSave(self.solver)
+            mg.solver.update()
+            mg.step.updateTime(verified)
+            mg.step.updateSave(mg.solver)
 
         # Ends the FSI simulation
 
         CW.Barrier()
-        self.solver.exit()
+        mg.solver.exit()
 
-# %% Predictor for the Next Solution
+# %% Interpolator Functions and Relaxation
 
-    def computePredictor(self):
+    @tb.only_solid
+    def computePredictor(self,verif):
+        
+        mg.interp.predicTerm(verif)
+        mg.interp.predicMecha(verif)
 
-        if self.convergM: self.predictorM()
-        if self.convergT: self.predictorT()
-
-    # Mechanical solution predictor
-
-    def predictorM(self):
-
-        if self.verified:
-            
-            self.prevMech = np.copy(self.interp.pos)
-            self.rateMech = self.solver.getVelocity()
-
-        else: self.interp.pos = np.copy(self.prevMech)
-        self.interp.pos += self.step.dt*self.rateMech
-
-    # Thermal solution predictor
-
-    def predictorT(self):
-
-        if self.verified:
-            
-            self.prevTher = np.copy(self.interp.temp)
-            self.rateTher = self.solver.getTempVeloc()
-
-        else: self.interp.temp = np.copy(self.prevTher)
-        self.interp.temp += self.step.dt*self.rateTher
-
-# %% Initialization and Relaxation
-
-    def initInterp(self):
-
-        if self.convergM: self.interp.pos = self.solver.getPosition()
-        if self.convergT: self.interp.temp = self.solver.getTemperature()
-
+    @tb.only_solid
     @tb.compute_time
     def relaxation(self):
 
-        if self.convergM: self.relaxationM()
-        if self.convergT: self.relaxationT()
-        self.printResidual()
+        self.relaxationM()
+        self.relaxationT()
+        self.showResidual()
 
 # %% Transfer and Update Functions
 
+    @tb.only_solid
     def computeResidual(self):
         
-        if self.convergM:
-            pos = self.solver.getPosition()
-            self.resP = pos-self.interp.pos
+        if mg.convMecha:
+            pos = mg.solver.getPosition()
+            self.resP = pos-mg.interp.pos
 
-        if self.convergT:
-            temp = self.solver.getTemperature()
-            self.resT = temp-self.interp.temp
+        if mg.convTherm:
+            temp = mg.solver.getTemperature()
+            self.resT = temp-mg.interp.temp
 
     # Transfer Dirichlet data Solid to Fluid
 
     def transferDirichletSF(self):
 
-        if self.convergM: self.interp.applyDispSF(self.step.dt)
-        if self.convergT: self.interp.applyTempSF()
+        mg.interp.applyDispSF()
+        mg.interp.applyTempSF()
 
     # Transfer Neumann data Fluid to Solid
 
     def transferNeumannFS(self):
 
-        if self.convergM: self.interp.applyLoadFS()
-        if self.convergT: self.interp.applyHeatFS()
+        mg.interp.applyLoadFS()
+        mg.interp.applyHeatFS()
 
 # %% Verification of Convergence
 
+    @tb.only_solid
     def resetConverg(self):
 
-        if self.convergM: self.convergM.epsilon = np.inf
-        if self.convergT: self.convergT.epsilon = np.inf
+        if mg.convMecha: mg.convMecha.epsilon = np.inf
+        if mg.convTherm: mg.convTherm.epsilon = np.inf
 
+    @tb.only_solid
     def updateConverg(self):
 
-        if self.convergM: self.convergM.update(self.resP)
-        if self.convergT: self.convergT.update(self.resT)
+        if mg.convMecha: mg.convMecha.update(self.resP)
+        if mg.convTherm: mg.convTherm.update(self.resT)
 
-    def isVerified(self):
+    @tb.only_solid
+    def verified(self):
 
         verif = list()
-        if self.convergM: verif.append(self.convergM.isVerified())
-        if self.convergT: verif.append(self.convergT.isVerified())
+        if mg.convMecha: verif.append(mg.convMecha.verified())
+        if mg.convTherm: verif.append(mg.convTherm.verified())
         return all(verif)
 
 # %% Print Some Informations
 
-    def printResidual(self):
+    def showResidual(self):
 
-        if self.convergM:
-
-            iter = '[{:.0f}]'.format(self.iteration)
-            epsilon = 'Residual Mech : {:.3e}'.format(self.convergM.epsilon)
-            print(iter,epsilon)
-            sys.stdout.flush()
-
-        if self.convergT:
+        if mg.convMecha:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            epsilon = 'Residual Ther : {:.3e}'.format(self.convergT.epsilon)
+            epsilon = 'Residual Mech : {:.3e}'.format(mg.convMecha.epsilon)
             print(iter,epsilon)
-            sys.stdout.flush()
 
-    def printStep(self):
+        if mg.convTherm:
+
+            iter = '[{:.0f}]'.format(self.iteration)
+            epsilon = 'Residual Ther : {:.3e}'.format(mg.convTherm.epsilon)
+            print(iter,epsilon)
+
+    @tb.only_solid
+    def showTimeStep(self):
 
         L = '\n------------------------------------------'
-        timeStep = 'Time Step : {:.3e}'.format(self.step.dt)
-        time = '\nTime : {:.3e}'.format(self.step.time).ljust(20)
+        timeStep = 'Time Step : {:.3e}'.format(mg.step.dt)
+        time = '\nTime : {:.3e}'.format(mg.step.time).ljust(20)
         print(L,time,timeStep,L)
-        sys.stdout.flush()

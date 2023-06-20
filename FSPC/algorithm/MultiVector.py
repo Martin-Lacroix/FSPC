@@ -1,14 +1,15 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from .Algorithm import Algorithm
+from .. import Toolbox as tb
+from .. import Manager as mg
 import numpy as np
 
 # %% Interface Quasi-Newton with Multi-Vector Jacobian
 
 class MVJ(Algorithm):
-    def __init__(self,solver):
-        Algorithm.__init__(self,solver)
+    def __init__(self):
+        Algorithm.__init__(self)
         
-        self.solver.dim = self.solver.dim
         self.makeBGS = True
         self.hasJP = False
         self.hasJT = False
@@ -19,15 +20,14 @@ class MVJ(Algorithm):
 
         verif = False
         self.iteration = 0
-        timeFrame = self.step.timeFrame()
         self.resetConverg()
 
-        if (CW.rank == 1) and self.convergM:
+        if (CW.rank == 1) and mg.convMecha:
 
             self.VP = list()
             self.WP = list()
 
-        if (CW.rank == 1) and self.convergT:
+        if (CW.rank == 1) and mg.convTherm:
 
             self.VT = list()
             self.WT = list()
@@ -37,28 +37,26 @@ class MVJ(Algorithm):
             # Transfer and fluid solver call
             
             self.transferDirichletSF()
-            if CW.rank == 0: verif = self.solver.run(*timeFrame)
+            if CW.rank == 0: verif = mg.solver.run()
             verif = CW.scatter([verif,verif],root=0)
             if not verif: return False
 
             # Transfer and solid solver call
 
             self.transferNeumannFS()
-            if CW.rank == 1: verif = self.solver.run(*timeFrame)
+            if CW.rank == 1: verif = mg.solver.run()
             verif = CW.scatter([verif,verif],root=1)
             if not verif: return False
 
             # Compute the coupling residual
 
-            if CW.rank == 1:
-                
-                self.computeResidual()
-                self.updateConverg()
-                self.relaxation()
+            self.computeResidual()
+            self.updateConverg()
+            self.relaxation()
             
             # Check the coupling converence
 
-            if CW.rank == 1: verif = self.isVerified()
+            verif = self.verified()
             verif = CW.scatter([verif,verif],root=1)
             self.iteration += 1
 
@@ -75,24 +73,25 @@ class MVJ(Algorithm):
 
 # %% Relaxation of Solid Interface Displacement
 
+    @tb.only_mecha
     def relaxationM(self):
 
-        pos = self.solver.getPosition()
+        pos = mg.solver.getPosition()
 
         # Performs either BGS or IQN iteration
 
         if self.makeBGS:
 
-            self.interp.pos += self.omega*self.resP
-            size = self.solver.nbrNode*self.solver.dim
+            mg.interp.pos += self.omega*self.resP
+            size = mg.solver.nbrNode*mg.solver.dim
             self.JprevP = np.zeros((size,size))
             self.makeBGS = False
 
         elif self.iteration == 0:
 
             R = np.hstack(-self.resP.T)
-            delta = np.split(np.dot(self.JprevP,R)-R,self.solver.dim)
-            self.interp.pos += np.transpose(delta)
+            delta = np.split(np.dot(self.JprevP,R)-R,mg.solver.dim)
+            mg.interp.pos += np.transpose(delta)
 
         else:
 
@@ -109,8 +108,8 @@ class MVJ(Algorithm):
 
             X = np.transpose(W-np.dot(self.JprevP,V))
             self.JP = self.JprevP+np.linalg.lstsq(V.T,X,-1)[0].T
-            delta = np.split(np.dot(self.JP,R)-R,self.solver.dim)
-            self.interp.pos += np.transpose(delta)
+            delta = np.split(np.dot(self.JP,R)-R,mg.solver.dim)
+            mg.interp.pos += np.transpose(delta)
             self.hasJP = True
 
         # Updates the residuals and displacement
@@ -120,24 +119,25 @@ class MVJ(Algorithm):
 
 # %% Relaxation of Solid Interface Displacement
 
+    @tb.only_therm
     def relaxationT(self):
 
-        temp = self.solver.getTemperature()
+        temp = mg.solver.getTemperature()
 
         # Performs either BGS or IQN iteration
 
         if self.makeBGS:
 
             self.makeBGS = False
-            size = self.solver.nbrNode
+            size = mg.solver.nbrNode
             self.JprevT = np.zeros((size,size))
-            self.interp.temp += self.omega*self.resT
+            mg.interp.temp += self.omega*self.resT
 
         elif self.iteration == 0:
 
             R = np.hstack(-self.resT.T)
             delta = np.split(np.dot(self.JprevT,R)-R,1)
-            self.interp.temp += np.transpose(delta)
+            mg.interp.temp += np.transpose(delta)
 
         else:
 
@@ -155,7 +155,7 @@ class MVJ(Algorithm):
             X = np.transpose(W-np.dot(self.JprevT,V))
             self.JT = self.JprevT+np.linalg.lstsq(V.T,X,-1)[0].T
             delta = np.split(np.dot(self.JT,R)-R,1)
-            self.interp.temp += np.transpose(delta)
+            mg.interp.temp += np.transpose(delta)
             self.hasJT = True
 
         # Updates the residuals and displacement

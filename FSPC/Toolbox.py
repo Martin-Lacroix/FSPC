@@ -1,24 +1,19 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
 from mpi4py.MPI import COMM_WORLD as CW
-import collections
-import numpy as np
-import math, time
+from . import Manager as mg
+import collections,time
 import fwkw
 
-# %% Clock Dictionary and Empty Class
+# %% Define Some Global Variables
+
+global redirect
+redirect = fwkw.StdOutErr2Py()
 
 global clock
 clock = collections.defaultdict(float)
 
-class Undefined(object):
-    def __getattribute__(self,_):
-        raise Exception('The class has not been defined')
-    
-    def __bool__(self):
-        return False
-
-# %% Define Some Decorator Functions
+# %% Print the Output in Log File
 
 def write_logs(func):
     def wrapper(*args,**kwargs):
@@ -44,88 +39,64 @@ def compute_time(func):
         return result
     return wrapper
 
-# %% Interface Data Norm Criterion
+# %% Only Accessed by Rank 0 Fluid Solver
 
-class Convergence(object):
-    def __init__(self,tol):
+def only_fluid(func):
+    def wrapper(*args,**kwargs):
 
-        self.tol = tol
-        self.epsilon = np.inf
+        if CW.rank == 0: result = func(*args,**kwargs)
+        else: result = None
 
-    # Updates the displacment norm
-    
-    def update(self,res):
+        return result
+    return wrapper
 
-        norm = np.linalg.norm(res,axis=0)
-        self.epsilon = np.linalg.norm(norm)
+# Only accessed by rank 1 solid solver
+
+def only_solid(func):
+    def wrapper(*args,**kwargs):
+
+        if CW.rank == 1: result = func(*args,**kwargs)
+        else: result = None
         
-    # Checks the convergence
+        return result
+    return wrapper
 
-    def isVerified(self):
+# %% Only Accessed when Mechanical Coupling
 
-        if self.epsilon < self.tol: return True
-        else: return False
+def only_mecha(func):
+    def wrapper(*args,**kwargs):
 
-# %% Coupling Time Step Manager
+        if mg.convMecha: result = func(*args,**kwargs)
+        else: result = None
 
-class TimeStep(object):
-    def __init__(self,dt,dtSave):
+        return result
+    return wrapper
 
-        self.time = 0
-        self.minDt = 1e-9
-        self.division = int(2)
-        self.maxDt = self.dt = dt
-        self.next = self.dtSave = dtSave
+# Only accessed when thermal coupling
 
-    def timeFrame(self):
-        return self.time,self.time+self.dt
+def only_therm(func):
+    def wrapper(*args,**kwargs):
 
-    # Update save time and export results if needed
+        if mg.convTherm: result = func(*args,**kwargs)
+        else: result = None
 
-    def updateSave(self,solver):
+        return result
+    return wrapper
 
-        if self.time >= self.next: solver.save()
-        next = math.floor(self.time/self.dtSave)
-        self.next = (next+1)*self.dtSave
+# %% Import and initialize the solvers
 
-    # Update the coupling time step
+@write_logs
+def getSolver(pathF,pathS):
 
-    def updateTime(self,verified):
+    if CW.rank == 0:
 
-        if not verified:
-            
-            self.dt /= self.division
-            if self.dt < self.minDt:
-                raise Exception('Reached minimal time step')
+        from .solver.Pfem3D import Pfem3D
+        return Pfem3D(pathF)
 
-        else:
+    if CW.rank == 1:
 
-            self.time += self.dt
-            self.dt = math.pow(self.division,1/7)*self.dt
-            self.dt = min(self.dt,self.maxDt)
-
-# %% MPI Process and Solvers
-
-class Process(object):
-    def __init__(self):
-
-        self.rank = CW.rank
-        self.redirect = fwkw.StdOutErr2Py()
-
-    # Import and initialize the solvers
-
-    @write_logs
-    def getSolver(self,pathF,pathS):
-
-        if self.rank == 0:
-
-            from .solver.Pfem3D import Pfem3D
-            return Pfem3D(pathF)
-
-        if self.rank == 1:
-
-            from .solver.Metafor import Metafor
-            return Metafor(pathS)
+        from .solver.Metafor import Metafor
+        return Metafor(pathS)
 
 # %% Print the Computation Times
 

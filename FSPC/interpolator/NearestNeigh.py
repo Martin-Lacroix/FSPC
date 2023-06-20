@@ -1,21 +1,22 @@
 from .Interpolator import Interpolator
 from scipy.sparse import dok_matrix
 from .. import Toolbox as tb
+from .. import Manager as mg
 import numpy as np
 
 # %% Mesh Interpolation with K-Nearest Neighbours
 
 class KNN(Interpolator):
-    def __init__(self,solver,K):
-        Interpolator.__init__(self,solver)
+    def __init__(self,K):
+        Interpolator.__init__(self)
 
         self.K = int(K)
-        self.nbrNode = self.solver.nbrNode
+        self.nbrNode = mg.solver.nbrNode
         self.H = dok_matrix((self.nbrNode,self.recvNode))
 
         # Compute the FS mesh interpolation matrix
 
-        position = self.solver.getPosition()
+        position = mg.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
 

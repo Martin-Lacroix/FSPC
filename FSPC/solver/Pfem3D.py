@@ -1,4 +1,5 @@
 from .. import Toolbox as tb
+from .. import Manager as mg
 import pfem3Dw as w
 import numpy as np
 import gmsh
@@ -57,11 +58,13 @@ class Pfem3D(object):
 
     @tb.write_logs
     @tb.compute_time
-    def runImplicit(self,t1,t2):
+    def runImplicit(self):
 
-        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
+        dt = mg.step.dt
+        t2 = mg.step.nexTime()
+        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
+
         self.problem.loadSolution(self.prevSolution)
-        dt = float(t2-t1)
         count = int(1)
 
         # Main solving loop for the fluid simulation
@@ -73,7 +76,7 @@ class Pfem3D(object):
                 
                 dt = float(dt/2)
                 count = np.multiply(2,count)
-                if dt < (t2-t1)/self.maxDivision: return False
+                if dt < mg.step.dt/self.maxDivision: return False
                 continue
 
             count = count-1
@@ -83,18 +86,21 @@ class Pfem3D(object):
 
     @tb.write_logs
     @tb.compute_time
-    def runExplicit(self,t1,t2):
+    def runExplicit(self):
 
-        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,t2-t1))
+        dt = mg.step.dt
+        t2 = mg.step.nexTime()
+        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
+
         self.problem.loadSolution(self.prevSolution)
         iteration = 0
 
         # Estimate the time step for stability
 
         self.solver.computeNextDT()
-        division = int((t2-t1)/self.solver.getTimeStep())
+        division = int(dt/self.solver.getTimeStep())
         if division > self.maxDivision: return False
-        dt = (t2-t1)/division
+        dt = dt/division
 
         # Main solving loop for the fluid simulation
 
@@ -108,10 +114,10 @@ class Pfem3D(object):
 
 # %% Dirichlet Boundary Conditions
 
-    def applyPosition(self,pos,dt):
+    def applyPosition(self,pos):
 
-        BC = (pos-self.pos)/dt
-        if not self.implicit: BC = 2*(BC-self.vel)/dt
+        BC = (pos-self.pos)/mg.step.dt
+        if not self.implicit: BC = 2*(BC-self.vel)/mg.step.dt
 
         for i,vector in enumerate(BC):
             for j,val in enumerate(vector): self.BC[i][j] = val

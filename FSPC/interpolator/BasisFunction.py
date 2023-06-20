@@ -1,19 +1,20 @@
 from .Interpolator import Interpolator
 from .. import Toolbox as tb
+from .. import Manager as mg
 import numpy as np
 
 # %% Mesh Interpolation with Radial Basis Functions
 
 class RBF(Interpolator):
-    def __init__(self,solver,fun):
-        Interpolator.__init__(self,solver)
+    def __init__(self,func):
+        Interpolator.__init__(self)
 
-        self.function = fun
-        self.nbrNode = self.solver.nbrNode
+        self.function = func
+        self.nbrNode = mg.solver.nbrNode
 
         # Compute the FS mesh interpolation matrix
 
-        position = self.solver.getPosition()
+        position = mg.solver.getPosition()
         self.computeMapping(position)
 
 # %% Mapping Matrix from RecvPos to Position
@@ -21,7 +22,7 @@ class RBF(Interpolator):
     @tb.compute_time
     def computeMapping(self,pos):
 
-        size = self.recvNode+self.solver.dim+1
+        size = self.recvNode+mg.solver.dim+1
         B = np.ones((self.nbrNode,size))
         A = np.zeros((size,size))
 
