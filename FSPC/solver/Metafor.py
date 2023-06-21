@@ -50,13 +50,11 @@ class Metafor(object):
 
         # Mechanical and thermal interactions
 
-        #if tb.convMecha:
         if 'interacM' in param:
 
             self.interacM = param['interacM']
             self.prevLoad = np.zeros((self.nbrNode,size))
 
-        #if tb.convTherm:
         if 'interacT' in param:
             
             self.interacT = param['interacT']
@@ -175,8 +173,8 @@ class Metafor(object):
     @tb.compute_time
     def update(self):
         
-        if tb.convMecha: self.prevLoad = np.copy(self.nextLoad)
-        if tb.convTherm: self.prevHeat = np.copy(self.nextHeat)
+        if tb.convMech: self.prevLoad = np.copy(self.nextLoad)
+        if tb.convTher: self.prevHeat = np.copy(self.nextHeat)
         self.metaFac.save(self.mfac)
         self.reload = False
 

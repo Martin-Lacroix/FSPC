@@ -10,7 +10,6 @@ from .Toolbox import setConvTherm
 from . import algorithm
 from . import interpolator
 
+# Remove the Base Modules
+
 del Toolbox
-
-#del ShapeFunction
-

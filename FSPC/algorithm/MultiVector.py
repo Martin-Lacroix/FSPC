@@ -9,10 +9,8 @@ class MVJ(Algorithm):
     def __init__(self):
         
         Algorithm.__init__(self)
-        self.makeBGS = True
-        self.hasJP = False
-        self.hasJT = False
         self.omega = 0.5
+        self.BGS = True
 
 # %% Coupling at Each Time Step
 
@@ -21,16 +19,6 @@ class MVJ(Algorithm):
         verif = False
         self.iteration = 0
         self.resetConverg()
-
-        if (CW.rank == 1) and tb.convMecha:
-
-            self.VP = list()
-            self.WP = list()
-
-        if (CW.rank == 1) and tb.convTherm:
-
-            self.VT = list()
-            self.WT = list()
 
         while self.iteration < self.maxIter:
 
@@ -50,115 +38,115 @@ class MVJ(Algorithm):
 
             # Compute the coupling residual
 
-            self.computeResidual()
-            self.updateConverg()
-            self.relaxation()
-            
-            # Check the coupling converence
-
-            verif = self.verified()
+            verif = self.relaxation()
             verif = CW.scatter([verif,verif],root=1)
-            self.iteration += 1
+            self.BGS = False
 
             # End of the coupling iteration
 
-            if verif == True:
-                 
-                if self.hasJP: self.JprevP = np.copy(self.JP)
-                if self.hasJT: self.JprevT = np.copy(self.JT)
-                return True
+            self.iteration += 1
+            if verif: self.updateJprev()
+            if verif: return True
 
-        self.makeBGS = True
+        self.BGS = True
         return False
+
+# %% Compute the Solution Correction
+
+    def compute(self,conv):
+    
+        V = np.flip(np.transpose(conv.V),axis=1)
+        W = np.flip(np.transpose(conv.W),axis=1)
+        R = np.hstack(-conv.residual)
+
+        # Update the inverse Jacobian
+
+        X = np.transpose(W-np.dot(conv.Jprev,V))
+        deltaJ = np.transpose(np.linalg.lstsq(V.T,X,-1)[0])
+        conv.J = conv.Jprev+deltaJ
+
+        # Return the solution correction
+
+        delta = np.dot(conv.J,R)-R
+        return np.split(delta,tb.solver.nbrNode)
+
+# %% Reset Jacobian and perform BGS iteration
+
+    def reset(self,conv,size):
+
+        conv.J = np.zeros((size,size))
+        conv.Jprev = np.zeros((size,size))
+        return self.omega*conv.residual
+
+    # Update the previous inverse Jacobian
+
+    @tb.only_solid
+    def updateJprev(self):
+
+        if tb.convMech:
+            tb.convMech.Jprev = np.copy(tb.convMech.J)
+
+        if tb.convTher:
+            tb.convTher.Jprev = np.copy(tb.convTher.J)
 
 # %% Relaxation of Solid Interface Displacement
 
     @tb.conv_mecha
-    def relaxationM(self):
+    def relaxMecha(self):
 
         pos = tb.solver.getPosition()
 
-        # Performs either BGS or IQN iteration
+        # Perform either BGS or IQN iteration
 
-        if self.makeBGS:
+        if self.iteration == 0:
 
-            tb.interp.pos += self.omega*self.resP
-            size = tb.solver.nbrNode*tb.solver.dim
-            self.JprevP = np.zeros((size,size))
-            self.makeBGS = False
+            tb.convMech.V = list()
+            tb.convMech.W = list()
+            if self.BGS: delta = self.reset(tb.convMech,pos.size)
+            else:
 
-        elif self.iteration == 0:
-
-            R = np.hstack(-self.resP.T)
-            delta = np.split(np.dot(self.JprevP,R)-R,tb.solver.dim)
-            tb.interp.pos += np.transpose(delta)
+                R = np.hstack(-tb.convMech.residual)
+                delta = np.dot(tb.convMech.Jprev,R)-R
+                delta = np.split(delta,tb.solver.nbrNode)
 
         else:
 
-            self.VP.insert(0,np.hstack(self.resP.T-self.prevResP.T))
-            self.WP.insert(0,np.hstack(pos.T-self.prevPos.T))
+            tb.convMech.V.append(np.hstack(tb.convMech.deltaRes()))
+            tb.convMech.W.append(np.hstack(pos-self.prevPos))
+            delta = self.compute(tb.convMech)
 
-            # V and W are stored as transpose and list
+        # Update the pedicted displacement
 
-            R = np.hstack(-self.resP.T)
-            V = np.transpose(self.VP)
-            W = np.transpose(self.WP)
-
-            # Computes the inverse Jacobian and new displacement
-
-            X = np.transpose(W-np.dot(self.JprevP,V))
-            self.JP = self.JprevP+np.linalg.lstsq(V.T,X,-1)[0].T
-            delta = np.split(np.dot(self.JP,R)-R,tb.solver.dim)
-            tb.interp.pos += np.transpose(delta)
-            self.hasJP = True
-
-        # Updates the residuals and displacement
-
+        tb.interp.pos += delta
         self.prevPos = np.copy(pos)
-        self.prevResP = np.copy(self.resP)
 
 # %% Relaxation of Solid Interface Temperature
 
     @tb.conv_therm
-    def relaxationT(self):
+    def relaxTherm(self):
 
         temp = tb.solver.getTemperature()
 
-        # Performs either BGS or IQN iteration
+        # Perform either BGS or IQN iteration
 
-        if self.makeBGS:
+        if self.iteration == 0:
 
-            self.makeBGS = False
-            size = tb.solver.nbrNode
-            self.JprevT = np.zeros((size,size))
-            tb.interp.temp += self.omega*self.resT
+            tb.convTher.V = list()
+            tb.convTher.W = list()
+            if self.BGS: delta = self.reset(tb.convTher,temp.size)
+            else:
 
-        elif self.iteration == 0:
-
-            R = np.hstack(-self.resT.T)
-            delta = np.split(np.dot(self.JprevT,R)-R,1)
-            tb.interp.temp += np.transpose(delta)
+                R = np.hstack(-tb.convTher.residual)
+                delta = np.dot(tb.convTher.Jprev,R)-R
+                delta = np.split(delta,tb.solver.nbrNode)
 
         else:
+            
+            tb.convTher.V.append(np.hstack(tb.convTher.deltaRes()))
+            tb.convTher.W.append(np.hstack(temp-self.prevTemp))
+            delta = self.compute(tb.convTher)
 
-            self.VT.insert(0,np.hstack((self.resT-self.prevResT).T))
-            self.WT.insert(0,np.hstack((temp-self.prevTemp).T))
+        # Update the pedicted temperature
 
-            # V and W are stored as transpose and list
-
-            R = np.hstack(-self.resT.T)
-            V = np.transpose(self.VT)
-            W = np.transpose(self.WT)
-
-            # Computes the inverse Jacobian and new temperature
-
-            X = np.transpose(W-np.dot(self.JprevT,V))
-            self.JT = self.JprevT+np.linalg.lstsq(V.T,X,-1)[0].T
-            delta = np.split(np.dot(self.JT,R)-R,1)
-            tb.interp.temp += np.transpose(delta)
-            self.hasJT = True
-
-        # Updates the residuals and temperature
-
+        tb.interp.temp += delta
         self.prevTemp = np.copy(temp)
-        self.prevResT = np.copy(self.resT)

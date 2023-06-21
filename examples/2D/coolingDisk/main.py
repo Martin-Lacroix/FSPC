@@ -17,6 +17,7 @@ FSPC.setInterp(FSPC.interpolator.KNN,2)
 # Configure the algorithm
 
 algorithm = FSPC.algorithm.ILS()
+algorithm = FSPC.algorithm.MVJ()
 algorithm.maxIter = 25
 algorithm.endTime = 8
 algorithm.omega = 0.5

@@ -26,7 +26,8 @@ FSPC.setConvMecha(1e-8)
 # Configure the algorithm
 
 algorithm = FSPC.algorithm.MVJ()
-algorithm = FSPC.algorithm.BGS()
+#algorithm = FSPC.algorithm.ILS()
+#algorithm = FSPC.algorithm.BGS()
 algorithm.maxIter = 25
 algorithm.endTime = 1
 algorithm.omega = 0.5

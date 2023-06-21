@@ -7,7 +7,7 @@ import fwkw
 
 # %% Empty Class Raising Exception
 
-class Empty(object):
+class Void(object):
 
     def __setattr__(self,*_):
         raise Exception('The class has not been defined')
@@ -21,19 +21,19 @@ class Empty(object):
 # %% Initialize the Global Variables
 
 global step
-step = Empty()
+step = Void()
 
 global interp
-interp = Empty()
+interp = Void()
 
 global solver
-solver = Empty()
+solver = Void()
 
-global convMecha
-convMecha = Empty()
+global convMech
+convMech = Void()
 
-global convTherm
-convTherm = Empty()
+global convTher
+convTher = Void()
 
 # Convert solver prints to Python
 
@@ -85,8 +85,8 @@ def only_solid(func):
 def conv_mecha(func):
     def wrapper(*args,**kwargs):
 
-        global convMecha
-        if convMecha: result = func(*args,**kwargs)
+        global convMech
+        if convMech: result = func(*args,**kwargs)
         else: result = None
 
         return result
@@ -97,8 +97,8 @@ def conv_mecha(func):
 def conv_therm(func):
     def wrapper(*args,**kwargs):
 
-        global convTherm
-        if convTherm: result = func(*args,**kwargs)
+        global convTher
+        if convTher: result = func(*args,**kwargs)
         else: result = None
 
         return result
@@ -118,13 +118,13 @@ def setInterp(interpolator,*arg):
 
 def setConvMecha(tol):
 
-    global convMecha
-    convMecha = ma.Convergence(tol)
+    global convMech
+    convMech = ma.Convergence(tol)
 
 def setConvTherm(tol):
 
-    global convTherm
-    convTherm = ma.Convergence(tol)
+    global convTher
+    convTher = ma.Convergence(tol)
 
 # %% Import and initialize the solvers
 

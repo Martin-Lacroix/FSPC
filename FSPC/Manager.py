@@ -45,18 +45,36 @@ class Convergence(object):
     def __init__(self,tol):
 
         self.tol = tol
+        self.reset()
+
+    def deltaRes(self):
+        return self.residual-self.prevRes
+
+    # Reset all the convergence indicators
+
+    def reset(self):
+
         self.epsilon = np.inf
+        self.prevRes = np.inf
+        self.residual = np.inf
 
-    # Updates the displacment norm
-    
-    def update(self,res):
-
-        norm = np.linalg.norm(res,axis=0)
-        self.epsilon = np.linalg.norm(norm)
+    # Update the current and previous residual
         
-    # Checks the convergence
+    def updateRes(self,residual):
+
+        self.prevRes = np.copy(self.residual)
+        self.residual = np.copy(residual)
+
+        if np.all(np.isfinite(residual)):
+            res = np.linalg.norm(residual,axis=0)
+            self.epsilon = np.linalg.norm(res)
+
+        else: self.epsilon = np.inf
+
+    # Check if the convergence is reached
 
     def verified(self):
 
         if self.epsilon < self.tol: return True
         else: return False
+    

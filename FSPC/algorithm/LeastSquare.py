@@ -19,16 +19,6 @@ class ILS(Algorithm):
         self.iteration = 0
         self.resetConverg()
 
-        if (CW.rank == 1) and tb.convMecha:
-
-            self.VP = list()
-            self.WP = list()
-
-        if (CW.rank == 1) and tb.convTherm:
-
-            self.VT = list()
-            self.WT = list()
-
         while self.iteration < self.maxIter:
 
             # Transfer and fluid solver call
@@ -47,13 +37,7 @@ class ILS(Algorithm):
 
             # Compute the coupling residual
 
-            self.computeResidual()
-            self.updateConverg()
-            self.relaxation()
-            
-            # Check the coupling converence
-
-            verif = self.verified()
+            verif = self.relaxation()
             verif = CW.scatter([verif,verif],root=1)
 
             # End of the coupling iteration
@@ -63,61 +47,65 @@ class ILS(Algorithm):
             
         return False
 
+# %% Compute the Solution Correction
+
+    def compute(self,conv):
+        
+        V = np.flip(np.transpose(conv.V),axis=1)
+        W = np.flip(np.transpose(conv.W),axis=1)
+        R = np.hstack(-conv.residual)
+
+        # Return the solution correction
+
+        delta = np.dot(W,np.linalg.lstsq(V,R,-1)[0])-R
+        return np.split(delta,tb.solver.nbrNode)
+
 # %% Relaxation of Solid Interface Displacement
     
     @tb.conv_mecha
-    def relaxationM(self):
+    def relaxMecha(self):
 
         pos = tb.solver.getPosition()
 
-        # Performs either BGS or IQN iteration
+        # Perform either BGS or IQN iteration
 
         if self.iteration == 0:
-            tb.interp.pos += self.omega*self.resP
+
+            tb.convMech.V = list()
+            tb.convMech.W = list()
+            delta = self.omega*tb.convMech.residual
 
         else:
+            tb.convMech.V.append(np.hstack(tb.convMech.deltaRes()))
+            tb.convMech.W.append(np.hstack(pos-self.prevPos))
+            delta = self.compute(tb.convMech)
 
-            self.VP.insert(0,np.hstack((self.resP-self.prevResP).T))
-            self.WP.insert(0,np.hstack((pos-self.prevPos).T))
+        # Update the pedicted displacement
 
-            # V and W are stored as transpose and list
-
-            R = np.hstack(-self.resP.T)
-            C = np.linalg.lstsq(np.transpose(self.VP),R,-1)[0]
-            delta = np.dot(np.transpose(self.WP),C)-R
-            delta = np.split(delta,tb.solver.dim)
-            tb.interp.pos += np.transpose(delta)
-
-        # Updates the residuals and displacement
-
+        tb.interp.pos += delta
         self.prevPos = np.copy(pos)
-        self.prevResP = np.copy(self.resP)
 
 # %% Relaxation of Solid Interface Temperature
 
     @tb.conv_therm
-    def relaxationT(self):
+    def relaxTherm(self):
 
         temp = tb.solver.getTemperature()
 
-        # Performs either BGS or IQN iteration
+        # Perform either BGS or IQN iteration
 
         if self.iteration == 0:
-            tb.interp.temp += self.omega*self.resT
+
+            tb.convTher.V = list()
+            tb.convTher.W = list()
+            delta = self.omega*tb.convTher.residual
 
         else:
+            tb.convTher.V.append(np.hstack(tb.convTher.deltaRes()))
+            tb.convTher.W.append(np.hstack(temp-self.prevTemp))
+            delta = self.compute(tb.convTher)
 
-            self.VT.insert(0,np.hstack((self.resT-self.prevResT).T))
-            self.WT.insert(0,np.hstack((temp-self.prevTemp).T))
+        # Update the predicted temperature
 
-            # V and W are stored as transpose and list
-
-            R = np.hstack(-self.resT.T)
-            C = np.linalg.lstsq(np.transpose(self.VT),R,-1)[0]
-            delta = np.split(np.dot(np.transpose(self.WT),C)-R,1)
-            tb.interp.temp += np.transpose(delta)
-
-        # Updates the residuals and temperature
-
+        tb.interp.temp += delta
         self.prevTemp = np.copy(temp)
-        self.prevResT = np.copy(self.resT)

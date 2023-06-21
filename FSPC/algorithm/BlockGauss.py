@@ -37,13 +37,7 @@ class BGS(Algorithm):
 
             # Compute the coupling residual
 
-            self.computeResidual()
-            self.updateConverg()
-            self.relaxation()
-
-            # Check the converence of the FSI
-
-            verif = self.verified()
+            verif = self.relaxation()
             verif = CW.scatter([verif,verif],root=1)
 
             # End of the coupling iteration
@@ -52,44 +46,41 @@ class BGS(Algorithm):
             if verif: return True
         
         return False
+    
+# %% Compute the Solution Correction
+
+    def compute(self,conv):
+
+        D = tb.convMech.deltaRes()
+        A = np.tensordot(D,tb.convMech.prevRes)
+
+        # Update the Aitken relaxation parameter
+
+        conv.omega = -A*conv.omega/np.tensordot(D,D)
+        conv.omega = max(min(conv.omega,1),0)
+        return conv.omega*conv.residual
 
 # %% Relaxation of Solid Interface Displacement
 
     @tb.conv_mecha
-    def relaxationM(self):
+    def relaxMecha(self):
 
-        if self.iteration == 0:
-            self.omegaP = self.omega
+        if self.iteration > 0:
+            tb.interp.pos += self.compute(tb.convMech)
 
         else:
-
-            dRes = self.resP-self.prevResP
-            alpha = np.tensordot(dRes,dRes)
-            alpha /= np.tensordot(dRes,self.prevResP)
-            self.omegaP = max(min(-self.omegaP*alpha,1),0)
-
-        # Updates the residuals and displacement
-
-        self.prevResP = np.copy(self.resP)
-        tb.interp.pos += self.omegaP*self.resP
+            tb.convMech.omega = self.omega
+            tb.interp.pos += self.omega*tb.convMech.residual
 
 # %% Relaxation of Solid Interface Temperature
 
     @tb.conv_therm
-    def relaxationT(self):
+    def relaxTherm(self):
 
-        if self.iteration == 0:
-            self.omegaT = self.omega
+        if self.iteration > 0:
+            tb.interp.temp += self.compute(tb.convTher)
 
         else:
-
-            dRes = self.resT-self.prevResT
-            alpha = np.tensordot(dRes,dRes)
-            alpha /= np.tensordot(dRes,self.prevResT)
-            self.omegaT = max(min(-self.omegaT*alpha,1),0)
-
-        # Updates the residuals and displacement
-
-        self.prevResT = np.copy(self.resT)
-        tb.interp.pos += self.omegaT*self.resT
+            tb.convTher.omega = self.omega
+            tb.interp.temp += self.omega*tb.convTher.residual
     

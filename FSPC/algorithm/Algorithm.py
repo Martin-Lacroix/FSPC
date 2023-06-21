@@ -6,8 +6,14 @@ import numpy as np
 
 class Algorithm(object):
 
-    def couplingAlgo():
+    def couplingAlgo(self):
         raise Exception('No coupling algorithm defined')
+    
+    def relaxTherm(self):
+        raise Exception('No thermal relaxation defined')
+    
+    def relaxMecha(self):
+        raise Exception('No mechanical relaxation defined')
 
 # %% Runs the Fluid-Solid Coupling
 
@@ -49,29 +55,30 @@ class Algorithm(object):
     @tb.only_solid
     def computePredictor(self,verif):
         
-        tb.interp.predicTerm(verif)
+        tb.interp.predicTherm(verif)
         tb.interp.predicMecha(verif)
 
     @tb.only_solid
     @tb.compute_time
     def relaxation(self):
 
-        self.relaxationM()
-        self.relaxationT()
+        self.computeResidual()
+        self.relaxMecha()
+        self.relaxTherm()
         self.showResidual()
+        return self.verified()
 
 # %% Transfer and Update Functions
 
-    @tb.only_solid
     def computeResidual(self):
         
-        if tb.convMecha:
+        if tb.convMech:
             pos = tb.solver.getPosition()
-            self.resP = pos-tb.interp.pos
+            tb.convMech.updateRes(pos-tb.interp.pos)
 
-        if tb.convTherm:
+        if tb.convTher:
             temp = tb.solver.getTemperature()
-            self.resT = temp-tb.interp.temp
+            tb.convTher.updateRes(temp-tb.interp.temp)
 
     # Transfer Dirichlet data Solid to Fluid
 
@@ -92,37 +99,30 @@ class Algorithm(object):
     @tb.only_solid
     def resetConverg(self):
 
-        if tb.convMecha: tb.convMecha.epsilon = np.inf
-        if tb.convTherm: tb.convTherm.epsilon = np.inf
+        if tb.convMech: tb.convMech.reset()
+        if tb.convTher: tb.convTher.reset()
 
-    @tb.only_solid
-    def updateConverg(self):
-
-        if tb.convMecha: tb.convMecha.update(self.resP)
-        if tb.convTherm: tb.convTherm.update(self.resT)
-
-    @tb.only_solid
     def verified(self):
 
         verif = list()
-        if tb.convMecha: verif.append(tb.convMecha.verified())
-        if tb.convTherm: verif.append(tb.convTherm.verified())
-        return all(verif)
+        if tb.convMech: verif.append(tb.convMech.verified())
+        if tb.convTher: verif.append(tb.convTher.verified())
+        return np.all(verif)
 
 # %% Print Some Informations
 
     def showResidual(self):
 
-        if tb.convMecha:
+        if tb.convMech:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            epsilon = 'Residual Mech : {:.3e}'.format(tb.convMecha.epsilon)
+            epsilon = 'Residual Mech : {:.3e}'.format(tb.convMech.epsilon)
             print(iter,epsilon)
 
-        if tb.convTherm:
+        if tb.convTher:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            epsilon = 'Residual Ther : {:.3e}'.format(tb.convTherm.epsilon)
+            epsilon = 'Residual Ther : {:.3e}'.format(tb.convTher.epsilon)
             print(iter,epsilon)
 
     @tb.only_solid

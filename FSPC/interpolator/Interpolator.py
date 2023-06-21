@@ -30,8 +30,8 @@ class Interpolator(object):
     @tb.only_solid
     def initialize(self):
 
-        if tb.convMecha: self.pos = tb.solver.getPosition()
-        if tb.convTherm: self.temp = tb.solver.getTemperature()
+        if tb.convMech: self.pos = tb.solver.getPosition()
+        if tb.convTher: self.temp = tb.solver.getTemperature()
 
 # %% Apply Actual Loading on Solid
 
@@ -93,7 +93,7 @@ class Interpolator(object):
     # Predictor for the temparature coupling
 
     @tb.conv_therm
-    def predicTerm(self,verified):
+    def predicTherm(self,verified):
 
         if verified:
             
