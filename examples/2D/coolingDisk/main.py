@@ -12,11 +12,11 @@ FSPC.setStep(1e-2,0.01)
 FSPC.setConvMecha(1e-8)
 FSPC.setConvTherm(1e-6)
 FSPC.setSolver(pathF,pathS)
-FSPC.setInterp(FSPC.KNN,2)
+FSPC.setInterp(FSPC.interpolator.KNN,2)
 
 # Configure the algorithm
 
-algorithm = FSPC.ILS()
+algorithm = FSPC.algorithm.ILS()
 algorithm.maxIter = 25
 algorithm.endTime = 8
 algorithm.omega = 0.5

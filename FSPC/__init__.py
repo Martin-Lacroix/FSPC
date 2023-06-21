@@ -5,16 +5,12 @@ from .Toolbox import printClock
 from .Toolbox import setConvMecha
 from .Toolbox import setConvTherm
 
-# Import the partitioned coupling algorithms
+# Import algorithm and interpolator
 
-from .algorithm.BlockGauss import BGS
-from .algorithm.LeastSquare import ILS
-from .algorithm.MultiVector import MVJ
+from . import algorithm
+from . import interpolator
 
-# Import the mesh interpolation methods
+del Toolbox
 
-from .interpolator.ElemTransfer import ETM 
-from .interpolator.NearestNeigh import KNN
-from .interpolator.BasisFunction import RBF
+#del ShapeFunction
 
-# Try adding init.py in the folder to create a sub-namespace ???

@@ -7,8 +7,6 @@ import numpy as np
 class Interpolator(object):
     def __init__(self):
 
-        self.initInterpolator()
-
         # Share the position vectors between solvers
 
         if CW.rank == 0:
@@ -30,14 +28,14 @@ class Interpolator(object):
         return self.H.dot(recvData)
     
     @tb.only_solid
-    def initInterpolator(self):
+    def initialize(self):
 
         if tb.convMecha: self.pos = tb.solver.getPosition()
         if tb.convTherm: self.temp = tb.solver.getTemperature()
 
 # %% Apply Actual Loading on Solid
 
-    @tb.only_mecha
+    @tb.conv_mecha
     def applyLoadFS(self):
 
         if CW.rank == 0: CW.send(tb.solver.getLoading(),1,tag=3)
@@ -48,7 +46,7 @@ class Interpolator(object):
 
 # Apply predicted displacement on fluid
 
-    @tb.only_mecha
+    @tb.conv_mecha
     def applyDispSF(self):
 
         if CW.rank == 1: CW.send(self.pos,0,tag=4)
@@ -59,7 +57,7 @@ class Interpolator(object):
 
 # Apply actual heat flux on solid
 
-    @tb.only_therm
+    @tb.conv_therm
     def applyHeatFS(self):
 
         if CW.rank == 0: CW.send(tb.solver.getHeatFlux(),1,tag=5)
@@ -70,7 +68,7 @@ class Interpolator(object):
 
 # Apply predicted temperature on fluid
 
-    @tb.only_therm
+    @tb.conv_therm
     def applyTempSF(self):
 
         if CW.rank == 1: CW.send(self.temp,0,tag=6)
@@ -81,27 +79,27 @@ class Interpolator(object):
 
 # %% Predict the Solution for Next Time Step
 
-    @tb.only_mecha
+    @tb.conv_mecha
     def predicMecha(self,verified):
-
+        
         if verified:
             
             self.prevPos = np.copy(self.pos)
-            self.ratePos = tb.solver.getVelocity()
+            self.velocityP = tb.solver.getVelocity()
 
         else: self.pos = np.copy(self.prevPos)
-        self.pos += tb.step.dt*self.ratePos
+        self.pos += tb.step.dt*self.velocityP
 
     # Predictor for the temparature coupling
 
-    @tb.only_therm
+    @tb.conv_therm
     def predicTerm(self,verified):
 
         if verified:
             
             self.prevTemp = np.copy(self.temp)
-            self.rateTemp = tb.solver.getTempVeloc()
+            self.velocityT = tb.solver.getTempVeloc()
 
         else: self.temp = np.copy(self.prevTemp)
-        self.temp += tb.step.dt*self.rateTemp
+        self.temp += tb.step.dt*self.velocityT
             

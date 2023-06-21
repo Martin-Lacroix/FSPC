@@ -14,8 +14,9 @@ class Algorithm(object):
     @tb.compute_time
     def simulate(self):
 
-        tb.solver.save()
         verified = True
+        tb.solver.save()
+        tb.interp.initialize()
 
         # Main loop of the FSI partitioned coupling
         

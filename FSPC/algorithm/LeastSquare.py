@@ -7,7 +7,9 @@ import numpy as np
 
 class ILS(Algorithm):
     def __init__(self):
+
         Algorithm.__init__(self)
+        self.omega = 0.5
 
 # %% Coupling at Each Time Step
 
@@ -63,7 +65,7 @@ class ILS(Algorithm):
 
 # %% Relaxation of Solid Interface Displacement
     
-    @tb.only_mecha
+    @tb.conv_mecha
     def relaxationM(self):
 
         pos = tb.solver.getPosition()
@@ -93,7 +95,7 @@ class ILS(Algorithm):
 
 # %% Relaxation of Solid Interface Temperature
 
-    @tb.only_therm
+    @tb.conv_therm
     def relaxationT(self):
 
         temp = tb.solver.getTemperature()
@@ -115,7 +117,7 @@ class ILS(Algorithm):
             delta = np.split(np.dot(np.transpose(self.WT),C)-R,1)
             tb.interp.temp += np.transpose(delta)
 
-        # Updates the residuals and displacement
+        # Updates the residuals and temperature
 
         self.prevTemp = np.copy(temp)
         self.prevResT = np.copy(self.resT)

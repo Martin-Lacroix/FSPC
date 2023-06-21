@@ -7,11 +7,12 @@ import numpy as np
 
 class MVJ(Algorithm):
     def __init__(self):
-        Algorithm.__init__(self)
         
+        Algorithm.__init__(self)
         self.makeBGS = True
         self.hasJP = False
         self.hasJT = False
+        self.omega = 0.5
 
 # %% Coupling at Each Time Step
 
@@ -72,7 +73,7 @@ class MVJ(Algorithm):
 
 # %% Relaxation of Solid Interface Displacement
 
-    @tb.only_mecha
+    @tb.conv_mecha
     def relaxationM(self):
 
         pos = tb.solver.getPosition()
@@ -116,9 +117,9 @@ class MVJ(Algorithm):
         self.prevPos = np.copy(pos)
         self.prevResP = np.copy(self.resP)
 
-# %% Relaxation of Solid Interface Displacement
+# %% Relaxation of Solid Interface Temperature
 
-    @tb.only_therm
+    @tb.conv_therm
     def relaxationT(self):
 
         temp = tb.solver.getTemperature()
@@ -149,7 +150,7 @@ class MVJ(Algorithm):
             V = np.transpose(self.VT)
             W = np.transpose(self.WT)
 
-            # Computes the inverse Jacobian and new displacement
+            # Computes the inverse Jacobian and new temperature
 
             X = np.transpose(W-np.dot(self.JprevT,V))
             self.JT = self.JprevT+np.linalg.lstsq(V.T,X,-1)[0].T
@@ -157,7 +158,7 @@ class MVJ(Algorithm):
             tb.interp.temp += np.transpose(delta)
             self.hasJT = True
 
-        # Updates the residuals and displacement
+        # Updates the residuals and temperature
 
         self.prevTemp = np.copy(temp)
         self.prevResT = np.copy(self.resT)

@@ -50,12 +50,14 @@ class Metafor(object):
 
         # Mechanical and thermal interactions
 
-        if tb.convMecha:
+        #if tb.convMecha:
+        if 'interacM' in param:
 
             self.interacM = param['interacM']
             self.prevLoad = np.zeros((self.nbrNode,size))
 
-        if tb.convTherm:
+        #if tb.convTherm:
+        if 'interacT' in param:
             
             self.interacT = param['interacT']
             self.prevHeat = np.zeros((self.nbrNode,self.dim))

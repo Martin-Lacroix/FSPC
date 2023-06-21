@@ -69,17 +69,6 @@ def compute_time(func):
         return result
     return wrapper
 
-# Only accessed by the fluid solver
-
-def only_fluid(func):
-    def wrapper(*args,**kwargs):
-
-        if CW.rank == 0: result = func(*args,**kwargs)
-        else: result = None
-
-        return result
-    return wrapper
-
 # Only accessed by the solid solver
 
 def only_solid(func):
@@ -93,7 +82,7 @@ def only_solid(func):
 
 # Only accessed when mechanical coupling
 
-def only_mecha(func):
+def conv_mecha(func):
     def wrapper(*args,**kwargs):
 
         global convMecha
@@ -105,7 +94,7 @@ def only_mecha(func):
 
 # Only accessed when thermal coupling
 
-def only_therm(func):
+def conv_therm(func):
     def wrapper(*args,**kwargs):
 
         global convTherm

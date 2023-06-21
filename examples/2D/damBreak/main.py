@@ -12,19 +12,21 @@ RBF = lambda r: np.square(r)*np.ma.log(r)
 
 
 print('\n\n',dir(FSPC),'\n\n')
-
-
+print('\n\n',dir(FSPC.interpolator),'\n\n')
+print('\n\n',dir(FSPC.algorithm),'\n\n')
 
 # %% Initialize the Manager Module
 
+FSPC.setSolver(pathF,pathS)
+FSPC.setInterp(FSPC.interpolator.RBF,RBF)
+
 FSPC.setStep(1e-3,1e-2)
 FSPC.setConvMecha(1e-8)
-FSPC.setSolver(pathF,pathS)
-FSPC.setInterp(FSPC.RBF,RBF)
 
 # Configure the algorithm
 
-algorithm = FSPC.MVJ()
+algorithm = FSPC.algorithm.MVJ()
+algorithm = FSPC.algorithm.BGS()
 algorithm.maxIter = 25
 algorithm.endTime = 1
 algorithm.omega = 0.5
