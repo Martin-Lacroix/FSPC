@@ -8,9 +8,9 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 # %% Initialize the Manager Module
 
+FSPC.setConvMech(1e-8)
+FSPC.setConvTher(1e-6)
 FSPC.setStep(1e-2,0.01)
-FSPC.setConvMecha(1e-8)
-FSPC.setConvTherm(1e-6)
 FSPC.setSolver(pathF,pathS)
 FSPC.setInterp(FSPC.interpolator.KNN,2)
 
@@ -25,4 +25,4 @@ algorithm.omega = 0.5
 # Start the FSPC simulation
 
 algorithm.simulate()
-FSPC.printClock()
+FSPC.general.printClock()

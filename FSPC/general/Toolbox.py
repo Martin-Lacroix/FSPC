@@ -110,21 +110,25 @@ def setStep(dt,dtSave):
 
     global step
     step = ma.TimeStep(dt,dtSave)
+    return step
 
 def setInterp(interpolator,*arg):
 
     global interp
     interp = interpolator(*arg)
+    return interp
 
-def setConvMecha(tol):
+def setConvMech(tol):
 
     global convMech
     convMech = ma.Convergence(tol)
+    return convMech
 
-def setConvTherm(tol):
+def setConvTher(tol):
 
     global convTher
     convTher = ma.Convergence(tol)
+    return convTher
 
 # %% Import and initialize the solvers
 
@@ -135,12 +139,12 @@ def setSolver(pathF,pathS):
 
     if CW.rank == 0:
 
-        from .solver.Pfem3D import Pfem3D
+        from ..solver.Pfem3D import Pfem3D
         solver = Pfem3D(pathF)
 
     if CW.rank == 1:
 
-        from .solver.Metafor import Metafor
+        from ..solver.Metafor import Metafor
         solver = Metafor(pathS)
 
 # %% Print the Computation Times

@@ -1,15 +1,11 @@
-from .Toolbox import setStep
-from .Toolbox import setInterp
-from .Toolbox import setSolver
-from .Toolbox import printClock
-from .Toolbox import setConvMecha
-from .Toolbox import setConvTherm
-
-# Import algorithm and interpolator
-
+from . import general
 from . import algorithm
 from . import interpolator
 
-# Remove the Base Modules
+# Import initializer functions
 
-del Toolbox
+from .general.Toolbox import setStep
+from .general.Toolbox import setInterp
+from .general.Toolbox import setSolver
+from .general.Toolbox import setConvMech
+from .general.Toolbox import setConvTher

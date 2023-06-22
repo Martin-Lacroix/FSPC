@@ -1,6 +1,6 @@
 from mpi4py.MPI import COMM_WORLD as CW
+from ..general import Toolbox as tb
 from .Algorithm import Algorithm
-from .. import Toolbox as tb
 import numpy as np
 
 # %% Interface Quasi-Newton with Multi-Vector Jacobian

@@ -1,4 +1,4 @@
-from .. import Toolbox as tb
+from ..general import Toolbox as tb
 import pfem3Dw as w
 import numpy as np
 import gmsh

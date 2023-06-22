@@ -1,5 +1,5 @@
+from ..general import Toolbox as tb
 import importlib.util as util
-from .. import Toolbox as tb
 import numpy as np
 import wrap as w
 import sys

@@ -1,8 +1,7 @@
 from mpi4py.MPI import COMM_WORLD as CW
+from ..general import ShapeFunction as sf
 from .Interpolator import Interpolator
-from scipy.sparse import dok_matrix
-from .. import ShapeFunction as sf
-from .. import Toolbox as tb
+from ..general import Toolbox as tb
 import numpy as np
 
 # %% Mesh Interpolation with Element Transfer Method
@@ -11,12 +10,9 @@ class ETM(Interpolator):
     def __init__(self,K):
         Interpolator.__init__(self)
 
-        self.K = int(K)
-        self.nbrNode = tb.solver.nbrNode
-        self.H = dok_matrix((self.nbrNode,self.recvNode))
-
         # Share the facet vectors between solvers
 
+        self.K = int(K)
         facet = tb.solver.getFacets()
         position = tb.solver.getPosition()
 

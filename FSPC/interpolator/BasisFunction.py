@@ -1,5 +1,5 @@
 from .Interpolator import Interpolator
-from .. import Toolbox as tb
+from ..general import Toolbox as tb
 import numpy as np
 
 # %% Mesh Interpolation with Radial Basis Functions
@@ -8,11 +8,9 @@ class RBF(Interpolator):
     def __init__(self,func):
         Interpolator.__init__(self)
 
-        self.function = func
-        self.nbrNode = tb.solver.nbrNode
-
         # Compute the FS mesh interpolation matrix
 
+        self.function = func
         position = tb.solver.getPosition()
         self.computeMapping(position)
 
@@ -44,7 +42,6 @@ class RBF(Interpolator):
 
         # Compute the interpolation H matrix
 
-        try: self.H = np.linalg.lstsq(A.T,B.T,-1)[0].T
-        except: self.H = np.linalg.solve(A.T,B.T).T
-        self.H = self.H[:self.nbrNode,:self.recvNode]
-
+        try: H = np.linalg.lstsq(A.T,B.T,-1)[0].T
+        except: H = np.linalg.solve(A.T,B.T).T
+        self.H = H[:self.nbrNode,:self.recvNode]

@@ -1,5 +1,5 @@
 from mpi4py.MPI import COMM_WORLD as CW
-from .. import Toolbox as tb
+from ..general import Toolbox as tb
 import numpy as np
 
 # %% Parent Algorithm Class
