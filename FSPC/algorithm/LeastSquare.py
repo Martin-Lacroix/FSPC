@@ -63,7 +63,7 @@ class ILS(Algorithm):
 # %% Relaxation of Solid Interface Displacement
     
     @tb.conv_mecha
-    def relaxMecha(self):
+    def relaxPosition(self):
 
         pos = tb.solver.getPosition()
 
@@ -88,7 +88,7 @@ class ILS(Algorithm):
 # %% Relaxation of Solid Interface Temperature
 
     @tb.conv_therm
-    def relaxTherm(self):
+    def relaxTemperature(self):
 
         temp = tb.solver.getTemperature()
 

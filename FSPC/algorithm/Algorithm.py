@@ -54,19 +54,31 @@ class Algorithm(object):
 
     @tb.only_solid
     def computePredictor(self,verif):
-        
-        tb.interp.predicTherm(verif)
-        tb.interp.predicMecha(verif)
+
+        tb.interp.predPosition(verif)
+        tb.interp.predTemperature(verif)
+
+    @tb.only_solid
+    def resetConverg(self):
+
+        if tb.convMech: tb.convMech.reset()
+        if tb.convTher: tb.convTher.reset()
 
     @tb.only_solid
     @tb.compute_time
     def relaxation(self):
 
         self.computeResidual()
-        self.relaxMecha()
-        self.relaxTherm()
+        self.relaxTemperature()
+        self.relaxPosition()
         self.showResidual()
-        return self.verified()
+
+        # Check for coupling convergence
+
+        verif = list()
+        if tb.convMech: verif.append(tb.convMech.verified())
+        if tb.convTher: verif.append(tb.convTher.verified())
+        return np.all(verif)
 
 # %% Transfer and Update Functions
 
@@ -93,21 +105,6 @@ class Algorithm(object):
 
         tb.interp.applyLoadFS()
         tb.interp.applyHeatFS()
-
-# %% Verification of Convergence
-
-    @tb.only_solid
-    def resetConverg(self):
-
-        if tb.convMech: tb.convMech.reset()
-        if tb.convTher: tb.convTher.reset()
-
-    def verified(self):
-
-        verif = list()
-        if tb.convMech: verif.append(tb.convMech.verified())
-        if tb.convTher: verif.append(tb.convTher.verified())
-        return np.all(verif)
 
 # %% Print Some Informations
 

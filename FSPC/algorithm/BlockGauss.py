@@ -63,7 +63,7 @@ class BGS(Algorithm):
 # %% Relaxation of Solid Interface Displacement
 
     @tb.conv_mecha
-    def relaxMecha(self):
+    def relaxPosition(self):
 
         if self.iteration > 0:
             tb.interp.pos += self.compute(tb.convMech)
@@ -75,7 +75,7 @@ class BGS(Algorithm):
 # %% Relaxation of Solid Interface Temperature
 
     @tb.conv_therm
-    def relaxTherm(self):
+    def relaxTemperature(self):
 
         if self.iteration > 0:
             tb.interp.temp += self.compute(tb.convTher)

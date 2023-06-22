@@ -87,7 +87,7 @@ class Interpolator(object):
 # %% Predict the Solution for Next Time Step
 
     @tb.conv_mecha
-    def predicMecha(self,verified):
+    def predPosition(self,verified):
         
         if verified:
             
@@ -100,7 +100,7 @@ class Interpolator(object):
     # Predictor for the temparature coupling
 
     @tb.conv_therm
-    def predicTherm(self,verified):
+    def predTemperature(self,verified):
 
         if verified:
             
