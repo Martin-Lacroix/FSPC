@@ -9,10 +9,10 @@ class Algorithm(object):
     def couplingAlgo(self):
         raise Exception('No coupling algorithm defined')
     
-    def relaxTherm(self):
+    def relaxTemperature(self):
         raise Exception('No thermal relaxation defined')
     
-    def relaxMecha(self):
+    def relaxPosition(self):
         raise Exception('No mechanical relaxation defined')
 
 # %% Runs the Fluid-Solid Coupling
@@ -113,14 +113,14 @@ class Algorithm(object):
         if tb.convMech:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            epsilon = 'Residual Mech : {:.3e}'.format(tb.convMech.epsilon)
-            print(iter,epsilon)
+            eps = 'Residual Mech : {:.3e}'.format(tb.convMech.epsilon)
+            print(iter,eps)
 
         if tb.convTher:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            epsilon = 'Residual Ther : {:.3e}'.format(tb.convTher.epsilon)
-            print(iter,epsilon)
+            eps = 'Residual Ther : {:.3e}'.format(tb.convTher.epsilon)
+            print(iter,eps)
 
     @tb.only_solid
     def showTimeStep(self):
