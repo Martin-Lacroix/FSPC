@@ -23,6 +23,7 @@ class Interpolator(object):
             self.recvPos = CW.recv(source=0,tag=2)
             self.recvNode = self.recvPos.shape[0]
 
+        # Initialize the interpolation matrix
 
         self.nbrNode = tb.solver.nbrNode
         self.H = dok_matrix((self.nbrNode,self.recvNode))
