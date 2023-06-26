@@ -12,36 +12,40 @@ class RBF(Interpolator):
 
         self.function = func
         position = tb.solver.getPosition()
-        self.computeMapping(position)
+        self.H = self.computeMapping(position)
 
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
     def computeMapping(self,pos):
 
-        size = self.recvNode+tb.solver.dim+1
-        B = np.ones((self.nbrNode,size))
+        size = 1+self.recvNode+tb.solver.dim
+        B = np.ones((size,self.nbrNode))
         A = np.zeros((size,size))
 
-        # Fill the matrices A,B with nodal positions
+        # Fill the B matrix using the basis function
 
-        B[:,self.recvNode+1:] = pos
-        A[:self.recvNode,self.recvNode+1:] = self.recvPos
-        A[:self.recvNode,self.recvNode] = 1
-        A += np.transpose(A)
-
-        # Fill the matrices A,B using the basis function
-
-        for i,position in enumerate(self.recvPos):
+        for i,position in enumerate(pos):
             
             rad = np.linalg.norm(position-self.recvPos,axis=1)
-            A[i,:self.recvNode] = self.function(rad)
+            B[range(self.recvNode),i] = self.function(rad)
+            B[range(self.recvNode+1,size),i] = position
 
-            rad = np.linalg.norm(pos-position,axis=1)
-            B[:,i] = self.function(rad)
+        # Fill the A matrix using the basis function
+
+        for i,recvPos in enumerate(self.recvPos):
+
+            A[self.recvNode,i] = 1
+            A[i,self.recvNode] = 1
+
+            A[range(self.recvNode+1,size),i] = recvPos
+            A[i,range(self.recvNode+1,size)] = recvPos
+
+            rad = np.linalg.norm(recvPos-self.recvPos,axis=1)
+            A[range(self.recvNode),i] = self.function(rad)
 
         # Compute the interpolation H matrix
 
-        try: H = np.linalg.lstsq(A.T,B.T,-1)[0].T
-        except: H = np.linalg.solve(A.T,B.T).T
-        self.H = H[:self.nbrNode,:self.recvNode]
+        try: H = np.transpose(np.linalg.lstsq(A,B,-1)[0])
+        except: H = np.transpose(np.linalg.solve(A,B))
+        return H[np.ix_(range(self.nbrNode),range(self.recvNode))]

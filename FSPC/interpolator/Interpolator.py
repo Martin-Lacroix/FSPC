@@ -1,8 +1,7 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
+import scipy.sparse as sp
 import numpy as np
-
-from scipy.sparse import dok_matrix
 
 # %% Parent Interpolator Class
 
@@ -26,7 +25,7 @@ class Interpolator(object):
         # Initialize the interpolation matrix
 
         self.nbrNode = tb.solver.nbrNode
-        self.H = dok_matrix((self.nbrNode,self.recvNode))
+        self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
 
 # %% Interpolate RecvData and Return the Result
 

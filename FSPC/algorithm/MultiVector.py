@@ -61,7 +61,7 @@ class MVJ(Algorithm):
 
         # Update the inverse Jacobian
 
-        X = np.transpose(W-np.dot(conv.Jprev,V))
+        X = np.transpose(W-np.dot(conv.Jprev,V)) # Maybe wen can avoid transpose !!!
         deltaJ = np.transpose(np.linalg.lstsq(V.T,X,-1)[0])
         conv.J = conv.Jprev+deltaJ
 
