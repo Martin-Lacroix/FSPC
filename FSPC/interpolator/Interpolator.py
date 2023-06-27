@@ -1,6 +1,6 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
-import scipy.sparse as sp
+from scipy import sparse as sp
 import numpy as np
 
 # %% Parent Interpolator Class
@@ -26,6 +26,22 @@ class Interpolator(object):
 
         self.nbrNode = tb.solver.nbrNode
         self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
+
+# %% Facets from the Target Interface Mesh
+
+    def getFacets(self):
+
+        if CW.rank == 0:
+            
+            CW.send(tb.solver.getFacets(),1,tag=7)
+            recvFacet = CW.recv(source=1,tag=8)
+
+        if CW.rank == 1:
+
+            recvFacet = CW.recv(source=0,tag=7)
+            CW.send(tb.solver.getFacets(),0,tag=8)
+
+        return recvFacet
 
 # %% Interpolate RecvData and Return the Result
 
@@ -89,7 +105,7 @@ class Interpolator(object):
     def predPosition(self,verified):
         
         if verified:
-            
+
             self.prevPos = np.copy(self.pos)
             self.velocityP = tb.solver.getVelocity()
 
@@ -102,7 +118,7 @@ class Interpolator(object):
     def predTemperature(self,verified):
 
         if verified:
-            
+
             self.prevTemp = np.copy(self.temp)
             self.velocityT = tb.solver.getTempVeloc()
 

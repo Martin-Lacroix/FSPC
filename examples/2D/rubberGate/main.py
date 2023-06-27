@@ -1,28 +1,26 @@
 import os.path as path
 import FSPC
 
-# %% Paths to the input files
+# %% Input Parameters for FSPC
 
 pathF = path.dirname(__file__)+'/inputF.lua'
 pathS = path.dirname(__file__)+'/inputS.py'
 
-# %% Fluid Structure Coupling
+# %% Initialize the Simulation
 
-process = FSPC.Process()
-solver = process.getSolver(pathF,pathS)
+FSPC.setConvMech(1e-8)
+FSPC.setStep(5e-4,1e-3)
+FSPC.setSolver(pathF,pathS)
+FSPC.setInterp(FSPC.interpolator.KNN,2)
 
 # Configure the algorithm
 
-algorithm = FSPC.MVJ(solver)
-algorithm.interp = FSPC.KNN(solver,2)
-algorithm.convergM = FSPC.Convergence(1e-8)
-algorithm.step = FSPC.TimeStep(5e-4,1e-3)
-
+algorithm = FSPC.algorithm.MVJ()
 algorithm.endTime = 0.4
-algorithm.omega = 0.5
 algorithm.maxIter = 25
+algorithm.omega = 0.5
 
 # Start the FSPC simulation
 
 algorithm.simulate()
-FSPC.printClock()
+FSPC.general.printClock()

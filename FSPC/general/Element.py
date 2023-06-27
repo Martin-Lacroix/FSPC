@@ -1,8 +1,8 @@
 import numpy as np
 
-# %% Isoparametric Shape Functions
+# %% Isoparametric Finite Element
 
-class ShapeFunction(object):
+class Element(object):
 
     def __init__(self): self.N = list()
     def __getitem__(self,i): return self.N[i]
@@ -12,17 +12,17 @@ class ShapeFunction(object):
     def getPosition(self,node,pos):
 
         result = float(0)
-        for i,fun in enumerate(self.N): result += fun(pos)*node[i]
+        for i,N in enumerate(self.N): result += N(pos)*node[i]
         return result
 
-# %% Line Element Shape Functions
+# %% Lnear Line Finite Element
 
-class Line(ShapeFunction):
+class Line(Element):
     def __init__(self):
+        Element.__init__(self)
 
-        N1 = lambda pos: (1-pos)/2
-        N2 = lambda pos: (1+pos)/2
-        self.N = [N1,N2]
+        self.N.append(lambda pos: (1-pos)/2)
+        self.N.append(lambda pos: (1+pos)/2)
 
     # Projection of a point in the reference space
 
@@ -38,15 +38,15 @@ class Line(ShapeFunction):
         if abs(param)>1.001: return param,np.inf
         else: return param,dist
 
-# %% Triangle Element Shape Functions
+# %% Linear Triangle Finite Element
 
-class Triangle(ShapeFunction):
+class Triangle(Element):
     def __init__(self):
+        Element.__init__(self)
 
-        N1 = lambda pos: 1-pos[0]-pos[1]
-        N2 = lambda pos: pos[0]
-        N3 = lambda pos: pos[1]
-        self.N = [N1,N2,N3]
+        self.N.append(lambda pos: 1-pos[0]-pos[1])
+        self.N.append(lambda pos: pos[0])
+        self.N.append(lambda pos: pos[1])
 
     # Projection of a point in the reference space
 
@@ -62,16 +62,16 @@ class Triangle(ShapeFunction):
         if all(-0.001<param) and (sum(param)<1.001): return param,dist
         else: return param,np.inf
 
-# %% Quadrangle Element Shape Function
+# %% Linear Quadrangle Finite Element
 
-class Quadrangle(ShapeFunction):
+class Quadrangle(Element):
     def __init__(self):
+        Element.__init__(self)
 
-        N1 = lambda pos: (1-pos[0])*(1-pos[1])/4
-        N2 = lambda pos: (1+pos[0])*(1-pos[1])/4
-        N3 = lambda pos: (1+pos[0])*(1+pos[1])/4
-        N4 = lambda pos: (1-pos[0])*(1+pos[1])/4
-        self.N = [N1,N2,N3,N4]
+        self.N.append(lambda pos: (1-pos[0])*(1-pos[1])/4)
+        self.N.append(lambda pos: (1+pos[0])*(1-pos[1])/4)
+        self.N.append(lambda pos: (1+pos[0])*(1+pos[1])/4)
+        self.N.append(lambda pos: (1-pos[0])*(1+pos[1])/4)
 
     # Projection of a point in the reference space
 

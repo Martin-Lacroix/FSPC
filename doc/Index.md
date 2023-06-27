@@ -113,7 +113,7 @@ Once the algorithm class has been initialized, the FSI simulation can be started
 
 ```python
 algorithm.simulate()        # Run the FSI simulation
-FSPC.printClock()           # Print the final time stats
+FSPC.general.printClock()           # Print the final time stats
 ```
 
 <br />

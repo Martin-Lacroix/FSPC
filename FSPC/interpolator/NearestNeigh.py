@@ -10,7 +10,7 @@ class KNN(Interpolator):
 
         # Compute the FS mesh interpolation matrix
 
-        self.K = int(K)
+        self.K = int(abs(K))
         position = tb.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
@@ -25,28 +25,27 @@ class KNN(Interpolator):
 
     # Nearest neighbour search if one neighbour
 
-    def search(self,pos):
+    def search(self,position):
 
-        for i in range(self.nbrNode):
+        for i,pos in enumerate(position):
 
-            distance = np.linalg.norm(pos[i]-self.recvPos,axis=1)
-            index = np.argmin(distance)
-            self.H[i,index] = 1
+            dist = np.linalg.norm(pos-self.recvPos,axis=1)
+            self.H[i,np.argmin(dist)] = 1
 
-    # Interpolate from the K nearest neighbours
+# %% Interpolate from the K nearest neighbours
+ 
+    def interpolate(self,position):
 
-    def interpolate(self,pos):
+        for i,pos in enumerate(position):
 
-        for i in range(self.nbrNode):
-
-            distance = np.linalg.norm(pos[i]-self.recvPos,axis=1)
-            index = np.argsort(distance)[:self.K]
+            dist = np.linalg.norm(pos-self.recvPos,axis=1)
+            index = np.argsort(dist)[range(self.K)]
             weight = np.zeros(self.K)
-            dist = distance[index]
+            dist = dist[index]
 
             for j in range(self.K):
 
-                val = [r for idx,r in enumerate(dist) if idx != j]
+                val = [R for k,R in enumerate(dist) if k != j]
                 weight[j] = np.prod(val)
 
             self.H[i,index] = weight/np.sum(weight)

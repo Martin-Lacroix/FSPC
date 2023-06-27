@@ -7,7 +7,7 @@ import pickle
 import FSPC
 import gmsh
 
-# %% Fluid Structure Coupling
+# %% Initialize the Simulation
 
 class TEST(FSPC.ETM):
     def __init__(self,solver,K):

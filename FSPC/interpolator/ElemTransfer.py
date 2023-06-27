@@ -1,7 +1,6 @@
-from mpi4py.MPI import COMM_WORLD as CW
-from ..general import ShapeFunction as sf
 from .Interpolator import Interpolator
 from ..general import Toolbox as tb
+from ..general import Element as el
 import numpy as np
 
 # %% Mesh Interpolation with Element Transfer Method
@@ -12,63 +11,61 @@ class ETM(Interpolator):
 
         # Share the facet vectors between solvers
 
-        self.K = int(K)
-        facet = tb.solver.getFacets()
+        self.K = int(abs(K))
+        recvFacet = self.getFacets()
         position = tb.solver.getPosition()
-
-        if CW.rank == 0:
-            
-            CW.send(facet,1,tag=7)
-            recvFacet = CW.recv(source=1,tag=8)
-
-        if CW.rank == 1:
-
-            recvFacet = CW.recv(source=0,tag=7)
-            CW.send(facet,0,tag=8)
 
         # Compute the FS mesh interpolation matrix
 
-        self.computeMapping(recvFacet,position)
+        self.computeMapping(position,recvFacet)
         self.H = self.H.tocsr()
 
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
-    def computeMapping(self,recvFacet,pos):
+    def computeMapping(self,pos,recvFacet):
 
+        E = self.getElement(recvFacet)
         facetList = self.getCloseFacets(pos,recvFacet)
 
-        if recvFacet.shape[1] == 2: fun = sf.Line()
-        if recvFacet.shape[1] == 3: fun = sf.Triangle()
-        if recvFacet.shape[1] == 4: fun = sf.Quadrangle()
+        # Loop on the node positions in reference mesh
 
         for i,node in enumerate(pos):
 
             parList = list()
-            dist = np.zeros(facetList[i].size)
+            dist = np.zeros(len(facetList[i]))
 
             for j,k in enumerate(facetList[i]):
 
                 facetNodePos = self.recvPos[recvFacet[k]]
-                param,dist[j] = fun.projection(facetNodePos,node)
+                param,dist[j] = E.projection(facetNodePos,node)
                 parList.append(param)
 
             # Store the closest projection in the H matrix
 
             idx = np.argmin(dist)
-            facet = recvFacet[facetList[i][idx]]
-            for j,k in enumerate(facet): self.H[i,k] = fun[j](parList[idx])
+            F = recvFacet[facetList[i][idx]]
+            for j,k in enumerate(F): self.H[i,k] = E[j](parList[idx])
 
 # %% Closest Facets to the Current Position
 
     def getCloseFacets(self,pos,recvFacet):
         
-        result = np.zeros((tb.solver.nbrNode,self.K),int)
+        result = np.zeros((self.nbrNode,self.K),int)
 
         for i,node in enumerate(pos):
             
             facetPosition = np.mean(self.recvPos[recvFacet],axis=1)
             dist = np.linalg.norm(node-facetPosition,axis=1)
-            result[i] = np.argsort(dist)[:self.K]
+            result[i] = np.argsort(dist)[range(self.K)]
 
         return result
+
+# %% Return the Correct Shape Function Class
+
+    def getElement(self,recvFacet):
+
+        if np.size(recvFacet,1) == 2: return el.Line()
+        if np.size(recvFacet,1) == 3: return el.Triangle()
+        if np.size(recvFacet,1) == 4: return el.Quadrangle()
+        raise Exception('Element type not yet supported')
