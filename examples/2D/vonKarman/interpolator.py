@@ -73,9 +73,9 @@ class TEST(FSPC.ETM):
 
         for tag in entity:
 
-            node,coord,param = gmsh.model.mesh.getNodes(1,tag,includeBoundary=True)
+            node,coord,parm = gmsh.model.mesh.getNodes(1,tag,includeBoundary=True)
             coord = np.reshape(coord,(len(node),3))[:,:2]
-            index = list(np.argsort(param))
+            index = list(np.argsort(parm))
 
             myDict['tags'] += node[index].tolist()
             myDict['coord'] += coord[index].tolist()

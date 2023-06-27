@@ -29,19 +29,17 @@ class Interpolator(object):
 
 # %% Facets from the Target Interface Mesh
 
-    def getFacets(self):
+    def getFace(self):
 
         if CW.rank == 0:
             
-            CW.send(tb.solver.getFacets(),1,tag=7)
-            recvFacet = CW.recv(source=1,tag=8)
+            CW.send(tb.solver.getFace(),1,tag=7)
+            self.recvFace = CW.recv(source=1,tag=8)
 
         if CW.rank == 1:
 
-            recvFacet = CW.recv(source=0,tag=7)
-            CW.send(tb.solver.getFacets(),0,tag=8)
-
-        return recvFacet
+            self.recvFace = CW.recv(source=0,tag=7)
+            CW.send(tb.solver.getFace(),0,tag=8)
 
 # %% Interpolate RecvData and Return the Result
 

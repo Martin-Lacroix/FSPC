@@ -4,49 +4,52 @@ import numpy as np
 
 class Element(object):
 
-    def __init__(self): self.N = list()
-    def __getitem__(self,i): return self.N[i]
-
-    # Map the reference space to the global space
-
     def getPosition(self,node,pos):
 
         result = float(0)
         for i,N in enumerate(self.N): result += N(pos)*node[i]
         return result
 
-# %% Lnear Line Finite Element
+# %% Linear Line Finite Element
 
 class Line(Element):
     def __init__(self):
-        Element.__init__(self)
-
+        
+        self.N = list()
         self.N.append(lambda pos: (1-pos)/2)
         self.N.append(lambda pos: (1+pos)/2)
+
+    # Distance between a point and the projection
+
+    def distance(self,parm,node,pos):
+
+        if abs(parm)>1.001: return np.inf
+        return np.linalg.norm(self.getPosition(node,parm)-pos)
 
     # Projection of a point in the reference space
 
     def projection(self,node,pos):
-
-        A = [node[1]/2-node[0]/2]
-        B = np.array(pos-(node[0]+node[1])/2)
-        param = np.linalg.lstsq(np.transpose(A),B,-1)[0]
-        dist = np.linalg.norm(self.getPosition(node,param)-pos)
-
-        # Check if the projection is in the element
-
-        if abs(param)>1.001: return param,np.inf
-        else: return param,dist
+    
+        A = np.diff(node,axis=0)/2
+        B = np.array(pos-np.sum(node,axis=0)/2)
+        return np.linalg.lstsq(np.transpose(A),B,-1)[0]
 
 # %% Linear Triangle Finite Element
 
 class Triangle(Element):
     def __init__(self):
-        Element.__init__(self)
 
+        self.N = list()
         self.N.append(lambda pos: 1-pos[0]-pos[1])
         self.N.append(lambda pos: pos[0])
         self.N.append(lambda pos: pos[1])
+
+    # Distance between a point and the projection
+
+    def distance(self,parm,node,pos):
+
+        if any(-0.001>parm) or sum(parm)>1.001: return np.inf
+        return np.linalg.norm(self.getPosition(node,parm)-pos)
 
     # Projection of a point in the reference space
 
@@ -54,45 +57,43 @@ class Triangle(Element):
 
         B = np.array(pos-node[0])
         A = [node[1]-node[0],node[2]-node[0]]
-        param = np.linalg.lstsq(np.transpose(A),B,-1)[0]
-        dist = np.linalg.norm(self.getPosition(node,param)-pos)
-
-        # Check if the projection is in the element
-
-        if all(-0.001<param) and (sum(param)<1.001): return param,dist
-        else: return param,np.inf
+        return np.linalg.lstsq(np.transpose(A),B,-1)[0]
 
 # %% Linear Quadrangle Finite Element
 
 class Quadrangle(Element):
     def __init__(self):
-        Element.__init__(self)
 
+        self.N = list()
         self.N.append(lambda pos: (1-pos[0])*(1-pos[1])/4)
         self.N.append(lambda pos: (1+pos[0])*(1-pos[1])/4)
         self.N.append(lambda pos: (1+pos[0])*(1+pos[1])/4)
         self.N.append(lambda pos: (1-pos[0])*(1+pos[1])/4)
 
+    # Distance between a point and the projection
+
+    def distance(self,parm,node,pos):
+
+        if any(abs(parm)>1.001): return np.inf
+        return np.linalg.norm(self.getPosition(node,parm)-pos)
+
     # Projection of a point in the reference space
 
     def projection(self,node,pos):
 
+        residual = np.inf
+        parm = np.zeros(2)
         J = np.zeros((2,3))
-        param = np.array([0,0],dtype=float)
 
-        while True:
-            
-            x,y = param
-            F = 4*(self.getPosition(node,param)-pos)
+        # Newton iterations for parametric coordinates
+
+        while np.any(abs(residual)>1e-12):
+
+            x,y = parm
+            F = 4*(self.getPosition(node,parm)-pos)
             J[0] = node[0]*(y-1)+node[1]*(1-y)+node[2]*(1+y)-node[3]*(1+y)
             J[1] = node[0]*(x-1)-node[1]*(1+x)+node[2]*(1+x)+node[3]*(1-x)
-            res = np.linalg.lstsq(np.transpose(J),F,-1)[0]
+            residual = np.linalg.lstsq(np.transpose(J),F,-1)[0]
+            parm = parm-residual
 
-            param = param-res
-            if all(abs(res)<1e-12): break
-
-        # Check if the projection is in the element
-
-        dist = np.linalg.norm(self.getPosition(node,param)-pos)
-        if any(abs(param)>1.001): return param,np.inf
-        else: return param,dist
+        return parm

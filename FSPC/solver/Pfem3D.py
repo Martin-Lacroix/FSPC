@@ -193,7 +193,7 @@ class Pfem3D(object):
 # %% FSI Facets Relative to Each Node
 
     @tb.compute_time
-    def getFacets(self):
+    def getFace(self):
 
         if not gmsh.isInitialized(): gmsh.initialize()
         gmsh.option.setNumber('General.Terminal',0)

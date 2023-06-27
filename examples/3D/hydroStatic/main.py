@@ -13,7 +13,9 @@ RBF = lambda r: np.square(r)*np.ma.log(r)
 FSPC.setConvMech(1e-8)
 FSPC.setStep(1e-2,0.05)
 FSPC.setSolver(pathF,pathS)
-FSPC.setInterp(FSPC.interpolator.RBF,RBF)
+#FSPC.setInterp(FSPC.interpolator.RBF,RBF)
+
+FSPC.setInterp(FSPC.interpolator.ETM,9)
 
 # Configure the algorithm
 

@@ -18,8 +18,8 @@ class Metafor(object):
 
         # Actually initialize Metafor from file
 
-        param = dict()
-        self.metafor = module.getMetafor(param)
+        parm = dict()
+        self.metafor = module.getMetafor(parm)
         self.tsm = self.metafor.getTimeStepManager()
         geometry = self.metafor.getDomain().getGeometry()
         self.metafor.getDomain().build()
@@ -43,21 +43,21 @@ class Metafor(object):
 
         self.reload = True
         self.neverRun = True
-        self.FSI = param['FSInterface']
-        self.exporter = param['exporter']
+        self.FSI = parm['FSInterface']
+        self.exporter = parm['exporter']
         self.nbrNode = self.FSI.getNumberOfMeshPoints()
         self.metafor.getInitialConditionSet().update(0)
 
         # Mechanical and thermal interactions
 
-        if 'interacM' in param:
+        if 'interacM' in parm:
 
-            self.interacM = param['interacM']
+            self.interacM = parm['interacM']
             self.prevLoad = np.zeros((self.nbrNode,size))
 
-        if 'interacT' in param:
+        if 'interacT' in parm:
             
-            self.interacT = param['interacT']
+            self.interacT = parm['interacT']
             self.prevHeat = np.zeros((self.nbrNode,self.dim))
 
         # Manages time step restart functions
@@ -186,7 +186,7 @@ class Metafor(object):
 # %% FSI Facets Relative to Each Node
 
     @tb.compute_time
-    def getFacets(self):
+    def getFace(self):
 
         nbrList = np.zeros(self.nbrNode,dtype=int)
         if self.interacM: elemSet = self.interacM.getElementSet()

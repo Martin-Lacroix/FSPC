@@ -5,7 +5,7 @@ import os
 # %% Main Function
 
 metafor = None
-def getMetafor(param):
+def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
@@ -106,8 +106,8 @@ def getMetafor(param):
 
     # Parameters for FSPC
 
-    param['interacT'] = heat
-    param['FSInterface'] = groups['FSInterface']
-    param['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
-    param['exporter'].addDataBaseField([w.TO])
+    parm['interacT'] = heat
+    parm['FSInterface'] = groups['FSInterface']
+    parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
+    parm['exporter'].addDataBaseField([w.TO])
     return metafor

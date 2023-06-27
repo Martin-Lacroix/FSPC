@@ -11,61 +11,61 @@ class ETM(Interpolator):
 
         # Share the facet vectors between solvers
 
+        self.getFace()
         self.K = int(abs(K))
-        recvFacet = self.getFacets()
         position = tb.solver.getPosition()
 
         # Compute the FS mesh interpolation matrix
 
-        self.computeMapping(position,recvFacet)
+        self.computeMapping(position)
         self.H = self.H.tocsr()
 
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
-    def computeMapping(self,pos,recvFacet):
+    def computeMapping(self,pos):
 
-        E = self.getElement(recvFacet)
-        facetList = self.getCloseFacets(pos,recvFacet)
+        E = self.getElement()
+        faceList = self.getCloseFace(pos)
 
         # Loop on the node positions in reference mesh
 
-        for i,node in enumerate(pos):
+        for i,nodePos in enumerate(pos):
 
-            parList = list()
-            dist = np.zeros(len(facetList[i]))
+            parm = list()
+            dist = list()
 
-            for j,k in enumerate(facetList[i]):
+            for j,k in enumerate(faceList[i]):
 
-                facetNodePos = self.recvPos[recvFacet[k]]
-                param,dist[j] = E.projection(facetNodePos,node)
-                parList.append(param)
+                facePos = self.recvPos[self.recvFace[k]]
+                parm.append(E.projection(facePos,nodePos))
+                dist.append(E.distance(parm[j],facePos,nodePos))
 
             # Store the closest projection in the H matrix
 
-            idx = np.argmin(dist)
-            F = recvFacet[facetList[i][idx]]
-            for j,k in enumerate(F): self.H[i,k] = E[j](parList[idx])
+            D = np.argmin(dist)
+            F = self.recvFace[faceList[i][D]]
+            for j,k in enumerate(F): self.H[i,k] = E.N[j](parm[D])
 
 # %% Closest Facets to the Current Position
 
-    def getCloseFacets(self,pos,recvFacet):
+    def getCloseFace(self,pos):
         
         result = np.zeros((self.nbrNode,self.K),int)
+        facePos = np.mean(self.recvPos[self.recvFace],axis=1)
 
         for i,node in enumerate(pos):
             
-            facetPosition = np.mean(self.recvPos[recvFacet],axis=1)
-            dist = np.linalg.norm(node-facetPosition,axis=1)
+            dist = np.linalg.norm(node-facePos,axis=1)
             result[i] = np.argsort(dist)[range(self.K)]
 
         return result
 
 # %% Return the Correct Shape Function Class
 
-    def getElement(self,recvFacet):
+    def getElement(self):
 
-        if np.size(recvFacet,1) == 2: return el.Line()
-        if np.size(recvFacet,1) == 3: return el.Triangle()
-        if np.size(recvFacet,1) == 4: return el.Quadrangle()
+        if np.size(self.recvFace,1) == 2: return el.Line()
+        if np.size(self.recvFace,1) == 3: return el.Triangle()
+        if np.size(self.recvFace,1) == 4: return el.Quadrangle()
         raise Exception('Element type not yet supported')

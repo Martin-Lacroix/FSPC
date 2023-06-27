@@ -155,13 +155,13 @@ importer.execute()                                      # Translate the mesh int
 
 <br />
 
-The object `domain` refers to the Metafor domain. The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSInterface` entry of the parameter dictionary retrieved from `getMetafor(param)`. An example with the Gmsh importer:
+The object `domain` refers to the Metafor domain. The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSInterface` entry of the parameter dictionary retrieved from `getMetafor(parm)`. An example with the Gmsh importer:
 
 <br />
 
 ```python
 groups = importer.groups                            # Dict of all physical groups in Gmsh
-param['FSInterface'] = groups['myInterface']        # myInterace is the FSI physical group
+parm['FSInterface'] = groups['myInterface']        # myInterace is the FSI physical group
 ```
 
 <br />
@@ -191,8 +191,8 @@ The resulting nodal interactions must be provided to FSPC through the parameter 
 <br />
 
 ```python
-param['interacT'] = heat        # Send the heat interaction to FSPC
-param['interacM'] = load        # Send the mechanical interaction to FSPC
+parm['interacT'] = heat        # Send the heat interaction to FSPC
+parm['interacM'] = load        # Send the mechanical interaction to FSPC
 ```
 
 <br />
@@ -202,7 +202,7 @@ Finally, the user may define an exporter class that will be called by FSPC to wr
 <br />
 
 ```python
-param['exporter'] = gmsh.GmshExport('output.msh',metafor)       # Create the Gmsh exporter class
-param['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
-param['exporter'].addDataBaseField([TO])                        # Add the temperature field
+parm['exporter'] = gmsh.GmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+parm['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
+parm['exporter'].addDataBaseField([TO])                        # Add the temperature field
 ```
