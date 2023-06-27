@@ -8,7 +8,7 @@ FSPC provides some classes able to perform FSI simulation by partitioned couplin
 
 ```sh
 export OPTION="-map-by node:PE=${CPU_PER_PROC}"
-mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC}
+mpiexec ${OPTION} -n 2 python ${SCRIPT} -k ${CPU_PER_PROC}
 ```
 
 | Input               | Type           | Description                                   |
@@ -18,60 +18,72 @@ mpiexec ${OPTION} -n 2 python3 ${SCRIPT} -k ${CPU_PER_PROC}
 
 <br />
 
-The first step is to import the package and create the `Process` class. The latter initializes MPI for Python and provides a method to initialize the external solver wrappers with their respective input files. At that point, the script is run on two MPI processes. The returned `Solver` class corresponds to the fluid wrapper on the rank 0 and to the solid wrapper on the rank 1.
+The first step is to import the package. The latter initializes MPI for Python and provides a method to initialize the external solver wrappers with their respective input files. At that point, the script is run on two MPI processes. One may then initialize some internal classes.
 
 <br />
 
 ```python
-import FSPC                                 # Import the FSPC library
-process = FSPC.Process()                    # Initialize the MPI process
-solver = process.getSolver(pathF,pathS)     # Return the solver wrapper
-rank = process.rank                         # Rank of the current process
+import FSPC                         # Import the FSPC package
+FSPC.setStep(dt,dtSave)             # Initialize the time step manager
+FSPC.setSolver(pathF,pathS)         # Initialize the external solvers
 ```
 
 | Input             | Type              | Description                                   |
 |-------------------|-------------------|-----------------------------------------------|
+| *dt*              | *float*           | *initial coupling time step*                  |
+| *dtSave*          | *float*           | *time step for saving on the disk*            |
 | *pathF*           | *string*          | *input file path for the fluid solver*        |
 | *pathS*           | *string*          | *input file path for the solid solver*        |
 
 <br />
 
-Different Algorithm classes are available in FSPC. The simplest one is the Block Gauss–Seidel `BGS` method, the two interface quasi-Newton methods are called Inverse Least Square `ILS` and Multi-Vector Jacobian `MVJ`. Each of them requires the solver previously obtained by the Process class.
+The convergence criterion is managed by the `Convergence` class. The latter should be specified both for the displacement and the temperature when relevant. It is important to note that the type of coupling is enabled by the initialization of the associated class such that `setConvMech` enables the mechanical coupling and `setConvTher` enables the thermal coupling.
 
 <br />
 
 ```python
-algorithm = FSPC.BGS(solver)    # Block-Gauss Seidel with Aitken dynamic relexation
-algorithm = FSPC.ILS(solver)    # Interface quasi-Newton with inverse least squares 
-algorithm = FSPC.MVJ(solver)    # Interface quasi-Newton with multi-vector Jacobian
+FSPC.setConvMech(tolDisp)       # Mechanical convergence criterion
+FSPC.setConvTher(tolTemp)       # Thermal convergence criterion
 ```
 
-| Input             | Type                      | Description                               |
-|-------------------|---------------------------|-------------------------------------------|
-| *solver*          | *class*                   | *fluid or solid solver wrapper*           |
+| Input             | Type              | Description                                |
+|-------------------|-------------------|--------------------------------------------|
+| *tolDisp*         | *float*           | *tolerance for the displacement FSI*       |
+| *tolTemp*         | *float*           | *tolerance for the temperature FSI*        |
 
 <br />
 
-The convergence and the time step are managed by the `Convergence` and the `TimeStep` classes respectively. The latter should be given to the `Algorithm` as presented bellow. It is important to note that the type of coupling is enabled by the creation of the associated class such that `convergM` enables the mechanical coupling and `convergT` enables the thermal coupling.
-
+The tolerance has the dimension of the Dirichlet condition exchanged between the solver, so a position for the mechanical coupling and a temperature for the thermal coupling. The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. 
 
 <br />
 
 ```python
-algorithm.convergM = FSPC.Convergence(tol)      # Mechanical convergence class
-algorithm.convergT = FSPC.Convergence(tol)      # Thermal convergence class
-algorithm.step = FSPC.TimeStep(dt,dtSave)       # Time step manager class
+FSPC.setInterp(FSPC.interpolator.KNN,k)           # K-nearest neighbours interpolator
+FSPC.setInterp(FSPC.interpolator.RBF,fun)         # Radial basis function interpolator
+FSPC.setInterp(FSPC.interpolator.ETM,nElem)       # Direct element transfer method
 ```
 
-| Input             | Type                      | Description                                |
-|-------------------|---------------------------|--------------------------------------------|
-| *tol*             | *float*                   | *tolerance for the FSI iterations*         |
-| *dtSave*          | *float*                   | *time step for saving on the disk*         |
-| *dt*              | *float*                   | *initial coupling time step*          |
+| Input             | Type                | Description                                     |
+|-------------------|---------------------|-------------------------------------------------|
+| *k*               | *int*               | *number of nearest neighbours*                  |
+| *fun*             | *function*          | *radial basis function for nodal distance*      |
+| *nElem*           | *int*               | *number of projection checking*                 |
 
 <br />
 
-The tolerance has the dimension of the Dirichlet condition exchanged between the solver, so a position for the mechanical coupling and a temperature for the thermal coupling. The initial time step is also the maximum allowed time step. Finally, additional variables must be initialized in order to run an FSI simulation.
+Note that the solver must be initialized before the interpolator. Finally, the last step is to initialize the`Algorithm` class. The simplest one is the block Gauss–Seidel `BGS` method. Moreover, two interface quasi-Newton methods are available, with inverse least square `ILS` and multi-vector Jacobian `MVJ` respectively.
+
+<br />
+
+```python
+algorithm = FSPC.algorithm.BGS()        # Aitken Block-Gauss Seidel
+algorithm = FSPC.algorithm.ILS()        # IQN with inverse least squares 
+algorithm = FSPC.algorithm.MVJ()        # IQN with multi-vector Jacobian
+```
+
+<br />
+
+It is important to note that the object `agorithm` can be initialized before the internal classes presented previously. However, they must be initialized before starting the simulation. The initial Gauss Seidel relaxation, the maximum number of iterations and the final simulation time must be set by the user.
 
 <br />
 
@@ -81,39 +93,21 @@ algorithm.maxIter = maxIter         # Maximum number of FSI iterations
 algorithm.endTime = endTime         # Final physical simulation time
 ```
 
-| Input             | Type                      | Description                               |
-|-------------------|---------------------------|-------------------------------------------|
-| *omega*           | *float*                   | *initial relaxation parameter*            |
-| *maxIter*         | *int*                     | *maximum number of FSI iterations*        |
-| *endTime*         | *float*                   | *final simulation time*                   |
+| Input             | Type              | Description                                  |
+|-------------------|-------------------|----------------------------------------------|
+| *omega*           | *float*           | *initial relaxation parameter*               |
+| *maxIter*         | *int*             | *maximum number of coupling iterations*      |
+| *endTime*         | *float*           | *final simulation time*                      |
 
 <br />
 
-The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. If the fluid and solid meshes are matching at the interface, the k-nearest neighbours with `k = 1` is advised. For complex interface geometries, the `ETM` is the most robust algorithm.
-
-<br />
-
-```python
-algorithm.interp = FSPC.KNN(solver,k)           # K-nearest neighbours interpolator
-algorithm.interp = FSPC.RBF(solver,fun)         # Radial basis function interpolator
-algorithm.interp = FSPC.ETM(solver,nElem)       # Direct element transfer method
-```
-
-| Input             | Type                      | Description                                     |
-|-------------------|---------------------------|-------------------------------------------------|
-| *k*               | *int*                     | *number of nearest neighbours*                  |
-| *fun*             | *function*                | *radial basis function for nodal distance*      |
-| *nElem*           | *int*                     | *number of projection checking*                 |
-
-<br />
-
-Once the algorithm class has been initialized, the FSI simulation can be started with the `simulate` function provided by the `ALgorithm` class. The latter will fail if the parameters presented previously have not been correctly initialized. It is also possible to print the time stats at the end of the run and compare the computation time for the fluid and the solid parts.
+Once everything has been initialized, the FSI simulation can be started with the `simulate` function provided by the `Algorithm` class. The latter will fail if the parameters presented previously have not been correctly initialized. It is also possible to print the time stats at the end of the simulation and compare the computation time for the fluid and the solid parts.
 
 <br />
 
 ```python
-algorithm.simulate()        # Run the FSI simulation
-FSPC.general.printClock()           # Print the final time stats
+algorithm.simulate()             # Run the FSI simulation
+FSPC.general.printClock()        # Print the final time stats
 ```
 
 <br />
@@ -138,9 +132,9 @@ In order to enable the FSI coupling, it is mandatory to give the name `FSInterfa
 <br />
 
 ```lua
-Problem.Mesh.mshFile = 'geometry.msh'                       -- Load the fluid mesh
-Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true          -- Enable thermal coupling
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true       -- Enable mechanical coupling
+Problem.Mesh.mshFile = 'geometry.msh'                   -- Load the fluid mesh
+Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true      -- Enable thermal coupling
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true   -- Enable mechanical coupling
 ```
 
 <br />
@@ -177,17 +171,17 @@ The FSI coupling is performed with the help of a nodal interaction allowing to d
 <br />
 
 ```python
-prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction boundary element
+prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction elements
 load = NodInteraction(1)                            # Object of mechanical interaction
-load.push(groups['FSInterface'])                    # Add the nodes from the FS interface
-load.addProperty(prp)                               # Add the element poroperty in interaction
+load.push(groups['FSInterface'])                    # Add the nodes from the interface
+load.addProperty(prp)                               # Add the element poroperty
 ```
 
 ```python
-prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction boundary element
+prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction elements
 heat = NodInteraction(2)                            # Object of thermal interaction
-heat.push(groups['FSInterface'])                    # Add the nodes from the FS interface
-heat.addProperty(prp)                               # Add the element poroperty in interaction
+heat.push(groups['FSInterface'])                    # Add the nodes from the interface
+heat.addProperty(prp)                               # Add the element poroperty
 ```
 
 <br />
