@@ -161,7 +161,7 @@ The object `domain` refers to the Metafor domain. The name of the physical group
 
 ```python
 groups = importer.groups                            # Dict of all physical groups in Gmsh
-parm['FSInterface'] = groups['myInterface']        # myInterace is the FSI physical group
+parm['FSInterface'] = groups['myInterface']         # myInterace is the FSI physical group
 ```
 
 <br />
@@ -186,7 +186,7 @@ heat.addProperty(prp)                               # Add the element poroperty
 
 <br />
 
-The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `convergM` is defined in FSPC, the algorithm will look for `load` in Metafor and if `convergT` is defined, it will look for the corresponding `heat` interaction.
+The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `convMech` is defined in FSPC, the algorithm will look for `load` in Metafor and if `convTher` is defined, it will look for the corresponding `heat` interaction.
 
 <br />
 
