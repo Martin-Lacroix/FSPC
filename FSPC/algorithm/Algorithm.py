@@ -64,6 +64,8 @@ class Algorithm(object):
         if tb.convMech: tb.convMech.reset()
         if tb.convTher: tb.convTher.reset()
 
+    # Update the predicted interface solution
+
     @tb.only_solid
     @tb.compute_time
     def relaxation(self):

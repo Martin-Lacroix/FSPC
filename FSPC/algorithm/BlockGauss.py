@@ -51,8 +51,8 @@ class BGS(Algorithm):
 
     def compute(self,conv):
 
-        D = tb.convMech.deltaRes()
-        A = np.tensordot(D,tb.convMech.prevRes)
+        D = conv.deltaRes()
+        A = np.tensordot(D,conv.prevRes)
 
         # Update the Aitken relaxation parameter
 
