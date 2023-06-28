@@ -23,40 +23,40 @@ class ETM(Interpolator):
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
-    def computeMapping(self,pos):
+    def computeMapping(self,position):
 
-        E = self.getElement()
-        faceList = self.getCloseFace(pos)
+        elem = self.getElement()
+        faceList = self.getCloseFace(position)
 
         # Loop on the node positions in reference mesh
 
-        for i,nodePos in enumerate(pos):
+        for i,pos in enumerate(position):
 
-            parm = list()
-            dist = list()
+            parList = list()
+            disList = list()
 
             for j,k in enumerate(faceList[i]):
 
-                facePos = self.recvPos[self.recvFace[k]]
-                parm.append(E.projection(facePos,nodePos))
-                dist.append(E.distance(parm[j],facePos,nodePos))
+                node = self.recvPos[self.recvFace[k]]
+                parList.append(elem.projection(node,pos))
+                disList.append(elem.distance(parList[j],node,pos))
 
             # Store the closest projection in the H matrix
 
-            D = np.argmin(dist)
+            D = np.argmin(disList)
             F = self.recvFace[faceList[i][D]]
-            for j,k in enumerate(F): self.H[i,k] = E.N[j](parm[D])
+            for j,k in enumerate(F): self.H[i,k] = elem.N[j](parList[D])
 
 # %% Closest Facets to the Current Position
 
-    def getCloseFace(self,pos):
+    def getCloseFace(self,position):
         
         result = np.zeros((self.nbrNode,self.K),int)
         facePos = np.mean(self.recvPos[self.recvFace],axis=1)
 
-        for i,node in enumerate(pos):
+        for i,pos in enumerate(position):
             
-            dist = np.linalg.norm(node-facePos,axis=1)
+            dist = np.linalg.norm(pos-facePos,axis=1)
             result[i] = np.argsort(dist)[range(self.K)]
 
         return result

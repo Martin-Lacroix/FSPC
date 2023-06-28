@@ -4,11 +4,11 @@ import numpy as np
 
 class Element(object):
 
-    def getPosition(self,node,pos):
+    def getPosition(self,node,parm):
 
-        result = float(0)
-        for i,N in enumerate(self.N): result += N(pos)*node[i]
-        return result
+        pos = float(0)
+        for i,N in enumerate(self.N): pos += N(parm)*node[i]
+        return pos
 
 # %% Linear Line Finite Element
 
