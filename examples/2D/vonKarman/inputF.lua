@@ -26,7 +26,8 @@ Problem.Mesh.exclusionZones = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.localHcharGroups = {'Polytope','Wall','Inlet'}
+--Problem.Mesh.localHcharGroups = {'Polytope','Wall','Inlet'}
+Problem.Mesh.localHcharGroups = {}
 Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters

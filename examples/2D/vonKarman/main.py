@@ -1,13 +1,10 @@
-#from interpolator import TEST
 import os.path as path
-import numpy as np
 import FSPC
 
 # %% Input Parameters for FSPC
 
 pathF = path.dirname(__file__)+'/inputF.lua'
 pathS = path.dirname(__file__)+'/inputS.py'
-RBF = lambda r: np.square(r)*np.ma.log(r)
 
 # %% Initialize the Simulation
 
