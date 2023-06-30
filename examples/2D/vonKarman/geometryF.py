@@ -79,14 +79,14 @@ sh.addPhysicalGroup(1,h+r,name='Polytope')
 fun = str(d)+'+0.1*F1'
 ref = h+r+[l[0],l[2],l[3]]
 
-gmsh.model.mesh.field.add('Distance',1)
-gmsh.model.mesh.field.setNumber(1,'Sampling',1e4)
-gmsh.model.mesh.field.setNumbers(1,'CurvesList',ref)
+sh.mesh.field.add('Distance',1)
+sh.mesh.field.setNumber(1,'Sampling',1e4)
+sh.mesh.field.setNumbers(1,'CurvesList',ref)
 
-gmsh.model.mesh.field.add('MathEval',2)
-gmsh.model.mesh.field.setString(2,'F',fun)
+sh.mesh.field.add('MathEval',2)
+sh.mesh.field.setString(2,'F',fun)
 
-gmsh.model.mesh.field.setAsBackgroundMesh(2)
+sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 

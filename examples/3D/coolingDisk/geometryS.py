@@ -14,8 +14,8 @@ HF = 0.05
 v = sh.occ.addSphere(0,0,HS+HF,RS)
 sh.occ.synchronize()
 
-g = gmsh.model.getBoundary([(3,v)],0,0,0)[0][1]
-p = gmsh.model.getBoundary([(3,v)],0,0,1)
+g = sh.getBoundary([(3,v)],0,0,0)[0][1]
+p = sh.getBoundary([(3,v)],0,0,1)
 sh.mesh.setSize(p,d)
 sh.occ.synchronize()
 

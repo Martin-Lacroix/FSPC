@@ -71,12 +71,12 @@ def meshSize(dim,tag,x,y,z,lc):
     F = 0.3
     size = list()
 
-    a = gmsh.model.mesh.getNode(p[0])[0]
-    b = gmsh.model.mesh.getNode(p[1])[0]
+    a = sh.mesh.getNode(p[0])[0]
+    b = sh.mesh.getNode(p[1])[0]
     size.append(max(F*distance(a,b,x,y),d))
 
-    a = gmsh.model.mesh.getNode(p[4])[0]
-    b = gmsh.model.mesh.getNode(p[5])[0]
+    a = sh.mesh.getNode(p[4])[0]
+    b = sh.mesh.getNode(p[5])[0]
     size.append(max(F*distance(a,b,x,y),d))
 
     size.append(max(d+F*(y-H),d))

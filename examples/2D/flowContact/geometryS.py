@@ -120,9 +120,9 @@ k.append(sh.occ.addCurveLoop(c))
 for a in k: s.append(sh.occ.addPlaneSurface([a]))
 sh.occ.synchronize()
 
-gmsh.model.mesh.setAlgorithm(2,s[0],8)
-gmsh.model.mesh.setAlgorithm(2,s[1],8)
-gmsh.model.mesh.setReverse(2,s[2])
+sh.mesh.setAlgorithm(2,s[0],8)
+sh.mesh.setAlgorithm(2,s[1],8)
+sh.mesh.setReverse(2,s[2])
 sh.occ.synchronize()
 
 # %% Boundaries

@@ -84,8 +84,8 @@ u = sh.occ.addSphere(0,0,HS+HF,RS)
 v = sh.occ.addVolume([h])
 sh.occ.synchronize()
 
-g = gmsh.model.getBoundary([(3,u)],0,0,0)[0][1]
-p = gmsh.model.getBoundary([(3,u)],0,0,1)
+g = sh.getBoundary([(3,u)],0,0,0)[0][1]
+p = sh.getBoundary([(3,u)],0,0,1)
 sh.occ.remove([(3,u)])
 sh.mesh.setSize(p,d)
 sh.occ.synchronize()
