@@ -11,7 +11,7 @@ class ETM(Interpolator):
 
         # Share the facet vectors between solvers
 
-        self.getFace()
+        self.getFaceList()
         self.K = int(abs(K))
         position = tb.solver.getPosition()
 
@@ -25,7 +25,7 @@ class ETM(Interpolator):
     @tb.compute_time
     def computeMapping(self,position):
 
-        elem = self.getElement()
+        elem = el.getElement(np.size(self.recvFace,1))
         faceList = self.getCloseFace(position)
 
         # Loop on the node positions in reference mesh
@@ -43,9 +43,9 @@ class ETM(Interpolator):
 
             # Store the closest projection in the H matrix
 
-            D = np.argmin(disList)
-            F = self.recvFace[faceList[i][D]]
-            for j,k in enumerate(F): self.H[i,k] = elem.N[j](parList[D])
+            idx = np.argmin(disList)
+            face = self.recvFace[faceList[i][idx]]
+            self.H[i,face] = elem.evaluate(parList[idx])
 
 # %% Closest Facets to the Current Position
 
@@ -60,12 +60,3 @@ class ETM(Interpolator):
             result[i] = np.argsort(dist)[range(self.K)]
 
         return result
-
-# %% Return the Correct Shape Function Class
-
-    def getElement(self):
-
-        if np.size(self.recvFace,1) == 2: return el.Line()
-        if np.size(self.recvFace,1) == 3: return el.Triangle()
-        if np.size(self.recvFace,1) == 4: return el.Quadrangle()
-        raise Exception('Element type not yet supported')

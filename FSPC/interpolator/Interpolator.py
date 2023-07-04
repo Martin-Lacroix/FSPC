@@ -29,7 +29,7 @@ class Interpolator(object):
 
 # %% Facets from the Target Interface Mesh
 
-    def getFace(self):
+    def getFaceList(self):
 
         if CW.rank == 0:
             
