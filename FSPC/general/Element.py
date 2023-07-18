@@ -3,11 +3,10 @@ import numpy as np
 # %% Return the Element with Adequate Nodes
 
 def getElement(nbrNode):
-    match nbrNode:
 
-        case 2: return Line()
-        case 3: return Triangle()
-        case 4: return Quadrangle()
+    if nbrNode == 2: return Line()
+    if nbrNode == 3: return Triangle()
+    if nbrNode == 4: return Quadrangle()
 
 # %% Linear Line Finite Element
 

@@ -40,7 +40,7 @@ cd workspace
 
 # Runs the code
 
-export CPU_PER_PROC=1
+export CPU_PER_PROC=4
 export MKL_NUM_THREADS=${CPU_PER_PROC}
 export OMP_NUM_THREADS=${CPU_PER_PROC}
 export OPTION="-map-by node:PE=${CPU_PER_PROC}"
