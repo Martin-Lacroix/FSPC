@@ -88,14 +88,16 @@ class Quadrangle(Line):
 
         residual = np.inf
         parm = np.zeros(2)
-
+        
         # Newton iterations for parametric coordinates
 
-        while np.any(abs(residual)>1e-12):
+        for i in range(25):
 
             B = self.getPosition(node,parm)-pos
             A = np.atleast_2d(self.grad(parm).dot(node))
             residual = np.linalg.lstsq(np.transpose(A),B,-1)[0]
             parm = parm-residual
 
-        return parm
+            if np.all(abs(residual) < 1e-12): return parm
+        return np.array([np.inf,np.inf])
+    
