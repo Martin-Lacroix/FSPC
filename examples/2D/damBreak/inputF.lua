@@ -68,7 +68,7 @@ Problem.Solver.coeffDTincrease = math.huge
 
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'Ax_f'
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.nlAlgo = 'QuasiNRApprox'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
