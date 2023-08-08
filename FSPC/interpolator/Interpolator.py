@@ -24,6 +24,7 @@ class Interpolator(object):
 
         # Initialize the interpolation matrix
 
+        self.initializeData()
         self.nbrNode = tb.solver.nbrNode
         self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
 
@@ -48,10 +49,13 @@ class Interpolator(object):
         return self.H.dot(recvData)
     
     @tb.only_solid
-    def initialize(self):
+    def initializeData(self):
 
         if tb.convMech: self.pos = tb.solver.getPosition()
         if tb.convTher: self.temp = tb.solver.getTemperature()
+
+    def initialize(self):
+        raise Exception('No initialize function defined')
 
 # %% Apply Actual Loading on Solid
 

@@ -7,16 +7,18 @@ import numpy as np
 
 class ETM(Interpolator):
     def __init__(self,K):
-        Interpolator.__init__(self)
-
-        # Share the facet vectors between solvers
-
-        self.getFaceList()
         self.K = int(abs(K))
-        position = tb.solver.getPosition()
+
+    # Share the facet vectors between solvers
+
+    def initialize(self):
+
+        Interpolator.__init__(self)
+        self.getFaceList()
 
         # Compute the FS mesh interpolation matrix
 
+        position = tb.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
 

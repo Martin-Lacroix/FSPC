@@ -6,11 +6,13 @@ import numpy as np
 
 class RBF(Interpolator):
     def __init__(self,func):
-        Interpolator.__init__(self)
-
-        # Compute the FS mesh interpolation matrix
-
         self.function = func
+
+    # Compute the FS mesh interpolation matrix
+
+    def initialize(self):
+
+        Interpolator.__init__(self)
         position = tb.solver.getPosition()
         self.H = self.computeMapping(position)
 

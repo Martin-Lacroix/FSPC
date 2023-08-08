@@ -6,11 +6,13 @@ import numpy as np
 
 class KNN(Interpolator):
     def __init__(self,K):
-        Interpolator.__init__(self)
-
-        # Compute the FS mesh interpolation matrix
-
         self.K = int(abs(K))
+
+    # Compute the FS mesh interpolation matrix
+
+    def initialize(self):
+
+        Interpolator.__init__(self)
         position = tb.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
