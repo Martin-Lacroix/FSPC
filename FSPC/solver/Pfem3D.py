@@ -27,31 +27,15 @@ class Pfem3D(object):
 
         self.FSI = w.VectorInt()
         self.mesh = self.problem.getMesh()
-        self.mesh.getNodesIndex('FSInterface',self.FSI)
         self.solver = self.problem.getSolver()
-
-        # Initialize the boundary conditions
-
-        self.BC = list()
         self.dim = self.mesh.getDim()
-        self.nbrNode = self.FSI.size()
-
-        for i in self.FSI:
-
-            vector = w.VectorDouble(self.dim+1)
-            self.mesh.getNode(i).setExtState(vector)
-            self.BC.append(vector)
+        self.initialize()
 
         # Save mesh after initializing the BC pointer
 
         self.prevSolution = w.SolutionData()
         self.problem.copySolution(self.prevSolution)
         self.problem.displayParams()
-
-        # Store temporary simulation variables
-
-        self.pos = self.getPosition()
-        self.vel = self.getVelocity()
 
 # %% Run for implicit integration scheme
 
@@ -169,6 +153,25 @@ class Pfem3D(object):
         vector = w.VectorVectorDouble()
         self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
         return np.copy(vector)
+
+# %% Initialize Communication Vectors
+
+    def initialize(self):
+
+        self.mesh.getNodesIndex('FSInterface',self.FSI)
+        self.nbrNode = self.FSI.size()
+        self.BC = list()
+
+        for i in self.FSI:
+
+            vector = w.VectorDouble(self.dim+1)
+            self.mesh.getNode(i).setExtState(vector)
+            self.BC.append(vector)
+
+        # Store temporary simulation variables
+
+        self.pos = self.getPosition()
+        self.vel = self.getVelocity()
 
 # %% Other Functions
 
