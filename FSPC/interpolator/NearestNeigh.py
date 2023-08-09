@@ -20,10 +20,10 @@ class KNN(Interpolator):
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
-    def computeMapping(self,pos):
+    def computeMapping(self,position):
 
-        if self.K == 1: self.search(pos)
-        else: self.interpolate(pos)
+        if self.K == 1: self.search(position)
+        else: self.interpolate(position)
 
     # Nearest neighbour search if one neighbour
 
