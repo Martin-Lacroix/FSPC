@@ -68,7 +68,7 @@ class Interpolator(object):
             load = CW.recv(source=0,tag=3)
             tb.solver.applyLoading(self.interpData(load))
 
-# Apply predicted displacement on fluid
+    # Apply predicted displacement on fluid
 
     @tb.conv_mecha
     def applyDispSF(self):
@@ -79,7 +79,7 @@ class Interpolator(object):
             pos = CW.recv(source=1,tag=4)
             tb.solver.applyPosition(self.interpData(pos))
 
-# Apply actual heat flux on solid
+    # Apply actual heat flux on solid
 
     @tb.conv_therm
     def applyHeatFS(self):
@@ -90,7 +90,7 @@ class Interpolator(object):
             heat = CW.recv(source=0,tag=5)
             tb.solver.applyHeatFlux(self.interpData(heat))
 
-# Apply predicted temperature on fluid
+    # Apply predicted temperature on fluid
 
     @tb.conv_therm
     def applyTempSF(self):
