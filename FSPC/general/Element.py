@@ -15,12 +15,12 @@ class Line(object):
     def evaluate(self,parm):
         return np.array([(1-parm[0])/2,(1+parm[0])/2])
 
-    # Position of a parametric point in the reference space
+    # Interpolate nodal data in the parametric space
+
+    def interpolate(self,nodeVal,parm):
+        return np.squeeze(self.evaluate(parm).dot(nodeVal))
     
-    def getPosition(self,node,parm):
-        return np.squeeze(self.evaluate(parm).dot(node))
-    
-    # Projection of a point in the reference space
+    # Projection of a point in the parametric space
 
     def projection(self,node,pos):
     
@@ -33,7 +33,7 @@ class Line(object):
     def distance(self,parm,node,pos):
 
         if abs(parm)>1.001: return np.inf
-        return np.linalg.norm(self.getPosition(node,parm)-pos)
+        return np.linalg.norm(self.interpolate(node,parm)-pos)
 
 # %% Linear Triangle Finite Element
 
@@ -42,7 +42,7 @@ class Triangle(Line):
     def evaluate(self,parm):
         return np.array([1-parm[0]-parm[1],parm[0],parm[1]])
     
-    # Projection of a point in the reference space
+    # Projection of a point in the parametric space
 
     def projection(self,node,pos):
 
@@ -55,7 +55,7 @@ class Triangle(Line):
     def distance(self,parm,node,pos):
 
         if any(-0.001>parm) or sum(parm)>1.001: return np.inf
-        return np.linalg.norm(self.getPosition(node,parm)-pos)
+        return np.linalg.norm(self.interpolate(node,parm)-pos)
 
 # %% Linear Quadrangle Finite Element
 
@@ -80,9 +80,9 @@ class Quadrangle(Line):
     def distance(self,parm,node,pos):
 
         if any(abs(parm)>1.001): return np.inf
-        return np.linalg.norm(self.getPosition(node,parm)-pos)
+        return np.linalg.norm(self.interpolate(node,parm)-pos)
 
-    # Projection of a point in the reference space
+    # Projection of a point in the parametric space
 
     def projection(self,node,pos):
 
@@ -93,7 +93,7 @@ class Quadrangle(Line):
 
         for i in range(25):
 
-            B = self.getPosition(node,parm)-pos
+            B = self.interpolate(node,parm)-pos
             A = np.atleast_2d(self.grad(parm).dot(node))
             residual = np.linalg.lstsq(np.transpose(A),B,-1)[0]
             parm = parm-residual
