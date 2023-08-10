@@ -34,13 +34,13 @@ class Interpolator(object):
 
         if CW.rank == 0:
             
-            CW.send(tb.solver.getFace(),1,tag=7)
+            CW.send(tb.solver.getFacet(),1,tag=7)
             self.recvFace = CW.recv(source=1,tag=8)
 
         if CW.rank == 1:
 
             self.recvFace = CW.recv(source=0,tag=7)
-            CW.send(tb.solver.getFace(),0,tag=8)
+            CW.send(tb.solver.getFacet(),0,tag=8)
 
 # %% Interpolate RecvData and Return the Result
 

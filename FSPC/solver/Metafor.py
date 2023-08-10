@@ -186,7 +186,7 @@ class Metafor(object):
 # %% FSI Facets Relative to Each Node
 
     @tb.compute_time
-    def getFace(self): # Alfeweld issue here no interacM !!!
+    def getFacet(self):
 
         nbrList = np.zeros(self.nbrNode,dtype=int)
         try: elemSet = self.interacM.getElementSet()
