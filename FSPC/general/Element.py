@@ -93,8 +93,8 @@ class Quadrangle(Line):
 
         for i in range(25):
 
+            A = self.grad(parm).dot(node)
             B = self.interpolate(node,parm)-pos
-            A = np.atleast_2d(self.grad(parm).dot(node))
             residual = np.linalg.lstsq(np.transpose(A),B,-1)[0]
             parm = parm-residual
 
