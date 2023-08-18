@@ -12,7 +12,7 @@ L2 = 0.1
 
 d = 1e-3
 eps = 1e-5
-N = 79
+N = 80
 
 # %% Point List
 
