@@ -54,22 +54,22 @@ class RBF(Interpolator):
             rad = np.linalg.norm(pos-self.recvPos,axis=1)
             A[range(self.recvNode),i] = self.function(rad)
 
-        return np.transpose(A)
+        return A
 
 # %% Fill the B Matrix Using Basis Functions
 
     def makeB(self,position):
 
         size = 1+self.recvNode+tb.solver.dim
-        B = np.ones((size,self.nbrNode))
+        B = np.ones((self.nbrNode,size))
 
         # Loop on the node positions in reference mesh
 
         for i,pos in enumerate(position):
             
             rad = np.linalg.norm(pos-self.recvPos,axis=1)
-            B[range(self.recvNode),i] = self.function(rad)
-            B[range(self.recvNode+1,size),i] = pos
+            B[i,range(self.recvNode)] = self.function(rad)
+            B[i,range(self.recvNode+1,size)] = pos
 
-        return np.transpose(B)
+        return B
     
