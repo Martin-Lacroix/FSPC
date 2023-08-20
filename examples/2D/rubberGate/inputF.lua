@@ -56,7 +56,7 @@ Problem.Material.rho = 1000
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.id = 'FracStep'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -68,7 +68,7 @@ Problem.Solver.coeffDTincrease = math.huge
 
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0

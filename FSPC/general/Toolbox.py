@@ -1,7 +1,6 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
 from mpi4py.MPI import COMM_WORLD as CW
-from . import Manager as ma
 import collections,time
 import fwkw
 
@@ -103,6 +102,17 @@ def conv_therm(func):
 
         return result
     return wrapper
+
+# %% Import Classes from Other Files
+
+from . import Manager as ma
+from . import Element as el
+
+def getElement(nbrNode):
+
+    if nbrNode == 2: return el.Line()
+    if nbrNode == 3: return el.Triangle()
+    if nbrNode == 4: return el.Quadrangle()
 
 # %% Initialize the Global Class
 

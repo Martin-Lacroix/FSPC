@@ -2,7 +2,7 @@ from .Interpolator import Interpolator
 from ..general import Toolbox as tb
 import numpy as np
 
-# %% Mesh Interpolation with Radial Basis Functions
+# %% Mesh Interpolation Radial Basis Functions
 
 class RBF(Interpolator):
     def __init__(self,func):
@@ -14,20 +14,25 @@ class RBF(Interpolator):
 
         Interpolator.__init__(self)
         position = tb.solver.getPosition()
-        self.H = self.computeMapping(position)
+        self.computeMapping(position)
 
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
     def computeMapping(self,position):
 
-        B = self.makeB(position)
-        A = self.makeA()
+        self.B = self.makeB(position)
+        self.A = self.makeA()
 
-        # Compute the interpolation H matrix
+    # Interpolate RecvData and Return the Result
 
-        H = np.transpose(np.linalg.lstsq(A,B,-1)[0])
-        return H[np.ix_(range(self.nbrNode),range(self.recvNode))]
+    @tb.compute_time
+    def interpData(self,recvData):
+
+        size = (tb.solver.dim+1,recvData.shape[1])
+        result = np.append(recvData,np.zeros(size),axis=0)
+        result = np.linalg.lstsq(self.A,result,-1)[0]
+        return np.dot(self.B,result)
 
 # %% Fill the A Matrix Using Basis Functions
 
@@ -49,7 +54,7 @@ class RBF(Interpolator):
             rad = np.linalg.norm(pos-self.recvPos,axis=1)
             A[range(self.recvNode),i] = self.function(rad)
 
-        return A
+        return np.transpose(A)
 
 # %% Fill the B Matrix Using Basis Functions
 
@@ -66,4 +71,5 @@ class RBF(Interpolator):
             B[range(self.recvNode),i] = self.function(rad)
             B[range(self.recvNode+1,size),i] = pos
 
-        return B
+        return np.transpose(B)
+    

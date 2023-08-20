@@ -1,8 +1,9 @@
 from .Interpolator import Interpolator
 from ..general import Toolbox as tb
+from scipy import sparse as sp
 import numpy as np
 
-# %% Mesh Interpolation with K-Nearest Neighbours
+# %% Mesh Interpolation K-Nearest Neighbours
 
 class KNN(Interpolator):
     def __init__(self,K):
@@ -13,6 +14,7 @@ class KNN(Interpolator):
     def initialize(self):
 
         Interpolator.__init__(self)
+        self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
         position = tb.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
@@ -25,8 +27,14 @@ class KNN(Interpolator):
         if self.K == 1: self.search(position)
         else: self.interpolate(position)
 
-    # Nearest neighbour search if one neighbour
+    # Interpolate RecvData and Return the Result
 
+    @tb.compute_time
+    def interpData(self,recvData):
+        return self.H.dot(recvData)
+
+# %% Find the K Nearest Neighbours
+ 
     def search(self,position):
 
         for i,pos in enumerate(position):
@@ -34,8 +42,6 @@ class KNN(Interpolator):
             dist = np.linalg.norm(pos-self.recvPos,axis=1)
             self.H[i,np.argmin(dist)] = 1
 
-# %% Interpolate from the K nearest neighbours
- 
     def interpolate(self,position):
 
         for i,pos in enumerate(position):

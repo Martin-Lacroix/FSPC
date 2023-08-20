@@ -1,9 +1,9 @@
 from .Interpolator import Interpolator
 from ..general import Toolbox as tb
-from ..general import Element as el
+from scipy import sparse as sp
 import numpy as np
 
-# %% Mesh Interpolation with Element Transfer Method
+# %% Mesh Interpolation Element Transfer Method
 
 class ETM(Interpolator):
     def __init__(self,K):
@@ -14,6 +14,7 @@ class ETM(Interpolator):
     def initialize(self):
 
         Interpolator.__init__(self)
+        self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
         self.getFaceList()
 
         # Compute the FS mesh interpolation matrix
@@ -22,12 +23,18 @@ class ETM(Interpolator):
         self.computeMapping(position)
         self.H = self.H.tocsr()
 
+    # Interpolate RecvData and Return the Result
+
+    @tb.compute_time
+    def interpData(self,recvData):
+        return self.H.dot(recvData)
+
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
     def computeMapping(self,position):
 
-        elem = el.getElement(np.size(self.recvFace,1))
+        elem = tb.getElement(np.size(self.recvFace,1))
         faceList = self.getCloseFace(position)
 
         # Loop on the node positions in reference mesh

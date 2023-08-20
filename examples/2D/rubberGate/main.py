@@ -1,4 +1,5 @@
 import os.path as path
+import numpy as np
 import FSPC
 
 # %% Input Parameters for FSPC
@@ -8,10 +9,13 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 # %% Initialize the Simulation
 
-FSPC.setConvMech(1e-8)
+R = 1e-2
+RBF = lambda r: np.square(r/R)*np.ma.log(r/R)
+
+FSPC.setConvMech(1e-6)
 FSPC.setStep(5e-4,1e-3)
 FSPC.setSolver(pathF,pathS)
-FSPC.setInterp(FSPC.interpolator.KNN,2)
+FSPC.setInterp(FSPC.interpolator.RBF,RBF)
 
 # Configure the algorithm
 

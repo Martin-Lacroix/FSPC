@@ -1,6 +1,5 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
-from scipy import sparse as sp
 import numpy as np
 
 # %% Parent Interpolator Class
@@ -26,7 +25,20 @@ class Interpolator(object):
 
         self.initializeData()
         self.nbrNode = tb.solver.nbrNode
-        self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
+
+# %% Initialize the Interpolation Data
+    
+    @tb.only_solid
+    def initializeData(self):
+
+        if tb.convMech: self.pos = tb.solver.getPosition()
+        if tb.convTher: self.temp = tb.solver.getTemperature()
+
+    def initialize(self):
+        raise Exception('No initialize function defined')
+    
+    def interpData(self):
+        raise Exception('No interpolation function defined')
 
 # %% Facets from the Target Interface Mesh
 
@@ -41,21 +53,6 @@ class Interpolator(object):
 
             self.recvFace = CW.recv(source=0,tag=7)
             CW.send(tb.solver.getFacet(),0,tag=8)
-
-# %% Interpolate RecvData and Return the Result
-
-    @tb.compute_time
-    def interpData(self,recvData):
-        return self.H.dot(recvData)
-    
-    @tb.only_solid
-    def initializeData(self):
-
-        if tb.convMech: self.pos = tb.solver.getPosition()
-        if tb.convTher: self.temp = tb.solver.getTemperature()
-
-    def initialize(self):
-        raise Exception('No initialize function defined')
 
 # %% Apply Actual Loading on Solid
 
