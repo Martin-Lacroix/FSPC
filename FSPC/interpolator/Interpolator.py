@@ -7,24 +7,19 @@ import numpy as np
 class Interpolator(object):
     def __init__(self):
 
+        self.initializeData()
+
         # Share the position vectors between solvers
 
         if CW.rank == 0:
 
             self.recvPos = CW.recv(source=1,tag=1)
             CW.send(tb.solver.getPosition(),1,tag=2)
-            self.recvNode = self.recvPos.shape[0]
 
         if CW.rank == 1:
 
             CW.send(tb.solver.getPosition(),0,tag=1)
             self.recvPos = CW.recv(source=0,tag=2)
-            self.recvNode = self.recvPos.shape[0]
-
-        # Initialize the interpolation matrix
-
-        self.initializeData()
-        self.nbrNode = tb.solver.nbrNode
 
 # %% Initialize the Interpolation Data
     

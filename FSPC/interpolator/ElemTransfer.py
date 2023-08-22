@@ -9,21 +9,16 @@ class ETM(Interpolator):
     def __init__(self,K):
         self.K = int(abs(K))
 
-    # Share the facet vectors between solvers
+    # Compute the FS mesh interpolation matrix
 
     def initialize(self):
 
         Interpolator.__init__(self)
-        self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
-        self.getFaceList()
-
-        # Compute the FS mesh interpolation matrix
-
         position = tb.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
 
-    # Interpolate RecvData and Return the Result
+    # Interpolate recvData and return the result
 
     @tb.compute_time
     def interpData(self,recvData):
@@ -34,6 +29,12 @@ class ETM(Interpolator):
     @tb.compute_time
     def computeMapping(self,position):
 
+        size = tb.solver.nbrNod,len(self.recvPos)
+        self.H = sp.dok_matrix(size)
+
+        # Loop on the node positions in reference mesh
+
+        self.getFaceList()
         elem = tb.getElement(np.size(self.recvFace,1))
         faceList = self.getCloseFace(position)
 
@@ -60,7 +61,7 @@ class ETM(Interpolator):
 
     def getCloseFace(self,position):
         
-        result = np.zeros((self.nbrNode,self.K),int)
+        result = np.zeros((tb.solver.nbrNod,self.K),int)
         facePos = np.mean(self.recvPos[self.recvFace],axis=1)
 
         for i,pos in enumerate(position):

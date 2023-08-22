@@ -61,14 +61,14 @@ class MVJ(Algorithm):
 
         # Update the inverse Jacobian
 
-        X = np.transpose(W-np.dot(conv.Jprev,V)) # Maybe wen can avoid transpose !!!
+        X = np.transpose(W-np.dot(conv.Jprev,V))
         deltaJ = np.transpose(np.linalg.lstsq(V.T,X,-1)[0])
         conv.J = conv.Jprev+deltaJ
 
         # Return the solution correction
 
         delta = np.dot(conv.J,R)-R
-        return np.split(delta,tb.solver.nbrNode)
+        return np.split(delta,tb.solver.nbrNod)
 
 # %% Reset Jacobian and perform BGS iteration
 
@@ -107,7 +107,7 @@ class MVJ(Algorithm):
 
                 R = np.hstack(-tb.convMech.residual)
                 delta = np.dot(tb.convMech.Jprev,R)-R
-                delta = np.split(delta,tb.solver.nbrNode)
+                delta = np.split(delta,tb.solver.nbrNod)
 
         else:
 
@@ -138,7 +138,7 @@ class MVJ(Algorithm):
 
                 R = np.hstack(-tb.convTher.residual)
                 delta = np.dot(tb.convTher.Jprev,R)-R
-                delta = np.split(delta,tb.solver.nbrNode)
+                delta = np.split(delta,tb.solver.nbrNod)
 
         else:
             

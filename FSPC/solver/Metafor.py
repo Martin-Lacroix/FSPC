@@ -45,7 +45,7 @@ class Metafor(object):
         self.neverRun = True
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
-        self.nbrNode = self.FSI.getNumberOfMeshPoints()
+        self.nbrNod = self.FSI.getNumberOfMeshPoints()
         self.metafor.getInitialConditionSet().update(0)
 
         # Mechanical and thermal interactions
@@ -53,12 +53,12 @@ class Metafor(object):
         if 'interacM' in parm:
 
             self.interacM = parm['interacM']
-            self.prevLoad = np.zeros((self.nbrNode,size))
+            self.prevLoad = np.zeros((self.nbrNod,size))
 
         if 'interacT' in parm:
             
             self.interacT = parm['interacT']
-            self.prevHeat = np.zeros((self.nbrNode,self.dim))
+            self.prevHeat = np.zeros((self.nbrNod,self.dim))
 
         # Manages time step restart functions
 
@@ -97,7 +97,7 @@ class Metafor(object):
         vector = (self.prevLoad+load)/2
         self.nextLoad = np.copy(load)
 
-        for i in range(self.nbrNode):
+        for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
             self.interacM.setNodTensor(node,*vector[i])
@@ -107,7 +107,7 @@ class Metafor(object):
         vector = (self.prevHeat+heat)/2
         self.nextHeat = np.copy(heat)
 
-        for i in range(self.nbrNode):
+        for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
             self.interacT.setNodVector(node,*vector[i])
@@ -116,7 +116,7 @@ class Metafor(object):
 
     def getPosition(self):
 
-        vector = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNod,self.dim))
 
         for i,axe in enumerate(self.axe):
             for j,data in enumerate(vector):
@@ -131,7 +131,7 @@ class Metafor(object):
 
     def getVelocity(self):
 
-        vector = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNod,self.dim))
 
         for i,axe in enumerate(self.axe):
             for j,data in enumerate(vector):
@@ -145,9 +145,9 @@ class Metafor(object):
 
     def getTemperature(self):
 
-        vector = np.zeros((self.nbrNode,1))
+        vector = np.zeros((self.nbrNod,1))
         
-        for i in range(self.nbrNode):
+        for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
             vector[i,0] += node.getValue(w.Field1D(w.TO,w.AB))
@@ -159,9 +159,9 @@ class Metafor(object):
 
     def getTempVeloc(self):
 
-        vector = np.zeros((self.nbrNode,1))
+        vector = np.zeros((self.nbrNod,1))
 
-        for i in range(self.nbrNode):
+        for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
             vector[i] = node.getValue(w.Field1D(w.TO,w.GV))
@@ -188,14 +188,14 @@ class Metafor(object):
     @tb.compute_time
     def getFacet(self):
 
-        nbrList = np.zeros(self.nbrNode,dtype=int)
+        nbrList = np.zeros(self.nbrNod,dtype=int)
         try: elemSet = self.interacM.getElementSet()
         except: elemSet = self.interacT.getElementSet()
 
         # Store the node indices from Metafor
 
         faceList = list()
-        for i in range(self.nbrNode):
+        for i in range(self.nbrNod):
             nbrList[i] = self.FSI.getMeshPoint(i).getNo()
 
         # Facet nodes and store their FSI indices

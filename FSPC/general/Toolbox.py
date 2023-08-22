@@ -108,11 +108,11 @@ def conv_therm(func):
 from . import Manager as ma
 from . import Element as el
 
-def getElement(nbrNode):
+def getElement(nbrNod):
 
-    if nbrNode == 2: return el.Line()
-    if nbrNode == 3: return el.Triangle()
-    if nbrNode == 4: return el.Quadrangle()
+    if nbrNod == 2: return el.Line()
+    if nbrNod == 3: return el.Triangle()
+    if nbrNod == 4: return el.Quadrangle()
 
 # %% Initialize the Global Class
 

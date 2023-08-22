@@ -16,60 +16,59 @@ class RBF(Interpolator):
         position = tb.solver.getPosition()
         self.computeMapping(position)
 
+    # Interpolate recvData and return the result
+
+    @tb.compute_time
+    def interpData(self,recvData):
+
+        size = (tb.solver.dim+1,np.size(recvData,1))
+        result = np.append(recvData,np.zeros(size),axis=0)
+        result = np.linalg.lstsq(self.A,result,-1)[0]
+        return np.dot(self.B,result)
+
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
     def computeMapping(self,position):
 
+        self.size = 1+tb.solver.dim+len(self.recvPos)
         self.B = self.makeB(position)
         self.A = self.makeA()
 
-    # Interpolate RecvData and Return the Result
+        # Fill A and B with radial basis function
 
-    @tb.compute_time
-    def interpData(self,recvData):
-
-        size = (tb.solver.dim+1,recvData.shape[1])
-        result = np.append(recvData,np.zeros(size),axis=0)
-        result = np.linalg.lstsq(self.A,result,-1)[0]
-        return np.dot(self.B,result)
-
-# %% Fill the A Matrix Using Basis Functions
-
-    def makeA(self):
-
-        size = 1+self.recvNode+tb.solver.dim
-        A = np.zeros((size,size))
-
-        # Loop on the node positions in target mesh
+        K = range(len(position))
+        N = range(len(self.recvPos))
 
         for i,pos in enumerate(self.recvPos):
 
-            A[self.recvNode,i] = 1
-            A[i,self.recvNode] = 1
-
-            A[range(1+self.recvNode,size),i] = pos
-            A[i,range(1+self.recvNode,size)] = pos
+            rad = np.linalg.norm(pos-position,axis=1)
+            self.B[K,i] = self.function(rad)
 
             rad = np.linalg.norm(pos-self.recvPos,axis=1)
-            A[range(self.recvNode),i] = self.function(rad)
+            self.A[i,N] = self.function(rad)
 
+# %% Initialize the A and B Matrices
+
+    def makeA(self):
+
+        N = len(self.recvPos)
+        K = range(1+N,self.size)
+        A = np.zeros((self.size,self.size))
+
+        # Initialize A with target mesh positions
+
+        A[N,range(N)] = A[range(N),N] = 1
+        A[np.ix_(range(N),K)] = self.recvPos
+        A[np.ix_(K,range(N))] = np.transpose(self.recvPos)
         return A
 
-# %% Fill the B Matrix Using Basis Functions
+    # Initialize B with reference mesh positions
 
     def makeB(self,position):
 
-        size = 1+self.recvNode+tb.solver.dim
-        B = np.ones((self.nbrNode,size))
-
-        # Loop on the node positions in reference mesh
-
-        for i,pos in enumerate(position):
-            
-            rad = np.linalg.norm(pos-self.recvPos,axis=1)
-            B[i,range(self.recvNode)] = self.function(rad)
-            B[i,range(self.recvNode+1,size)] = pos
-
+        N = len(position)
+        B = np.ones((N,self.size))
+        K = range(1+len(self.recvPos),self.size)
+        B[np.ix_(range(N),K)] = position
         return B
-    

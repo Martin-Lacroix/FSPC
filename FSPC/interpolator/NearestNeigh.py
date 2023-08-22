@@ -14,24 +14,26 @@ class KNN(Interpolator):
     def initialize(self):
 
         Interpolator.__init__(self)
-        self.H = sp.dok_matrix((self.nbrNode,self.recvNode))
         position = tb.solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
+
+    # Interpolate recvData and return the result
+
+    @tb.compute_time
+    def interpData(self,recvData):
+        return self.H.dot(recvData)
 
 # %% Mapping Matrix from RecvPos to Position
 
     @tb.compute_time
     def computeMapping(self,position):
 
+        size = tb.solver.nbrNod,len(self.recvPos)
+        self.H = sp.dok_matrix(size)
+
         if self.K == 1: self.search(position)
         else: self.interpolate(position)
-
-    # Interpolate RecvData and Return the Result
-
-    @tb.compute_time
-    def interpData(self,recvData):
-        return self.H.dot(recvData)
 
 # %% Find the K Nearest Neighbours
  

@@ -58,7 +58,7 @@ class ILS(Algorithm):
         # Return the solution correction
 
         delta = np.dot(W,np.linalg.lstsq(V,R,-1)[0])-R
-        return np.split(delta,tb.solver.nbrNode)
+        return np.split(delta,tb.solver.nbrNod)
 
 # %% Relaxation of Solid Interface Displacement
     

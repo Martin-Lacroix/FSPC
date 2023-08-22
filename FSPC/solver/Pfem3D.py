@@ -116,7 +116,7 @@ class Pfem3D(object):
 
     def getPosition(self):
 
-        vector = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNod,self.dim))
 
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -128,7 +128,7 @@ class Pfem3D(object):
 
     def getVelocity(self):
 
-        vector = np.zeros((self.nbrNode,self.dim))
+        vector = np.zeros((self.nbrNod,self.dim))
         
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -159,7 +159,7 @@ class Pfem3D(object):
     def initialize(self):
 
         self.mesh.getNodesIndex('FSInterface',self.FSI)
-        self.nbrNode = self.FSI.size()
+        self.nbrNod = self.FSI.size()
         self.BC = list()
 
         for i in self.FSI:
