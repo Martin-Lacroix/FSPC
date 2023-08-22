@@ -24,7 +24,6 @@ class RBF(Interpolator):
         size = (tb.solver.dim+1,np.size(recvData,1))
         result = np.append(recvData,np.zeros(size),axis=0)
         result = np.linalg.lstsq(self.A,result,-1)[0]
-        #result = np.linalg.solve(self.A,result)
         return np.dot(self.B,result)
 
 # %% Mapping Matrix from RecvPos to Position
