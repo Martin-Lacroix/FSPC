@@ -55,8 +55,8 @@ class Algorithm(object):
     @tb.only_solid
     def computePredictor(self,verif):
 
-        tb.interp.predDisplacement(verif)
         tb.interp.predTemperature(verif)
+        tb.interp.predDisplacement(verif)
 
     @tb.only_solid
     def resetConverg(self):
@@ -88,11 +88,11 @@ class Algorithm(object):
         
         if tb.convMech:
             disp = tb.solver.getDisplacement()
-            tb.convMech.updateRes(disp-tb.interp.disp)
+            tb.convMech.updateRes(disp,tb.interp.disp)
 
         if tb.convTher:
             temp = tb.solver.getTemperature()
-            tb.convTher.updateRes(temp-tb.interp.temp)
+            tb.convTher.updateRes(temp,tb.interp.temp)
 
     # Transfer Dirichlet data Solid to Fluid
 

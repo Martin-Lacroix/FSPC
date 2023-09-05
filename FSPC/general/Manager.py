@@ -59,17 +59,17 @@ class Convergence(object):
         self.residual = np.inf
 
     # Update the current and previous residual
-        
-    def updateRes(self,residual):
+
+    def updateRes(self,result,prediction):
 
         self.prevRes = np.copy(self.residual)
-        self.residual = np.copy(residual)
+        self.residual = result-prediction
 
-        if np.all(np.isfinite(residual)):
-            res = np.linalg.norm(residual,axis=0)
-            self.epsilon = np.linalg.norm(res)
-
-        else: self.epsilon = np.inf
+        res = np.linalg.norm(self.residual,axis=0)
+        den = np.linalg.norm(result,axis=0)
+        
+        res = res/(den+self.tol)
+        self.epsilon = np.linalg.norm(res)
 
     # Check if the convergence is reached
 
