@@ -26,7 +26,7 @@ class Interpolator(object):
     @tb.only_solid
     def initializeData(self):
 
-        if tb.convMech: self.pos = tb.solver.getPosition()
+        if tb.convMech: self.disp = tb.solver.getDisplacement()
         if tb.convTher: self.temp = tb.solver.getTemperature()
 
     def initialize(self):
@@ -65,11 +65,11 @@ class Interpolator(object):
     @tb.conv_mecha
     def applyDispSF(self):
 
-        if CW.rank == 1: CW.send(self.pos,0,tag=4)
+        if CW.rank == 1: CW.send(self.disp,0,tag=4)
         if CW.rank == 0:
 
-            pos = CW.recv(source=1,tag=4)
-            tb.solver.applyPosition(self.interpData(pos))
+            disp = CW.recv(source=1,tag=4)
+            tb.solver.applyDisplacement(self.interpData(disp))
 
     # Apply actual heat flux on solid
 
@@ -96,15 +96,11 @@ class Interpolator(object):
 # %% Predict the Solution for Next Time Step
 
     @tb.conv_mecha
-    def predPosition(self,verified):
+    def predDisplacement(self,verified):
         
-        if verified:
-
-            self.prevPos = np.copy(self.pos)
-            self.velocityP = tb.solver.getVelocity()
-
-        else: self.pos = np.copy(self.prevPos)
-        self.pos += tb.step.dt*self.velocityP
+        if verified: self.velocityD = tb.solver.getVelocity()
+        else: self.disp = np.zeros(self.disp.shape)
+        self.disp += tb.step.dt*self.velocityD
 
     # Predictor for the temparature coupling
 

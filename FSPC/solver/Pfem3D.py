@@ -97,10 +97,11 @@ class Pfem3D(object):
 
 # %% Dirichlet Boundary Conditions
 
-    def applyPosition(self,pos):
+    def applyDisplacement(self,disp):
 
-        BC = (pos-self.pos)/tb.step.dt
-        if not self.implicit: BC = 2*(BC-self.vel)/tb.step.dt
+        BC = disp/tb.step.dt
+        if not self.implicit:
+            BC = np.multiply(2,BC-self.vel)/tb.step.dt
 
         for i,vector in enumerate(BC):
             for j,val in enumerate(vector): self.BC[i][j] = val
@@ -109,34 +110,10 @@ class Pfem3D(object):
 
     def applyTemperature(self,temp):
 
-        for i,vector in enumerate(temp):
-            self.BC[i][self.dim] = vector[0]
-            
-# %% Return Nodal Values
+        for i,result in enumerate(temp):
+            self.BC[i][self.dim] = result[0]
 
-    def getPosition(self):
-
-        vector = np.zeros((self.nbrNod,self.dim))
-
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
-                vector[j,i] = self.mesh.getNode(k).getCoordinate(i)
-
-        return vector
-
-    # Computes the nodal velocity vector
-
-    def getVelocity(self):
-
-        vector = np.zeros((self.nbrNod,self.dim))
-        
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
-                vector[j,i] = self.mesh.getNode(k).getState(i)
-
-        return vector
-        
-    # Mechanical boundary conditions
+# %% Neumann Boundary Conditions
 
     @tb.compute_time
     def getLoading(self):
@@ -153,6 +130,35 @@ class Pfem3D(object):
         vector = w.VectorVectorDouble()
         self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
         return np.copy(vector)
+            
+# %% Return Nodal Values
+
+    def getDisplacement(self):
+        return self.getPosition()-self.prevPos
+    
+    # Computes the nodal position vector
+
+    def getPosition(self):
+
+        result = np.zeros((self.nbrNod,self.dim))
+
+        for i in range(self.dim):
+            for j,k in enumerate(self.FSI):
+                result[j,i] = self.mesh.getNode(k).getCoordinate(i)
+
+        return result
+
+    # Computes the nodal velocity vector
+
+    def getVelocity(self):
+
+        result = np.zeros((self.nbrNod,self.dim))
+        
+        for i in range(self.dim):
+            for j,k in enumerate(self.FSI):
+                result[j,i] = self.mesh.getNode(k).getState(i)
+
+        return result
 
 # %% Initialize Communication Vectors
 
@@ -170,7 +176,7 @@ class Pfem3D(object):
 
         # Store temporary simulation variables
 
-        self.pos = self.getPosition()
+        self.prevPos = self.getPosition()
         self.vel = self.getVelocity()
 
 # %% Other Functions
@@ -181,7 +187,7 @@ class Pfem3D(object):
         self.mesh.remesh(False)
         if self.implicit: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
-        self.pos = self.getPosition()
+        self.prevPos = self.getPosition()
         self.vel = self.getVelocity()
 
     # Save the results or finalize

@@ -92,9 +92,9 @@ class MVJ(Algorithm):
 # %% Relaxation of Solid Interface Displacement
 
     @tb.conv_mecha
-    def relaxPosition(self):
+    def relaxDisplacement(self):
 
-        pos = tb.solver.getPosition()
+        disp = tb.solver.getDisplacement()
 
         # Perform either BGS or IQN iteration
 
@@ -102,7 +102,7 @@ class MVJ(Algorithm):
 
             tb.convMech.V = list()
             tb.convMech.W = list()
-            if self.BGS: delta = self.reset(tb.convMech,pos.size)
+            if self.BGS: delta = self.reset(tb.convMech,disp.size)
             else:
 
                 R = np.hstack(-tb.convMech.residual)
@@ -112,13 +112,13 @@ class MVJ(Algorithm):
         else:
 
             tb.convMech.V.append(np.hstack(tb.convMech.deltaRes()))
-            tb.convMech.W.append(np.hstack(pos-self.prevPos))
+            tb.convMech.W.append(np.hstack(disp-self.prevDisp))
             delta = self.compute(tb.convMech)
 
         # Update the pedicted displacement
 
-        tb.interp.pos += delta
-        self.prevPos = np.copy(pos)
+        tb.interp.disp += delta
+        self.prevDisp = np.copy(disp)
 
 # %% Relaxation of Solid Interface Temperature
 

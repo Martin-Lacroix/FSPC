@@ -12,7 +12,7 @@ class Algorithm(object):
     def relaxTemperature(self):
         raise Exception('No thermal relaxation defined')
     
-    def relaxPosition(self):
+    def relaxDisplacement(self):
         raise Exception('No mechanical relaxation defined')
 
 # %% Runs the Fluid-Solid Coupling
@@ -55,7 +55,7 @@ class Algorithm(object):
     @tb.only_solid
     def computePredictor(self,verif):
 
-        tb.interp.predPosition(verif)
+        tb.interp.predDisplacement(verif)
         tb.interp.predTemperature(verif)
 
     @tb.only_solid
@@ -71,8 +71,8 @@ class Algorithm(object):
     def relaxation(self):
 
         self.computeResidual()
+        self.relaxDisplacement()
         self.relaxTemperature()
-        self.relaxPosition()
         self.showResidual()
 
         # Check for coupling convergence
@@ -87,8 +87,8 @@ class Algorithm(object):
     def computeResidual(self):
         
         if tb.convMech:
-            pos = tb.solver.getPosition()
-            tb.convMech.updateRes(pos-tb.interp.pos)
+            disp = tb.solver.getDisplacement()
+            tb.convMech.updateRes(disp-tb.interp.disp)
 
         if tb.convTher:
             temp = tb.solver.getTemperature()

@@ -22,6 +22,7 @@ class Metafor(object):
         self.metafor = module.getMetafor(parm)
         self.tsm = self.metafor.getTimeStepManager()
         geometry = self.metafor.getDomain().getGeometry()
+        self.metafor.getInitialConditionSet().update(0)
         self.metafor.getDomain().build()
 
         # Sets the dimension of the mesh
@@ -46,7 +47,7 @@ class Metafor(object):
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
         self.nbrNod = self.FSI.getNumberOfMeshPoints()
-        self.metafor.getInitialConditionSet().update(0)
+        self.prevPos = self.getPosition()
 
         # Mechanical and thermal interactions
 
@@ -94,79 +95,84 @@ class Metafor(object):
 
     def applyLoading(self,load):
 
-        vector = (self.prevLoad+load)/2
+        result = (self.prevLoad+load)/2
         self.nextLoad = np.copy(load)
 
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            self.interacM.setNodTensor(node,*vector[i])
+            self.interacM.setNodTensor(node,*result[i])
 
     def applyHeatFlux(self,heat):
 
-        vector = (self.prevHeat+heat)/2
+        result = (self.prevHeat+heat)/2
         self.nextHeat = np.copy(heat)
 
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            self.interacT.setNodVector(node,*vector[i])
+            self.interacT.setNodVector(node,*result[i])
 
 # %% Return Mechanical Nodal Values
 
+    def getDisplacement(self):
+        return self.getPosition()-self.prevPos
+
+    # Computes the nodal position vector
+
     def getPosition(self):
 
-        vector = np.zeros((self.nbrNod,self.dim))
+        result = np.zeros((self.nbrNod,self.dim))
 
         for i,axe in enumerate(self.axe):
-            for j,data in enumerate(vector):
+            for j,data in enumerate(result):
 
                 node = self.FSI.getMeshPoint(j)
                 data[i] += node.getValue(w.Field1D(axe,w.AB))
                 data[i] += node.getValue(w.Field1D(axe,w.RE))
 
-        return vector
+        return result
 
-    # Computes the nodal velocity vector
+    # Computes the nodal velocity result
 
     def getVelocity(self):
 
-        vector = np.zeros((self.nbrNod,self.dim))
+        result = np.zeros((self.nbrNod,self.dim))
 
         for i,axe in enumerate(self.axe):
-            for j,data in enumerate(vector):
+            for j,data in enumerate(result):
 
                 node = self.FSI.getMeshPoint(j)
                 data[i] = node.getValue(w.Field1D(axe,w.GV))
         
-        return vector
+        return result
 
 # %% Return Thermal Nodal Values
 
     def getTemperature(self):
 
-        vector = np.zeros((self.nbrNod,1))
+        result = np.zeros((self.nbrNod,1))
         
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            vector[i,0] += node.getValue(w.Field1D(w.TO,w.AB))
-            vector[i,0] += node.getValue(w.Field1D(w.TO,w.RE))
+            result[i] += node.getValue(w.Field1D(w.TO,w.AB))
+            result[i] += node.getValue(w.Field1D(w.TO,w.RE))
 
-        return vector
+        return result
 
     # Computes the nodal temperature velocity
 
     def getTempVeloc(self):
 
-        vector = np.zeros((self.nbrNod,1))
+        result = np.zeros((self.nbrNod,1))
 
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            vector[i] = node.getValue(w.Field1D(w.TO,w.GV))
+            result[i] = node.getValue(w.Field1D(w.TO,w.GV))
         
-        return vector
+        return result
 
 # %% Other Functions
 
@@ -175,6 +181,7 @@ class Metafor(object):
         
         if tb.convMech: self.prevLoad = np.copy(self.nextLoad)
         if tb.convTher: self.prevHeat = np.copy(self.nextHeat)
+        self.prevPos = self.getPosition()
         self.metaFac.save(self.mfac)
         self.reload = False
 

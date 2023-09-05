@@ -141,4 +141,3 @@ for D in data: plt.plot(*np.transpose(D))
 plt.plot(time,disp,'k--')
 plt.grid()
 plt.show()
-
