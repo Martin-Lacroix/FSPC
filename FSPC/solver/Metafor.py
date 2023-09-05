@@ -29,16 +29,24 @@ class Metafor(object):
 
         if geometry.is2D():
 
+            size = 3
             self.dim = 2
-            self.axe = [w.TX,w.TY]
-            if geometry.isAxisymmetric(): size = 4
-            else: size = 3
+            self.axis = [w.TX,w.TY]
+            tensor = 'setNodTensor2D'
 
-        elif geometry.is3D():
-            
+        if geometry.isAxisymmetric():
+
+            size = 4
+            self.dim = 2
+            self.axis = [w.TX,w.TY]
+            tensor = 'setNodTensorAxi'
+
+        if geometry.is3D():
+
             size = 6
             self.dim = 3
-            self.axe = [w.TX,w.TY,w.TZ]
+            self.axis = [w.TX,w.TY,w.TZ]
+            tensor = 'setNodTensor3D'
 
         # Defines some internal variables
 
@@ -53,15 +61,16 @@ class Metafor(object):
 
         if 'interacM' in parm:
 
-            self.interacM = parm['interacM']
+            self.interac = parm['interacM']
             self.prevLoad = np.zeros((self.nbrNod,size))
+            self.setNodLoad = getattr(self.interac,tensor)
 
         if 'interacT' in parm:
             
-            self.interacT = parm['interacT']
+            self.interac = parm['interacT']
             self.prevHeat = np.zeros((self.nbrNod,self.dim))
 
-        # Manages time step restart functions
+        # Manages time step and restart functions
 
         self.mfac = w.MemoryFac()
         self.metaFac = w.MetaFac(self.metafor)
@@ -91,17 +100,19 @@ class Metafor(object):
         self.reload = True
         return ok
 
-# %% Set Nodal Loads
+# %% Neumann Boundary Conditions
 
     def applyLoading(self,load):
 
         result = (self.prevLoad+load)/2
-        self.nextLoad = np.copy(load)
+        self.nextLoad = np.copy(load)    
 
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            self.interacM.setNodTensor(node,*result[i])
+            self.setNodLoad(node,*result[i])
+
+    # Apply Thermal boundary conditions
 
     def applyHeatFlux(self,heat):
 
@@ -111,7 +122,7 @@ class Metafor(object):
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            self.interacT.setNodVector(node,*result[i])
+            self.interac.setNodVector(node,*result[i])
 
 # %% Return Mechanical Nodal Values
 
@@ -124,7 +135,7 @@ class Metafor(object):
 
         result = np.zeros((self.nbrNod,self.dim))
 
-        for i,axe in enumerate(self.axe):
+        for i,axe in enumerate(self.axis):
             for j,data in enumerate(result):
 
                 node = self.FSI.getMeshPoint(j)
@@ -139,7 +150,7 @@ class Metafor(object):
 
         result = np.zeros((self.nbrNod,self.dim))
 
-        for i,axe in enumerate(self.axe):
+        for i,axe in enumerate(self.axis):
             for j,data in enumerate(result):
 
                 node = self.FSI.getMeshPoint(j)
@@ -195,9 +206,8 @@ class Metafor(object):
     @tb.compute_time
     def getFacet(self):
 
+        elemSet = self.interac.getElementSet()
         nbrList = np.zeros(self.nbrNod,dtype=int)
-        try: elemSet = self.interacM.getElementSet()
-        except: elemSet = self.interacT.getElementSet()
 
         # Store the node indices from Metafor
 

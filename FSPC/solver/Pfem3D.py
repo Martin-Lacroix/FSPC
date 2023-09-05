@@ -8,19 +8,20 @@ import gmsh
 class Pfem3D(object):
     def __init__(self,path):
 
+        self.problem = w.getProblem(path)
+
         # Incompressible or weakly compressible solver
 
-        self.problem = w.getProblem(path)
         if 'WC' in self.problem.getID():
             
             self.implicit = False
-            self.run = self.runExplicit
+            self.run = getattr(self,'runExplicit')
             self.maxDivision = 200
 
         else:
             
             self.implicit = True
-            self.run = self.runImplicit
+            self.run = getattr(self,'runImplicit')
             self.maxDivision = 10
 
         # Store the important objects and variables
@@ -122,7 +123,7 @@ class Pfem3D(object):
         self.solver.computeStress('FSInterface',self.FSI,vector)
         return np.copy(vector)
 
-    # Thermal boundary conditions
+    # Return Thermal boundary conditions
 
     @tb.compute_time
     def getHeatFlux(self):
