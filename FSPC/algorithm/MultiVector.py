@@ -3,7 +3,9 @@ from ..general import Toolbox as tb
 from .Algorithm import Algorithm
 import numpy as np
 
-# %% Interface Quasi-Newton with Multi-Vector Jacobian
+# -----------------------------------------------|
+# Interface Quasi-Newton Multi-Vector Jacobian   |
+# -----------------------------------------------|
 
 class MVJ(Algorithm):
     def __init__(self):
@@ -12,7 +14,9 @@ class MVJ(Algorithm):
         self.omega = 0.5
         self.BGS = True
 
-# %% Coupling at Each Time Step
+# -----------------------------|
+# Coupling at Each Time Step   |
+# -----------------------------|
 
     def couplingAlgo(self):
 
@@ -51,7 +55,9 @@ class MVJ(Algorithm):
         self.BGS = True
         return False
 
-# %% Compute the Solution Correction
+# ----------------------------------|
+# Compute the Solution Correction   |
+# ----------------------------------|
 
     def compute(self,conv):
     
@@ -70,7 +76,9 @@ class MVJ(Algorithm):
         delta = np.dot(conv.J,R)-R
         return np.split(delta,tb.solver.nbrNod)
 
-# %% Reset Jacobian and perform BGS iteration
+# -------------------------------------------|
+# Reset Jacobian and Perform BGS Iteration   |
+# -------------------------------------------|
 
     def reset(self,conv,size):
 
@@ -89,7 +97,9 @@ class MVJ(Algorithm):
         if tb.convTher:
             tb.convTher.Jprev = np.copy(tb.convTher.J)
 
-# %% Relaxation of Solid Interface Displacement
+# ---------------------------------------------|
+# Relaxation of Solid Interface Displacement   |
+# ---------------------------------------------|
 
     @tb.conv_mecha
     def relaxDisplacement(self):
@@ -120,7 +130,9 @@ class MVJ(Algorithm):
         tb.interp.disp += delta
         self.prevDisp = np.copy(disp)
 
-# %% Relaxation of Solid Interface Temperature
+# --------------------------------------------|
+# Relaxation of Solid Interface Temperature   |
+# --------------------------------------------|
 
     @tb.conv_therm
     def relaxTemperature(self):

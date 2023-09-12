@@ -2,7 +2,9 @@ import toolbox.gmsh as gmsh
 import wrap as w
 import os
 
-# %% Main Function
+# --------------------------------------|
+# Initialization and Input Parameters   |
+# --------------------------------------|
 
 metafor = None
 def getMetafor(parm):

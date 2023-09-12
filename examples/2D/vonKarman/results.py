@@ -3,9 +3,9 @@ import numpy as np
 import gmsh
 import os
 
-data = list()
-
-# %% Post Procesing of Results
+# ----------------------------|
+# Post Procesing of Results   |
+# ----------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)
@@ -27,9 +27,8 @@ gmsh.finalize()
 disp = (coord-coord[0])[:,1]
 time = np.sort(time)
 
-# Plot the solid displacement
+# Plot the final solution
 
-# for D in data: plt.plot(*np.transpose(D))
 plt.plot(time,disp,'k--')
 plt.grid()
 plt.show()

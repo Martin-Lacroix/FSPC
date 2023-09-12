@@ -2,7 +2,9 @@ import numpy as np
 import meshio
 import os
 
-# %% Main Code
+# ---------------------------------|
+# Convert MSH Files to VTU Files   |
+# ---------------------------------|
 
 workspace = os.getcwd()
 folderList = ['metafor','pfem']

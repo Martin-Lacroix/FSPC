@@ -3,7 +3,9 @@ from ..general import Toolbox as tb
 from scipy import sparse as sp
 import numpy as np
 
-# %% Mesh Interpolation Element Transfer Method
+# ---------------------------------------------|
+# Mesh Interpolation Element Transfer Method   |
+# ---------------------------------------------|
 
 class ETM(Interpolator):
     def __init__(self,K):
@@ -24,7 +26,9 @@ class ETM(Interpolator):
     def interpData(self,recvData):
         return self.H.dot(recvData)
 
-# %% Mapping Matrix from RecvPos to Position
+# ------------------------------------------|
+# Mapping Matrix from RecvPos to Position   |
+# ------------------------------------------|
 
     @tb.compute_time
     def computeMapping(self,position):
@@ -57,7 +61,9 @@ class ETM(Interpolator):
             face = self.recvFace[faceList[i][idx]]
             self.H[i,face] = elem.evaluate(parList[idx])
 
-# %% Closest Facets to the Current Position
+# -----------------------------------------|
+# Closest Facets to the Current Position   |
+# -----------------------------------------|
 
     def getCloseFace(self,position):
         

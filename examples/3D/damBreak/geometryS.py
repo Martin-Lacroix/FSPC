@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 S = 0.6
 Ly = 0.3
@@ -14,7 +16,9 @@ N = 20
 M = 10
 P = 4
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -28,7 +32,7 @@ p.append(sh.occ.addPoint(S+Sx,(Ly-Sy)/2,Sz))
 p.append(sh.occ.addPoint(S+Sx,(Ly+Sy)/2,Sz))
 p.append(sh.occ.addPoint(S,(Ly+Sy)/2,Sz))
 
-# %% Lines List
+# Lines List
 
 l = list()
 
@@ -47,7 +51,9 @@ l.append(sh.occ.addLine(p[1],p[5]))
 l.append(sh.occ.addLine(p[2],p[6]))
 l.append(sh.occ.addLine(p[3],p[7]))
 
-# %% Surface List
+# ----------------------------------|
+# Surfaces and Volumes Definition   |
+# ----------------------------------|
 
 k = list()
 s = list()
@@ -80,7 +86,7 @@ sh.mesh.setTransfiniteCurve(l[6],P)
 for a in s: sh.mesh.setTransfiniteSurface(a)
 for a in s: sh.mesh.setRecombine(2,a)
 
-# %% Solid Volume
+# Volumes List
 
 h = sh.occ.addSurfaceLoop(s)
 v = sh.occ.addVolume([h])
@@ -89,16 +95,17 @@ sh.occ.synchronize()
 sh.mesh.setTransfiniteVolume(v)
 sh.mesh.setRecombine(3,v)
 
-# %% Physical Surface
+# Physical Surface
 
 sh.addPhysicalGroup(3,[v],name='Solid')
 sh.addPhysicalGroup(2,[s[0]],name='Clamped')
 sh.addPhysicalGroup(2,s[1:],name='FSInterface')
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 sh.mesh.generate(3)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')
 gmsh.fltk.run()
 gmsh.finalize()

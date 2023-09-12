@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 H = 0.4
 B = 0.25
@@ -18,7 +20,9 @@ N = 40
 M = 10
 P = 4
 
-# %% Point List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -40,7 +44,7 @@ p.append(sh.occ.addPoint(L1+W,(B-BS)/2,HS,d))
 p.append(sh.occ.addPoint(L1+W,(B+BS)/2,HS,d))
 p.append(sh.occ.addPoint(L1,(B+BS)/2,HS,d))
 
-# %% Line List
+# # Lines List
 
 l = list()
 
@@ -71,7 +75,9 @@ l.append(sh.occ.addLine(p[9],p[13]))
 l.append(sh.occ.addLine(p[10],p[14]))
 l.append(sh.occ.addLine(p[11],p[15]))
 
-# %% Surface List
+# ----------------------------------|
+# Surfaces and Volumes Definition   |
+# ----------------------------------|
 
 k = list()
 s = list()
@@ -109,13 +115,13 @@ sh.mesh.setTransfiniteCurve(l[10],P)
 sh.mesh.setTransfiniteCurve(l[12],P)
 sh.mesh.setTransfiniteCurve(l[14],P)
 
-# %% Fluid Volume
+# Volumes List
 
 h = sh.occ.addSurfaceLoop(s[1:])
 v = sh.occ.addVolume([h])
 sh.occ.synchronize()
 
-# %% Physical Surface
+# Physical Surface
 
 sh.addPhysicalGroup(3,[v],name='Fluid')
 sh.addPhysicalGroup(2,s[:6],name='Polytope')
@@ -125,7 +131,9 @@ sh.addPhysicalGroup(2,[s[6],s[7],s[10]],name='Wall')
 sh.addPhysicalGroup(2,[s[8]],name='Outlet')
 sh.addPhysicalGroup(2,[s[9]],name='Inlet')
 
-# %% Mesh Size Function
+# ------------------------------------|
+# Mesh Characteristic Size Function   |
+# ------------------------------------|
 
 def meshSize(dim,tag,x,y,z,lc):
 
@@ -142,10 +150,9 @@ sh.mesh.setSizeCallback(meshSize)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 
-# %% Save the Mesh
+# Write the Mesh File
 
 sh.mesh.generate(3)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')
 gmsh.fltk.run()
 gmsh.finalize()

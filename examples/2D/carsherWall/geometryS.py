@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 L1 = 0.3
 L2 = 0.5
@@ -23,7 +25,9 @@ eps = 1e-3
 N = 100
 M = 5
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -54,7 +58,7 @@ p.append(sh.occ.addPoint(L1+L2+S,H1+H2+H3-S-B,0,d))
 p.append(sh.occ.addPoint(L1+L2+S,H1+H2+H3-S,0,d))
 p.append(sh.occ.addPoint(L1+L2+L3+S,H1+H2+H3-S,0,d))
 
-# %% Lines List
+# Lines List
 
 l = list()
 r = list()
@@ -85,7 +89,9 @@ h.append(sh.occ.addLine(p[0],p[1]))
 h.append(sh.occ.addLine(p[1],p[3]))
 h.append(sh.occ.addLine(p[3],p[2]))
 
-# %% Solid Surface
+# --------------------------------|
+# Physical Surface and Boundary   |
+# --------------------------------|
 
 k = list()
 s = list()
@@ -104,17 +110,18 @@ sh.mesh.setTransfiniteCurve(h[3],N)
 sh.mesh.setTransfiniteSurface(s[0])
 sh.mesh.setRecombine(2,s[0])
 
-# %% Boundaries
+# Boundaries
 
 sh.addPhysicalGroup(2,s[1:3],name='Tool')
 sh.addPhysicalGroup(2,[s[0]],name='Solid')
 sh.addPhysicalGroup(1,h,name='FSInterface')
 sh.addPhysicalGroup(1,l+r,name='Contact')
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 sh.mesh.generate(2)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')
 gmsh.fltk.run()
 gmsh.finalize()

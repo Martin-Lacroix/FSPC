@@ -1,6 +1,8 @@
 import numpy as np
 
-# %% Linear Line Finite Element
+# -----------------------------|
+# Linear Line Finite Element   |
+# -----------------------------|
 
 class Line(object):
 
@@ -27,7 +29,9 @@ class Line(object):
         if abs(parm)>1.001: return np.inf
         return np.linalg.norm(self.interpolate(node,parm)-pos)
 
-# %% Linear Triangle Finite Element
+# ---------------------------------|
+# Linear Triangle Finite Element   |
+# ---------------------------------|
 
 class Triangle(Line):
 
@@ -49,7 +53,9 @@ class Triangle(Line):
         if any(-0.001>parm) or sum(parm)>1.001: return np.inf
         return np.linalg.norm(self.interpolate(node,parm)-pos)
 
-# %% Linear Quadrangle Finite Element
+# -----------------------------------|
+# Linear Quadrangle Finite Element   |
+# -----------------------------------|
 
 class Quadrangle(Line):
 

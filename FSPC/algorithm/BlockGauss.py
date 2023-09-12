@@ -3,7 +3,9 @@ from ..general import Toolbox as tb
 from .Algorithm import Algorithm
 import numpy as np
 
-# %% Block-Gauss Seidel with Aitken Dynamic Relaxation
+# -----------------------------------------------|
+# Block-Gauss Seidel Aitken Dynamic Relaxation   |
+# -----------------------------------------------|
 
 class BGS(Algorithm):
     def __init__(self):
@@ -11,7 +13,9 @@ class BGS(Algorithm):
         Algorithm.__init__(self)
         self.omega = 0.5
 
-# %% Coupling at Each Time Step
+# -----------------------------|
+# Coupling at Each Time Step   |
+# -----------------------------|
 
     def couplingAlgo(self):
 
@@ -46,8 +50,10 @@ class BGS(Algorithm):
             if verif: return True
         
         return False
-    
-# %% Compute the Solution Correction
+
+# ----------------------------------|
+# Compute the Solution Correction   |
+# ----------------------------------|
 
     def compute(self,conv):
 
@@ -60,7 +66,9 @@ class BGS(Algorithm):
         conv.omega = max(min(conv.omega,1),0)
         return conv.omega*conv.residual
 
-# %% Relaxation of Solid Interface Displacement
+# ---------------------------------------------|
+# Relaxation of Solid Interface Displacement   |
+# ---------------------------------------------|
 
     @tb.conv_mecha
     def relaxDisplacement(self):
@@ -72,7 +80,9 @@ class BGS(Algorithm):
             tb.convMech.omega = self.omega
             tb.interp.disp += self.omega*tb.convMech.residual
 
-# %% Relaxation of Solid Interface Temperature
+# --------------------------------------------|
+# Relaxation of Solid Interface Temperature   |
+# --------------------------------------------|
 
     @tb.conv_therm
     def relaxTemperature(self):

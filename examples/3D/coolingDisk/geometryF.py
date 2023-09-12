@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 RS = 0.0125
 HS = 0.014
@@ -11,7 +13,9 @@ RF = 0.1
 
 d = 3.7e-3
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -31,7 +35,7 @@ p.append(sh.occ.addPoint(RF,0,HF+HS+RS,d))
 p.append(sh.occ.addPoint(-RF,0,HF+HS+RS,d))
 p.append(sh.occ.addPoint(0,RF,HF+HS+RS,d))
 
-# %% Line List
+# # Lines List
 
 l = list()
 c = list()
@@ -58,7 +62,9 @@ l.append(sh.occ.addLine(p[8],p[14]))
 l.append(sh.occ.addLine(p[7],p[13]))
 l.append(sh.occ.addLine(p[11],p[9]))
 
-# %% Surface List
+# ----------------------------------|
+# Surfaces and Volumes Definition   |
+# ----------------------------------|
 
 k = list()
 s = list()
@@ -77,7 +83,7 @@ k.append(sh.occ.addCurveLoop([c[6],l[5],c[11],l[4]]))
 for a in k: s.append(sh.occ.addBSplineFilling(a))
 sh.occ.synchronize()
 
-# %% Fluid Volume
+# Volumes List
 
 h = sh.occ.addSurfaceLoop(s[:6])
 u = sh.occ.addSphere(0,0,HS+HF,RS)
@@ -90,17 +96,18 @@ sh.occ.remove([(3,u)])
 sh.mesh.setSize(p,d)
 sh.occ.synchronize()
 
-# %% Physical Surface
+# Physical Surface
 
 sh.addPhysicalGroup(3,[v],name='Fluid')
 sh.addPhysicalGroup(2,[g],name='FSInterface')
 sh.addPhysicalGroup(2,[s[0]],name='FreeSurface')
 sh.addPhysicalGroup(2,s[1:],name='Wall')
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 sh.mesh.generate(3)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')
 gmsh.fltk.run()
 gmsh.finalize()

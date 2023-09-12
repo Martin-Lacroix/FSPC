@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 R = 0.25
 L = 0.15+R
@@ -19,7 +21,9 @@ RB = 0.375
 
 d = 0.02
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -78,7 +82,7 @@ p.append(sh.occ.addPoint(-(L+L1+L2),H+5*R+D2,0,d))
 p.append(sh.occ.addPoint(L+L1+L2,H+5*R+D2,0,d))
 p.append(sh.occ.addPoint(L+L1+L2,H-(5*R+D1),0,d))
 
-# %% Lines List
+# Lines List
 
 l = list()
 r = list()
@@ -130,7 +134,9 @@ sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(L,1)
 sh.mesh.setTransfiniteCurve(R,1)
 
-# %% Fluid Surface
+# --------------------------------|
+# Physical Surface and Boundary   |
+# --------------------------------|
 
 k = list()
 
@@ -139,7 +145,7 @@ k.append(sh.occ.addCurveLoop(l+h+r+q))
 s = sh.occ.addPlaneSurface([k[1],-k[0]])
 sh.occ.synchronize()
 
-# %% Physical Boundary
+# Physical Boundary
 
 sh.addPhysicalGroup(2,[s],name='Fluid')
 sh.addPhysicalGroup(1,[q[1]],name='FreeSurface')
@@ -153,10 +159,11 @@ sh.addPhysicalGroup(1,c,name='Poly')
 sh.addPhysicalGroup(1,l+[L],name='PolyL')
 sh.addPhysicalGroup(1,r+[R],name='PolyR')
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 sh.mesh.generate(2)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')
 gmsh.fltk.run()
 gmsh.finalize()

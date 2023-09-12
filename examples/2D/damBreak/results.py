@@ -5,7 +5,7 @@ import os
 
 data = list()
 
-# %% Cerquaglia Results
+# Cerquaglia Results
 
 data.append(
 [[0.00000,0.000000],
@@ -410,7 +410,9 @@ data.append(
 [0.984682,-0.00947],
 [0.996810,-0.00833]])
 
-# %% Post Procesing of Results
+# ----------------------------|
+# Post Procesing of Results   |
+# ----------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)
@@ -432,7 +434,7 @@ gmsh.finalize()
 disp = (coord-coord[0])[:,0]
 time = np.sort(time)
 
-# Plot the solid displacement
+# Plot the final solution
 
 for D in data: plt.plot(*np.transpose(D))
 plt.plot(time,disp,'k--')

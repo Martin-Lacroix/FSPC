@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 R = 2.25
 H = 3.75
@@ -13,7 +15,9 @@ N = 160
 M = 80
 P = 5
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -27,7 +31,7 @@ p.append(sh.occ.addPoint(R,0,0))
 p.append(sh.occ.addPoint(R+s,0,0))
 p.append(sh.occ.addPoint(0,0,0))
 
-# %% Lines List
+# Lines List
 
 l = list()
 
@@ -44,7 +48,9 @@ l.append(sh.occ.addLine(p[4],p[6]))
 l.append(sh.occ.addCircleArc(p[7],p[8],p[3]))
 l.append(sh.occ.addCircleArc(p[6],p[8],p[2]))
 
-# %% Solid Surface
+# --------------------------------|
+# Physical Surface and Boundary   |
+# --------------------------------|
 
 k = list()
 s = list()
@@ -73,16 +79,17 @@ sh.occ.synchronize()
 for a in s: sh.mesh.setTransfiniteSurface(a)
 for a in s: sh.mesh.setRecombine(2,a)
 
-# %% Physical Boundary
+# Physical Boundary
 
 sh.addPhysicalGroup(2,s,name='Solid')
 sh.addPhysicalGroup(1,[l[3],l[7],l[9]],name='FSInterface')
 sh.addPhysicalGroup(1,[l[0],l[6]],name='SolidBase')
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 sh.mesh.generate(2)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')
 gmsh.fltk.run()
 gmsh.finalize()

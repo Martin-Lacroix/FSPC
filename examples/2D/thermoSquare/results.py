@@ -3,9 +3,13 @@ import numpy as np
 import gmsh
 import os
 
+# ---------------------------|
+# Data From the Literature   |
+# ---------------------------|
+
 data = list()
 
-# %% Long Results
+# Long Results
 
 data.append(
 [[0.00000,2000.0000],
@@ -31,7 +35,9 @@ data.append(
 [9.750983,1809.9137],
 [10.00000,1803.448]])
 
-# %% Post Procesing of Results
+# ----------------------------|
+# Post Procesing of Results   |
+# ----------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)
@@ -53,7 +59,7 @@ for i,j in enumerate(index):
 gmsh.finalize()
 time = np.sort(time)
 
-# Plot the solid value
+# Plot the final solution
 
 for D in data: plt.plot(*np.transpose(D))
 plt.plot(time,value,'k--')

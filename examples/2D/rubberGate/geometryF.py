@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 H = 0.079
 S = 0.005
@@ -14,7 +16,9 @@ d = 1e-3
 eps = 1e-5
 N = 80
 
-# %% Point List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -26,7 +30,7 @@ p.append(sh.occ.addPoint(L1,D,0,d))
 p.append(sh.occ.addPoint(L1,H,0,d))
 p.append(sh.occ.addPoint(L1,eps,0,d))
 
-# %% Line List
+# # Lines List
 
 l = list()
 
@@ -38,7 +42,9 @@ l.append(sh.occ.addLine(p[4],p[3]))
 l.append(sh.occ.addLine(p[3],p[0]))
 l.append(sh.occ.addLine(p[1],p[2]))
 
-# %% Fluid Mesh
+# --------------------------------|
+# Physical Surface and Boundary   |
+# --------------------------------|
 
 k = sh.occ.addCurveLoop(l[:6])
 s = sh.occ.addPlaneSurface([k])
@@ -46,14 +52,16 @@ s = sh.occ.addPlaneSurface([k])
 sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(l[2],N)
 
-# %% Boundary Domains
+# Boundary Domains
 
 sh.addPhysicalGroup(2,[s],name='Fluid')
 sh.addPhysicalGroup(1,[l[4]],name='FreeSurface')
 sh.addPhysicalGroup(1,[l[2]],name='FSInterface')
 sh.addPhysicalGroup(1,[l[0],l[3]]+l[5:7],name='Reservoir')
 
-# %% Mesh Size Function
+# ------------------------------------|
+# Mesh Characteristic Size Function   |
+# ------------------------------------|
 
 def meshSize(dim,tag,x,y,z,lc):
 
@@ -69,10 +77,9 @@ sh.mesh.setSizeCallback(meshSize)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 
-# %% Save the Mesh
+# Write the Mesh File
 
 sh.mesh.generate(2)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')
 gmsh.fltk.run()
 gmsh.finalize()

@@ -3,9 +3,13 @@ import numpy as np
 import gmsh
 import os
 
+# ---------------------------|
+# Data From the Literature   |
+# ---------------------------|
+
 data = list()
 
-# %% Bano Results
+# Bano Results
 
 data.append(
 [[0.00000,0.000000],
@@ -34,7 +38,9 @@ data.append(
 [1.854545,0.090990],
 [2.002020,0.090990]])
 
-# %% Post Procesing of Results
+# ----------------------------|
+# Post Procesing of Results   |
+# ----------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)
@@ -56,7 +62,7 @@ gmsh.finalize()
 disp = np.linalg.norm(coord-coord[0],axis=1)
 time = np.sort(time)
 
-# Plot the solid displacement
+# Plot the final solution
 
 for D in data: plt.plot(*np.transpose(D))
 plt.plot(time,disp,'k--')

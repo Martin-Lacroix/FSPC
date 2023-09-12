@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 R = 0.25
 L = 0.15+R
@@ -19,7 +21,9 @@ RB = 0.375
 
 d = 0.03
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -73,7 +77,7 @@ p.append(sh.occ.addPoint(-RB,HB,0,d))
 p.append(sh.occ.addPoint(0,HB,0,d))
 p.append(sh.occ.addPoint(RB,HB,0,d))
 
-# %% Lines List
+# Lines List
 
 l = list()
 h = list()
@@ -108,7 +112,9 @@ h.append(sh.occ.addLine(p[33],p[17]))
 c.append(sh.occ.addCircleArc(p[36],p[35],p[34]))
 c.append(sh.occ.addCircleArc(p[34],p[35],p[36]))
 
-# %% Solid
+# --------------------------------|
+# Physical Surface and Boundary   |
+# --------------------------------|
 
 k = list()
 s = list()
@@ -125,7 +131,7 @@ sh.mesh.setAlgorithm(2,s[1],8)
 sh.mesh.setReverse(2,s[2])
 sh.occ.synchronize()
 
-# %% Boundaries
+# Boundaries
 
 sh.addPhysicalGroup(2,[s[2]],name='Ball')
 sh.addPhysicalGroup(2,s[0:2],name='Border')
@@ -135,11 +141,13 @@ sh.addPhysicalGroup(1,l[:11]+h[1:],name='Master')
 sh.addPhysicalGroup(1,c,name='Slave')
 
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 gmsh.option.setNumber('Mesh.RecombineAll',1)
 gmsh.option.setNumber('Mesh.Algorithm',11)
-gmsh.option.setNumber('Mesh.Binary',1)
+
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')

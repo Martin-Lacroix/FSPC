@@ -2,7 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# %% Parameters
+# -----------------------|
+# Mesh Size Parameters   |
+# -----------------------|
 
 L1 = 0.3
 L2 = 0.5
@@ -25,7 +27,9 @@ eps = 1e-3
 N = 100
 M = 5
 
-# %% Points List
+# ------------------------------|
+# Points and Lines Definition   |
+# ------------------------------|
 
 p = list()
 
@@ -63,7 +67,7 @@ p.append(sh.occ.addPoint(L1+L2-eps,S+h+eps,0,d))
 p.append(sh.occ.addPoint(L1+L2-w-eps,S+eps,0,d))
 p.append(sh.occ.addPoint(L1+L2-w-eps,S+h+eps,0,d))
 
-# %% Lines List
+# Lines List
 
 l = list()
 h = list()
@@ -103,7 +107,9 @@ h.append(sh.occ.addLine(p[24],p[25]))
 h.append(sh.occ.addLine(p[25],p[27]))
 h.append(sh.occ.addLine(p[27],p[26]))
 
-# %% Fluid Surface
+# --------------------------------|
+# Physical Surface and Boundary   |
+# --------------------------------|
 
 k = sh.occ.addCurveLoop([l[0],r[0],l[1],r[1]])
 s = sh.occ.addPlaneSurface([k])
@@ -114,7 +120,7 @@ sh.mesh.setTransfiniteCurve(h[1],N)
 sh.mesh.setTransfiniteCurve(h[2],M)
 sh.mesh.setTransfiniteCurve(h[3],N)
 
-# %% Physical Boundary
+# Physical Boundary
 
 sh.addPhysicalGroup(2,[s],name='Fluid')
 sh.addPhysicalGroup(1,h,name='FSInterface')
@@ -122,10 +128,11 @@ sh.addPhysicalGroup(1,[r[1]],name='FreeSurface')
 sh.addPhysicalGroup(1,[r[0]],name='Inlet')
 sh.addPhysicalGroup(1,l,name='Border')
 
-# %% Save the Mesh
+# ----------------------|
+# Write the Mesh File   |
+# ----------------------|
 
 sh.mesh.generate(2)
-gmsh.option.setNumber('Mesh.Binary',1)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')
 gmsh.fltk.run()
 gmsh.finalize()
