@@ -2,9 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# -----------------------|
-# Mesh Size Parameters   |
-# -----------------------|
+# |--------------------------|
+# |   Mesh Size Parameters   |
+# |--------------------------|
 
 R = 0.25
 L = 0.15+R
@@ -21,9 +21,9 @@ RB = 0.375
 
 d = 0.03
 
-# ------------------------------|
-# Points and Lines Definition   |
-# ------------------------------|
+# |---------------------------------|
+# |   Points and Lines Definition   |
+# |---------------------------------|
 
 p = list()
 
@@ -112,9 +112,9 @@ h.append(sh.occ.addLine(p[33],p[17]))
 c.append(sh.occ.addCircleArc(p[36],p[35],p[34]))
 c.append(sh.occ.addCircleArc(p[34],p[35],p[36]))
 
-# --------------------------------|
-# Physical Surface and Boundary   |
-# --------------------------------|
+# |-----------------------------------|
+# |   Physical Surface and Boundary   |
+# |-----------------------------------|
 
 k = list()
 s = list()
@@ -141,9 +141,9 @@ sh.addPhysicalGroup(1,l[:11]+h[1:],name='Master')
 sh.addPhysicalGroup(1,c,name='Slave')
 
 
-# ----------------------|
-# Write the Mesh File   |
-# ----------------------|
+# |-------------------------|
+# |   Write the Mesh File   |
+# |-------------------------|
 
 gmsh.option.setNumber('Mesh.RecombineAll',1)
 gmsh.option.setNumber('Mesh.Algorithm',11)

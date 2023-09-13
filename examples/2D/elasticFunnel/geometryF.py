@@ -3,9 +3,9 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# -----------------------|
-# Mesh Size Parameters   |
-# -----------------------|
+# |--------------------------|
+# |   Mesh Size Parameters   |
+# |--------------------------|
 
 R = 2.25
 H = 3.75
@@ -17,9 +17,9 @@ d = 0.05
 N = 160
 M = 80
 
-# ------------------------------|
-# Points and Lines Definition   |
-# ------------------------------|
+# |---------------------------------|
+# |   Points and Lines Definition   |
+# |---------------------------------|
 
 p = list()
 
@@ -45,9 +45,9 @@ l.append(sh.occ.addLine(p[1],p[5]))
 l.append(sh.occ.addLine(p[5],p[4]))
 l.append(sh.occ.addLine(p[4],p[0]))
 
-# --------------------------------|
-# Physical Surface and Boundary   |
-# --------------------------------|
+# |-----------------------------------|
+# |   Physical Surface and Boundary   |
+# |-----------------------------------|
 
 k = sh.occ.addCurveLoop(l[3:])
 s = sh.occ.addPlaneSurface([k])
@@ -64,9 +64,9 @@ sh.addPhysicalGroup(1,l[:3],name='FSInterface')
 sh.addPhysicalGroup(1,[l[3],l[5]],name='Reservoir')
 sh.addPhysicalGroup(1,[l[4],l[6]],name='FreeSurface')
 
-# ----------------------|
-# Write the Mesh File   |
-# ----------------------|
+# |-------------------------|
+# |   Write the Mesh File   |
+# |-------------------------|
 
 def distance(a,b,x,y):
 
@@ -95,9 +95,9 @@ sh.mesh.setSizeCallback(meshSize)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 
-# ----------------------|
-# Write the Mesh File   |
-# ----------------------|
+# |-------------------------|
+# |   Write the Mesh File   |
+# |-------------------------|
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')

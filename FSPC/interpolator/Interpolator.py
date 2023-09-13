@@ -2,9 +2,9 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
 import numpy as np
 
-# ----------------------------|
-# Parent Interpolator Class   |
-# ----------------------------|
+# |-------------------------------|
+# |   Parent Interpolator Class   |
+# |-------------------------------|
 
 class Interpolator(object):
     def __init__(self):
@@ -23,9 +23,9 @@ class Interpolator(object):
             CW.send(tb.solver.getPosition(),0,tag=1)
             self.recvPos = CW.recv(source=0,tag=2)
 
-# ------------------------------------|
-# Initialize the Interpolation Data   |
-# ------------------------------------|
+# |---------------------------------------|
+# |   Initialize the Interpolation Data   |
+# |---------------------------------------|
 
     @tb.only_solid
     def initializeData(self):
@@ -53,9 +53,9 @@ class Interpolator(object):
             self.recvFace = CW.recv(source=0,tag=7)
             CW.send(tb.solver.getFacet(),0,tag=8)
 
-# -----------------------------------|
-# Apply the Fluid Loading on Solid   |
-# -----------------------------------|
+# |--------------------------------------|
+# |   Apply the Fluid Loading on Solid   |
+# |--------------------------------------|
 
     @tb.conv_mecha
     def applyLoadFS(self):
@@ -99,9 +99,9 @@ class Interpolator(object):
             temp = CW.recv(source=1,tag=6)
             tb.solver.applyTemperature(self.interpData(temp))
 
-# ------------------------------------------|
-# Predict the Solution for Next Time Step   |
-# ------------------------------------------|
+# |---------------------------------------------|
+# |   Predict the Solution for Next Time Step   |
+# |---------------------------------------------|
 
     @tb.conv_mecha
     def predDisplacement(self,verified):

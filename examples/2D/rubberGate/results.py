@@ -3,9 +3,9 @@ import numpy as np
 import gmsh
 import os
 
-# ---------------------------|
-# Data From the Literature   |
-# ---------------------------|
+# |------------------------------|
+# |   Data From the Literature   |
+# |------------------------------|
 
 data = list()
 
@@ -117,9 +117,9 @@ data.append(
 [0.384615,0.034165],
 [0.400000,0.034006]])
 
-# ----------------------------|
-# Post Procesing of Results   |
-# ----------------------------|
+# |-------------------------------|
+# |   Post Procesing of Results   |
+# |-------------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)

@@ -3,9 +3,9 @@ from ..general import Toolbox as tb
 from .Algorithm import Algorithm
 import numpy as np
 
-# ----------------------------------------------|
-# Interface Quasi-Newton Inverse Least Square   |
-# ----------------------------------------------|
+# |-------------------------------------------------|
+# |   Interface Quasi-Newton Inverse Least Square   |
+# |-------------------------------------------------|
 
 class ILS(Algorithm):
     def __init__(self):
@@ -13,9 +13,9 @@ class ILS(Algorithm):
         Algorithm.__init__(self)
         self.omega = 0.5
 
-# -----------------------------|
-# Coupling at Each Time Step   |
-# -----------------------------|
+# |--------------------------------|
+# |   Coupling at Each Time Step   |
+# |--------------------------------|
 
     def couplingAlgo(self):
 
@@ -51,9 +51,9 @@ class ILS(Algorithm):
             
         return False
 
-# ----------------------------------|
-# Compute the Solution Correction   |
-# ----------------------------------|
+# |-------------------------------------|
+# |   Compute the Solution Correction   |
+# |-------------------------------------|
 
     def compute(self,conv):
         
@@ -66,9 +66,9 @@ class ILS(Algorithm):
         delta = np.dot(W,np.linalg.lstsq(V,R,-1)[0])-R
         return np.split(delta,tb.solver.nbrNod)
 
-# ---------------------------------------------|
-# Relaxation of Solid Interface Displacement   |
-# ---------------------------------------------|
+# |------------------------------------------------|
+# |   Relaxation of Solid Interface Displacement   |
+# |------------------------------------------------|
     
     @tb.conv_mecha
     def relaxDisplacement(self):
@@ -93,9 +93,9 @@ class ILS(Algorithm):
         tb.interp.disp += delta
         self.prevDisp = np.copy(disp)
 
-# --------------------------------------------|
-# Relaxation of Solid Interface Temperature   |
-# --------------------------------------------|
+# |-----------------------------------------------|
+# |   Relaxation of Solid Interface Temperature   |
+# |-----------------------------------------------|
 
     @tb.conv_therm
     def relaxTemperature(self):

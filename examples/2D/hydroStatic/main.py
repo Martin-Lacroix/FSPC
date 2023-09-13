@@ -7,9 +7,9 @@ import FSPC
 pathF = path.dirname(__file__)+'/inputF.lua'
 pathS = path.dirname(__file__)+'/inputS.py'
 
-# ----------------------------|
-# Initialize the Simulation   |
-# ----------------------------|
+# |-------------------------------|
+# |   Initialize the Simulation   |
+# |-------------------------------|
 
 R = 1e-1
 RBF = lambda r: np.square(r/R)*np.ma.log(r/R)

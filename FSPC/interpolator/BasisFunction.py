@@ -2,9 +2,9 @@ from .Interpolator import Interpolator
 from ..general import Toolbox as tb
 import numpy as np
 
-# --------------------------------------------|
-# Mesh Interpolation Radial Basis Functions   |
-# --------------------------------------------|
+# |-----------------------------------------------|
+# |   Mesh Interpolation Radial Basis Functions   |
+# |-----------------------------------------------|
 
 class RBF(Interpolator):
     def __init__(self,func):
@@ -28,9 +28,9 @@ class RBF(Interpolator):
         result = np.linalg.lstsq(self.A,result,-1)[0]
         return np.dot(self.B,result)
 
-# ------------------------------------------|
-# Mapping Matrix from RecvPos to Position   |
-# ------------------------------------------|
+# |---------------------------------------------|
+# |   Mapping Matrix from RecvPos to Position   |
+# |---------------------------------------------|
 
     @tb.compute_time
     def computeMapping(self,position):
@@ -52,9 +52,9 @@ class RBF(Interpolator):
             rad = np.linalg.norm(pos-self.recvPos,axis=1)
             self.A[i,N] = self.function(rad)
 
-# ----------------------------------|
-# Initialize the A and B Matrices   |
-# ----------------------------------|
+# |-------------------------------------|
+# |   Initialize the A and B Matrices   |
+# |-------------------------------------|
 
     def makeA(self):
 

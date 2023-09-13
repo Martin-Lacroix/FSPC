@@ -410,9 +410,9 @@ data.append(
 [0.984682,-0.00947],
 [0.996810,-0.00833]])
 
-# ----------------------------|
-# Post Procesing of Results   |
-# ----------------------------|
+# |-------------------------------|
+# |   Post Procesing of Results   |
+# |-------------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)

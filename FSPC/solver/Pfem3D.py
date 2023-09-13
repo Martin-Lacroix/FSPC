@@ -3,9 +3,9 @@ import pfem3Dw as w
 import numpy as np
 import gmsh
 
-# -------------------------------|
-# Initializes the Fluid Wraper   |
-# -------------------------------|
+# |----------------------------------|
+# |   Initializes the Fluid Wraper   |
+# |----------------------------------|
 
 class Pfem3D(object):
     def __init__(self,path):
@@ -40,9 +40,9 @@ class Pfem3D(object):
         self.problem.copySolution(self.prevSolution)
         self.problem.displayParams()
 
-# --------------------------------------|
-# Run for Implicit Integration Scheme   |
-# --------------------------------------|
+# |-----------------------------------------|
+# |   Run for Implicit Integration Scheme   |
+# |-----------------------------------------|
 
     @tb.write_logs
     @tb.compute_time
@@ -70,9 +70,9 @@ class Pfem3D(object):
             count = count-1
         return True
 
-# --------------------------------------|
-# Run for Explicit Integration Scheme   |
-# --------------------------------------|
+# |-----------------------------------------|
+# |   Run for Explicit Integration Scheme   |
+# |-----------------------------------------|
 
     @tb.write_logs
     @tb.compute_time
@@ -102,9 +102,9 @@ class Pfem3D(object):
 
         return True
 
-# --------------------------------|
-# Dirichlet Boundary Conditions   |
-# --------------------------------|
+# |-----------------------------------|
+# |   Dirichlet Boundary Conditions   |
+# |-----------------------------------|
 
     def applyDisplacement(self,disp):
 
@@ -122,9 +122,9 @@ class Pfem3D(object):
         for i,result in enumerate(temp):
             self.BC[i][self.dim] = result[0]
 
-# ------------------------------|
-# Neumann Boundary Conditions   |
-# ------------------------------|
+# |---------------------------------|
+# |   Neumann Boundary Conditions   |
+# |---------------------------------|
 
     @tb.compute_time
     def getLoading(self):
@@ -142,9 +142,9 @@ class Pfem3D(object):
         self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
         return np.copy(vector)
 
-# -----------------------|
-# Return Nodal Valuese   |
-# -----------------------|
+# |--------------------------|
+# |   Return Nodal Valuese   |
+# |--------------------------|
 
     def getDisplacement(self):
         return self.getPosition()-self.prevPos
@@ -173,9 +173,9 @@ class Pfem3D(object):
 
         return result
 
-# ------------------------------------|
-# Initialize Communication Vectorse   |
-# ------------------------------------|
+# |---------------------------------------|
+# |   Initialize Communication Vectorse   |
+# |---------------------------------------|
 
     def initialize(self):
 
@@ -194,9 +194,9 @@ class Pfem3D(object):
         self.prevPos = self.getPosition()
         self.vel = self.getVelocity()
 
-# --------------------------|
-# Other Wrapper Functions   |
-# --------------------------|
+# |-----------------------------|
+# |   Other Wrapper Functions   |
+# |-----------------------------|
 
     @tb.compute_time
     def update(self):
@@ -216,9 +216,9 @@ class Pfem3D(object):
     @tb.write_logs
     def exit(self): self.problem.displayTimeStats()
 
-# -----------------------------------|
-# FSI Facets Relative to Each Node   |
-# -----------------------------------|
+# |--------------------------------------|
+# |   FSI Facets Relative to Each Node   |
+# |--------------------------------------|
 
     @tb.compute_time
     def getFacet(self):

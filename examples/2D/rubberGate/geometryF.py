@@ -2,9 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# -----------------------|
-# Mesh Size Parameters   |
-# -----------------------|
+# |--------------------------|
+# |   Mesh Size Parameters   |
+# |--------------------------|
 
 H = 0.079
 S = 0.005
@@ -16,9 +16,9 @@ d = 1e-3
 eps = 1e-5
 N = 80
 
-# ------------------------------|
-# Points and Lines Definition   |
-# ------------------------------|
+# |---------------------------------|
+# |   Points and Lines Definition   |
+# |---------------------------------|
 
 p = list()
 
@@ -42,9 +42,9 @@ l.append(sh.occ.addLine(p[4],p[3]))
 l.append(sh.occ.addLine(p[3],p[0]))
 l.append(sh.occ.addLine(p[1],p[2]))
 
-# --------------------------------|
-# Physical Surface and Boundary   |
-# --------------------------------|
+# |-----------------------------------|
+# |   Physical Surface and Boundary   |
+# |-----------------------------------|
 
 k = sh.occ.addCurveLoop(l[:6])
 s = sh.occ.addPlaneSurface([k])
@@ -59,9 +59,9 @@ sh.addPhysicalGroup(1,[l[4]],name='FreeSurface')
 sh.addPhysicalGroup(1,[l[2]],name='FSInterface')
 sh.addPhysicalGroup(1,[l[0],l[3]]+l[5:7],name='Reservoir')
 
-# ------------------------------------|
-# Mesh Characteristic Size Function   |
-# ------------------------------------|
+# |---------------------------------------|
+# |   Mesh Characteristic Size Function   |
+# |---------------------------------------|
 
 def meshSize(dim,tag,x,y,z,lc):
 

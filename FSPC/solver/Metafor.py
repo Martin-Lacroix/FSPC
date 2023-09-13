@@ -4,9 +4,9 @@ import numpy as np
 import wrap as w
 import sys
 
-# -------------------------------|
-# Initializes the Solid Wraper   |
-# -------------------------------|
+# |----------------------------------|
+# |   Initializes the Solid Wraper   |
+# |----------------------------------|
 
 class Metafor(object):
     def __init__(self,path):
@@ -80,9 +80,9 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
-# ---------------------------|
-# Calculates One Time Step   |
-# ---------------------------|
+# |------------------------------|
+# |   Calculates One Time Step   |
+# |------------------------------|
     
     @tb.write_logs
     @tb.compute_time
@@ -104,9 +104,9 @@ class Metafor(object):
         self.reload = True
         return ok
 
-# ------------------------------|
-# Neumann Boundary Conditions   |
-# ------------------------------|
+# |---------------------------------|
+# |   Neumann Boundary Conditions   |
+# |---------------------------------|
 
     def applyLoading(self,load):
 
@@ -128,9 +128,9 @@ class Metafor(object):
             node = self.FSI.getMeshPoint(i)
             self.interac.setNodVector(node,*result[i])
 
-# ---------------------------------|
-# Return Mechanical Nodal Values   |
-# ---------------------------------|
+# |------------------------------------|
+# |   Return Mechanical Nodal Values   |
+# |------------------------------------|
 
     def getDisplacement(self):
         return self.getPosition()-self.prevPos
@@ -164,9 +164,9 @@ class Metafor(object):
         
         return result
 
-# ------------------------------|
-# Return Thermal Nodal Values   |
-# ------------------------------|
+# |---------------------------------|
+# |   Return Thermal Nodal Values   |
+# |---------------------------------|
 
     def getTemperature(self):
 
@@ -193,9 +193,9 @@ class Metafor(object):
         
         return result
 
-# --------------------------|
-# Other Wrapper Functions   |
-# --------------------------|
+# |-----------------------------|
+# |   Other Wrapper Functions   |
+# |-----------------------------|
 
     @tb.compute_time
     def update(self):
@@ -211,9 +211,9 @@ class Metafor(object):
     def save(self): self.exporter.execute()
     def exit(self): return
 
-# -----------------------------------|
-# FSI Facets Relative to Each Node   |
-# -----------------------------------|
+# |--------------------------------------|
+# |   FSI Facets Relative to Each Node   |
+# |--------------------------------------|
 
     @tb.compute_time
     def getFacet(self):
