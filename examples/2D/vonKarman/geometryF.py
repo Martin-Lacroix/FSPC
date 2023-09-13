@@ -3,9 +3,9 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# |--------------------------|
-# |   Mesh Size Parameters   |
-# |--------------------------|
+# |---------------------------|
+# |   Mesh Size Parameters    |
+# |---------------------------|
 
 L = 1.5
 H = 0.41
@@ -20,9 +20,9 @@ LN = 376
 N = 88
 M = 6
 
-# |---------------------------------|
-# |   Points and Lines Definition   |
-# |---------------------------------|
+# |----------------------------------|
+# |   Points and Lines Definition    |
+# |----------------------------------|
 
 p = list()
 A = np.sqrt(np.square(R)-np.square(BH))
@@ -58,9 +58,9 @@ r.append(sh.occ.addLine(p[8],p[6]))
 r.append(sh.occ.addLine(p[6],p[7]))
 r.append(sh.occ.addLine(p[7],p[9]))
 
-# |-----------------------------------|
-# |   Physical Surface and Boundary   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Physical Surface and Boundary    |
+# |------------------------------------|
 
 k = sh.occ.addCurveLoop(l)
 u = sh.occ.addCurveLoop(h+r)
@@ -80,9 +80,9 @@ sh.addPhysicalGroup(1,[l[0],l[2]]+h,name='Wall')
 sh.addPhysicalGroup(1,[l[3]],name='Inlet')
 sh.addPhysicalGroup(1,h+r,name='Polytope')
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 # fun = str(d)+'+0.1*F1'
 # ref = h+r+[l[0],l[2],l[3]]
@@ -98,9 +98,9 @@ sh.addPhysicalGroup(1,h+r,name='Polytope')
 # gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 # gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 sh.mesh.generate(2)
 gmsh.option.setNumber('Mesh.SaveParametric',1)

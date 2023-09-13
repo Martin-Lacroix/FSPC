@@ -2,9 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |--------------------------|
-# |   Mesh Size Parameters   |
-# |--------------------------|
+# |---------------------------|
+# |   Mesh Size Parameters    |
+# |---------------------------|
 
 d = 2e-3
 RS = 0.0125
@@ -26,9 +26,9 @@ sh.occ.synchronize()
 sh.addPhysicalGroup(3,[v],name='Solid')
 sh.addPhysicalGroup(2,[g],name='FSInterface')
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 sh.mesh.generate(3)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')

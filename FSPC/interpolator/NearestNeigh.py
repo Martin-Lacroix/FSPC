@@ -3,9 +3,9 @@ from ..general import Toolbox as tb
 from scipy import sparse as sp
 import numpy as np
 
-# |---------------------------------------------|
-# |   Mesh Interpolation K-Nearest Neighbours   |
-# |---------------------------------------------|
+# |----------------------------------------------|
+# |   Mesh Interpolation K-Nearest Neighbours    |
+# |----------------------------------------------|
 
 class KNN(Interpolator):
     def __init__(self,K):
@@ -26,9 +26,9 @@ class KNN(Interpolator):
     def interpData(self,recvData):
         return self.H.dot(recvData)
 
-# |---------------------------------------------|
-# |   Mapping Matrix from RecvPos to Position   |
-# |---------------------------------------------|
+# |----------------------------------------------|
+# |   Mapping Matrix from RecvPos to Position    |
+# |----------------------------------------------|
 
     @tb.compute_time
     def computeMapping(self,position):
@@ -39,9 +39,9 @@ class KNN(Interpolator):
         if self.K == 1: self.search(position)
         else: self.interpolate(position)
 
-# |-----------------------------------|
-# |   Find the K Nearest Neighbours   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Find the K Nearest Neighbours    |
+# |------------------------------------|
  
     def search(self,position):
 

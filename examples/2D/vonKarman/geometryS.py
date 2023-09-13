@@ -3,9 +3,9 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# |--------------------------|
-# |   Mesh Size Parameters   |
-# |--------------------------|
+# |---------------------------|
+# |   Mesh Size Parameters    |
+# |---------------------------|
 
 L = 1
 H = 0.41
@@ -19,9 +19,9 @@ d = 4e-3
 N = 101
 M = 7
 
-# |---------------------------------|
-# |   Points and Lines Definition   |
-# |---------------------------------|
+# |----------------------------------|
+# |   Points and Lines Definition    |
+# |----------------------------------|
 
 p = list()
 A = np.sqrt(np.square(R)-np.square(BH))
@@ -40,9 +40,9 @@ l.append(sh.occ.addLine(p[0],p[1]))
 l.append(sh.occ.addLine(p[1],p[3]))
 l.append(sh.occ.addLine(p[3],p[2]))
 
-# |-----------------------------------|
-# |   Physical Surface and Boundary   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Physical Surface and Boundary    |
+# |------------------------------------|
 
 k = sh.occ.addCurveLoop(l)
 s = sh.occ.addPlaneSurface([k])
@@ -62,9 +62,9 @@ sh.addPhysicalGroup(2,[s],name='Solid')
 sh.addPhysicalGroup(1,[l[3]],name='Clamped')
 sh.addPhysicalGroup(1,l[:3],name='FSInterface')
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 sh.mesh.generate(2)
 gmsh.option.setNumber('Mesh.SaveParametric',1)

@@ -1,9 +1,9 @@
 import numpy as np
 import math
 
-# |--------------------------------|
-# |   Coupling Time Step Manager   |
-# |--------------------------------|
+# |---------------------------------|
+# |   Coupling Time Step Manager    |
+# |---------------------------------|
 
 class TimeStep(object):
     def __init__(self,dt,dtSave):
@@ -41,9 +41,9 @@ class TimeStep(object):
             self.dt = math.pow(self.division,1/7)*self.dt
             self.dt = min(self.dt,self.maxDt)
 
-# |----------------------------------|
-# |   Solution Convergence Manager   |
-# |----------------------------------|
+# |-----------------------------------|
+# |   Solution Convergence Manager    |
+# |-----------------------------------|
 
 class Convergence(object):
     def __init__(self,tol):

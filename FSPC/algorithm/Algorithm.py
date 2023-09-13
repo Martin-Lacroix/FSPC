@@ -2,9 +2,9 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
 import numpy as np
 
-# |----------------------------|
-# |   Parent Algorithm Class   |
-# |----------------------------|
+# |-----------------------------|
+# |   Parent Algorithm Class    |
+# |-----------------------------|
 
 class Algorithm(object):
 
@@ -17,9 +17,9 @@ class Algorithm(object):
     def relaxDisplacement(self):
         raise Exception('No mechanical relaxation defined')
 
-# |----------------------------------|
-# |   Run the Fluid-Solid Coupling   |
-# |----------------------------------|
+# |-----------------------------------|
+# |   Run the Fluid-Solid Coupling    |
+# |-----------------------------------|
 
     @tb.compute_time
     def simulate(self):
@@ -54,9 +54,9 @@ class Algorithm(object):
         CW.Barrier()
         tb.solver.exit()
 
-# |-------------------------------------------|
-# |   Interpolator Functions and Relaxation   |
-# |-------------------------------------------|
+# |--------------------------------------------|
+# |   Interpolator Functions and Relaxation    |
+# |--------------------------------------------|
 
     @tb.only_solid
     def computePredictor(self,verif):
@@ -88,9 +88,9 @@ class Algorithm(object):
         if tb.convTher: verif.append(tb.convTher.verified())
         return np.all(verif)
 
-# |-----------------------------------|
-# |   Transfer and Update Functions   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Transfer and Update Functions    |
+# |------------------------------------|
 
     def computeResidual(self):
         
@@ -116,9 +116,9 @@ class Algorithm(object):
         tb.interp.applyLoadFS()
         tb.interp.applyHeatFS()
 
-# |-----------------------------------|
-# |   Print Convergence Information   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Print Convergence Information    |
+# |------------------------------------|
 
     def showResidual(self):
 

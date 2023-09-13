@@ -2,9 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |--------------------------|
-# |   Mesh Size Parameters   |
-# |--------------------------|
+# |---------------------------|
+# |   Mesh Size Parameters    |
+# |---------------------------|
 
 L = 0.9
 HF = 0.25
@@ -14,9 +14,9 @@ R = 0.025
 N = 7
 M = 5
 
-# |-------------------------------|
-# |   Function to Make a Circle   |
-# |-------------------------------|
+# |--------------------------------|
+# |   Function to Make a Circle    |
+# |--------------------------------|
 
 def Quad_Circle(x):
 
@@ -75,9 +75,9 @@ def Quad_Circle(x):
     for a in s: sh.mesh.setRecombine(2,a)
     return s,c
 
-# |-----------------------------------|
-# |   Physical Surface and Boundary   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Physical Surface and Boundary    |
+# |------------------------------------|
 
 s,l = Quad_Circle(0.2)
 u,h = Quad_Circle(0.45)
@@ -88,9 +88,9 @@ sh.addPhysicalGroup(2,u,name='Solid_2')
 sh.addPhysicalGroup(2,v,name='Solid_3')
 sh.addPhysicalGroup(1,l+h+c,name='FSInterface')
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')

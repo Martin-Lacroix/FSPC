@@ -2,9 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |--------------------------|
-# |   Mesh Size Parameters   |
-# |--------------------------|
+# |---------------------------|
+# |   Mesh Size Parameters    |
+# |---------------------------|
 
 R = 0.25
 L = 0.15+R
@@ -21,9 +21,9 @@ RB = 0.375
 
 d = 0.02
 
-# |---------------------------------|
-# |   Points and Lines Definition   |
-# |---------------------------------|
+# |----------------------------------|
+# |   Points and Lines Definition    |
+# |----------------------------------|
 
 p = list()
 
@@ -134,9 +134,9 @@ sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(L,1)
 sh.mesh.setTransfiniteCurve(R,1)
 
-# |-----------------------------------|
-# |   Physical Surface and Boundary   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Physical Surface and Boundary    |
+# |------------------------------------|
 
 k = list()
 
@@ -159,9 +159,9 @@ sh.addPhysicalGroup(1,c,name='Poly')
 sh.addPhysicalGroup(1,l+[L],name='PolyL')
 sh.addPhysicalGroup(1,r+[R],name='PolyR')
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')

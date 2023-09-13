@@ -2,9 +2,9 @@ import os,gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |--------------------------|
-# |   Mesh Size Parameters   |
-# |--------------------------|
+# |---------------------------|
+# |   Mesh Size Parameters    |
+# |---------------------------|
 
 L = 0.9
 HF = 0.25
@@ -15,9 +15,9 @@ C = 0.2
 d = HF/33
 N = 13
 
-# |---------------------------------|
-# |   Points and Lines Definition   |
-# |---------------------------------|
+# |----------------------------------|
+# |   Points and Lines Definition    |
+# |----------------------------------|
 
 p = list()
 
@@ -63,9 +63,9 @@ r.append(sh.occ.addCircleArc(p[11],p[9],p[10]))
 u.append(sh.occ.addCircleArc(p[13],p[12],p[14]))
 u.append(sh.occ.addCircleArc(p[14],p[12],p[13]))
 
-# |-----------------------------------|
-# |   Physical Surface and Boundary   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Physical Surface and Boundary    |
+# |------------------------------------|
 
 k = sh.occ.addCurveLoop(l[:4])
 s = sh.occ.addPlaneSurface([k])
@@ -88,9 +88,9 @@ sh.addPhysicalGroup(1,h,name='Poly_1')
 sh.addPhysicalGroup(1,r,name='Poly_2')
 sh.addPhysicalGroup(1,u,name='Poly_3')
 
-# |-------------------------|
-# |   Write the Mesh File   |
-# |-------------------------|
+# |--------------------------|
+# |   Write the Mesh File    |
+# |--------------------------|
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')

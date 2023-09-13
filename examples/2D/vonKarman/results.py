@@ -3,9 +3,9 @@ import numpy as np
 import gmsh
 import os
 
-# |-------------------------------|
-# |   Post Procesing of Results   |
-# |-------------------------------|
+# |--------------------------------|
+# |   Post Procesing of Results    |
+# |--------------------------------|
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal',0)

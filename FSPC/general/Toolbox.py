@@ -4,9 +4,9 @@ from mpi4py.MPI import COMM_WORLD as CW
 import collections,time
 import fwkw
 
-# |-----------------------------------|
-# |   Empty Class Raising Exception   |
-# |-----------------------------------|
+# |------------------------------------|
+# |   Empty Class Raising Exception    |
+# |------------------------------------|
 
 class Void(object):
 
@@ -19,9 +19,9 @@ class Void(object):
     def __bool__(self):
         return False
 
-# |-------------------------------------|
-# |   Initialize the Global Variables   |
-# |-------------------------------------|
+# |--------------------------------------|
+# |   Initialize the Global Variables    |
+# |--------------------------------------|
 
 global step
 step = Void()
@@ -46,9 +46,9 @@ redirect = fwkw.StdOutErr2Py()
 global clock
 clock = collections.defaultdict(float)
 
-# |-------------------------------------|
-# |   Define Some Decorator Functions   |
-# |-------------------------------------|
+# |--------------------------------------|
+# |   Define Some Decorator Functions    |
+# |--------------------------------------|
 
 def write_logs(func):
     def wrapper(*args,**kwargs):
@@ -109,9 +109,9 @@ def conv_therm(func):
         return result
     return wrapper
 
-# |-------------------------------------|
-# |   Import Classes from Other Files   |
-# |-------------------------------------|
+# |--------------------------------------|
+# |   Import Classes from Other Files    |
+# |--------------------------------------|
 
 from . import Manager as ma
 from . import Element as el
@@ -122,9 +122,9 @@ def getElement(nbrNod):
     if nbrNod == 3: return el.Triangle()
     if nbrNod == 4: return el.Quadrangle()
 
-# |---------------------------------|
-# |   Initialize the Global Class   |
-# |---------------------------------|
+# |----------------------------------|
+# |   Initialize the Global Class    |
+# |----------------------------------|
 
 def setStep(dt,dtSave):
 
@@ -150,9 +150,9 @@ def setConvTher(tol):
     convTher = ma.Convergence(tol)
     return convTher
 
-# |---------------------------------------|
-# |   Import and Initialize the Solvers   |
-# |---------------------------------------|
+# |----------------------------------------|
+# |   Import and Initialize the Solvers    |
+# |----------------------------------------|
 
 @write_logs
 def setSolver(pathF,pathS):
@@ -169,9 +169,9 @@ def setSolver(pathF,pathS):
         from ..solver.Metafor import Metafor
         solver = Metafor(pathS)
 
-# |-------------------------------------------|
-# |   Print the Summary of Computation Time   |
-# |-------------------------------------------|
+# |--------------------------------------------|
+# |   Print the Summary of Computation Time    |
+# |--------------------------------------------|
 
 def printClock():
 
