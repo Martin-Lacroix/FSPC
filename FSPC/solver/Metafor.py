@@ -25,6 +25,7 @@ class Metafor(object):
         self.tsm = self.metafor.getTimeStepManager()
         geometry = self.metafor.getDomain().getGeometry()
         self.metafor.getInitialConditionSet().update(0)
+        self.dim = geometry.getDimension().getNdim()
         self.metafor.getDomain().build()
 
         # Sets the dimension of the mesh
@@ -32,21 +33,18 @@ class Metafor(object):
         if geometry.is2D():
 
             size = 3
-            self.dim = 2
             self.axis = [w.TX,w.TY]
             tensor = 'setNodTensor2D'
 
         if geometry.isAxisymmetric():
 
             size = 4
-            self.dim = 2
             self.axis = [w.TX,w.TY]
             tensor = 'setNodTensorAxi'
 
         if geometry.is3D():
 
             size = 6
-            self.dim = 3
             self.axis = [w.TX,w.TY,w.TZ]
             tensor = 'setNodTensor3D'
 
