@@ -32,20 +32,20 @@ class Metafor(object):
 
         if geometry.is2D():
 
-            size = 3
-            self.axis = [w.TX,w.TY]
+            loadSize = 3
+            self.axis = (w.TX,w.TY)
             tensor = 'setNodTensor2D'
 
         if geometry.isAxisymmetric():
 
-            size = 4
-            self.axis = [w.TX,w.TY]
+            loadSize = 4
+            self.axis = (w.TX,w.TY)
             tensor = 'setNodTensorAxi'
 
         if geometry.is3D():
 
-            size = 6
-            self.axis = [w.TX,w.TY,w.TZ]
+            loadSize = 6
+            self.axis = (w.TX,w.TY,w.TZ)
             tensor = 'setNodTensor3D'
 
         # Defines some internal variables
@@ -62,7 +62,7 @@ class Metafor(object):
         if 'interacM' in parm:
 
             self.interac = parm['interacM']
-            self.prevLoad = np.zeros((self.nbrNod,size))
+            self.prevLoad = np.zeros((self.nbrNod,loadSize))
             self.setNodLoad = getattr(self.interac,tensor)
 
         if 'interacT' in parm:
