@@ -109,7 +109,7 @@ class Metafor(object):
     def applyLoading(self,load):
 
         self.nextLoad = np.copy(load)
-        result = (self.prevLoad+load)/2
+        result = (self.prevLoad+self.nextLoad)/2
 
         for i in range(self.nbrNod):
             self.setNodLoad(self.FSI.getMeshPoint(i),*result[i])
@@ -119,7 +119,7 @@ class Metafor(object):
     def applyHeatFlux(self,heat):
 
         self.nextHeat = np.copy(heat)
-        result = (self.prevHeat+heat)/2
+        result = (self.prevHeat+self.nextHeat)/2
 
         for i in range(self.nbrNod):
 
