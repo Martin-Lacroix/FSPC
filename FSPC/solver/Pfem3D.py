@@ -2,6 +2,7 @@ from ..general import Toolbox as tb
 import pfem3Dw as w
 import numpy as np
 import gmsh
+import math
 
 # |-----------------------------------|
 # |   Initializes the Fluid Wraper    |
@@ -88,7 +89,7 @@ class Pfem3D(object):
         # Estimate the time step for stability
 
         self.solver.computeNextDT()
-        division = int(dt/self.solver.getTimeStep())
+        division = math.ceil(dt/self.solver.getTimeStep())
         if division > self.maxDivision: return False
         dt = dt/division
 
