@@ -83,8 +83,6 @@ Problem.Solver.solveHeatFirst = true
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.sparseSolverPstep = 'LLT'
-Problem.Solver.MomContEq.sparseSolverLibPstep = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
