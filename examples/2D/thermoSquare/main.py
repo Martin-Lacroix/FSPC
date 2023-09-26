@@ -6,9 +6,7 @@ import FSPC
 pathF = path.dirname(__file__)+'/inputF.lua'
 pathS = path.dirname(__file__)+'/inputS.py'
 
-# |--------------------------------|
-# |   Initialize the Simulation    |
-# |--------------------------------|
+# Initialize the Simulation 
 
 FSPC.setConvTher(1e-8)
 FSPC.setStep(1e-3,1e-2)
