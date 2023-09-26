@@ -58,9 +58,9 @@ class Convergence(object):
 
     def reset(self):
 
+        self.prevRes = None
+        self.residual = None
         self.epsilon = np.inf
-        self.prevRes = np.inf
-        self.residual = np.inf
 
     # Update the current and previous residual
 

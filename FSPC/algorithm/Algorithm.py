@@ -33,6 +33,7 @@ class Algorithm(object):
         while tb.step.time < self.endTime:
 
             self.showTimeStep()
+            self.resetConverg()
             self.computePredictor(verified)
             verified = self.couplingAlgo()
 

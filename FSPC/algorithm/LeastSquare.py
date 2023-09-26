@@ -21,7 +21,6 @@ class ILS(Algorithm):
 
         verif = False
         self.iteration = 0
-        self.resetConverg()
 
         while self.iteration < self.maxIter:
 
