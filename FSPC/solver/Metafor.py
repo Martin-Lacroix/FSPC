@@ -32,19 +32,16 @@ class Metafor(object):
 
         if geometry.is2D():
 
-            loadSize = 3
             self.axis = (w.TX,w.TY)
             tensor = 'setNodTensor2D'
 
         if geometry.isAxisymmetric():
 
-            loadSize = 4
             self.axis = (w.TX,w.TY)
             tensor = 'setNodTensorAxi'
 
         if geometry.is3D():
 
-            loadSize = 6
             self.axis = (w.TX,w.TY,w.TZ)
             tensor = 'setNodTensor3D'
 
@@ -62,13 +59,10 @@ class Metafor(object):
         if 'interacM' in parm:
 
             self.interac = parm['interacM']
-            self.prevLoad = np.zeros((self.nbrNod,loadSize))
             self.setNodLoad = getattr(self.interac,tensor)
 
         if 'interacT' in parm:
-            
             self.interac = parm['interacT']
-            self.prevHeat = np.zeros((self.nbrNod,self.dim))
 
         # Manages time step and restart functions
 
@@ -108,23 +102,16 @@ class Metafor(object):
 
     def applyLoading(self,load):
 
-        self.nextLoad = np.copy(load)
-        result = (self.prevLoad+self.nextLoad)/2
-
         for i in range(self.nbrNod):
-            self.setNodLoad(self.FSI.getMeshPoint(i),*result[i])
+            self.setNodLoad(self.FSI.getMeshPoint(i),*load[i])
 
     # Apply Thermal boundary conditions
 
     def applyHeatFlux(self,heat):
-
-        self.nextHeat = np.copy(heat)
-        result = (self.prevHeat+self.nextHeat)/2
-
         for i in range(self.nbrNod):
 
             node = self.FSI.getMeshPoint(i)
-            self.interac.setNodVector(node,*result[i])
+            self.interac.setNodVector(node,*heat[i])
 
 # |-------------------------------------|
 # |   Return Mechanical Nodal Values    |
@@ -197,9 +184,7 @@ class Metafor(object):
 
     @tb.compute_time
     def update(self):
-        
-        if tb.convMech: self.prevLoad = np.copy(self.nextLoad)
-        if tb.convTher: self.prevHeat = np.copy(self.nextHeat)
+
         self.prevPos = self.getPosition()
         self.metaFac.save(self.mfac)
         self.reload = False
