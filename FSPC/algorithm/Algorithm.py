@@ -55,15 +55,33 @@ class Algorithm(object):
         CW.Barrier()
         tb.solver.exit()
 
+# |----------------------------------|
+# |   Run Solid and Fluid Solvers    |
+# |----------------------------------|
+
+    def runFluid(self):
+
+        output = None
+        if CW.rank == 0: output = tb.solver.run()
+        verified = CW.bcast(output,root=0)
+        return verified
+    
+    def runSolid(self):
+
+        output = None
+        if CW.rank == 1: output = tb.solver.run()
+        verified = CW.bcast(output,root=1)
+        return verified
+
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |
 # |--------------------------------------------|
 
     @tb.only_solid
-    def computePredictor(self,verif):
+    def computePredictor(self,verified):
 
-        tb.interp.predTemperature(verif)
-        tb.interp.predDisplacement(verif)
+        tb.interp.predTemperature(verified)
+        tb.interp.predDisplacement(verified)
 
     @tb.only_solid
     def resetConverg(self):
@@ -84,10 +102,10 @@ class Algorithm(object):
 
         # Check for coupling convergence
 
-        verif = list()
-        if tb.convMech: verif.append(tb.convMech.verified())
-        if tb.convTher: verif.append(tb.convTher.verified())
-        return np.all(verif)
+        verified = list()
+        if tb.convMech: verified.append(tb.convMech.verified())
+        if tb.convTher: verified.append(tb.convTher.verified())
+        return np.all(verified)
 
 # |------------------------------------|
 # |   Transfer and Update Functions    |

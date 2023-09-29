@@ -20,36 +20,30 @@ class MVJ(Algorithm):
 
     def couplingAlgo(self):
 
-        verif = False
         self.iteration = 0
-
         while self.iteration < self.maxIter:
 
             # Transfer and fluid solver call
-            
+
             self.transferDirichletSF()
-            if CW.rank == 0: verif = tb.solver.run()
-            verif = CW.scatter([verif,verif],root=0)
-            if not verif: return False
+            if not self.runFluid(): return False
 
             # Transfer and solid solver call
 
             self.transferNeumannFS()
-            if CW.rank == 1: verif = tb.solver.run()
-            verif = CW.scatter([verif,verif],root=1)
-            if not verif: return False
+            if not self.runSolid(): return False
 
             # Compute the coupling residual
 
-            verif = self.relaxation()
-            verif = CW.scatter([verif,verif],root=1)
+            output = self.relaxation()
+            verified = CW.bcast(output,root=1)
             self.BGS = False
 
             # End of the coupling iteration
 
             self.iteration += 1
-            if verif: self.updateJprev()
-            if verif: return True
+            if verified: self.updateJprev()
+            if verified: return True
 
         self.BGS = True
         return False
