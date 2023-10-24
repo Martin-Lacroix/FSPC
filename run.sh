@@ -1,11 +1,3 @@
-# Experimental Gmsh
-
-# export GMSH_DIR=/mnt/Data/Devs/Gmsh/build/bin
-# export PYTHONPATH=${GMSH_DIR}/lib:${PYTHONPATH}
-# export INCLUDE=${GMSH_DIR}/include:${INCLUDE}
-# export PATH=${GMSH_DIR}/bin:${PATH}
-# export LIB=${GMSH_DIR}/lib:${LIB}
-
 # Path to the external library
 
 export PYTHONPATH=${PWD}:${PYTHONPATH}
