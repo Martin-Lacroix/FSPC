@@ -122,9 +122,9 @@ def getElement(nbrNod):
     if nbrNod == 3: return el.Triangle()
     if nbrNod == 4: return el.Quadrangle()
 
-# |----------------------------------|
-# |   Initialize the Global Class    |
-# |----------------------------------|
+# |------------------------------------|
+# |   Initialize the Global Classes    |
+# |------------------------------------|
 
 def setStep(dt,dtSave):
 
