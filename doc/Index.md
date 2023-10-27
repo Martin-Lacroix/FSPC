@@ -76,7 +76,7 @@ Note that there is no required ordering when initializing the classes and the in
 <br />
 
 ```python
-FSPC.setAlgo(FSPC.algorithm.BGS,maxIter)        # Aitken Block-Gauss Seidel
+FSPC.setAlgo(FSPC.algorithm.BGS,maxIter)        # Aitken block-Gauss Seidel
 FSPC.setAlgo(FSPC.algorithm.ILS,maxIter)        # IQN with inverse least squares 
 FSPC.setAlgo(FSPC.algorithm.MVJ,maxIter)        # IQN with multi-vector Jacobian
 ```
