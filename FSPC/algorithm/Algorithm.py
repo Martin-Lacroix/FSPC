@@ -22,7 +22,7 @@ class Algorithm(object):
 # |-----------------------------------|
 
     @tb.compute_time
-    def simulate(self):
+    def simulate(self,endTime):
 
         verified = True
         tb.solver.save()
@@ -30,7 +30,7 @@ class Algorithm(object):
 
         # Main loop of the FSI partitioned coupling
         
-        while tb.step.time < self.endTime:
+        while tb.step.time < endTime:
 
             self.showTimeStep()
             self.resetConverg()

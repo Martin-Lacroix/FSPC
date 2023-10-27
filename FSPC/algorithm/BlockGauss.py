@@ -8,9 +8,10 @@ import numpy as np
 # |---------------------------------------------------|
 
 class BGS(Algorithm):
-    def __init__(self):
-        
+    def __init__(self,maxIter):
+
         Algorithm.__init__(self)
+        self.maxIter = maxIter
         self.omega = 0.5
 
 # |---------------------------------|

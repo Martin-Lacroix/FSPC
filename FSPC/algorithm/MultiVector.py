@@ -8,9 +8,10 @@ import numpy as np
 # |---------------------------------------------------|
 
 class MVJ(Algorithm):
-    def __init__(self):
-        
+    def __init__(self,maxIter):
+
         Algorithm.__init__(self)
+        self.maxIter = maxIter
         self.omega = 0.5
         self.BGS = True
 

@@ -26,6 +26,9 @@ class Void(object):
 global step
 step = Void()
 
+global algo
+algo = Void()
+
 global interp
 interp = Void()
 
@@ -122,6 +125,11 @@ def getElement(nbrNod):
     if nbrNod == 3: return el.Triangle()
     if nbrNod == 4: return el.Quadrangle()
 
+def simulate(endTime):
+
+    global algo
+    return algo.simulate(endTime)
+
 # |------------------------------------|
 # |   Initialize the Global Classes    |
 # |------------------------------------|
@@ -131,6 +139,12 @@ def setStep(dt,dtSave):
     global step
     step = ma.TimeStep(dt,dtSave)
     return step
+
+def setAlgo(algorithm,*arg):
+
+    global algo
+    algo = algorithm(*arg)
+    return algo
 
 def setInterp(interpolator,*arg):
 
