@@ -53,7 +53,7 @@ FSPC.setConvTher(tolTemp)       # Thermal convergence criterion
 
 <br />
 
-The tolerance has the dimension of the Dirichlet condition exchanged between the solver, so a position for the mechanical coupling and a temperature for the thermal coupling. The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. 
+The tolerance is a relative change in the Dirichlet condition exchanged between the solver, so the position for the mechanical coupling and the temperature for the thermal coupling. The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. 
 
 <br />
 
@@ -71,44 +71,34 @@ FSPC.setInterp(FSPC.interpolator.ETM,nElem)       # Direct element transfer meth
 
 <br />
 
-Note that the solver must be initialized before the interpolator. Finally, the last step is to initialize the`Algorithm` class. The simplest one is the block Gauss–Seidel `BGS` method. Moreover, two interface quasi-Newton methods are available, with inverse least square `ILS` and multi-vector Jacobian `MVJ` respectively.
+Note that there is no required ordering when initializing the classes and the interpolator may be initialized before the `Convergence` class. Finally, the last step is the initialization of the`Algorithm` class. The simplest one is the block Gauss–Seidel `BGS` method. Moreover, two interface quasi-Newton methods are available, with inverse least square `ILS` and multi-vector Jacobian `MVJ` respectively.
 
 <br />
 
 ```python
-algorithm = FSPC.algorithm.BGS()        # Aitken Block-Gauss Seidel
-algorithm = FSPC.algorithm.ILS()        # IQN with inverse least squares 
-algorithm = FSPC.algorithm.MVJ()        # IQN with multi-vector Jacobian
+FSPC.setAlgo(FSPC.algorithm.BGS,maxIter)        # Aitken Block-Gauss Seidel
+FSPC.setAlgo(FSPC.algorithm.ILS,maxIter)        # IQN with inverse least squares 
+FSPC.setAlgo(FSPC.algorithm.MVJ,maxIter)        # IQN with multi-vector Jacobian
 ```
 
+| Input             | Type                | Description                                     |
+|-------------------|---------------------|-------------------------------------------------|
+| *maxIter*         | *int*               | *maximum number of iterations*                  |
+
 <br />
 
-It is important to note that the object `agorithm` can be initialized before the internal classes presented previously. However, they must be initialized before starting the simulation. The initial Gauss Seidel relaxation, the maximum number of iterations and the final simulation time must be set by the user.
+It is important to note that each `Set` function returns a reference to the class created. Thereby, some additional parameters such as the initial Aitken relaxation factor can be modified by the user. This is achieved by assigning a new value to the corresponding attribute, for instance `algorithm.omega = 0.5` is the default Aitken parameter. The simulation can be started with the `simulate` function provided by the `general` module. It is also possible to print the time stats at the end of the simulation and compare the computation time for the fluid and the solid processes.
 
 <br />
 
 ```python
-algorithm.omega = omega             # Gauss Seidel relaxation parameter
-algorithm.maxIter = maxIter         # Maximum number of FSI iterations
-algorithm.endTime = endTime         # Final physical simulation time
+FSPC.general.simulate(endTime)      # Run the FSI simulation
+FSPC.general.printClock()           # Print the final time stats
 ```
 
 | Input             | Type              | Description                                  |
 |-------------------|-------------------|----------------------------------------------|
-| *omega*           | *float*           | *initial relaxation parameter*               |
-| *maxIter*         | *int*             | *maximum number of coupling iterations*      |
 | *endTime*         | *float*           | *final simulation time*                      |
-
-<br />
-
-Once everything has been initialized, the FSI simulation can be started with the `simulate` function provided by the `Algorithm` class. The latter will fail if the parameters presented previously have not been correctly initialized. It is also possible to print the time stats at the end of the simulation and compare the computation time for the fluid and the solid parts.
-
-<br />
-
-```python
-algorithm.simulate()             # Run the FSI simulation
-FSPC.general.printClock()        # Print the final time stats
-```
 
 <br />
 
