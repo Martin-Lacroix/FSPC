@@ -19,7 +19,6 @@ Problem.Mesh.minAspectRatio = 1e-3
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = true
-Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.boundingBox = {0,0.04,1.56,0.6}
 Problem.Mesh.exclusionZones = {}
 

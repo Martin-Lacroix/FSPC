@@ -19,7 +19,6 @@ Problem.Mesh.minAspectRatio = 1e-4
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.laplacianSmoothingBoundaries = false
 Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
 Problem.Mesh.boundingBox = {-4,-4,4,6.25}
 Problem.Mesh.exclusionZones = {}
