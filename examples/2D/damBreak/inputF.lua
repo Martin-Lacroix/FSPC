@@ -66,8 +66,8 @@ Problem.Solver.coeffDTincrease = math.huge
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
+Problem.Solver.MomContEq.nlAlgo = 'NR'
 Problem.Solver.MomContEq.residual = 'Ax_f'
-Problem.Solver.MomContEq.nlAlgo = 'QuasiNRApprox'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
