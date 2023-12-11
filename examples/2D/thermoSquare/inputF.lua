@@ -9,29 +9,27 @@ Problem.id = 'Boussinesq'
 -- Mesh Parameters
 
 Problem.Mesh = {}
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometryF.msh'
+Problem.Mesh.localHcharGroups = {'FSInterface'}
+Problem.Mesh.boundingBox = {-5,-5,5,5}
+Problem.Mesh.exclusionZones = {}
+
 Problem.Mesh.alpha = 1e3
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.05
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
+
+Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.boundingBox = {-5,-5,5,5}
-Problem.Mesh.exclusionZones = {}
-
-Problem.Mesh.remeshAlgo = 'GMSH'
-Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'FSInterface'}
-Problem.Mesh.localHcharGroups = {'FSInterface'}
-Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
 
 Problem.Extractors = {}
-
 Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
@@ -101,12 +99,14 @@ Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-6
 Problem.Solver.HeatEq.cgTolerance = 1e-16
 
--- Heat Momentum Continuity BC
+-- Fluid Structure Interface
 
 Problem.IC = {}
 Problem.Solver.HeatEq.BC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
+
+-- Boundary Condition Functions
 
 function Problem.IC.initStates(x,y,z)
 	return {0,0,0,1000}
@@ -125,7 +125,5 @@ function Problem.Solver.HeatEq.BC.WallQ(x,y,z,t)
 end
 
 function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
-
-	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.1
+	return Problem.Mesh.hchar+dist*0.1
 end

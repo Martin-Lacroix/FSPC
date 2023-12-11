@@ -13,6 +13,8 @@ b = 0.02
 h = 0.1
 w = 0.005
 
+# Characteristic size
+
 N = 40
 M = 10
 P = 4
@@ -32,7 +34,7 @@ p.append(sh.occ.addPoint(L1+w,(B-b)/2,h))
 p.append(sh.occ.addPoint(L1+w,(B+b)/2,h))
 p.append(sh.occ.addPoint(L1,(B+b)/2,h))
 
-# # Lines List
+# Lines List
 
 l = list()
 

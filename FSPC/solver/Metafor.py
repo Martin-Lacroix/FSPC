@@ -13,6 +13,7 @@ class Metafor(object):
         
         # Convert Metafor into a module
 
+        parm = dict()
         spec = util.spec_from_file_location('module.name',path)
         module = util.module_from_spec(spec)
         sys.modules['module.name'] = module
@@ -20,56 +21,36 @@ class Metafor(object):
 
         # Actually initialize Metafor from file
 
-        parm = dict()
         self.metafor = module.getMetafor(parm)
+        self.geometry = self.metafor.getDomain().getGeometry()
+        self.dim = self.geometry.getDimension().getNdim()
         self.tsm = self.metafor.getTimeStepManager()
-        geometry = self.metafor.getDomain().getGeometry()
-        self.metafor.getInitialConditionSet().update(0)
-        self.dim = geometry.getDimension().getNdim()
-        self.metafor.getDomain().build()
 
-        # Sets the dimension of the mesh
+        # Sets the dimension of the interaction
 
-        if geometry.is2D():
-
-            self.axis = (w.TX,w.TY)
-            tensor = 'setNodTensor2D'
-
-        if geometry.isAxisymmetric():
-
-            self.axis = (w.TX,w.TY)
-            tensor = 'setNodTensorAxi'
-
-        if geometry.is3D():
-
-            self.axis = (w.TX,w.TY,w.TZ)
-            tensor = 'setNodTensor3D'
+        if self.dim == 2: self.axis = (w.TX,w.TY)
+        if self.dim == 3: self.axis = (w.TX,w.TY,w.TZ)
 
         # Defines some internal variables
 
-        self.reload = True
         self.neverRun = True
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
-        self.nbrNod = self.FSI.getNumberOfMeshPoints()
-        self.prevPos = self.getPosition()
+        self.polytope = parm['polytope']
 
         # Mechanical and thermal interactions
 
         if 'interacM' in parm:
-
-            self.interac = parm['interacM']
-            self.setNodLoad = getattr(self.interac,tensor)
+            self.interacM = np.atleast_1d(parm['interacM'])
 
         if 'interacT' in parm:
-            self.interac = parm['interacT']
+            self.interacT = np.atleast_1d(parm['interacT'])
 
         # Manages time step and restart functions
 
         self.mfac = w.MemoryFac()
         self.metaFac = w.MetaFac(self.metafor)
         self.metaFac.mode(False,False,True)
-        self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
 # |-------------------------------|
@@ -102,16 +83,29 @@ class Metafor(object):
 
     def applyLoading(self,load):
 
-        for i in range(self.nbrNod):
-            self.setNodLoad(self.FSI.getMeshPoint(i),*load[i])
+        for interaction in self.interacM:
+            for i,data in enumerate(load):
+
+                node = self.FSI.getMeshPoint(i)
+
+                if self.geometry.isAxisymmetric():
+                    interaction.setNodTensorAxi(node,*data)
+
+                elif self.geometry.is2D():
+                    interaction.setNodTensor2D(node,*data)
+
+                elif self.geometry.is3D():
+                    interaction.setNodTensor3D(node,*data)
 
     # Apply Thermal boundary conditions
 
     def applyHeatFlux(self,heat):
-        for i in range(self.nbrNod):
 
-            node = self.FSI.getMeshPoint(i)
-            self.interac.setNodVector(node,*heat[i])
+        for interaction in self.interacT:
+            for i,data in enumerate(heat):
+
+                node = self.FSI.getMeshPoint(i)
+                interaction.setNodVector(node,*data)
 
 # |-------------------------------------|
 # |   Return Mechanical Nodal Values    |
@@ -124,7 +118,7 @@ class Metafor(object):
 
     def getPosition(self):
 
-        result = np.zeros((self.nbrNod,self.dim))
+        result = np.zeros((self.getSize(),self.dim))
 
         for i,axe in enumerate(self.axis):
             for j,data in enumerate(result):
@@ -139,7 +133,7 @@ class Metafor(object):
 
     def getVelocity(self):
 
-        result = np.zeros((self.nbrNod,self.dim))
+        result = np.zeros((self.getSize(),self.dim))
 
         for i,axe in enumerate(self.axis):
             for j,data in enumerate(result):
@@ -155,9 +149,9 @@ class Metafor(object):
 
     def getTemperature(self):
 
-        result = np.zeros((self.nbrNod,1))
+        result = np.zeros((self.getSize(),1))
         
-        for i in range(self.nbrNod):
+        for i in range(self.getSize()):
 
             node = self.FSI.getMeshPoint(i)
             result[i] += node.getValue(w.Field1D(w.TO,w.AB))
@@ -167,11 +161,11 @@ class Metafor(object):
 
     # Computes the nodal temperature velocity
 
-    def getTempVeloc(self):
+    def getTempRate(self):
 
-        result = np.zeros((self.nbrNod,1))
+        result = np.zeros((self.getSize(),1))
 
-        for i in range(self.nbrNod):
+        for i in range(self.getSize()):
 
             node = self.FSI.getMeshPoint(i)
             result[i] = node.getValue(w.Field1D(w.TO,w.GV))
@@ -185,42 +179,61 @@ class Metafor(object):
     @tb.compute_time
     def update(self):
 
+        tb.interp.sharePolytope()
         self.prevPos = self.getPosition()
         self.metaFac.save(self.mfac)
         self.reload = False
 
+    def swapIndex(self,element):
+
+        size = element.getNumberOfNodes()
+
+        if size == 2: return np.array([[1,0]])
+        if size == 3: return np.array([[2,1,0]])
+        if size == 4: return np.array([[0,3,2],[2,1,0]])
+
+    # Save and exit the simulation
+
     @tb.write_logs
     @tb.compute_time
     def save(self): self.exporter.execute()
+    def getSize(self): return self.FSI.getNumberOfMeshPoints()
     def exit(self): return
 
-# |---------------------------------------|
-# |   FSI Facets Relative to Each Node    |
-# |---------------------------------------|
-
-    @tb.compute_time
-    def getFacet(self):
-
-        elemSet = self.interac.getElementSet()
-        nbrList = np.zeros(self.nbrNod,dtype=int)
-
-        # Store the node indices from Metafor
+# |-------------------------------------|
+# |   Build Facet List from Polytope    |
+# |-------------------------------------|
+    
+    def getPolytope(self):
 
         faceList = list()
-        for i in range(self.nbrNod):
-            nbrList[i] = self.FSI.getMeshPoint(i).getNo()
+        for i in range(self.polytope.size()):
 
-        # Facet nodes and store their FSI indices
+            element = self.polytope.getElement(i)
+            if not element.getEnabled(): continue
 
-        for i in range(elemSet.size()):
-            
-            faceList.append(list())
-            element = elemSet.getElement(i).getMyMesh()
+            # Split the square elements in two triangles
 
-            for j in range(element.getNbOfDownPoints()):
+            position = self.elemPos(element)[self.swapIndex(element)]
+            for pos in position: faceList.append(pos.ravel())
 
-                ref = element.getDownPoint(j).getNo()
-                index = np.argwhere(nbrList == ref).item()
-                faceList[-1].append(index)
+        return faceList
 
-        return np.array(faceList)
+# |-------------------------------------|
+# |   Positions of the Element Nodes    |
+# |-------------------------------------|
+
+    def elemPos(self,element):
+
+        size = element.getNumberOfNodes()
+        position = np.zeros((size,self.dim))
+
+        for i in range(size):
+
+            node = element.getNodeI(i)
+            for j,axe in enumerate(self.axis):
+
+                position[i,j] += node.getValue(w.Field1D(axe,w.AB))
+                position[i,j] += node.getValue(w.Field1D(axe,w.RE))
+
+        return position

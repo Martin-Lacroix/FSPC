@@ -25,8 +25,9 @@ class Algorithm(object):
     def simulate(self,endTime):
 
         verified = True
-        tb.solver.save()
+        tb.solver.update()
         tb.interp.initialize()
+        tb.solver.save()
 
         # Main loop of the FSI partitioned coupling
         
@@ -49,6 +50,7 @@ class Algorithm(object):
             tb.solver.update()
             tb.step.updateTime(verified)
             tb.step.updateSave(tb.solver)
+            tb.interp.initialize()
 
         # Ends the FSI simulation
 

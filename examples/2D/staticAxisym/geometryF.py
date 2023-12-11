@@ -9,6 +9,9 @@ gmsh.initialize()
 L = 1
 HF = 0.2
 HS = 0.02
+
+# Characteristic size
+
 d = 0.01
 N = 40
 
@@ -38,8 +41,8 @@ l.append(sh.occ.addLine(p[3],p[1]))
 
 k = sh.occ.addCurveLoop(l)
 s = sh.occ.addPlaneSurface([k])
-sh.occ.synchronize()
 
+sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(l[3],N)
 
 # Physical Boundary

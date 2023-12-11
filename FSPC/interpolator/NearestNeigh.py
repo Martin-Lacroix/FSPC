@@ -33,7 +33,7 @@ class KNN(Interpolator):
     @tb.compute_time
     def computeMapping(self,position):
 
-        size = tb.solver.nbrNod,len(self.recvPos)
+        size = tb.solver.getSize(),len(self.recvPos)
         self.H = sp.dok_matrix(size)
 
         if self.K == 1: self.search(position)

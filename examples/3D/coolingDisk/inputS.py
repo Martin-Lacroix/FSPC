@@ -11,27 +11,17 @@ def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
+    metafor = w.Metafor()
 
     w.StrVectorBase.useTBB()
     w.StrMatrixBase.useTBB()
     w.ContactInteraction.useTBB()
-    
-    # Group and interaction sets
-
-    metafor = w.Metafor()
-    domain = metafor.getDomain()
-    tsm = metafor.getTimeStepManager()
-    materset = domain.getMaterialSet()
-    tim = metafor.getThermalIterationManager()
-    solvermanager = metafor.getSolverManager()
-    interactionset = domain.getInteractionSet()
-    mim = metafor.getMechanicalIterationManager()
-    initcondset = metafor.getInitialConditionSet()
 
     # Dimension and DSS solver
 
+    domain = metafor.getDomain()
     domain.getGeometry().setDim3D()
-    solvermanager.setSolver(w.DSSolver())
+    metafor.getSolverManager().setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -42,12 +32,14 @@ def getMetafor(parm):
 
     # Defines the solid domain
 
+    iset = domain.getInteractionSet()
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
-    interactionset.add(app)
+    iset.add(app)
 
     # Solid material parameters
 
+    materset = domain.getMaterialSet()
     materset.define(1,w.TmElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.THERM_EXPANSION,0)
@@ -73,7 +65,7 @@ def getMetafor(parm):
     heat = w.NodInteraction(2)
     heat.push(groups['FSInterface'])
     heat.addProperty(prp2)
-    interactionset.add(heat)
+    iset.add(heat)
 
     # Elements for surface traction
 
@@ -81,10 +73,11 @@ def getMetafor(parm):
     load = w.NodInteraction(3)
     load.push(groups['FSInterface'])
     load.addProperty(prp3)
-    interactionset.add(load)
+    iset.add(load)
 
     # Initial and boundary conditions
 
+    initcondset = metafor.getInitialConditionSet()
     initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),270)
     initcondset.define(groups['FSInterface'],w.Field1D(w.TO,w.AB),270)
 
@@ -100,14 +93,17 @@ def getMetafor(parm):
 
     # Mechanical and thermal iterations
 
-    mim.setMaxNbOfIterations(25)
+    mim = metafor.getMechanicalIterationManager()
     mim.setResidualTolerance(1e-6)
+    mim.setMaxNbOfIterations(25)
 
-    tim.setMaxNbOfIterations(25)
+    tim = metafor.getThermalIterationManager()
     tim.setResidualTolerance(1e-6)
+    tim.setMaxNbOfIterations(25)
 
     # Time step iterations
     
+    tsm = metafor.getTimeStepManager()
     tscm = w.NbOfStaggeredTmNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
@@ -120,4 +116,8 @@ def getMetafor(parm):
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     parm['exporter'].addDataBaseField([w.TO])
+    parm['polytope'] = load.getElementSet()
+
+    domain.build()
+    initcondset.update(0)
     return metafor

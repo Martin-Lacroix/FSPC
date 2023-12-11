@@ -1,8 +1,6 @@
 from ..general import Toolbox as tb
 import pfem3Dw as w
 import numpy as np
-import gmsh
-import math
 
 # |-----------------------------------|
 # |   Initializes the Fluid Wraper    |
@@ -32,13 +30,13 @@ class Pfem3D(object):
         self.FSI = w.VectorInt()
         self.mesh = self.problem.getMesh()
         self.solver = self.problem.getSolver()
-        self.dim = self.mesh.getDim()
-        self.initialize()
-
-        # Save mesh after initializing the BC pointer
-
         self.prevSolution = w.SolutionData()
-        self.problem.copySolution(self.prevSolution)
+        self.dim = self.mesh.getDim()
+
+        # Initialize the polytope and display parameters
+
+        vec = w.VectorVectorDouble()
+        self.polyIdx = self.mesh.addPolytope(vec)
         self.problem.displayParams()
 
 # |------------------------------------------|
@@ -89,7 +87,7 @@ class Pfem3D(object):
         # Estimate the time step for stability
 
         self.solver.computeNextDT()
-        division = math.ceil(dt/self.solver.getTimeStep())
+        division = np.ceil(dt/self.solver.getTimeStep())
         if division > self.maxDivision: return False
         dt = dt/division
 
@@ -143,9 +141,9 @@ class Pfem3D(object):
         self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
         return np.copy(vector)
 
-# |---------------------------|
-# |   Return Nodal Valuese    |
-# |---------------------------|
+# |--------------------------|
+# |   Return Nodal Values    |
+# |--------------------------|
 
     def getDisplacement(self):
         return self.getPosition()-self.prevPos
@@ -154,7 +152,7 @@ class Pfem3D(object):
 
     def getPosition(self):
 
-        result = np.zeros((self.nbrNod,self.dim))
+        result = np.zeros((self.getSize(),self.dim))
 
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -166,7 +164,7 @@ class Pfem3D(object):
 
     def getVelocity(self):
 
-        result = np.zeros((self.nbrNod,self.dim))
+        result = np.zeros((self.getSize(),self.dim))
         
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -174,14 +172,21 @@ class Pfem3D(object):
 
         return result
 
-# |----------------------------------------|
-# |   Initialize Communication Vectorse    |
-# |----------------------------------------|
+# |---------------------------------------------|
+# |   Remesh and Update the Internal Vectors    |
+# |---------------------------------------------|
 
-    def initialize(self):
+    @tb.compute_time
+    def update(self):
+
+        faceList = tb.interp.sharePolytope()
+        vector = w.VectorVectorDouble(faceList)
+        self.mesh.updatePoly(self.polyIdx,vector)
+        self.mesh.remesh(False)
+
+        # Update the interface and BC after remeshing
 
         self.mesh.getNodesIndex('FSInterface',self.FSI)
-        self.nbrNod = self.FSI.size()
         self.BC = list()
 
         for i in self.FSI:
@@ -190,8 +195,10 @@ class Pfem3D(object):
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 
-        # Store temporary simulation variables
+        # Update data and precompute PFEM matrices
 
+        if self.implicit: self.solver.precomputeMatrix()
+        self.problem.copySolution(self.prevSolution)
         self.prevPos = self.getPosition()
         self.vel = self.getVelocity()
 
@@ -199,67 +206,10 @@ class Pfem3D(object):
 # |   Other Wrapper Functions    |
 # |------------------------------|
 
-    @tb.compute_time
-    def update(self):
-
-        self.mesh.remesh(False)
-        if self.implicit: self.solver.precomputeMatrix()
-        self.problem.copySolution(self.prevSolution)
-        self.prevPos = self.getPosition()
-        self.vel = self.getVelocity()
-
-    # Save the results or finalize
-
     @tb.write_logs
     @tb.compute_time
     def save(self): self.problem.dump()
 
     @tb.write_logs
     def exit(self): self.problem.displayTimeStats()
-
-# |---------------------------------------|
-# |   FSI Facets Relative to Each Node    |
-# |---------------------------------------|
-
-    @tb.compute_time
-    def getFacet(self):
-
-        if not gmsh.isInitialized(): gmsh.initialize()
-        gmsh.option.setNumber('General.Terminal',0)
-        file = self.mesh.getInfos().mshFile
-        gmsh.open(file)
-
-        # Find the tag of FSInterface physical group
-
-        for data in gmsh.model.getPhysicalGroups():
-            group = gmsh.model.getPhysicalName(*data)
-            if 'FSInterface' == group: physical = data
-
-        faceList = list()
-        entity = gmsh.model.getEntitiesForPhysicalGroup(*physical)
-
-        # Node with coordinates and elements of the interface
-
-        for tag in entity:
-            faceList.append(gmsh.model.mesh.getElements(physical[0],tag)[2])
-
-        faceList = np.ravel(np.concatenate(faceList,axis=1))
-        nodeTags,coord = gmsh.model.mesh.getNodesForPhysicalGroup(*physical)
-        coord = np.reshape(coord,(len(nodeTags),3))[:,:self.dim]
-        gmsh.finalize()
-
-        # Make the tag to index vector converter
-
-        index = np.zeros(int(max(nodeTags))+1,dtype=int)-1
-        for i,tag in enumerate(nodeTags): index[tag] = i
-        vectorPos = self.getPosition()
-
-        for i,tag in enumerate(faceList):
-
-            position = coord[index[tag]]
-            distance = np.linalg.norm(position-vectorPos,axis=1)
-            idx = np.argmin(distance)
-            faceList[i] = idx
-
-        faceList = np.reshape(faceList,(-1,self.dim))
-        return faceList
+    def getSize(self): return self.FSI.size()

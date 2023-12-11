@@ -8,11 +8,11 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 # Initialize the simulation
 
-FSPC.setConvMech(1e-6)
+FSPC.setConvMech(1e-4)
 FSPC.setStep(1e-4,1e-4)
 FSPC.setSolver(pathF,pathS)
-FSPC.setInterp(FSPC.interpolator.KNN,2)
-FSPC.setAlgo(FSPC.algorithm.ILS,25)
+FSPC.setInterp(FSPC.interpolator.KNN,1)
+FSPC.setAlgo(FSPC.algorithm.MVJ,25)
 
 # Start the FSPC simulation
 

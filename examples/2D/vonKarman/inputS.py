@@ -11,22 +11,13 @@ def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
+    metafor = w.Metafor()
     
     # Group and interaction sets
 
-    metafor = w.Metafor()
     domain = metafor.getDomain()
-    tsm = metafor.getTimeStepManager()
-    materset = domain.getMaterialSet()
-    loadingset = domain.getLoadingSet()
-    solvermanager = metafor.getSolverManager()
-    interactionset = domain.getInteractionSet()
-    mim = metafor.getMechanicalIterationManager()
-
-    # Dimension and DSS solver
-
     domain.getGeometry().setDimPlaneStrain(1)
-    solvermanager.setSolver(w.DSSolver())
+    metafor.getSolverManager().setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -37,12 +28,14 @@ def getMetafor(parm):
 
     # Defines the solid domain
 
+    iset = domain.getInteractionSet()
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
-    interactionset.add(app)
+    iset.add(app)
     
     # Material parameters
 
+    materset = domain.getMaterialSet()
     materset.define(1,w.ElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1.4e6)
     materset(1).put(w.MASS_DENSITY,10000)
@@ -61,11 +54,13 @@ def getMetafor(parm):
     prp2 = w.ElementProperties(w.NodStress2DElement)
     load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
+    load.push(groups['Clamped'])
     load.addProperty(prp2)
-    interactionset.add(load)
+    iset.add(load)
     
     # Boundary conditions
     
+    loadingset = domain.getLoadingSet()
     loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
 
@@ -76,11 +71,13 @@ def getMetafor(parm):
 
     # Mechanical iterations
 
-    mim.setMaxNbOfIterations(25)
+    mim = metafor.getMechanicalIterationManager()
     mim.setResidualTolerance(1e-6)
+    mim.setMaxNbOfIterations(25)
 
     # Time step iterations
 
+    tsm = metafor.getTimeStepManager()
     tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
@@ -92,4 +89,7 @@ def getMetafor(parm):
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     parm['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    parm['polytope'] = load.getElementSet()
+
+    domain.build()
     return metafor

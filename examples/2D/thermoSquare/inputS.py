@@ -11,28 +11,17 @@ def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
+    metafor = w.Metafor()
 
     w.StrVectorBase.useTBB()
     w.StrMatrixBase.useTBB()
     w.ContactInteraction.useTBB()
-    
-    # Group and interaction sets
-
-    metafor = w.Metafor()
-    domain = metafor.getDomain()
-    tsm = metafor.getTimeStepManager()
-    materset = domain.getMaterialSet()
-    loadingset = domain.getLoadingSet()
-    tim = metafor.getThermalIterationManager()
-    solvermanager = metafor.getSolverManager()
-    interactionset = domain.getInteractionSet()
-    mim = metafor.getMechanicalIterationManager()
-    initcondset = metafor.getInitialConditionSet()
 
     # Dimension and DSS solver
 
+    domain = metafor.getDomain()
     domain.getGeometry().setDimPlaneStrain(1)
-    solvermanager.setSolver(w.DSSolver())
+    metafor.getSolverManager().setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -43,12 +32,14 @@ def getMetafor(parm):
 
     # Defines the ball domain
 
+    iset = domain.getInteractionSet()
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
-    interactionset.add(app)
+    iset.add(app)
 
     # Solid material parameters
 
+    materset = domain.getMaterialSet()
     materset.define(1,w.TmElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1)
     materset(1).put(w.THERM_EXPANSION,0)
@@ -73,11 +64,14 @@ def getMetafor(parm):
     heat = w.NodInteraction(2)
     heat.push(groups['FSInterface'])
     heat.addProperty(prp2)
-    interactionset.add(heat)
+    iset.add(heat)
 
     # Boundary conditions
 
+    initcondset = metafor.getInitialConditionSet()
     initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),2000)
+
+    loadingset = domain.getLoadingSet()
     loadingset.define(groups['Solid'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['Solid'],w.Field1D(w.TY,w.RE))
 
@@ -93,23 +87,30 @@ def getMetafor(parm):
 
     # Mechanical and thermal iterations
 
-    mim.setMaxNbOfIterations(25)
+    mim = metafor.getMechanicalIterationManager()
     mim.setResidualTolerance(1e-6)
+    mim.setMaxNbOfIterations(25)
 
-    tim.setMaxNbOfIterations(25)
+    tim = metafor.getThermalIterationManager()
     tim.setResidualTolerance(1e-6)
+    tim.setMaxNbOfIterations(25)
 
     # Time step iterations
     
+    tsm = metafor.getTimeStepManager()
     tscm = w.NbOfStaggeredTmNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
     tscm.setNbOptiIte(25)
 
     # Parameters for FSPC
-
+    
     parm['interacT'] = heat
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     parm['exporter'].addDataBaseField([w.TO])
+    parm['polytope'] = heat.getElementSet()
+
+    domain.build()
+    initcondset.update(0)
     return metafor

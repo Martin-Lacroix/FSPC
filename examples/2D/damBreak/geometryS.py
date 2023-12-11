@@ -10,8 +10,11 @@ L = 0.146
 w = 0.012
 h = 0.08
 
-N = 40
-M = 8
+# Characteristic size
+
+d = 0.002
+N = 41
+M = 7
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -52,8 +55,8 @@ sh.mesh.setRecombine(2,s)
 # Physical Boundary
 
 sh.addPhysicalGroup(2,[s],name='Solid')
-sh.addPhysicalGroup(1,l[1:4],name='FSInterface')
-sh.addPhysicalGroup(1,[l[0]],name='SolidBase')
+sh.addPhysicalGroup(1,l[1:],name='FSInterface')
+sh.addPhysicalGroup(1,[l[0]],name='Base')
 
 # |--------------------------|
 # |   Write the Mesh File    |

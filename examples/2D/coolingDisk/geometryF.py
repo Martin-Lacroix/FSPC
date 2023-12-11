@@ -12,8 +12,10 @@ HS = 0.03
 R = 0.025
 C = 0.2
 
-d = HF/33
-N = 13
+# Characteristic size
+
+d = 0.0075
+N = 11
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -84,9 +86,6 @@ sh.addPhysicalGroup(2,[s],name='Fluid')
 sh.addPhysicalGroup(1,h+r+u,name='FSInterface')
 sh.addPhysicalGroup(1,[l[2]],name='FreeSurface')
 sh.addPhysicalGroup(1,l[:2]+l[3:],name='Wall')
-sh.addPhysicalGroup(1,h,name='Poly_1')
-sh.addPhysicalGroup(1,r,name='Poly_2')
-sh.addPhysicalGroup(1,u,name='Poly_3')
 
 # |--------------------------|
 # |   Write the Mesh File    |

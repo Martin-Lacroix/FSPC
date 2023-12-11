@@ -11,6 +11,8 @@ W = 1
 HF = 0.2
 HS = 0.02
 
+# Characteristic size
+
 M = 21
 N = 6
 

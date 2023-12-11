@@ -11,26 +11,17 @@ def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
+    metafor = w.Metafor()
 
     w.StrVectorBase.useTBB()
     w.StrMatrixBase.useTBB()
     w.ContactInteraction.useTBB()
-    
-    # Group and interaction sets
-
-    metafor = w.Metafor()
-    domain = metafor.getDomain()
-    tsm = metafor.getTimeStepManager()
-    materset = domain.getMaterialSet()
-    loadingset = domain.getLoadingSet()
-    solvermanager = metafor.getSolverManager()
-    interactionset = domain.getInteractionSet()
-    mim = metafor.getMechanicalIterationManager()
 
     # Dimension and DSS solver
 
+    domain = metafor.getDomain()
     domain.getGeometry().setDimPlaneStrain(1)
-    solvermanager.setSolver(w.DSSolver())
+    metafor.getSolverManager().setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -41,15 +32,14 @@ def getMetafor(parm):
     
     # Defines the solid domain
 
+    iset = domain.getInteractionSet()
     app1 = w.FieldApplicator(1)
-    app1.push(groups['Border'])
-    interactionset.add(app1)
-
-    # Defines the ball domain
+    app1.push(groups['Peigne'])
+    iset.add(app1)
 
     app2 = w.FieldApplicator(2)
-    app2.push(groups['Ball'])
-    interactionset.add(app2)
+    app2.push(groups['Disk'])
+    iset.add(app2)
     
     # Wall material parameters
 
@@ -58,6 +48,7 @@ def getMetafor(parm):
     G = E/(2*(1+v))
     K = E/(3*(1-2*v))
 
+    materset = domain.getMaterialSet()
     materset.define(1,w.NeoHookeanHyperPk2Material)
     materset(1).put(w.MASS_DENSITY,1e-6)
     materset(1).put(w.HYPER_K0,K)
@@ -106,29 +97,36 @@ def getMetafor(parm):
     # Elements for surface traction
 
     prp3 = w.ElementProperties(w.NodStress2DElement)
-    load = w.NodInteraction(3)
-    load.push(groups['FSInterface'])
-    load.addProperty(prp3)
-    interactionset.add(load)
+    load1 = w.NodInteraction(3)
+    load1.push(groups['PeigneSide'])
+    load1.addProperty(prp3)
+    iset.add(load1)
+
+    prp4 = w.ElementProperties(w.NodStress2DElement)
+    load2 = w.NodInteraction(4)
+    load2.push(groups['DiskSide'])
+    load2.addProperty(prp4)
+    iset.add(load2)
 
     # Contact properties
 
-    prp4 = w.ElementProperties(w.Contact2DElement)
-    prp4.put(w.AREAINCONTACT,w.AIC_ONCE)
-    prp4.put(w.MATERIAL,3)
+    prp5 = w.ElementProperties(w.Contact2DElement)
+    prp5.put(w.AREAINCONTACT,w.AIC_ONCE)
+    prp5.put(w.MATERIAL,3)
 
     # Defines the contact entities
 
-    ci = w.DdContactInteraction(4)
-    ci.setTool(groups['Master'])
+    ci = w.DdContactInteraction(5)
+    ci.setTool(groups['PeigneSide'])
     ci.setSmoothNormals(False)
-    ci.push(groups['Slave'])
+    ci.push(groups['DiskSide'])
     ci.setSinglePass()
-    ci.addProperty(prp4)
-    interactionset.add(ci)
+    ci.addProperty(prp5)
+    iset.add(ci)
 
     # Boundary conditions
 
+    loadingset = domain.getLoadingSet()
     loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
 
@@ -139,11 +137,13 @@ def getMetafor(parm):
 
     # Mechanical iterations
 
-    mim.setMaxNbOfIterations(25)
+    mim = metafor.getMechanicalIterationManager()
     mim.setResidualTolerance(1e-4)
+    mim.setMaxNbOfIterations(25)
 
     # Time step iterations
     
+    tsm = metafor.getTimeStepManager()
     tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
@@ -151,8 +151,11 @@ def getMetafor(parm):
 
     # Parameters for FSPC
 
-    parm['interacM'] = load
+    parm['interacM'] = [load1,load2]
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     parm['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    parm['polytope'] = load2.getElementSet()
+
+    domain.build()
     return metafor

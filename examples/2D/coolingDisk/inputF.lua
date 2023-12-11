@@ -9,28 +9,26 @@ Problem.id = 'Boussinesq'
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.25/33
-Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = false
-Problem.Mesh.minAspectRatio = 1e-3
-Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = true
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.boundingBox = {0,0,0.9,1}
 Problem.Mesh.exclusionZones = {}
 
-Problem.Mesh.remeshAlgo = 'GMSH'
-Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'Poly_1','Poly_2','Poly_3'}
-Problem.Mesh.ignoreGroups = {}
+Problem.Mesh.alpha = 1.2
+Problem.Mesh.omega = 0.5
+Problem.Mesh.gamma = 0.6
+Problem.Mesh.gammaFS = 0.2
+Problem.Mesh.hchar = 0.0075
+Problem.Mesh.minAspectRatio = 1e-3
+
+Problem.Mesh.addOnFS = false
+Problem.Mesh.keepFluidElements = true
+Problem.Mesh.deleteFlyingNodes = true
+Problem.Mesh.deleteBoundElements = false
 
 -- Extractor Parameters
 
 Problem.Extractors = {}
-
 Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
@@ -99,7 +97,7 @@ Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-6
 Problem.Solver.HeatEq.cgTolerance = 1e-16
 
--- Heat Momentum Continuity BC
+-- Fluid Structure Interface
 
 Problem.IC = {}
 Problem.Solver.HeatEq.BC = {}
@@ -107,13 +105,7 @@ Problem.Solver.MomContEq.BC = {}
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
-Problem.Solver.HeatEq.BC['Poly_1TExt'] = true
-Problem.Solver.HeatEq.BC['Poly_2TExt'] = true
-Problem.Solver.HeatEq.BC['Poly_3TExt'] = true
-
-Problem.Solver.MomContEq.BC['Poly_1VExt'] = true
-Problem.Solver.MomContEq.BC['Poly_2VExt'] = true
-Problem.Solver.MomContEq.BC['Poly_3VExt'] = true
+-- Boundary Condition Functions
 
 function Problem.IC.initStates(x,y,z)
 	return {0,0,0,340}

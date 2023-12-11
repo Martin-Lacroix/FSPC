@@ -1,6 +1,7 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
 from mpi4py.MPI import COMM_WORLD as CW
+from . import Manager as ma
 import collections,time
 import fwkw
 
@@ -112,24 +113,6 @@ def conv_therm(func):
         return result
     return wrapper
 
-# |--------------------------------------|
-# |   Import Classes from Other Files    |
-# |--------------------------------------|
-
-from . import Manager as ma
-from . import Element as el
-
-def getElement(nbrNod):
-
-    if nbrNod == 2: return el.Line()
-    if nbrNod == 3: return el.Triangle()
-    if nbrNod == 4: return el.Quadrangle()
-
-def simulate(endTime):
-
-    global algo
-    return algo.simulate(endTime)
-
 # |------------------------------------|
 # |   Initialize the Global Classes    |
 # |------------------------------------|
@@ -163,6 +146,11 @@ def setConvTher(tol):
     global convTher
     convTher = ma.Convergence(tol)
     return convTher
+
+def simulate(endTime):
+
+    global algo
+    return algo.simulate(endTime)
 
 # |----------------------------------------|
 # |   Import and Initialize the Solvers    |

@@ -1,29 +1,29 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.verboseOutput = true
+Problem.verboseOutput = false
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
-Problem.id = 'IncompNewtonNoT'
+Problem.id = 'WCompNewtonNoT'
 
 -- Mesh Parameters
 
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.boundingBox = {0,0,-10,1,1,1}
+Problem.Mesh.boundingBox = {-1,-2.625,1,2.375}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.05
-Problem.Mesh.gammaFS = 0.6
-Problem.Mesh.minAspectRatio = 1e-12
+Problem.Mesh.hchar = 0.04
+Problem.Mesh.gammaFS = 0.2
+Problem.Mesh.minAspectRatio = 1e-2
 
 Problem.Mesh.addOnFS = true
 Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = false
+Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = false
 
 -- Extractor Parameters
@@ -45,45 +45,60 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 1e+3
+Problem.Material.p0 = 0
+Problem.Material.mu = 1e-5
+Problem.Material.K0p = 1
 Problem.Material.gamma = 0
-Problem.Material.rho = 1000
+Problem.Material.K0 = 100
+Problem.Material.rhoStar = 1e-6
 
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.id = 'CDS_dpdt'
+Problem.Solver.securityCoeff = 0.2
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
-Problem.Solver.coeffDTDecrease = math.huge
-Problem.Solver.coeffDTincrease = math.huge
+Problem.Solver.maxRemeshDT = math.huge
 
 -- Momentum Continuity Equation
 
-Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.residual = 'Ax_f'
-Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomEq = {}
+Problem.Solver.ContEq = {}
+Problem.Solver.MomEq.pExt = 0
+Problem.Solver.MomEq.bodyForce = {0,0}
+Problem.Solver.ContEq.stabilization = 'CLS'
 
-Problem.Solver.MomContEq.pExt = 0
-Problem.Solver.MomContEq.maxIter = 25
-Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
-
--- Fluid Structure Interface
+-- Momentum Continuity BC
 
 Problem.IC = {}
-Problem.Solver.MomContEq.BC = {}
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
-
--- Boundary Condition Functions
+Problem.Solver.MomEq.BC = {}
+Problem.Solver.ContEq.BC = {}
+Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true
 
 function Problem.IC.initStates(x,y,z)
-	return {0,0,0,0}
+	return {0,0,0,Problem.Material.rhoStar,0,0}
 end
 
-function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
-	return 0,0,0
+function Problem.Solver.MomEq.BC.WallV(x,y,z,t)
+	return 0,0
+end
+
+function Problem.Solver.MomEq.BC.InletVEuler(x,y,z,t)
+
+	local amax = -4e5
+	local tmax = 2.5e-4
+	local r = math.abs(x)
+	local R = 1
+
+	if (t<tmax) then
+
+		local a = amax*(1-(r*r)/(R*R))
+		return 0,a
+
+	else
+		return 0,0
+	end
 end

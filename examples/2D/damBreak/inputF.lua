@@ -9,29 +9,27 @@ Problem.id = 'IncompNewtonNoT'
 -- Mesh Parameters
 
 Problem.Mesh = {}
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometryF.msh'
+Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
+Problem.Mesh.boundingBox = {0,0,0.584,0.584}
+Problem.Mesh.exclusionZones = {}
+
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 0.005
 Problem.Mesh.gammaFS = 0.5
-Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
+
+Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.boundingBox = {0,0,0.584,0.584}
-Problem.Mesh.exclusionZones = {}
-
-Problem.Mesh.remeshAlgo = 'GMSH'
-Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {'Polytope'}
-Problem.Mesh.localHcharGroups = {'Polytope','Reservoir','FreeSurface'}
-Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
 
 Problem.Extractors = {}
-
 Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
@@ -75,11 +73,13 @@ Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
--- Momentum Continuity BC
+-- Fluid Structure Interface
 
 Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
+-- Boundary Condition Functions
 
 function Problem.IC.initStates(x,y,z)
 	return {0,0,0}
@@ -89,12 +89,6 @@ function Problem.Solver.MomContEq.BC.ReservoirV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC.PolytopeV(x,y,z,t)
-	return 0,0
-end
-
 function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
-
-	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.1
+	return Problem.Mesh.hchar+dist*0.1
 end

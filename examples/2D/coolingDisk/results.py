@@ -88,9 +88,9 @@ for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
     nodeVal = gmsh.view.getModelData(1,i)[2]
-    value[0][i] = nodeVal[192][0]
-    value[1][i] = nodeVal[277][0]
-    value[2][i] = nodeVal[362][0]
+    value[0][i] = nodeVal[252][0]
+    value[1][i] = nodeVal[385][0]
+    value[2][i] = nodeVal[518][0]
 
 gmsh.finalize()
 time = np.sort(time)

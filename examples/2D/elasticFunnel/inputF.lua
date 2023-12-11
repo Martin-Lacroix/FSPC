@@ -9,29 +9,27 @@ Problem.id = 'IncompNewtonNoT'
 -- Mesh Parameters
 
 Problem.Mesh = {}
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometryF.msh'
+Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
+Problem.Mesh.boundingBox = {-4,-4,4,6.25}
+Problem.Mesh.exclusionZones = {}
+
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 0.05
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-4
+
+Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
-Problem.Mesh.boundingBox = {-4,-4,4,6.25}
-Problem.Mesh.exclusionZones = {}
-
-Problem.Mesh.remeshAlgo = 'GMSH'
-Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {}
-Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
 
 Problem.Extractors = {}
-
 Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
@@ -68,8 +66,6 @@ Problem.Solver.coeffDTincrease = math.huge
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.sparseSolverPstep = 'LLT'
-Problem.Solver.MomContEq.sparseSolverLibPstep = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
@@ -78,11 +74,13 @@ Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.cgTolerance = 1e-16
 Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
--- Momentum Continuity BC
+-- Fluid Structure Interface
 
 Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
+-- Boundary Condition Functions
 
 function Problem.IC.initStates(x,y,z)
 	return {0,0,0}
@@ -92,20 +90,6 @@ function Problem.Solver.MomContEq.BC.ReservoirV(x,y,z,t)
 	return 0,0
 end
 
-function Problem.Solver.MomContEq.BC.PolyLV(x,y,z,t)
-	return 0,0
-end
-
-function Problem.Solver.MomContEq.BC.PolyRV(x,y,z,t)
-	return 0,0
-end
-
-function Problem.Solver.MomContEq.BC.SolidBaseV(x,y,z,t)
-	return 0,0
-end
-
 function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
-
-	local hchar = Problem.Mesh.hchar
-	return hchar+dist*0.3
+	return Problem.Mesh.hchar+dist*0.3
 end

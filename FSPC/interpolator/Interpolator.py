@@ -118,8 +118,20 @@ class Interpolator(object):
         if verified:
 
             self.prevTemp = np.copy(self.temp)
-            self.velocityT = tb.solver.getTempVeloc()
+            self.velocityT = tb.solver.getTempRate()
 
         else: self.temp = np.copy(self.prevTemp)
         self.temp += tb.step.dt*self.velocityT
-            
+
+# |----------------------------------------|
+# |   Send Polytope from Solid to Fluid    |
+# |----------------------------------------|
+
+    def sharePolytope(self):
+
+        if CW.rank == 0:
+            recvFace = CW.recv(source=1,tag=9)
+            return recvFace
+
+        if CW.rank == 1:
+            CW.send(tb.solver.getPolytope(),0,tag=9)

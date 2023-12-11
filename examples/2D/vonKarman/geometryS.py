@@ -15,6 +15,8 @@ CY = 0.2
 BX = 0.6
 BH = 0.01
 
+# Characteristic size
+
 d = 4e-3
 N = 101
 M = 7

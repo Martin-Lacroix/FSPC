@@ -19,7 +19,13 @@ D2 = 1.25
 HB = 0.75+H+5*R
 RB = 0.375
 
-d = 0.02
+# Characteristic size
+
+d = 0.04
+N = 30
+M = 25
+P = 4
+Q = 15
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -145,6 +151,39 @@ k.append(sh.occ.addCurveLoop(l+h+r+q))
 s = sh.occ.addPlaneSurface([k[1],-k[0]])
 sh.occ.synchronize()
 
+# Transfinite Mesh
+
+sh.mesh.setTransfiniteCurve(c[0],N)
+sh.mesh.setTransfiniteCurve(c[1],N)
+
+sh.mesh.setTransfiniteCurve(l[1],M)
+sh.mesh.setTransfiniteCurve(l[3],M)
+sh.mesh.setTransfiniteCurve(l[5],M)
+sh.mesh.setTransfiniteCurve(l[7],M)
+sh.mesh.setTransfiniteCurve(l[9],M)
+
+sh.mesh.setTransfiniteCurve(r[1],M)
+sh.mesh.setTransfiniteCurve(r[3],M)
+sh.mesh.setTransfiniteCurve(r[5],M)
+sh.mesh.setTransfiniteCurve(r[7],M)
+sh.mesh.setTransfiniteCurve(r[9],M)
+
+sh.mesh.setTransfiniteCurve(l[2],P)
+sh.mesh.setTransfiniteCurve(l[4],P)
+sh.mesh.setTransfiniteCurve(l[6],P)
+sh.mesh.setTransfiniteCurve(l[8],P)
+
+sh.mesh.setTransfiniteCurve(r[2],P)
+sh.mesh.setTransfiniteCurve(r[4],P)
+sh.mesh.setTransfiniteCurve(r[6],P)
+sh.mesh.setTransfiniteCurve(r[8],P)
+
+sh.mesh.setTransfiniteCurve(l[0],Q)
+sh.mesh.setTransfiniteCurve(l[10],Q)
+
+sh.mesh.setTransfiniteCurve(r[0],Q)
+sh.mesh.setTransfiniteCurve(r[10],Q)
+
 # Physical Boundary
 
 sh.addPhysicalGroup(2,[s],name='Fluid')
@@ -152,12 +191,6 @@ sh.addPhysicalGroup(1,[q[1]],name='FreeSurface')
 sh.addPhysicalGroup(1,[h[0],h[2],q[0],q[2]],name='Wall')
 sh.addPhysicalGroup(1,l+r+c,name='FSInterface')
 sh.addPhysicalGroup(1,[h[1]],name='Inlet')
-
-# Polytope boundary
-
-sh.addPhysicalGroup(1,c,name='Poly')
-sh.addPhysicalGroup(1,l+[L],name='PolyL')
-sh.addPhysicalGroup(1,r+[R],name='PolyR')
 
 # |--------------------------|
 # |   Write the Mesh File    |

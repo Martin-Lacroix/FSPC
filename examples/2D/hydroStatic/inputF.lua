@@ -9,28 +9,26 @@ Problem.id = 'IncompNewtonNoT'
 -- Mesh Parameters
 
 Problem.Mesh = {}
+Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.mshFile = 'geometryF.msh'
+Problem.Mesh.boundingBox = {0,-10,1,1}
+Problem.Mesh.exclusionZones = {}
+
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
 Problem.Mesh.hchar = 0.01
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.addOnFS = false
 Problem.Mesh.minAspectRatio = 1e-3
+
+Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
 Problem.Mesh.deleteBoundElements = false
-Problem.Mesh.boundingBox = {0,-10,1,1}
-Problem.Mesh.exclusionZones = {}
-
-Problem.Mesh.remeshAlgo = 'GMSH'
-Problem.Mesh.mshFile = 'geometryF.msh'
-Problem.Mesh.exclusionGroups = {}
-Problem.Mesh.ignoreGroups = {}
 
 -- Extractor Parameters
 
 Problem.Extractors = {}
-
 Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
@@ -74,11 +72,13 @@ Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
--- Momentum Continuity BC
+-- Fluid Structure Interface
 
 Problem.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
+-- Boundary Condition Functions
 
 function Problem.IC.initStates(x,y,z)
 	return {0,0,0}

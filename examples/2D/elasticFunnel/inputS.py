@@ -11,26 +11,17 @@ def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
+    metafor = w.Metafor()
 
     w.StrVectorBase.useTBB()
     w.StrMatrixBase.useTBB()
     w.ContactInteraction.useTBB()
-    
-    # Group and interaction sets
-
-    metafor = w.Metafor()
-    domain = metafor.getDomain()
-    tsm = metafor.getTimeStepManager()
-    materset = domain.getMaterialSet()
-    loadingset = domain.getLoadingSet()
-    solvermanager = metafor.getSolverManager()
-    interactionset = domain.getInteractionSet()
-    mim = metafor.getMechanicalIterationManager()
 
     # Dimension and DSS solver
 
+    domain = metafor.getDomain()
     domain.getGeometry().setDimPlaneStrain(1)
-    solvermanager.setSolver(w.DSSolver())
+    metafor.getSolverManager().setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -41,12 +32,14 @@ def getMetafor(parm):
 
     # Defines the solid domain
 
+    iset = domain.getInteractionSet()
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
-    interactionset.add(app)
+    iset.add(app)
     
     # Material parameters
 
+    materset = domain.getMaterialSet()
     materset.define(1,w.ElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,2.1e7)
     materset(1).put(w.POISSON_RATIO,0.3)
@@ -67,12 +60,13 @@ def getMetafor(parm):
     load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
-    interactionset.add(load)
+    iset.add(load)
     
     # Boundary conditions
     
-    loadingset.define(groups['SolidBase'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['SolidBase'],w.Field1D(w.TY,w.RE))
+    loadingset = domain.getLoadingSet()
+    loadingset.define(groups['Base'],w.Field1D(w.TX,w.RE))
+    loadingset.define(groups['Base'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 
@@ -81,11 +75,13 @@ def getMetafor(parm):
 
     # Mechanical iterations
 
-    mim.setMaxNbOfIterations(25)
+    mim = metafor.getMechanicalIterationManager()
     mim.setResidualTolerance(1e-6)
+    mim.setMaxNbOfIterations(25)
 
     # Time step iterations
 
+    tsm = metafor.getTimeStepManager()
     tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
@@ -97,4 +93,7 @@ def getMetafor(parm):
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     parm['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    parm['polytope'] = None
+
+    domain.build()
     return metafor

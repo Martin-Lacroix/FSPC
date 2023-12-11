@@ -8,6 +8,9 @@ gmsh.initialize()
 
 L = 5
 R = 2
+
+# Characteristic size
+
 d = 0.05
 N = 101
 
@@ -68,15 +71,15 @@ sh.addPhysicalGroup(1,l,name='Wall')
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-def meshSize(dim,tag,x,y,z,lc):
+fun = str(d)+'+0.1*F1'
+sh.mesh.field.add('Distance',1)
+sh.mesh.field.setNumber(1,'Sampling',1e4)
+sh.mesh.field.setNumbers(1,'CurvesList',h)
 
-    F = 0.1
-    size = list()
-    size.append(max(d+F*(abs(x)-R),d))
-    size.append(max(d+F*(abs(y)-R),d))
-    return max(size)
-    
-sh.mesh.setSizeCallback(meshSize)
+sh.mesh.field.add('MathEval',2)
+sh.mesh.field.setString(2,'F',fun)
+
+sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 

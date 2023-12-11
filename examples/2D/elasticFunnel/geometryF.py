@@ -13,6 +13,8 @@ B = 4.87
 h = 2.5
 b = 1.3
 
+# Characteristic size
+
 d = 0.05
 N = 160
 M = 80
@@ -64,40 +66,23 @@ sh.addPhysicalGroup(1,l[:3],name='FSInterface')
 sh.addPhysicalGroup(1,[l[3],l[5]],name='Reservoir')
 sh.addPhysicalGroup(1,[l[4],l[6]],name='FreeSurface')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# |----------------------------------------|
+# |   Mesh Characteristic Size Function    |
+# |----------------------------------------|
 
-def distance(a,b,x,y):
+fun = str(d)+'+0.3*F1'
+sh.mesh.field.add('Distance',1)
+sh.mesh.field.setNumber(1,'Sampling',1e4)
+sh.mesh.field.setNumbers(1,'CurvesList',l)
 
-    num = abs((b[0]-a[0])*(y-a[1])-(b[1]-a[1])*(x-a[0]))
-    den = np.sqrt(np.square(b[0]-a[0])+np.square(b[1]-a[1]))
-    return num/den
+sh.mesh.field.add('MathEval',2)
+sh.mesh.field.setString(2,'F',fun)
 
-def meshSize(dim,tag,x,y,z,lc):
-
-    F = 0.3
-    size = list()
-
-    a = sh.mesh.getNode(p[0])[0]
-    b = sh.mesh.getNode(p[1])[0]
-    size.append(max(F*distance(a,b,x,y),d))
-
-    a = sh.mesh.getNode(p[4])[0]
-    b = sh.mesh.getNode(p[5])[0]
-    size.append(max(F*distance(a,b,x,y),d))
-
-    size.append(max(d+F*(y-H),d))
-    size.append(max(d+F*(H+h-y),d))
-    return min(size)
-    
-sh.mesh.setSizeCallback(meshSize)
+sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# Write the Mesh File
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')

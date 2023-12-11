@@ -19,7 +19,13 @@ D2 = 1.25
 HB = 0.75+H+5*R
 RB = 0.375
 
-d = 0.03
+# Characteristic size
+
+d = 0.02
+N = 30
+M = 25
+P = 4
+Q = 15
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -131,15 +137,47 @@ sh.mesh.setAlgorithm(2,s[1],8)
 sh.mesh.setReverse(2,s[2])
 sh.occ.synchronize()
 
+# Transfinite Mesh
+
+sh.mesh.setTransfiniteCurve(c[0],N)
+sh.mesh.setTransfiniteCurve(c[1],N)
+
+sh.mesh.setTransfiniteCurve(l[1],M)
+sh.mesh.setTransfiniteCurve(l[3],M)
+sh.mesh.setTransfiniteCurve(l[5],M)
+sh.mesh.setTransfiniteCurve(l[7],M)
+sh.mesh.setTransfiniteCurve(l[9],M)
+
+sh.mesh.setTransfiniteCurve(h[2],M)
+sh.mesh.setTransfiniteCurve(h[4],M)
+sh.mesh.setTransfiniteCurve(h[6],M)
+sh.mesh.setTransfiniteCurve(h[8],M)
+sh.mesh.setTransfiniteCurve(h[10],M)
+
+sh.mesh.setTransfiniteCurve(l[2],P)
+sh.mesh.setTransfiniteCurve(l[4],P)
+sh.mesh.setTransfiniteCurve(l[6],P)
+sh.mesh.setTransfiniteCurve(l[8],P)
+
+sh.mesh.setTransfiniteCurve(h[3],P)
+sh.mesh.setTransfiniteCurve(h[5],P)
+sh.mesh.setTransfiniteCurve(h[7],P)
+sh.mesh.setTransfiniteCurve(h[9],P)
+
+sh.mesh.setTransfiniteCurve(l[0],Q)
+sh.mesh.setTransfiniteCurve(l[10],Q)
+
+sh.mesh.setTransfiniteCurve(h[1],Q)
+sh.mesh.setTransfiniteCurve(h[11],Q)
+
 # Boundaries
 
-sh.addPhysicalGroup(2,[s[2]],name='Ball')
-sh.addPhysicalGroup(2,s[0:2],name='Border')
+sh.addPhysicalGroup(2,[s[2]],name='Disk')
+sh.addPhysicalGroup(2,s[0:2],name='Peigne')
+sh.addPhysicalGroup(1,l[:11]+h[1:],name='PeigneSide')
 sh.addPhysicalGroup(1,l[:11]+h[1:]+c,name='FSInterface')
 sh.addPhysicalGroup(1,[l[11],h[0]],name='Clamped')
-sh.addPhysicalGroup(1,l[:11]+h[1:],name='Master')
-sh.addPhysicalGroup(1,c,name='Slave')
-
+sh.addPhysicalGroup(1,c,name='DiskSide')
 
 # |--------------------------|
 # |   Write the Mesh File    |
@@ -147,9 +185,8 @@ sh.addPhysicalGroup(1,c,name='Slave')
 
 gmsh.option.setNumber('Mesh.RecombineAll',1)
 gmsh.option.setNumber('Mesh.Algorithm',11)
-
-
 sh.mesh.generate(2)
+
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')
 gmsh.fltk.run()
 gmsh.finalize()

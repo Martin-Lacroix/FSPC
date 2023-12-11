@@ -12,6 +12,8 @@ D = 0.14
 L1 = 0.1
 L2 = 0.1
 
+# Characteristic size
+
 d = 1e-3
 eps = 1e-5
 N = 80
@@ -30,7 +32,7 @@ p.append(sh.occ.addPoint(L1,D,0,d))
 p.append(sh.occ.addPoint(L1,H,0,d))
 p.append(sh.occ.addPoint(L1,eps,0,d))
 
-# # Lines List
+# Lines List
 
 l = list()
 
@@ -63,17 +65,15 @@ sh.addPhysicalGroup(1,[l[0],l[3]]+l[5:7],name='Reservoir')
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-def meshSize(dim,tag,x,y,z,lc):
+fun = str(d)+'+0.2*F1'
+sh.mesh.field.add('Distance',1)
+sh.mesh.field.setNumber(1,'Sampling',1e4)
+sh.mesh.field.setNumbers(1,'CurvesList',l)
 
-    F = 0.2
-    size = list()
-    size.append(max(d+F*x,d))
-    size.append(max(d+F*y,d))
-    size.append(max(d+F*(L1-x),d))
-    size.append(max(d+F*(D-y),d))
-    return min(size)
-    
-sh.mesh.setSizeCallback(meshSize)
+sh.mesh.field.add('MathEval',2)
+sh.mesh.field.setString(2,'F',fun)
+
+sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 

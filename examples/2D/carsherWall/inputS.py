@@ -11,27 +11,17 @@ def getMetafor(parm):
 
     global metafor
     if metafor: return metafor
+    metafor = w.Metafor()
 
     w.StrVectorBase.useTBB()
     w.StrMatrixBase.useTBB()
     w.ContactInteraction.useTBB()
-    
-    # Group and interaction sets
-
-    metafor = w.Metafor()
-    domain = metafor.getDomain()
-    tsm = metafor.getTimeStepManager()
-    materset = domain.getMaterialSet()
-    lawset = domain.getMaterialLawSet()
-    loadingset = domain.getLoadingSet()
-    solvermanager = metafor.getSolverManager()
-    interactionset = domain.getInteractionSet()
-    mim = metafor.getMechanicalIterationManager()
 
     # Dimension and DSS solver
 
+    domain = metafor.getDomain()
     domain.getGeometry().setDimPlaneStrain(1)
-    solvermanager.setSolver(w.DSSolver())
+    metafor.getSolverManager().setSolver(w.DSSolver())
     
     # Imports the mesh
 
@@ -42,18 +32,21 @@ def getMetafor(parm):
     
     # Defines the solid domain
 
+    iset = domain.getInteractionSet()
     app = w.FieldApplicator(1)
     app.push(groups['Solid'])
-    interactionset.add(app)
+    iset.add(app)
     
     # Solid material parameters
 
+    materset = domain.getMaterialSet()
     materset.define(1,w.EvpIsoHHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1e7)
     materset(1).put(w.MASS_DENSITY,8e3)
     materset(1).put(w.POISSON_RATIO,0)
     materset(1).put(w.YIELD_NUM,1)
 
+    lawset = domain.getMaterialLawSet()
     lawset.define(1,w.SwiftIsotropicHardening)
     lawset(1).put(w.IH_SIGEL,1e5)
     lawset(1).put(w.IH_B,375)
@@ -83,7 +76,7 @@ def getMetafor(parm):
     load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
-    interactionset.add(load)
+    iset.add(load)
 
     # Contact properties
 
@@ -98,10 +91,11 @@ def getMetafor(parm):
     ci.setSmoothNormals(False)
     ci.push(groups['Solid'])
     ci.addProperty(prp3)
-    interactionset.add(ci)
+    iset.add(ci)
 
     # Boundary conditions
 
+    loadingset = domain.getLoadingSet()
     loadingset.define(groups['Contact'],w.Field1D(w.TX,w.RE))
     loadingset.define(groups['Contact'],w.Field1D(w.TY,w.RE))
 
@@ -112,11 +106,13 @@ def getMetafor(parm):
 
     # Mechanical iterations
 
-    mim.setMaxNbOfIterations(25)
+    mim = metafor.getMechanicalIterationManager()
     mim.setResidualTolerance(1e-6)
+    mim.setMaxNbOfIterations(25)
 
     # Time step iterations
     
+    tsm = metafor.getTimeStepManager()
     tscm = w.NbOfMechNRIterationsTimeStepComputationMethod(metafor)
     tsm.setTimeStepComputationMethod(tscm)
     tscm.setTimeStepDivisionFactor(2)
@@ -128,4 +124,7 @@ def getMetafor(parm):
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
     parm['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
+    parm['polytope'] = load.getElementSet()
+
+    domain.build()
     return metafor

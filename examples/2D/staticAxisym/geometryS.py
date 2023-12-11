@@ -8,6 +8,9 @@ gmsh.initialize()
 
 L = 1
 HS = 0.02
+
+# Characteristic size
+
 N = 3
 M = 101
 

@@ -15,6 +15,8 @@ CY = 0.2
 BX = 0.6
 BH = 0.01
 
+# Characteristic size
+
 d = 4e-3
 LN = 376
 N = 88
@@ -78,25 +80,6 @@ sh.addPhysicalGroup(1,r,name='FSInterface')
 sh.addPhysicalGroup(1,[l[1]],name='Outlet')
 sh.addPhysicalGroup(1,[l[0],l[2]]+h,name='Wall')
 sh.addPhysicalGroup(1,[l[3]],name='Inlet')
-sh.addPhysicalGroup(1,h+r,name='Polytope')
-
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
-
-# fun = str(d)+'+0.1*F1'
-# ref = h+r+[l[0],l[2],l[3]]
-
-# sh.mesh.field.add('Distance',1)
-# sh.mesh.field.setNumber(1,'Sampling',1e4)
-# sh.mesh.field.setNumbers(1,'CurvesList',ref)
-
-# sh.mesh.field.add('MathEval',2)
-# sh.mesh.field.setString(2,'F',fun)
-
-# sh.mesh.field.setAsBackgroundMesh(2)
-# gmsh.option.setNumber('Mesh.MeshSizeFromPoints',0)
-# gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary',0)
 
 # |--------------------------|
 # |   Write the Mesh File    |

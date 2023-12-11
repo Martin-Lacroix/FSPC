@@ -10,6 +10,8 @@ R = 2.25
 H = 3.75
 s = 0.2
 
+# Characteristic size
+
 d = 0.05
 N = 160
 M = 80
@@ -83,7 +85,7 @@ for a in s: sh.mesh.setRecombine(2,a)
 
 sh.addPhysicalGroup(2,s,name='Solid')
 sh.addPhysicalGroup(1,[l[3],l[7],l[9]],name='FSInterface')
-sh.addPhysicalGroup(1,[l[0],l[6]],name='SolidBase')
+sh.addPhysicalGroup(1,[l[0],l[6]],name='Base')
 
 # |--------------------------|
 # |   Write the Mesh File    |

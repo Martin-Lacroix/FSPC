@@ -12,6 +12,8 @@ Sx = 0.03
 Sy = 0.1
 Sz = 0.3
 
+# Characteristic size
+
 N = 20
 M = 10
 P = 4
