@@ -207,6 +207,8 @@ class Metafor(object):
     def getPolytope(self):
 
         faceList = list()
+        if not self.polytope: return list()
+
         for i in range(self.polytope.size()):
 
             element = self.polytope.getElement(i)
