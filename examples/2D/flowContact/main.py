@@ -3,7 +3,7 @@ import FSPC
 
 # Input parameters for FSPC
 
-pathF = path.dirname(__file__)+'/inputF.lua'
+pathF = path.dirname(__file__)+'/inputF_weak.lua'
 pathS = path.dirname(__file__)+'/inputS.py'
 
 # Initialize the simulation
