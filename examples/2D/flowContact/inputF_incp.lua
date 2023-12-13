@@ -96,7 +96,6 @@ function Problem.Solver.MomContEq.BC.InletP(x,y,z,t)
 	local tmax = 0.01
 
 	if (t<tmax) then
-
 		local p = pmax*(t/tmax)
 		return p
 	else

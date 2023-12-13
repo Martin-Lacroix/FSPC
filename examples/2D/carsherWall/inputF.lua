@@ -98,7 +98,6 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
 	local R = 0.05
 
 	if (t<tmax) then
-
 		local v = vt*(1-(r*r)/(R*R))
 		return v,0
 	else

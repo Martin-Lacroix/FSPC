@@ -94,7 +94,6 @@ function Problem.Solver.MomEq.BC.InletVEuler(x,y,z,t)
 	local R = 1
 
 	if (t<tmax) then
-
 		local a = amax*(1-(r*r)/(R*R))
 		return 0,a
 
