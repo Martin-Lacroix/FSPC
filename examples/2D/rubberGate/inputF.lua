@@ -72,7 +72,7 @@ Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.cgTolerance = 1e-16
+Problem.Solver.MomContEq.tolerance = 1e-16
 Problem.Solver.MomContEq.bodyForce = {0,-9.81}
 
 -- Fluid Structure Interface

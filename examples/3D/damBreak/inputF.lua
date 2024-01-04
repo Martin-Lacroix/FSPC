@@ -12,13 +12,13 @@ Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
-Problem.Mesh.boundingBox = {0,0,0,1.1,0.3,0.4}
+Problem.Mesh.boundingBox = {0,-0.073,0,0.438,0.073,0.292}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.7
-Problem.Mesh.hchar = 0.01
+Problem.Mesh.hchar = 0.005
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.minAspectRatio = 1e-2
 
@@ -71,7 +71,7 @@ Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-6
-Problem.Solver.MomContEq.cgTolerance = 1e-16
+Problem.Solver.MomContEq.tolerance = 1e-16
 Problem.Solver.MomContEq.bodyForce = {0,0,-9.81}
 
 -- Fluid Structure Interface

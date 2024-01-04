@@ -95,7 +95,7 @@ Problem.Solver.HeatEq.sparseSolver = 'CG'
 
 Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-6
-Problem.Solver.HeatEq.cgTolerance = 1e-16
+Problem.Solver.HeatEq.tolerance = 1e-16
 
 -- Fluid Structure Interface
 

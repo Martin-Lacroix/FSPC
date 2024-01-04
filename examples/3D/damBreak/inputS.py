@@ -42,12 +42,12 @@ def getMetafor(parm):
     materset = domain.getMaterialSet()
     materset.define(1,w.ElastHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS,1e6)
-    materset(1).put(w.MASS_DENSITY,8e3)
-    materset(1).put(w.POISSON_RATIO,0)
+    materset(1).put(w.MASS_DENSITY,2500)
+    materset(1).put(w.POISSON_RATIO,0.3)
     
     # Finite element properties
 
-    prp = w.ElementProperties(w.Volume3DElement)
+    prp = w.ElementProperties(w.TetraVolume3DElement)
     prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
     prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
     prp.put(w.MATERIAL,1)
@@ -55,7 +55,7 @@ def getMetafor(parm):
 
     # Elements for surface traction
 
-    prp2 = w.ElementProperties(w.NodStress3DElement)
+    prp2 = w.ElementProperties(w.NodTriangleStress3DElement)
     load = w.NodInteraction(2)
     load.push(groups['FSInterface'])
     load.push(groups['Clamped'])
@@ -97,4 +97,5 @@ def getMetafor(parm):
     parm['polytope'] = load.getElementSet()
 
     domain.build()
+    parm['polytope'].activateBoundaryElements()
     return metafor
