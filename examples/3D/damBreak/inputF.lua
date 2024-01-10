@@ -20,7 +20,7 @@ Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.7
 Problem.Mesh.hchar = 0.005
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.minAspectRatio = 2e-2
+Problem.Mesh.minAspectRatio = 1e-2
 
 Problem.Mesh.addOnFS = true
 Problem.Mesh.keepFluidElements = true

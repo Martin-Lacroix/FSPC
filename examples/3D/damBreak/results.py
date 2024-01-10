@@ -107,16 +107,16 @@ os.chdir('workspace/metafor')
 
 fileList = os.listdir()
 time = [float(F[7:-4]) for F in fileList]
-coord = np.zeros((len(fileList),3))
+coord = np.zeros(len(fileList))
 index = np.argsort(time)
 
 for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
-    coord[i] = gmsh.model.mesh.getNode(93)[0]
+    coord[i] = gmsh.model.mesh.getNode(93)[0][0]
 
 gmsh.finalize()
-disp = np.linalg.norm(coord-coord[0],axis=1)
+disp = coord-coord[0]
 time = np.sort(time)
 
 # Plot the final solution

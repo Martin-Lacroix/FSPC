@@ -9,7 +9,7 @@ gmsh.initialize()
 S = 0.15
 L = 0.146
 R = 0.015
-A = 3*L/2
+A = 2*L
 H = 2*L
 W = L/2
 
@@ -32,10 +32,10 @@ p.append(sh.occ.addPoint(L,-W,H,d))
 p.append(sh.occ.addPoint(L,W,H,d))
 p.append(sh.occ.addPoint(0,W,H,d))
 
-p.append(sh.occ.addPoint(3*L,-W,0,d))
-p.append(sh.occ.addPoint(3*L,W,0,d))
-p.append(sh.occ.addPoint(3*L,-W,H,d))
-p.append(sh.occ.addPoint(3*L,W,H,d))
+p.append(sh.occ.addPoint(4*L,-W,0,d))
+p.append(sh.occ.addPoint(4*L,W,0,d))
+p.append(sh.occ.addPoint(4*L,-W,H,d))
+p.append(sh.occ.addPoint(4*L,W,H,d))
 
 p.append(sh.occ.addPoint(A,-W,0,d))
 p.append(sh.occ.addPoint(A,-R,0,d))

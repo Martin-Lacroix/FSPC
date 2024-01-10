@@ -9,9 +9,7 @@ gmsh.initialize()
 S = 0.15
 L = 0.146
 R = 0.015
-A = 3*L/2
-H = 2*L
-W = L/2
+A = 2*L
 
 # Characteristic size
 
