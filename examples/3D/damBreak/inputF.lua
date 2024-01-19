@@ -12,7 +12,7 @@ Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometryF.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface','Reservoir','FreeSurface'}
-Problem.Mesh.boundingBox = {0,-0.073,0,0.438,0.073,0.292}
+Problem.Mesh.boundingBox = {0,-0.073,0,0.584,0.073,0.292}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
