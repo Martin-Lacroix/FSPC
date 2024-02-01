@@ -191,6 +191,7 @@ In some cases, the PFEM remeshing may generate fluid elements or nodes within th
 
 ```python
 parm['polytope'] = myInteraction.getElementSet()        # Exclusion zone formed by an element set
+metafor.getDomain().build()                             # Initialize the elements in Metafor
 ```
 
 <br />
