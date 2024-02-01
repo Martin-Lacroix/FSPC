@@ -53,21 +53,19 @@ FSPC.setConvTher(tolTemp)       # Thermal convergence criterion
 
 <br />
 
-The tolerance is a relative change in the Dirichlet condition exchanged between the solver, so the position for the mechanical coupling and the temperature for the thermal coupling. The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions. The `ETM` performs an orthogonal projection on the target mesh and uses the shape functions for the interpolation. 
+The tolerance is a relative change in the Dirichlet condition exchanged between the solver, so the position for the mechanical coupling and the temperature for the thermal coupling. The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions, the latter can be defined as a simple lambda function.
 
 <br />
 
 ```python
 FSPC.setInterp(FSPC.interpolator.KNN,k)           # K-nearest neighbours interpolator
 FSPC.setInterp(FSPC.interpolator.RBF,fun)         # Radial basis function interpolator
-FSPC.setInterp(FSPC.interpolator.ETM,nElem)       # Direct element transfer method
 ```
 
 | Input             | Type                | Description                                     |
 |-------------------|---------------------|-------------------------------------------------|
 | *k*               | *int*               | *number of nearest neighbours*                  |
 | *fun*             | *function*          | *radial basis function for nodal distance*      |
-| *nElem*           | *int*               | *number of projection checking*                 |
 
 <br />
 
@@ -162,27 +160,37 @@ The FSI coupling is performed with the help of a nodal interaction allowing to d
 
 ```python
 prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction elements
-load = NodInteraction(1)                            # Object of mechanical interaction
-load.push(groups['FSInterface'])                    # Add the nodes from the interface
-load.addProperty(prp)                               # Add the element poroperty
+loadInt = NodInteraction(1)                         # Object of mechanical interaction
+loadInt.push(groups['FSInterface'])                 # Add the nodes from the interface
+loadInt.addProperty(prp)                            # Add the element poroperty
 ```
 
 ```python
 prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction elements
-heat = NodInteraction(2)                            # Object of thermal interaction
-heat.push(groups['FSInterface'])                    # Add the nodes from the interface
-heat.addProperty(prp)                               # Add the element poroperty
+heatInt = NodInteraction(2)                         # Object of thermal interaction
+heatInt.push(groups['FSInterface'])                 # Add the nodes from the interface
+heatInt.addProperty(prp)                            # Add the element poroperty
 ```
 
 <br />
 
-The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `convMech` is defined in FSPC, the algorithm will look for `load` in Metafor and if `convTher` is defined, it will look for the corresponding `heat` interaction.
+The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `convMech` is defined in FSPC, the algorithm will look for `loadInt` in Metafor and if `convTher` is defined, it will look for the corresponding `heatInt` interaction.
 
 <br />
 
 ```python
-parm['interacT'] = heat        # Send the heat interaction to FSPC
-parm['interacM'] = load        # Send the mechanical interaction to FSPC
+parm['interacT'] = heatInt      # Send the heat interaction to FSPC
+parm['interacM'] = loadInt      # Send the mechanical interaction to FSPC
+```
+
+<br />
+
+In some cases, the PFEM remeshing may generate fluid elements or nodes within the solid domain and invalidate the simulation. This can be prevented by defining a dynamic exclusion zone formed by the exterior boundaries of the solid mesh. The element set of the exclusion zone is communicated to the fluid solver by the parameter `polytope` and will follow the evolution of the solid boundary during the simulation. The following example uses the interaction `myInteraction` which contains a closed surface mesh.
+
+<br />
+
+```python
+parm['polytope'] = myInteraction.getElementSet()        # Exclusion zone formed by an element set
 ```
 
 <br />
