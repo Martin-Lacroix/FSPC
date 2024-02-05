@@ -29,7 +29,7 @@ rm -rf workspace
 mkdir workspace
 cd workspace
 
-# Runs the code
+# Run the code
 
 export CPU_PER_PROC=4
 export THR_PER_PROC=8
