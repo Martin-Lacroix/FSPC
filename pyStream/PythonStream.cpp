@@ -7,14 +7,14 @@
 // |-----------------------------------------------|
 
 PyCerrCout::PyCerrCout(std::ostream& ostream, bool err): 
-stream(ostream), errstream(err){
-
+stream(ostream), errstream(err)
+{
     oldbuf = stream.rdbuf();
     stream.rdbuf(this);
 }
 
-PyCerrCout::~PyCerrCout(){
-
+PyCerrCout::~PyCerrCout()
+{
     stream.rdbuf(oldbuf);
 }
 
@@ -39,8 +39,8 @@ std::streamsize PyCerrCout::xsputn(const char* input, std::streamsize size)
     return written;
 }
 
-int PyCerrCout::overflow(int input){
-
+int PyCerrCout::overflow(int input)
+{
     if(input != EOF)
     {
         // Acquire the global interpreter lock using the Python API
