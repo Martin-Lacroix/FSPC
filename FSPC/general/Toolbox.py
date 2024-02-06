@@ -2,8 +2,7 @@ from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
 from mpi4py.MPI import COMM_WORLD as CW
 from . import Manager as ma
-import collections,time
-import fwkw
+import time
 
 # |------------------------------------|
 # |   Empty Class Raising Exception    |
@@ -45,9 +44,16 @@ convTher = Void()
 # Convert solver prints to Python
 
 global redirect
-redirect = fwkw.StdOutErr2Py()
+
+try:
+    import pyStream
+    redirect = pyStream.Redirect()
+except: redirect = None
+
+# Store the computation times of functions
 
 global clock
+import collections
 clock = collections.defaultdict(float)
 
 # |--------------------------------------|

@@ -1,6 +1,7 @@
 # Path to the external library
 
 export PYTHONPATH=${PWD}:${PYTHONPATH}
+export PYTHONPATH=${PWD}/pyStream/build:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../Metafor/oo_meta:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../Metafor/oo_metaB/bin:${PYTHONPATH}
 export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
