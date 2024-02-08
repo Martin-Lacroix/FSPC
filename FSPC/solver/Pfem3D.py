@@ -25,23 +25,24 @@ class Pfem3D(object):
             self.run = getattr(self,'runImplicit')
             self.maxDivision = 10
 
-        # Store the important objects and variables
+        # Store important classes and variables
 
         self.FSI = w.VectorInt()
         self.mesh = self.problem.getMesh()
         self.solver = self.problem.getSolver()
         self.dim = self.mesh.getDim()
-        self.updateBC()
 
-        # Save mesh after initializing the BC pointer
+        # Initialize the communication objects
 
+        self.resetFSI()
         vec = w.VectorVectorDouble()
         self.polyIdx = self.mesh.addPolytope(vec)
+
+        # Save the current mesh for next way back
 
         self.prevSolution = w.SolutionData()
         self.problem.copySolution(self.prevSolution)
         self.problem.displayParams()
-
 
 # |------------------------------------------|
 # |   Run for Implicit Integration Scheme    |
@@ -51,12 +52,10 @@ class Pfem3D(object):
     @tb.compute_time
     def runImplicit(self):
 
+        count = int(1)
         dt = tb.step.dt
         t2 = tb.step.nexTime()
         print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
-
-        self.problem.loadSolution(self.prevSolution)
-        count = int(1)
 
         # Main solving loop for the fluid simulation
 
@@ -81,12 +80,10 @@ class Pfem3D(object):
     @tb.compute_time
     def runExplicit(self):
 
+        iteration = 0
         dt = tb.step.dt
         t2 = tb.step.nexTime()
         print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
-
-        self.problem.loadSolution(self.prevSolution)
-        iteration = 0
 
         # Estimate the time step for stability
 
@@ -109,7 +106,7 @@ class Pfem3D(object):
 # |   Dirichlet Boundary Conditions    |
 # |------------------------------------|
 
-    def applyDisplacement(self,disp):
+    def applyDisplacement(self,disp): # Ugly function
 
         for i in range(self.dim):
             for j,k in enumerate(self.FSI):
@@ -179,7 +176,7 @@ class Pfem3D(object):
 # |   Update the Communication Vectors    |
 # |---------------------------------------|
 
-    def updateBC(self):
+    def resetFSI(self):
 
         self.mesh.getNodesIndex('FSInterface',self.FSI)
         self.BC = list()
@@ -197,11 +194,10 @@ class Pfem3D(object):
         vector = w.VectorVectorDouble(faceList)
         self.mesh.updatePoly(self.polyIdx,vector)
         self.mesh.remesh(False)
+        self.resetFSI()
 
-        self.updateBC()
-
-        # Update backup and precompute PFEM matrices
-
+        # Update the backup and precompute global matrices
+        
         if self.implicit: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
 
@@ -210,7 +206,7 @@ class Pfem3D(object):
 # |------------------------------|
 
     @tb.compute_time
-    def reset(self):
+    def wayBack(self):
         self.problem.loadSolution(self.prevSolution)
 
     @tb.write_logs

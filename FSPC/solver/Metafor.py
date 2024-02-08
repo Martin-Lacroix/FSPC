@@ -190,9 +190,10 @@ class Metafor(object):
     @tb.compute_time
     def save(self): self.exporter.execute()
     def getSize(self): return self.FSI.getNumberOfMeshPoints()
-    def exit(self): return
 
-    def reset(self): self.tsm.removeLastStage()
+    @tb.compute_time
+    def wayBack(self): self.tsm.removeLastStage()
+    def exit(self): return
 
 # |-------------------------------------|
 # |   Build Facet List from Polytope    |

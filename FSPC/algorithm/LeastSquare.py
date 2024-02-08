@@ -26,16 +26,12 @@ class ILS(Algorithm):
             # Transfer and fluid solver call
 
             self.transferDirichletSF()
-            if not self.runFluid():
-                if CW.rank == 0: tb.solver.reset()
-                return False
+            if not self.runFluid(): return False
 
             # Transfer and solid solver call
 
             self.transferNeumannFS()
-            if not self.runSolid():
-                if CW.rank == 1: tb.solver.reset()
-                return False
+            if not self.runSolid(): return False
 
             # Compute the coupling residual
 
@@ -46,7 +42,7 @@ class ILS(Algorithm):
 
             self.iteration += 1
             if verified: return True
-            else: tb.solver.reset()
+            else: tb.solver.wayBack()
         
         return False
 
