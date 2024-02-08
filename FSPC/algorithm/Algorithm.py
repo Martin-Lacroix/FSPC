@@ -25,9 +25,8 @@ class Algorithm(object):
     def simulate(self,endTime):
 
         verified = True
-        tb.solver.update()
-        tb.interp.initialize()
         tb.solver.save()
+        tb.interp.initialize()
 
         # Main loop of the FSI partitioned coupling
         
@@ -116,7 +115,7 @@ class Algorithm(object):
     def computeResidual(self):
         
         if tb.convMech:
-            disp = tb.solver.getDisplacement()
+            disp = tb.solver.getPosition()
             tb.convMech.updateRes(disp,tb.interp.disp)
 
         if tb.convTher:

@@ -30,14 +30,18 @@ class Pfem3D(object):
         self.FSI = w.VectorInt()
         self.mesh = self.problem.getMesh()
         self.solver = self.problem.getSolver()
-        self.prevSolution = w.SolutionData()
         self.dim = self.mesh.getDim()
+        self.updateBC()
 
-        # Initialize the polytope and display parameters
+        # Save mesh after initializing the BC pointer
 
         vec = w.VectorVectorDouble()
         self.polyIdx = self.mesh.addPolytope(vec)
+
+        self.prevSolution = w.SolutionData()
+        self.problem.copySolution(self.prevSolution)
         self.problem.displayParams()
+
 
 # |------------------------------------------|
 # |   Run for Implicit Integration Scheme    |
@@ -107,12 +111,16 @@ class Pfem3D(object):
 
     def applyDisplacement(self,disp):
 
-        BC = disp/tb.step.dt
-        if not self.implicit:
-            BC = np.multiply(2,BC-self.vel)/tb.step.dt
+        for i in range(self.dim):
+            for j,k in enumerate(self.FSI):
 
-        for i,vector in enumerate(BC):
-            for j,val in enumerate(vector): self.BC[i][j] = val
+                pos = self.mesh.getNode(k).getCoordinate(i)
+                self.BC[j][i] = (disp[j,i]-pos)/tb.step.dt
+
+                if not self.implicit:
+                   
+                   vel = self.mesh.getNode(k).getState(i)
+                   self.BC[j][i] = 2*(self.BC[j][i]-vel)/tb.step.dt
 
     # Update the Dirichlet nodal temperature
 
@@ -141,14 +149,9 @@ class Pfem3D(object):
         self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
         return np.copy(vector)
 
-# |--------------------------|
-# |   Return Nodal Values    |
-# |--------------------------|
-
-    def getDisplacement(self):
-        return self.getPosition()-self.prevPos
-    
-    # Computes the nodal position vector
+# |-----------------------------------|
+# |   Return Position and Velocity    |
+# |-----------------------------------|
 
     def getPosition(self):
 
@@ -172,19 +175,11 @@ class Pfem3D(object):
 
         return result
 
-# |---------------------------------------------|
-# |   Remesh and Update the Internal Vectors    |
-# |---------------------------------------------|
+# |---------------------------------------|
+# |   Update the Communication Vectors    |
+# |---------------------------------------|
 
-    @tb.compute_time
-    def update(self):
-
-        faceList = tb.interp.sharePolytope()
-        vector = w.VectorVectorDouble(faceList)
-        self.mesh.updatePoly(self.polyIdx,vector)
-        self.mesh.remesh(False)
-
-        # Update the interface and BC after remeshing
+    def updateBC(self):
 
         self.mesh.getNodesIndex('FSInterface',self.FSI)
         self.BC = list()
@@ -195,16 +190,28 @@ class Pfem3D(object):
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 
-        # Update data and precompute PFEM matrices
+    @tb.compute_time
+    def update(self):
+
+        faceList = tb.interp.sharePolytope()
+        vector = w.VectorVectorDouble(faceList)
+        self.mesh.updatePoly(self.polyIdx,vector)
+        self.mesh.remesh(False)
+
+        self.updateBC()
+
+        # Update backup and precompute PFEM matrices
 
         if self.implicit: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prevSolution)
-        self.prevPos = self.getPosition()
-        self.vel = self.getVelocity()
 
 # |------------------------------|
 # |   Other Wrapper Functions    |
 # |------------------------------|
+
+    @tb.compute_time
+    def reset(self):
+        self.problem.loadSolution(self.prevSolution)
 
     @tb.write_logs
     @tb.compute_time
@@ -213,3 +220,4 @@ class Pfem3D(object):
     @tb.write_logs
     def exit(self): self.problem.displayTimeStats()
     def getSize(self): return self.FSI.size()
+
