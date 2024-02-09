@@ -106,18 +106,19 @@ class Pfem3D(object):
 # |   Dirichlet Boundary Conditions    |
 # |------------------------------------|
 
-    def applyDisplacement(self,disp): # Ugly function
+    def applyDisplacement(self,disp):
 
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
+        velocity = (disp-self.getPosition())/tb.step.dt
 
-                pos = self.mesh.getNode(k).getCoordinate(i)
-                self.BC[j][i] = (disp[j,i]-pos)/tb.step.dt
+        if self.implicit:
+            for i in range(self.getSize()):
+                self.BC[i][:self.dim] = velocity[i]
 
-                if not self.implicit:
-                   
-                   vel = self.mesh.getNode(k).getState(i)
-                   self.BC[j][i] = 2*(self.BC[j][i]-vel)/tb.step.dt
+        else:
+            acceler = (velocity-self.getVelocity())/(tb.step.dt/2)
+
+            for i in range(self.getSize()):
+                self.BC[i][:self.dim] = acceler[i]
 
     # Update the Dirichlet nodal temperature
 

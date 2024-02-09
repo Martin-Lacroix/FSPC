@@ -40,12 +40,14 @@ class MVJ(Algorithm):
             verified = CW.bcast(output,root=1)
             self.BGS = False
 
-            # End of the coupling iteration
+            # Exit the loop if the solution is converged
 
+            if verified:
+                self.updateJprev()
+                return True
+            
             self.iteration += 1
-            if verified: self.updateJprev()
-            if verified: return True
-            else: tb.solver.wayBack()
+            tb.solver.wayBack()
 
         self.BGS = True
         return False
