@@ -25,9 +25,8 @@ class Algorithm(object):
     def simulate(self,endTime):
 
         verified = True
-        tb.solver.update()
-        tb.interp.initialize()
         tb.solver.save()
+        tb.interp.initialize()
 
         # Main loop of the FSI partitioned coupling
         
@@ -63,17 +62,23 @@ class Algorithm(object):
 
     def runFluid(self):
 
-        output = None
-        if CW.rank == 0: output = tb.solver.run()
-        verified = CW.bcast(output,root=0)
-        return verified
+        verified = None
+        if CW.rank == 0:
+            
+            verified = tb.solver.run()
+            if not verified: tb.solver.wayBack()
+
+        return CW.bcast(verified,root=0)
     
     def runSolid(self):
 
-        output = None
-        if CW.rank == 1: output = tb.solver.run()
-        verified = CW.bcast(output,root=1)
-        return verified
+        verified = None
+        if CW.rank == 1:
+
+            verified = tb.solver.run()
+            if not verified: tb.solver.wayBack()
+
+        return CW.bcast(verified,root=1)
 
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |
@@ -116,7 +121,7 @@ class Algorithm(object):
     def computeResidual(self):
         
         if tb.convMech:
-            disp = tb.solver.getDisplacement()
+            disp = tb.solver.getPosition()
             tb.convMech.updateRes(disp,tb.interp.disp)
 
         if tb.convTher:

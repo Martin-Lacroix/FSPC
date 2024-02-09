@@ -51,6 +51,7 @@ class Metafor(object):
         self.mfac = w.MemoryFac()
         self.metaFac = w.MetaFac(self.metafor)
         self.metaFac.mode(False,False,True)
+        self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
 # |-------------------------------|
@@ -62,20 +63,16 @@ class Metafor(object):
     def run(self):
 
         if(self.neverRun):
-
+            
+            self.neverRun = False
             self.tsm.setInitialTime(tb.step.time,tb.step.dt)
             self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-            ok = self.metafor.getTimeIntegration().integration()
-            self.neverRun = False
+            return self.metafor.getTimeIntegration().integration()
 
         else:
 
-            if self.reload: self.tsm.removeLastStage()
             self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-            ok = self.metafor.getTimeIntegration().restart(self.mfac)
-
-        self.reload = True
-        return ok
+            return self.metafor.getTimeIntegration().restart(self.mfac)
 
 # |----------------------------------|
 # |   Neumann Boundary Conditions    |
@@ -110,11 +107,6 @@ class Metafor(object):
 # |-------------------------------------|
 # |   Return Mechanical Nodal Values    |
 # |-------------------------------------|
-
-    def getDisplacement(self):
-        return self.getPosition()-self.prevPos
-
-    # Computes the nodal position vector
 
     def getPosition(self):
 
@@ -198,6 +190,9 @@ class Metafor(object):
     @tb.compute_time
     def save(self): self.exporter.execute()
     def getSize(self): return self.FSI.getNumberOfMeshPoints()
+
+    @tb.compute_time
+    def wayBack(self): self.tsm.removeLastStage()
     def exit(self): return
 
 # |-------------------------------------|

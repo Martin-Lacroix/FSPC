@@ -30,7 +30,7 @@ class Interpolator(object):
     @tb.only_solid
     def initializeData(self):
 
-        if tb.convMech: self.disp = tb.solver.getDisplacement()
+        if tb.convMech: self.disp = tb.solver.getPosition()
         if tb.convTher: self.temp = tb.solver.getTemperature()
 
     def initialize(self):
@@ -106,8 +106,12 @@ class Interpolator(object):
     @tb.conv_mecha
     def predDisplacement(self,verified):
         
-        if verified: self.velocityD = tb.solver.getVelocity()
-        else: self.disp = np.zeros(self.disp.shape)
+        if verified:
+
+            self.prevDisp = np.copy(self.disp)
+            self.velocityD = tb.solver.getVelocity()
+
+        else: self.disp = np.copy(self.prevDisp)
         self.disp += tb.step.dt*self.velocityD
 
     # Predictor for the temparature coupling

@@ -38,10 +38,11 @@ class BGS(Algorithm):
             output = self.relaxation()
             verified = CW.bcast(output,root=1)
 
-            # End of the coupling iteration
+            # Exit the loop if the solution is converged
 
             self.iteration += 1
             if verified: return True
+            tb.solver.wayBack()
         
         return False
 
