@@ -54,9 +54,9 @@ class Metafor(object):
         self.metaFac.save(self.mfac)
         self.tsm.setVerbose(False)
 
-# |-------------------------------|
-# |   Calculates One Time Step    |
-# |-------------------------------|
+# |--------------------------------------------|
+# |   Run Metafor in the Current Time Frame    |
+# |--------------------------------------------|
     
     @tb.write_logs
     @tb.compute_time

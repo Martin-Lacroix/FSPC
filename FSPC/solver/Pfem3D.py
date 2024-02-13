@@ -16,13 +16,11 @@ class Pfem3D(object):
         if 'WC' in self.problem.getID():
             
             self.implicit = False
-            self.run = getattr(self,'runExplicit')
             self.maxDivision = 200
 
         else:
             
             self.implicit = True
-            self.run = getattr(self,'runImplicit')
             self.maxDivision = 10
 
         # Store important classes and variables
@@ -44,63 +42,19 @@ class Pfem3D(object):
         self.problem.copySolution(self.prevSolution)
         self.problem.displayParams()
 
-# |------------------------------------------|
-# |   Run for Implicit Integration Scheme    |
-# |------------------------------------------|
-
-    @tb.write_logs
-    @tb.compute_time
-    def runImplicit(self):
-
-        count = int(1)
-        dt = tb.step.dt
-        t2 = tb.step.nexTime()
-        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
-
-        # Main solving loop for the fluid simulation
-
-        while count > 0:
-            
-            self.solver.setTimeStep(dt)
-            if not self.solver.solveOneTimeStep():
-                
-                dt = float(dt/2)
-                count = np.multiply(2,count)
-                if dt < tb.step.dt/self.maxDivision: return False
-                continue
-
-            count = count-1
-        return True
-
-# |------------------------------------------|
-# |   Run for Explicit Integration Scheme    |
-# |------------------------------------------|
-
-    @tb.write_logs
-    @tb.compute_time
-    def runExplicit(self):
-
-        iteration = 0
-        dt = tb.step.dt
-        t2 = tb.step.nexTime()
-        print('\nt = {:.5e} - dt = {:.5e}'.format(t2,dt))
-
-        # Estimate the time step for stability
-
-        self.solver.computeNextDT()
-        division = np.ceil(dt/self.solver.getTimeStep())
-        if division > self.maxDivision: return False
-        dt = dt/division
-
-        # Main solving loop for the fluid simulation
-
-        while iteration < division:
+# |-----------------------------------------|
+# |   Run PFEM in the Current Time Frame    |
+# |-----------------------------------------|
     
-            iteration += 1
-            self.solver.setTimeStep(dt)
-            self.solver.solveOneTimeStep()
+    @tb.write_logs
+    @tb.compute_time
+    def run(self):
 
-        return True
+        self.problem.setMaxSimTime(tb.step.nexTime())
+        self.problem.setMinTimeStep(tb.step.dt/self.maxDivision)
+        if self.implicit: self.solver.setTimeStep(tb.step.dt)
+        else: self.solver.computeNextDT()
+        return self.problem.simulate()
 
 # |------------------------------------|
 # |   Dirichlet Boundary Conditions    |
