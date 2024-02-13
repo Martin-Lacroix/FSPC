@@ -1,7 +1,7 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.verboseOutput = false
+Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
 Problem.id = 'IncompNewtonNoT'
@@ -24,7 +24,7 @@ Problem.Mesh.minHeightFactor = 1e-3
 Problem.Mesh.addOnFS = true
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.deleteBoundElements = true
 
 -- Extractor Parameters
 

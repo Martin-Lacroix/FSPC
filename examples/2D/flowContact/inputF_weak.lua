@@ -24,7 +24,7 @@ Problem.Mesh.minHeightFactor = 1e-3
 Problem.Mesh.addOnFS = true
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
-Problem.Mesh.deleteBoundElements = false
+Problem.Mesh.deleteBoundElements = true
 
 -- Extractor Parameters
 
