@@ -143,7 +143,7 @@ class Pfem3D(object):
             self.BC.append(vector)
 
     @tb.compute_time
-    def update(self):
+    def updateBackup(self):
 
         faceList = tb.interp.sharePolytope()
         vector = w.VectorVectorDouble(faceList)

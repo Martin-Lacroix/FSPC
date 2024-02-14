@@ -42,7 +42,7 @@ class ILS(Algorithm):
 
             self.iteration += 1
             if verified: return True
-            tb.solver.wayBack()
+            else: self.solverWayBack()
         
         return False
 

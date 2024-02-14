@@ -42,12 +42,9 @@ class MVJ(Algorithm):
 
             # Exit the loop if the solution is converged
 
-            if verified:
-                self.updateJprev()
-                return True
-            
             self.iteration += 1
-            tb.solver.wayBack()
+            if verified: self.updateJprev(); return True
+            self.solverWayBack()
 
         self.BGS = True
         return False

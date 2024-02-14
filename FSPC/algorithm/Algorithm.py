@@ -23,10 +23,11 @@ class Algorithm(object):
 
     @tb.compute_time
     def simulate(self,endTime):
-
-        verified = True
+        
         tb.solver.save()
         tb.interp.initialize()
+        self.hasRun = False
+        verified = True
 
         # Main loop of the FSI partitioned coupling
         
@@ -40,13 +41,16 @@ class Algorithm(object):
             # Restart the time step the coupling fails
 
             if not verified:
-
+                
+                self.solverWayBack()
                 tb.step.updateTime(verified)
                 continue
 
             # Update the solvers for the next time step
 
-            tb.solver.update()
+            tb.solver.updateBackup()
+            self.hasRun = False
+            
             tb.step.updateTime(verified)
             tb.step.updateSave(tb.solver)
             tb.interp.initialize()
@@ -65,8 +69,8 @@ class Algorithm(object):
         verified = None
         if CW.rank == 0:
             
+            self.hasRun = True
             verified = tb.solver.run()
-            if not verified: tb.solver.wayBack()
 
         return CW.bcast(verified,root=0)
     
@@ -74,11 +78,18 @@ class Algorithm(object):
 
         verified = None
         if CW.rank == 1:
-
+            
+            self.hasRun = True
             verified = tb.solver.run()
-            if not verified: tb.solver.wayBack()
 
         return CW.bcast(verified,root=1)
+    
+    # Reset the solvers to their last backup state
+
+    def solverWayBack(self):
+
+        if self.hasRun: tb.solver.wayBack()
+        self.hasRun = False
 
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |

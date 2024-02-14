@@ -62,6 +62,9 @@ class Metafor(object):
     @tb.compute_time
     def run(self):
 
+        #self.metafor.setErrorDuringTimeIntegration(False)
+        self.tsm.setMinimumTimeStep(tb.step.dt/100)
+
         if(self.neverRun):
             
             self.neverRun = False
@@ -169,7 +172,7 @@ class Metafor(object):
 # |------------------------------|
 
     @tb.compute_time
-    def update(self):
+    def updateBackup(self):
 
         tb.interp.sharePolytope()
         self.prevPos = self.getPosition()
