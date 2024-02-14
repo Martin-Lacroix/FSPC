@@ -2,60 +2,50 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
 import numpy as np
 
-# |-----------------------------|
-# |   Parent Algorithm Class    |
-# |-----------------------------|
+# |---------------------------------|
+# |   Parent FSI Algorithm Class    |
+# |---------------------------------|
 
 class Algorithm(object):
+    def __init__(self):
 
-    def couplingAlgo(self):
-        raise Exception('No coupling algorithm defined')
-    
-    def relaxTemperature(self):
-        raise Exception('No thermal relaxation defined')
-    
-    def relaxDisplacement(self):
-        raise Exception('No mechanical relaxation defined')
+        self.hasRun = False
 
-# |-----------------------------------|
-# |   Run the Fluid-Solid Coupling    |
-# |-----------------------------------|
+# |---------------------------------------|
+# |   Start the Fluid-Solid Simulation    |
+# |---------------------------------------|
 
     @tb.compute_time
     def simulate(self,endTime):
         
-        tb.solver.save()
-        tb.interp.initialize()
-        self.hasRun = False
         verified = True
+        tb.solver.save()
 
-        # Main loop of the FSI partitioned coupling
+        # Main loop on the FSI coupling time steps
         
         while tb.step.time < endTime:
-
-            self.showTimeStep()
+            
+            tb.interp.initialize()
+            self.displayTimeStep()
             self.resetConverg()
+
+            # Main loop on the FSI coupling iterations
+
             self.computePredictor(verified)
             verified = self.couplingAlgo()
-
-            # Restart the time step the coupling fails
-
-            if not verified:
-                
-                self.solverWayBack()
-                tb.step.updateTime(verified)
-                continue
+            tb.step.updateTime(verified)
 
             # Update the solvers for the next time step
 
-            tb.solver.updateBackup()
-            self.hasRun = False
-            
-            tb.step.updateTime(verified)
-            tb.step.updateSave(tb.solver)
-            tb.interp.initialize()
+            if verified:
 
-        # Ends the FSI simulation
+                tb.solver.updateBackup()
+                tb.step.updateSave(tb.solver)
+                self.hasRun = False
+
+            else: self.solverWayBack(); continue
+
+        # End of the FSI simulation
 
         CW.Barrier()
         tb.solver.exit()
@@ -86,6 +76,8 @@ class Algorithm(object):
     
     # Reset the solvers to their last backup state
 
+    @tb.write_logs
+    @tb.compute_time
     def solverWayBack(self):
 
         if self.hasRun: tb.solver.wayBack()
@@ -116,7 +108,7 @@ class Algorithm(object):
         self.computeResidual()
         self.relaxDisplacement()
         self.relaxTemperature()
-        self.showResidual()
+        self.displayResidual()
 
         # Check for coupling convergence
 
@@ -157,7 +149,7 @@ class Algorithm(object):
 # |   Print Convergence Information    |
 # |------------------------------------|
 
-    def showResidual(self):
+    def displayResidual(self):
 
         if tb.convMech:
 
@@ -172,7 +164,7 @@ class Algorithm(object):
             print(iter,eps)
 
     @tb.only_solid
-    def showTimeStep(self):
+    def displayTimeStep(self):
 
         L = '\n------------------------------------------'
         timeStep = 'Time Step : {:.3e}'.format(tb.step.dt)

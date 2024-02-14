@@ -33,7 +33,9 @@ class Metafor(object):
 
         # Defines some internal variables
 
-        self.neverRun = True
+        self.maxDivision = 200
+        self.tsm.setInitialTime(0,np.inf)
+
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
         self.polytope = parm['polytope']
@@ -52,7 +54,6 @@ class Metafor(object):
         self.metaFac = w.MetaFac(self.metafor)
         self.metaFac.mode(False,False,True)
         self.metaFac.save(self.mfac)
-        self.tsm.setVerbose(False)
 
 # |--------------------------------------------|
 # |   Run Metafor in the Current Time Frame    |
@@ -62,20 +63,9 @@ class Metafor(object):
     @tb.compute_time
     def run(self):
 
-        #self.metafor.setErrorDuringTimeIntegration(False)
-        self.tsm.setMinimumTimeStep(tb.step.dt/100)
-
-        if(self.neverRun):
-            
-            self.neverRun = False
-            self.tsm.setInitialTime(tb.step.time,tb.step.dt)
-            self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-            return self.metafor.getTimeIntegration().integration()
-
-        else:
-
-            self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-            return self.metafor.getTimeIntegration().restart(self.mfac)
+        self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
+        self.tsm.setMinimumTimeStep(tb.step.dt/self.maxDivision)
+        return self.metafor.getTimeIntegration().integration()
 
 # |----------------------------------|
 # |   Neumann Boundary Conditions    |
@@ -167,9 +157,9 @@ class Metafor(object):
         
         return result
 
-# |------------------------------|
-# |   Other Wrapper Functions    |
-# |------------------------------|
+# |------------------------------------------|
+# |   Backup and Update the PFEM Polytope    |
+# |------------------------------------------|
 
     @tb.compute_time
     def updateBackup(self):
@@ -187,20 +177,26 @@ class Metafor(object):
         if size == 3: return np.array([[2,1,0]])
         if size == 4: return np.array([[0,3,2],[2,1,0]])
 
-    # Save and exit the simulation
+# |------------------------------|
+# |   Other Wrapper Functions    |
+# |------------------------------|
 
     @tb.write_logs
     @tb.compute_time
     def save(self): self.exporter.execute()
     def getSize(self): return self.FSI.getNumberOfMeshPoints()
 
-    @tb.compute_time
-    def wayBack(self): self.tsm.removeLastStage()
+    @tb.write_logs
     def exit(self): return
 
-# |-------------------------------------|
-# |   Build Facet List from Polytope    |
-# |-------------------------------------|
+    def wayBack(self):
+
+        self.tsm.removeLastStage()
+        self.metafor.restart(self.mfac)
+
+# |-----------------------------------------|
+# |   Build the Facet List from Polytope    |
+# |-----------------------------------------|
     
     def getPolytope(self):
 

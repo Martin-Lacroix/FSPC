@@ -2,9 +2,9 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
 import numpy as np
 
-# |--------------------------------|
-# |   Parent Interpolator Class    |
-# |--------------------------------|
+# |------------------------------------|
+# |   Parent FSI Interpolator Class    |
+# |------------------------------------|
 
 class Interpolator(object):
     def __init__(self):

@@ -127,9 +127,9 @@ class Pfem3D(object):
 
         return result
 
-# |---------------------------------------|
-# |   Update the Communication Vectors    |
-# |---------------------------------------|
+# |-----------------------------------------------|
+# |   Backup and Reset the Boundary Conditions    |
+# |-----------------------------------------------|
 
     def resetFSI(self):
 
@@ -160,7 +160,6 @@ class Pfem3D(object):
 # |   Other Wrapper Functions    |
 # |------------------------------|
 
-    @tb.compute_time
     def wayBack(self):
         self.problem.loadSolution(self.prevSolution)
 
