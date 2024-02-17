@@ -123,8 +123,13 @@ def getMetafor(parm):
     parm['interacM'] = load
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
-    parm['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
     parm['polytope'] = load.getElementSet()
+
+    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_P)
+    parm['exporter'].addExtractor(extr)
+
+    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS)
+    parm['exporter'].addExtractor(extr)
 
     domain.build()
     return metafor

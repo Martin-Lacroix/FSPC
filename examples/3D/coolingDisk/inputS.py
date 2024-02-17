@@ -1,3 +1,4 @@
+import toolbox.pythonExtractors as py
 import toolbox.gmsh as gmsh
 import wrap as w
 import os
@@ -115,9 +116,11 @@ def getMetafor(parm):
     parm['interacM'] = load
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
-    parm['exporter'].addDataBaseField([w.TO])
     parm['polytope'] = load.getElementSet()
 
-    domain.build()
     initcondset.update(0)
+    extr = py.CurrentValueExtractor(groups['Solid'],w.TO)
+    parm['exporter'].addExtractor(extr)
+
+    domain.build()
     return metafor

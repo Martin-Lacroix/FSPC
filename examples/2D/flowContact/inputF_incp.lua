@@ -58,7 +58,7 @@ Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
 Problem.Solver.coeffDTDecrease = 2
-Problem.Solver.coeffDTincrease = 1.5
+Problem.Solver.coeffDTincrease = 1
 
 -- Momentum Continuity Equation
 

@@ -11,9 +11,9 @@ class Algorithm(object):
 
         self.hasRun = False
 
-# |---------------------------------------|
-# |   Start the Fluid-Solid Simulation    |
-# |---------------------------------------|
+# |-------------------------------------------|
+# |   Start the Fluid-Structure Simulation    |
+# |-------------------------------------------|
 
     @tb.compute_time
     def simulate(self,endTime):
@@ -50,9 +50,9 @@ class Algorithm(object):
         CW.Barrier()
         tb.solver.exit()
 
-# |----------------------------------|
-# |   Run Solid and Fluid Solvers    |
-# |----------------------------------|
+# |-----------------------------------------|
+# |   Run and Restore the Solver Backups    |
+# |-----------------------------------------|
 
     def runFluid(self):
 

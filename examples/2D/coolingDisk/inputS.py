@@ -1,3 +1,4 @@
+import toolbox.pythonExtractors as py
 import toolbox.gmsh as gmsh
 import wrap as w
 import os
@@ -34,9 +35,9 @@ def getMetafor(parm):
 
     iset = domain.getInteractionSet()
     app = w.FieldApplicator(1)
-    app.push(groups['Solid_1'])
-    app.push(groups['Solid_2'])
-    app.push(groups['Solid_3'])
+    app.push(groups['S1'])
+    app.push(groups['S2'])
+    app.push(groups['S3'])
     iset.add(app)
 
     # Solid material parameters
@@ -80,9 +81,9 @@ def getMetafor(parm):
     # Initial and boundary conditions
 
     initcondset = metafor.getInitialConditionSet()
-    initcondset.define(groups['Solid_1'],w.Field1D(w.TO,w.AB),180)
-    initcondset.define(groups['Solid_2'],w.Field1D(w.TO,w.AB),200)
-    initcondset.define(groups['Solid_3'],w.Field1D(w.TO,w.AB),220)
+    initcondset.define(groups['S1'],w.Field1D(w.TO,w.AB),180)
+    initcondset.define(groups['S2'],w.Field1D(w.TO,w.AB),200)
+    initcondset.define(groups['S3'],w.Field1D(w.TO,w.AB),220)
 
     # Mechanical and thermal time integration
 
@@ -118,9 +119,11 @@ def getMetafor(parm):
     parm['interacM'] = load
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
-    parm['exporter'].addDataBaseField([w.TO])
     parm['polytope'] = load.getElementSet()
 
-    domain.build()
     initcondset.update(0)
+    extr = py.CurrentValueExtractor(groups['Solid'],w.TO)
+    parm['exporter'].addExtractor(extr)
+
+    domain.build()
     return metafor
