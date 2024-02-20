@@ -16,11 +16,11 @@ class Interpolator(object):
         if CW.rank == 0:
 
             self.recvPos = CW.recv(source=1,tag=1)
-            CW.send(tb.solver.getPosition(),1,tag=2)
+            CW.send(tb.Solver.getPosition(),1,tag=2)
 
         if CW.rank == 1:
 
-            CW.send(tb.solver.getPosition(),0,tag=1)
+            CW.send(tb.Solver.getPosition(),0,tag=1)
             self.recvPos = CW.recv(source=0,tag=2)
 
 # |----------------------------------------|
@@ -30,8 +30,8 @@ class Interpolator(object):
     @tb.only_solid
     def initializeData(self):
 
-        if tb.convMech: self.disp = tb.solver.getPosition()
-        if tb.convTher: self.temp = tb.solver.getTemperature()
+        if tb.ResMech: self.disp = tb.Solver.getPosition()
+        if tb.ResTher: self.temp = tb.Solver.getTemperature()
 
     def initialize(self):
         raise Exception('No initialize function defined')
@@ -45,13 +45,13 @@ class Interpolator(object):
 
         if CW.rank == 0:
             
-            CW.send(tb.solver.getFacet(),1,tag=7)
+            CW.send(tb.Solver.getFacet(),1,tag=7)
             self.recvFace = CW.recv(source=1,tag=8)
 
         if CW.rank == 1:
 
             self.recvFace = CW.recv(source=0,tag=7)
-            CW.send(tb.solver.getFacet(),0,tag=8)
+            CW.send(tb.Solver.getFacet(),0,tag=8)
 
 # |---------------------------------------|
 # |   Apply the Fluid Loading on Solid    |
@@ -60,11 +60,11 @@ class Interpolator(object):
     @tb.conv_mecha
     def applyLoadFS(self):
 
-        if CW.rank == 0: CW.send(tb.solver.getLoading(),1,tag=3)
+        if CW.rank == 0: CW.send(tb.Solver.getLoading(),1,tag=3)
         if CW.rank == 1:
 
             load = CW.recv(source=0,tag=3)
-            tb.solver.applyLoading(self.interpData(load))
+            tb.Solver.applyLoading(self.interpData(load))
 
     # Apply predicted displacement on fluid
 
@@ -75,18 +75,18 @@ class Interpolator(object):
         if CW.rank == 0:
 
             disp = CW.recv(source=1,tag=4)
-            tb.solver.applyDisplacement(self.interpData(disp))
+            tb.Solver.applyDisplacement(self.interpData(disp))
 
     # Apply actual heat flux on solid
 
     @tb.conv_therm
     def applyHeatFS(self):
 
-        if CW.rank == 0: CW.send(tb.solver.getHeatFlux(),1,tag=5)
+        if CW.rank == 0: CW.send(tb.Solver.getHeatFlux(),1,tag=5)
         if CW.rank == 1:
             
             heat = CW.recv(source=0,tag=5)
-            tb.solver.applyHeatFlux(self.interpData(heat))
+            tb.Solver.applyHeatFlux(self.interpData(heat))
 
     # Apply predicted temperature on fluid
 
@@ -97,7 +97,7 @@ class Interpolator(object):
         if CW.rank == 0:
             
             temp = CW.recv(source=1,tag=6)
-            tb.solver.applyTemperature(self.interpData(temp))
+            tb.Solver.applyTemperature(self.interpData(temp))
 
 # |----------------------------------------------|
 # |   Predict the Solution for Next Time Step    |
@@ -109,10 +109,10 @@ class Interpolator(object):
         if verified:
 
             self.prevDisp = np.copy(self.disp)
-            self.velocityD = tb.solver.getVelocity()
+            self.velocityD = tb.Solver.getVelocity()
 
         else: self.disp = np.copy(self.prevDisp)
-        self.disp += tb.step.dt*self.velocityD
+        self.disp += tb.Step.dt*self.velocityD
 
     # Predictor for the temparature coupling
 
@@ -122,10 +122,10 @@ class Interpolator(object):
         if verified:
 
             self.prevTemp = np.copy(self.temp)
-            self.velocityT = tb.solver.getTempRate()
+            self.velocityT = tb.Solver.getTempRate()
 
         else: self.temp = np.copy(self.prevTemp)
-        self.temp += tb.step.dt*self.velocityT
+        self.temp += tb.Step.dt*self.velocityT
 
 # |----------------------------------------|
 # |   Send Polytope from Solid to Fluid    |
@@ -138,4 +138,4 @@ class Interpolator(object):
             return recvFace
 
         if CW.rank == 1:
-            CW.send(tb.solver.getPolytope(),0,tag=9)
+            CW.send(tb.Solver.getPolytope(),0,tag=9)

@@ -23,23 +23,23 @@ class Void(object):
 # |   Initialize the Global Variables    |
 # |--------------------------------------|
 
-global step
-step = Void()
+global Step
+Step = Void()
 
-global algo
-algo = Void()
+global Algo
+Algo = Void()
 
-global interp
-interp = Void()
+global Interp
+Interp = Void()
 
-global solver
-solver = Void()
+global Solver
+Solver = Void()
 
-global convMech
-convMech = Void()
+global ResMech
+ResMech = Void()
 
-global convTher
-convTher = Void()
+global ResTher
+ResTher = Void()
 
 # Convert solver prints to Python
 
@@ -100,8 +100,8 @@ def only_solid(func):
 def conv_mecha(func):
     def wrapper(*args,**kwargs):
 
-        global convMech
-        if convMech: result = func(*args,**kwargs)
+        global ResMech
+        if ResMech: result = func(*args,**kwargs)
         else: result = None
 
         return result
@@ -112,8 +112,8 @@ def conv_mecha(func):
 def conv_therm(func):
     def wrapper(*args,**kwargs):
 
-        global convTher
-        if convTher: result = func(*args,**kwargs)
+        global ResTher
+        if ResTher: result = func(*args,**kwargs)
         else: result = None
 
         return result
@@ -125,38 +125,38 @@ def conv_therm(func):
 
 def setStep(dt,dtSave):
 
-    global step
-    step = ma.TimeStep(dt,dtSave)
-    return step
+    global Step
+    Step = ma.TimeStep(dt,dtSave)
+    return Step
 
 def setAlgo(algorithm,*arg):
 
-    global algo
-    algo = algorithm(*arg)
-    return algo
+    global Algo
+    Algo = algorithm(*arg)
+    return Algo
 
 def setInterp(interpolator,*arg):
 
-    global interp
-    interp = interpolator(*arg)
-    return interp
+    global Interp
+    Interp = interpolator(*arg)
+    return Interp
 
-def setConvMech(tol):
+def setResMech(tol):
 
-    global convMech
-    convMech = ma.Convergence(tol)
-    return convMech
+    global ResMech
+    ResMech = ma.Residual(tol)
+    return ResMech
 
-def setConvTher(tol):
+def setResTher(tol):
 
-    global convTher
-    convTher = ma.Convergence(tol)
-    return convTher
+    global ResTher
+    ResTher = ma.Residual(tol)
+    return ResTher
 
 def simulate(endTime):
 
-    global algo
-    return algo.simulate(endTime)
+    global Algo
+    return Algo.simulate(endTime)
 
 # |----------------------------------------|
 # |   Import and Initialize the Solvers    |
@@ -165,17 +165,17 @@ def simulate(endTime):
 @write_logs
 def setSolver(pathF,pathS):
 
-    global solver
+    global Solver
 
     if CW.rank == 0:
 
         from ..solver.Pfem3D import Pfem3D
-        solver = Pfem3D(pathF)
+        Solver = Pfem3D(pathF)
 
     if CW.rank == 1:
 
         from ..solver.Metafor import Metafor
-        solver = Metafor(pathS)
+        Solver = Metafor(pathS)
 
 # |--------------------------------------------|
 # |   Print the Summary of Computation Time    |

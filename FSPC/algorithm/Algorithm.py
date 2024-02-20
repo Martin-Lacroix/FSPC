@@ -19,13 +19,13 @@ class Algorithm(object):
     def simulate(self,endTime):
         
         verified = True
-        tb.solver.save()
+        tb.Solver.save()
 
         # Main loop on the FSI coupling time steps
         
-        while tb.step.time < endTime:
+        while tb.Step.time < endTime:
             
-            tb.interp.initialize()
+            tb.Interp.initialize()
             self.displayTimeStep()
             self.resetConverg()
 
@@ -33,14 +33,14 @@ class Algorithm(object):
 
             self.computePredictor(verified)
             verified = self.couplingAlgo()
-            tb.step.updateTime(verified)
+            tb.Step.updateTime(verified)
 
             # Update the solvers for the next time step
 
             if verified:
 
-                tb.solver.updateBackup()
-                tb.step.updateSave(tb.solver)
+                tb.Solver.updateBackup()
+                tb.Step.updateSave(tb.Solver)
                 self.hasRun = False
 
             else: self.solverWayBack(); continue
@@ -48,7 +48,7 @@ class Algorithm(object):
         # End of the FSI simulation
 
         CW.Barrier()
-        tb.solver.exit()
+        tb.Solver.exit()
 
 # |-----------------------------------------|
 # |   Run and Restore the Solver Backups    |
@@ -60,7 +60,7 @@ class Algorithm(object):
         if CW.rank == 0:
             
             self.hasRun = True
-            verified = tb.solver.run()
+            verified = tb.Solver.run()
 
         return CW.bcast(verified,root=0)
     
@@ -70,7 +70,7 @@ class Algorithm(object):
         if CW.rank == 1:
             
             self.hasRun = True
-            verified = tb.solver.run()
+            verified = tb.Solver.run()
 
         return CW.bcast(verified,root=1)
     
@@ -80,7 +80,7 @@ class Algorithm(object):
     @tb.compute_time
     def solverWayBack(self):
 
-        if self.hasRun: tb.solver.wayBack()
+        if self.hasRun: tb.Solver.wayBack()
         self.hasRun = False
 
 # |--------------------------------------------|
@@ -90,14 +90,14 @@ class Algorithm(object):
     @tb.only_solid
     def computePredictor(self,verified):
 
-        tb.interp.predTemperature(verified)
-        tb.interp.predDisplacement(verified)
+        tb.Interp.predTemperature(verified)
+        tb.Interp.predDisplacement(verified)
 
     @tb.only_solid
     def resetConverg(self):
 
-        if tb.convMech: tb.convMech.reset()
-        if tb.convTher: tb.convTher.reset()
+        if tb.ResMech: tb.ResMech.reset()
+        if tb.ResTher: tb.ResTher.reset()
 
     # Update the predicted interface solution
 
@@ -113,8 +113,8 @@ class Algorithm(object):
         # Check for coupling convergence
 
         verified = list()
-        if tb.convMech: verified.append(tb.convMech.verified())
-        if tb.convTher: verified.append(tb.convTher.verified())
+        if tb.ResMech: verified.append(tb.ResMech.verified())
+        if tb.ResTher: verified.append(tb.ResTher.verified())
         return np.all(verified)
 
 # |------------------------------------|
@@ -123,27 +123,27 @@ class Algorithm(object):
 
     def computeResidual(self):
         
-        if tb.convMech:
-            disp = tb.solver.getPosition()
-            tb.convMech.updateRes(disp,tb.interp.disp)
+        if tb.ResMech:
+            disp = tb.Solver.getPosition()
+            tb.ResMech.updateRes(disp,tb.Interp.disp)
 
-        if tb.convTher:
-            temp = tb.solver.getTemperature()
-            tb.convTher.updateRes(temp,tb.interp.temp)
+        if tb.ResTher:
+            temp = tb.Solver.getTemperature()
+            tb.ResTher.updateRes(temp,tb.Interp.temp)
 
     # Transfer Dirichlet data Solid to Fluid
 
     def transferDirichletSF(self):
 
-        tb.interp.applyDispSF()
-        tb.interp.applyTempSF()
+        tb.Interp.applyDispSF()
+        tb.Interp.applyTempSF()
 
     # Transfer Neumann data Fluid to Solid
 
     def transferNeumannFS(self):
 
-        tb.interp.applyLoadFS()
-        tb.interp.applyHeatFS()
+        tb.Interp.applyLoadFS()
+        tb.Interp.applyHeatFS()
 
 # |------------------------------------|
 # |   Print Convergence Information    |
@@ -151,22 +151,22 @@ class Algorithm(object):
 
     def displayResidual(self):
 
-        if tb.convMech:
+        if tb.ResMech:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            eps = 'Residual Mech : {:.3e}'.format(tb.convMech.epsilon)
+            eps = 'Residual Mech : {:.3e}'.format(tb.ResMech.epsilon)
             print(iter,eps)
 
-        if tb.convTher:
+        if tb.ResTher:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            eps = 'Residual Ther : {:.3e}'.format(tb.convTher.epsilon)
+            eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
             print(iter,eps)
 
     @tb.only_solid
     def displayTimeStep(self):
 
         L = '\n------------------------------------------'
-        timeStep = 'Time Step : {:.3e}'.format(tb.step.dt)
-        time = '\nTime : {:.3e}'.format(tb.step.time).ljust(20)
+        timeStep = 'Time Step : {:.3e}'.format(tb.Step.dt)
+        time = '\nTime : {:.3e}'.format(tb.Step.time).ljust(20)
         print(L,time,timeStep,L)

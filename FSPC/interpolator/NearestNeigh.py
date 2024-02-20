@@ -16,7 +16,7 @@ class KNN(Interpolator):
     def initialize(self):
 
         Interpolator.__init__(self)
-        position = tb.solver.getPosition()
+        position = tb.Solver.getPosition()
         self.computeMapping(position)
         self.H = self.H.tocsr()
 
@@ -33,7 +33,7 @@ class KNN(Interpolator):
     @tb.compute_time
     def computeMapping(self,position):
 
-        size = tb.solver.getSize(),len(self.recvPos)
+        size = tb.Solver.getSize(),len(self.recvPos)
         self.H = sp.dok_matrix(size)
 
         if self.K == 1: self.search(position)

@@ -15,7 +15,7 @@ class RBF(Interpolator):
     def initialize(self):
 
         Interpolator.__init__(self)
-        position = tb.solver.getPosition()
+        position = tb.Solver.getPosition()
         self.computeMapping(position)
 
     # Interpolate recvData and return the result
@@ -23,7 +23,7 @@ class RBF(Interpolator):
     @tb.compute_time
     def interpData(self,recvData):
 
-        size = (tb.solver.dim+1,np.size(recvData,1))
+        size = (tb.Solver.dim+1,np.size(recvData,1))
         result = np.append(recvData,np.zeros(size),axis=0)
         result = np.linalg.lstsq(self.A,result,-1)[0]
         return np.dot(self.B,result)
@@ -35,7 +35,7 @@ class RBF(Interpolator):
     @tb.compute_time
     def computeMapping(self,position):
 
-        self.size = 1+tb.solver.dim+len(self.recvPos)
+        self.size = 1+tb.Solver.dim+len(self.recvPos)
         self.B = self.makeB(position)
         self.A = self.makeA()
 

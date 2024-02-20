@@ -63,8 +63,8 @@ class Metafor(object):
     @tb.compute_time
     def run(self):
 
-        self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-        self.tsm.setMinimumTimeStep(tb.step.dt/self.maxDivision)
+        self.tsm.setNextTime(tb.Step.nexTime(),0,tb.Step.dt)
+        self.tsm.setMinimumTimeStep(tb.Step.dt/self.maxDivision)
         return self.metafor.getTimeIntegration().integration()
 
 # |----------------------------------|
@@ -164,7 +164,7 @@ class Metafor(object):
     @tb.compute_time
     def updateBackup(self):
 
-        tb.interp.sharePolytope()
+        tb.Interp.sharePolytope()
         self.prevPos = self.getPosition()
         self.metaFac.save(self.mfac)
         self.reload = False

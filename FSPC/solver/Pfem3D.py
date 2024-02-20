@@ -50,9 +50,9 @@ class Pfem3D(object):
     @tb.compute_time
     def run(self):
 
-        self.problem.setMaxSimTime(tb.step.nexTime())
-        self.problem.setMinTimeStep(tb.step.dt/self.maxDivision)
-        if self.implicit: self.solver.setTimeStep(tb.step.dt)
+        self.problem.setMaxSimTime(tb.Step.nexTime())
+        self.problem.setMinTimeStep(tb.Step.dt/self.maxDivision)
+        if self.implicit: self.solver.setTimeStep(tb.Step.dt)
         else: self.solver.computeNextDT()
         return self.problem.simulate()
 
@@ -62,14 +62,14 @@ class Pfem3D(object):
 
     def applyDisplacement(self,disp):
 
-        velocity = (disp-self.getPosition())/tb.step.dt
+        velocity = (disp-self.getPosition())/tb.Step.dt
 
         if self.implicit:
             for i in range(self.getSize()):
                 self.BC[i][:self.dim] = velocity[i]
 
         else:
-            acceler = (velocity-self.getVelocity())/(tb.step.dt/2)
+            acceler = (velocity-self.getVelocity())/(tb.Step.dt/2)
 
             for i in range(self.getSize()):
                 self.BC[i][:self.dim] = acceler[i]
@@ -145,7 +145,7 @@ class Pfem3D(object):
     @tb.compute_time
     def updateBackup(self):
 
-        faceList = tb.interp.sharePolytope()
+        faceList = tb.Interp.sharePolytope()
         vector = w.VectorVectorDouble(faceList)
         self.mesh.updatePoly(self.polyIdx,vector)
         self.mesh.remesh(False)

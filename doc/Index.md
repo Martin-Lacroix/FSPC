@@ -37,13 +37,13 @@ FSPC.setSolver(pathF,pathS)         # Initialize the external solvers
 
 <br />
 
-The convergence criterion is managed by the `Convergence` class. The latter should be specified both for the displacement and the temperature when relevant. It is important to note that the type of coupling is enabled by the initialization of the associated class such that `setConvMech` enables the mechanical coupling and `setConvTher` enables the thermal coupling.
+The convergence criterion is managed by the `Residual` class. The latter should be specified both for the displacement and the temperature when relevant. It is important to note that the type of coupling is enabled by the initialization of the associated class such that `setResMech` enables the mechanical coupling and `setResTher` enables the thermal coupling.
 
 <br />
 
 ```python
-FSPC.setConvMech(tolDisp)       # Mechanical convergence criterion
-FSPC.setConvTher(tolTemp)       # Thermal convergence criterion
+FSPC.setResMech(tolDisp)       # Mechanical convergence criterion
+FSPC.setResTher(tolTemp)       # Thermal convergence criterion
 ```
 
 | Input             | Type              | Description                                |
@@ -174,7 +174,7 @@ heatInt.addProperty(prp)                            # Add the element poroperty
 
 <br />
 
-The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `convMech` is defined in FSPC, the algorithm will look for `loadInt` in Metafor and if `convTher` is defined, it will look for the corresponding `heatInt` interaction.
+The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `ResMech` is defined in FSPC, the algorithm will look for `loadInt` in Metafor and if `ResTher` is defined, it will look for the corresponding `heatInt` interaction.
 
 <br />
 
@@ -201,7 +201,7 @@ Finally, the user may define an exporter class that will be called by FSPC to wr
 <br />
 
 ```python
-parm['exporter'] = gmsh.GmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+parm['exporter'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
 parm['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
 parm['exporter'].addDataBaseField([TO])                        # Add the temperature field
 ```

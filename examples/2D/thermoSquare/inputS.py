@@ -108,7 +108,7 @@ def getMetafor(parm):
     
     parm['interacT'] = heat
     parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
+    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
     parm['polytope'] = heat.getElementSet()
 
     initcondset.update(0)

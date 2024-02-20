@@ -93,7 +93,7 @@ def getMetafor(parm):
 
     parm['interacM'] = load
     parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
+    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
     parm['polytope'] = None
 
     extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_P)

@@ -154,7 +154,7 @@ def getMetafor(parm):
 
     parm['interacM'] = [load1,load2]
     parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
+    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
     parm['polytope'] = load1.getElementSet()
 
     extr = w.IFNodalValueExtractor(groups['Peigne'],w.IF_EVMS)

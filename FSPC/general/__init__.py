@@ -1,5 +1,5 @@
 from .Manager import TimeStep
-from .Manager import Convergence
+from .Manager import Residual
 
 # Toolbox general utility
 

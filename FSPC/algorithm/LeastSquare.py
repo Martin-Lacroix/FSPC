@@ -59,7 +59,7 @@ class ILS(Algorithm):
         # Return the solution correction
 
         delta = np.dot(W,np.linalg.lstsq(V,R,-1)[0])-R
-        return np.split(delta,tb.solver.getSize())
+        return np.split(delta,tb.Solver.getSize())
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |
@@ -68,24 +68,24 @@ class ILS(Algorithm):
     @tb.conv_mecha
     def relaxDisplacement(self):
 
-        disp = tb.solver.getPosition()
+        disp = tb.Solver.getPosition()
 
         # Perform either BGS or IQN iteration
 
         if self.iteration == 0:
 
-            tb.convMech.V = list()
-            tb.convMech.W = list()
-            delta = self.omega*tb.convMech.residual
+            tb.ResMech.V = list()
+            tb.ResMech.W = list()
+            delta = self.omega*tb.ResMech.residual
 
         else:
-            tb.convMech.V.append(np.hstack(tb.convMech.deltaRes()))
-            tb.convMech.W.append(np.hstack(disp-self.prevDisp))
-            delta = self.compute(tb.convMech)
+            tb.ResMech.V.append(np.hstack(tb.ResMech.deltaRes()))
+            tb.ResMech.W.append(np.hstack(disp-self.prevDisp))
+            delta = self.compute(tb.ResMech)
 
         # Update the pedicted displacement
 
-        tb.interp.disp += delta
+        tb.Interp.disp += delta
         self.prevDisp = np.copy(disp)
 
 # |------------------------------------------------|
@@ -95,22 +95,22 @@ class ILS(Algorithm):
     @tb.conv_therm
     def relaxTemperature(self):
 
-        temp = tb.solver.getTemperature()
+        temp = tb.Solver.getTemperature()
 
         # Perform either BGS or IQN iteration
 
         if self.iteration == 0:
 
-            tb.convTher.V = list()
-            tb.convTher.W = list()
-            delta = self.omega*tb.convTher.residual
+            tb.ResTher.V = list()
+            tb.ResTher.W = list()
+            delta = self.omega*tb.ResTher.residual
 
         else:
-            tb.convTher.V.append(np.hstack(tb.convTher.deltaRes()))
-            tb.convTher.W.append(np.hstack(temp-self.prevTemp))
-            delta = self.compute(tb.convTher)
+            tb.ResTher.V.append(np.hstack(tb.ResTher.deltaRes()))
+            tb.ResTher.W.append(np.hstack(temp-self.prevTemp))
+            delta = self.compute(tb.ResTher)
 
         # Update the predicted temperature
 
-        tb.interp.temp += delta
+        tb.Interp.temp += delta
         self.prevTemp = np.copy(temp)

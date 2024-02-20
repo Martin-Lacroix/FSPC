@@ -8,7 +8,7 @@ pathS = path.dirname(__file__)+'/inputS.py'
 
 # Initialize the simulation
 
-FSPC.setConvTher(1e-6)
+FSPC.setResTher(1e-6)
 FSPC.setStep(1e-3,1e-2)
 FSPC.setSolver(pathF,pathS)
 FSPC.setInterp(FSPC.interpolator.KNN,1)

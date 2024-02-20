@@ -68,7 +68,7 @@ class MVJ(Algorithm):
         # Return the solution correction
 
         delta = np.dot(conv.J,R)-R
-        return np.split(delta,tb.solver.getSize())
+        return np.split(delta,tb.Solver.getSize())
 
 # |-----------------------------------------------|
 # |   Reset Jacobian and Perform BGS Iteration    |
@@ -85,11 +85,11 @@ class MVJ(Algorithm):
     @tb.only_solid
     def updateJprev(self):
 
-        if tb.convMech:
-            tb.convMech.Jprev = np.copy(tb.convMech.J)
+        if tb.ResMech:
+            tb.ResMech.Jprev = np.copy(tb.ResMech.J)
 
-        if tb.convTher:
-            tb.convTher.Jprev = np.copy(tb.convTher.J)
+        if tb.ResTher:
+            tb.ResTher.Jprev = np.copy(tb.ResTher.J)
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |
@@ -98,30 +98,30 @@ class MVJ(Algorithm):
     @tb.conv_mecha
     def relaxDisplacement(self):
 
-        disp = tb.solver.getPosition()
+        disp = tb.Solver.getPosition()
 
         # Perform either BGS or IQN iteration
 
         if self.iteration == 0:
 
-            tb.convMech.V = list()
-            tb.convMech.W = list()
-            if self.BGS: delta = self.reset(tb.convMech,disp.size)
+            tb.ResMech.V = list()
+            tb.ResMech.W = list()
+            if self.BGS: delta = self.reset(tb.ResMech,disp.size)
             else:
 
-                R = np.hstack(-tb.convMech.residual)
-                delta = np.dot(tb.convMech.Jprev,R)-R
-                delta = np.split(delta,tb.solver.getSize())
+                R = np.hstack(-tb.ResMech.residual)
+                delta = np.dot(tb.ResMech.Jprev,R)-R
+                delta = np.split(delta,tb.Solver.getSize())
 
         else:
 
-            tb.convMech.V.append(np.hstack(tb.convMech.deltaRes()))
-            tb.convMech.W.append(np.hstack(disp-self.prevDisp))
-            delta = self.compute(tb.convMech)
+            tb.ResMech.V.append(np.hstack(tb.ResMech.deltaRes()))
+            tb.ResMech.W.append(np.hstack(disp-self.prevDisp))
+            delta = self.compute(tb.ResMech)
 
         # Update the pedicted displacement
 
-        tb.interp.disp += delta
+        tb.Interp.disp += delta
         self.prevDisp = np.copy(disp)
 
 # |------------------------------------------------|
@@ -131,28 +131,28 @@ class MVJ(Algorithm):
     @tb.conv_therm
     def relaxTemperature(self):
 
-        temp = tb.solver.getTemperature()
+        temp = tb.Solver.getTemperature()
 
         # Perform either BGS or IQN iteration
 
         if self.iteration == 0:
 
-            tb.convTher.V = list()
-            tb.convTher.W = list()
-            if self.BGS: delta = self.reset(tb.convTher,temp.size)
+            tb.ResTher.V = list()
+            tb.ResTher.W = list()
+            if self.BGS: delta = self.reset(tb.ResTher,temp.size)
             else:
 
-                R = np.hstack(-tb.convTher.residual)
-                delta = np.dot(tb.convTher.Jprev,R)-R
-                delta = np.split(delta,tb.solver.getSize())
+                R = np.hstack(-tb.ResTher.residual)
+                delta = np.dot(tb.ResTher.Jprev,R)-R
+                delta = np.split(delta,tb.Solver.getSize())
 
         else:
             
-            tb.convTher.V.append(np.hstack(tb.convTher.deltaRes()))
-            tb.convTher.W.append(np.hstack(temp-self.prevTemp))
-            delta = self.compute(tb.convTher)
+            tb.ResTher.V.append(np.hstack(tb.ResTher.deltaRes()))
+            tb.ResTher.W.append(np.hstack(temp-self.prevTemp))
+            delta = self.compute(tb.ResTher)
 
         # Update the pedicted temperature
 
-        tb.interp.temp += delta
+        tb.Interp.temp += delta
         self.prevTemp = np.copy(temp)
