@@ -12,7 +12,7 @@ pathS = path.dirname(__file__)+'/inputS.py'
 # Initialize the simulation
 
 FSPC.setResMech(1e-6)
-FSPC.setStep(1e-3,2e-3)
+FSPC.setStep(1e-4,2e-3)
 FSPC.setSolver(pathF,pathS)
 FSPC.setInterp(FSPC.interpolator.RBF,RBF)
 FSPC.setAlgo(FSPC.algorithm.MVJ,25)

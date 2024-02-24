@@ -33,9 +33,6 @@ class Metafor(object):
 
         # Defines some internal variables
 
-        self.maxDivision = 200
-        self.tsm.setInitialTime(0,np.inf)
-
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
         self.polytope = parm['polytope']
@@ -48,12 +45,17 @@ class Metafor(object):
         if 'interacT' in parm:
             self.interacT = np.atleast_1d(parm['interacT'])
 
-        # Manages time step and restart functions
+        # Create the memory fac used to restart
 
         self.mfac = w.MemoryFac()
         self.metaFac = w.MetaFac(self.metafor)
         self.metaFac.mode(False,False,True)
         self.metaFac.save(self.mfac)
+
+        # Initialize the integration and restart
+
+        self.maxDivision = 200
+        self.tsm.setInitialTime(0,np.inf)
 
 # |--------------------------------------------|
 # |   Run Metafor in the Current Time Frame    |
@@ -65,7 +67,7 @@ class Metafor(object):
 
         self.tsm.setNextTime(tb.Step.nexTime(),0,tb.Step.dt)
         self.tsm.setMinimumTimeStep(tb.Step.dt/self.maxDivision)
-        return self.metafor.getTimeIntegration().integration()
+        return self.metafor.getTimeIntegration().restart(self.mfac)
 
 # |----------------------------------|
 # |   Neumann Boundary Conditions    |
@@ -165,9 +167,7 @@ class Metafor(object):
     def updateBackup(self):
 
         tb.Interp.sharePolytope()
-        self.prevPos = self.getPosition()
         self.metaFac.save(self.mfac)
-        self.reload = False
 
     def swapIndex(self,element):
 
@@ -188,11 +188,7 @@ class Metafor(object):
 
     @tb.write_logs
     def exit(self): return
-
-    def wayBack(self):
-
-        self.tsm.removeLastStage()
-        self.metafor.restart(self.mfac)
+    def wayBack(self): self.tsm.removeLastStage()
 
 # |-----------------------------------------|
 # |   Build the Facet List from Polytope    |
