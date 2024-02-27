@@ -93,7 +93,6 @@ def getMetafor(parm):
     parm['interacM'] = load
     parm['FSInterface'] = groups['FSInterface']
     parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
-    parm['polytope'] = load.getElementSet()
 
     extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS)
     parm['exporter'].addExtractor(extr)
@@ -105,4 +104,7 @@ def getMetafor(parm):
     parm['exporter'].addExtractor(extr)
 
     domain.build()
+    parm['polytope'] = load.getElementSet()
+    parm['polytope'].activateBoundaryElements()
+    
     return metafor
