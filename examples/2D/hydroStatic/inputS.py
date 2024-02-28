@@ -93,10 +93,13 @@ def getMetafor(parm):
     parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
     parm['polytope'] = None
 
-    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_P)
+    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS)
     parm['exporter'].addExtractor(extr)
 
-    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS)
+    extr = w.DbNodalValueExtractor(groups['Solid'],w.Field1D(w.TX,w.GF1))
+    parm['exporter'].addExtractor(extr)
+
+    extr = w.DbNodalValueExtractor(groups['Solid'],w.Field1D(w.TY,w.GF1))
     parm['exporter'].addExtractor(extr)
 
     domain.build()
