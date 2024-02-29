@@ -86,9 +86,10 @@ s,l = Quad_Circle(0.2)
 u,h = Quad_Circle(0.45)
 v,c = Quad_Circle(0.7)
 
-sh.addPhysicalGroup(2,s,name='Solid_1')
-sh.addPhysicalGroup(2,u,name='Solid_2')
-sh.addPhysicalGroup(2,v,name='Solid_3')
+sh.addPhysicalGroup(2,s,name='S1')
+sh.addPhysicalGroup(2,u,name='S2')
+sh.addPhysicalGroup(2,v,name='S3')
+sh.addPhysicalGroup(2,s+u+v,name='Solid')
 sh.addPhysicalGroup(1,l+h+c,name='FSInterface')
 
 # |--------------------------|

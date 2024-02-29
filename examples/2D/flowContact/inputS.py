@@ -99,6 +99,7 @@ def getMetafor(parm):
     prp3 = w.ElementProperties(w.NodStress2DElement)
     load1 = w.NodInteraction(3)
     load1.push(groups['PeigneSide'])
+    load1.push(groups['Clamped'])
     load1.addProperty(prp3)
     iset.add(load1)
 
@@ -153,9 +154,14 @@ def getMetafor(parm):
 
     parm['interacM'] = [load1,load2]
     parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.GmshExport('metafor/output.msh',metafor)
-    parm['exporter'].addInternalField([w.IF_EVMS,w.IF_P])
-    parm['polytope'] = load2.getElementSet()
+    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
+    parm['polytope'] = load1.getElementSet()
 
+    extr = w.IFNodalValueExtractor(groups['Peigne'],w.IF_EVMS)
+    parm['exporter'].addExtractor(extr)
+
+    extr = w.IFNodalValueExtractor(groups['Disk'],w.IF_EVMS)
+    parm['exporter'].addExtractor(extr)
+    
     domain.build()
     return metafor

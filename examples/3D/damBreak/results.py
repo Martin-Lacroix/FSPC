@@ -9,7 +9,7 @@ import os
 
 data = list()
 
-# Bano Results
+# Marti Results
 
 data.append(
 [[0.00000,0.000324],
@@ -113,7 +113,7 @@ index = np.argsort(time)
 for i,j in enumerate(index):
 
     gmsh.open(fileList[j])
-    coord[i] = gmsh.model.mesh.getNode(93)[0][0]
+    coord[i] = gmsh.model.mesh.getNode(94)[0][0]
 
 gmsh.finalize()
 disp = coord-coord[0]

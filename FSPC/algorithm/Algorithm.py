@@ -2,71 +2,65 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import Toolbox as tb
 import numpy as np
 
-# |-----------------------------|
-# |   Parent Algorithm Class    |
-# |-----------------------------|
+# |---------------------------------|
+# |   Parent FSI Algorithm Class    |
+# |---------------------------------|
 
 class Algorithm(object):
+    def __init__(self):
 
-    def couplingAlgo(self):
-        raise Exception('No coupling algorithm defined')
-    
-    def relaxTemperature(self):
-        raise Exception('No thermal relaxation defined')
-    
-    def relaxDisplacement(self):
-        raise Exception('No mechanical relaxation defined')
+        self.hasRun = False
 
-# |-----------------------------------|
-# |   Run the Fluid-Solid Coupling    |
-# |-----------------------------------|
+# |-------------------------------------------|
+# |   Start the Fluid-Structure Simulation    |
+# |-------------------------------------------|
 
     @tb.compute_time
     def simulate(self,endTime):
-
-        verified = True
-        tb.solver.save()
-        tb.interp.initialize()
-
-        # Main loop of the FSI partitioned coupling
         
-        while tb.step.time < endTime:
+        verified = True
+        tb.Solver.save()
 
-            self.showTimeStep()
+        # Main loop on the FSI coupling time steps
+        
+        while tb.Step.time < endTime:
+            
+            tb.Interp.initialize()
+            self.displayTimeStep()
             self.resetConverg()
+
+            # Main loop on the FSI coupling iterations
+
             self.computePredictor(verified)
             verified = self.couplingAlgo()
-
-            # Restart the time step the coupling fails
-
-            if not verified:
-
-                tb.step.updateTime(verified)
-                continue
+            tb.Step.updateTime(verified)
 
             # Update the solvers for the next time step
 
-            tb.solver.update()
-            tb.step.updateTime(verified)
-            tb.step.updateSave(tb.solver)
-            tb.interp.initialize()
+            if verified:
 
-        # Ends the FSI simulation
+                tb.Solver.updateBackup()
+                tb.Step.updateSave(tb.Solver)
+                self.hasRun = False
+
+            else: self.solverWayBack(); continue
+
+        # End of the FSI simulation
 
         CW.Barrier()
-        tb.solver.exit()
+        tb.Solver.exit()
 
-# |----------------------------------|
-# |   Run Solid and Fluid Solvers    |
-# |----------------------------------|
+# |-----------------------------------------|
+# |   Run and Restore the Solver Backups    |
+# |-----------------------------------------|
 
     def runFluid(self):
 
         verified = None
         if CW.rank == 0:
             
-            verified = tb.solver.run()
-            if not verified: tb.solver.wayBack()
+            self.hasRun = True
+            verified = tb.Solver.run()
 
         return CW.bcast(verified,root=0)
     
@@ -74,11 +68,20 @@ class Algorithm(object):
 
         verified = None
         if CW.rank == 1:
-
-            verified = tb.solver.run()
-            if not verified: tb.solver.wayBack()
+            
+            self.hasRun = True
+            verified = tb.Solver.run()
 
         return CW.bcast(verified,root=1)
+    
+    # Reset the solvers to their last backup state
+
+    @tb.write_logs
+    @tb.compute_time
+    def solverWayBack(self):
+
+        if self.hasRun: tb.Solver.wayBack()
+        self.hasRun = False
 
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |
@@ -87,14 +90,14 @@ class Algorithm(object):
     @tb.only_solid
     def computePredictor(self,verified):
 
-        tb.interp.predTemperature(verified)
-        tb.interp.predDisplacement(verified)
+        tb.Interp.predTemperature(verified)
+        tb.Interp.predDisplacement(verified)
 
     @tb.only_solid
     def resetConverg(self):
 
-        if tb.convMech: tb.convMech.reset()
-        if tb.convTher: tb.convTher.reset()
+        if tb.ResMech: tb.ResMech.reset()
+        if tb.ResTher: tb.ResTher.reset()
 
     # Update the predicted interface solution
 
@@ -105,13 +108,13 @@ class Algorithm(object):
         self.computeResidual()
         self.relaxDisplacement()
         self.relaxTemperature()
-        self.showResidual()
+        self.displayResidual()
 
         # Check for coupling convergence
 
         verified = list()
-        if tb.convMech: verified.append(tb.convMech.verified())
-        if tb.convTher: verified.append(tb.convTher.verified())
+        if tb.ResMech: verified.append(tb.ResMech.verified())
+        if tb.ResTher: verified.append(tb.ResTher.verified())
         return np.all(verified)
 
 # |------------------------------------|
@@ -120,50 +123,50 @@ class Algorithm(object):
 
     def computeResidual(self):
         
-        if tb.convMech:
-            disp = tb.solver.getPosition()
-            tb.convMech.updateRes(disp,tb.interp.disp)
+        if tb.ResMech:
+            disp = tb.Solver.getPosition()
+            tb.ResMech.updateRes(disp,tb.Interp.disp)
 
-        if tb.convTher:
-            temp = tb.solver.getTemperature()
-            tb.convTher.updateRes(temp,tb.interp.temp)
+        if tb.ResTher:
+            temp = tb.Solver.getTemperature()
+            tb.ResTher.updateRes(temp,tb.Interp.temp)
 
     # Transfer Dirichlet data Solid to Fluid
 
     def transferDirichletSF(self):
 
-        tb.interp.applyDispSF()
-        tb.interp.applyTempSF()
+        tb.Interp.applyDispSF()
+        tb.Interp.applyTempSF()
 
     # Transfer Neumann data Fluid to Solid
 
     def transferNeumannFS(self):
 
-        tb.interp.applyLoadFS()
-        tb.interp.applyHeatFS()
+        tb.Interp.applyLoadFS()
+        tb.Interp.applyHeatFS()
 
 # |------------------------------------|
 # |   Print Convergence Information    |
 # |------------------------------------|
 
-    def showResidual(self):
+    def displayResidual(self):
 
-        if tb.convMech:
+        if tb.ResMech:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            eps = 'Residual Mech : {:.3e}'.format(tb.convMech.epsilon)
+            eps = 'Residual Mech : {:.3e}'.format(tb.ResMech.epsilon)
             print(iter,eps)
 
-        if tb.convTher:
+        if tb.ResTher:
 
             iter = '[{:.0f}]'.format(self.iteration)
-            eps = 'Residual Ther : {:.3e}'.format(tb.convTher.epsilon)
+            eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
             print(iter,eps)
 
     @tb.only_solid
-    def showTimeStep(self):
+    def displayTimeStep(self):
 
         L = '\n------------------------------------------'
-        timeStep = 'Time Step : {:.3e}'.format(tb.step.dt)
-        time = '\nTime : {:.3e}'.format(tb.step.time).ljust(20)
+        timeStep = 'Time Step : {:.3e}'.format(tb.Step.dt)
+        time = '\nTime : {:.3e}'.format(tb.Step.time).ljust(20)
         print(L,time,timeStep,L)

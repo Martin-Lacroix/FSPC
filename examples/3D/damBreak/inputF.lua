@@ -17,9 +17,9 @@ Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.7
-Problem.Mesh.gamma = 0.2
+Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 0.005
-Problem.Mesh.gammaFS = 0.1
+Problem.Mesh.gammaFS = 0.3
 Problem.Mesh.minHeightFactor = 1e-3
 
 Problem.Mesh.addOnFS = true
@@ -58,8 +58,8 @@ Problem.Solver.id = 'FracStep'
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
-Problem.Solver.coeffDTDecrease = math.huge
-Problem.Solver.coeffDTincrease = math.huge
+Problem.Solver.coeffDTDecrease = 2
+Problem.Solver.coeffDTincrease = 1
 
 -- Momentum Continuity Equation
 

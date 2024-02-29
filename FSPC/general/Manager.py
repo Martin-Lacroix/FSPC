@@ -41,11 +41,11 @@ class TimeStep(object):
             self.dt = math.pow(self.division,1/7)*self.dt
             self.dt = min(self.dt,self.maxDt)
 
-# |-----------------------------------|
-# |   Solution Convergence Manager    |
-# |-----------------------------------|
+# |--------------------------------|
+# |   Solution Residual Manager    |
+# |--------------------------------|
 
-class Convergence(object):
+class Residual(object):
     def __init__(self,tol):
 
         self.tol = tol

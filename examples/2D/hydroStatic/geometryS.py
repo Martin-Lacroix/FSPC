@@ -8,8 +8,8 @@ gmsh.initialize()
 
 L = 1
 HS = 0.02
+M = 11
 N = 1
-M = 10
 
 # |----------------------------------|
 # |   Points and Lines Definition    |

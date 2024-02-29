@@ -21,7 +21,7 @@ RB = 0.375
 
 # Characteristic size
 
-d = 0.02
+d = 0.04
 N = 30
 M = 25
 P = 4
@@ -184,7 +184,7 @@ sh.addPhysicalGroup(1,c,name='DiskSide')
 # |--------------------------|
 
 gmsh.option.setNumber('Mesh.RecombineAll',1)
-gmsh.option.setNumber('Mesh.Algorithm',11)
+gmsh.option.setNumber('Mesh.Algorithm',6)
 sh.mesh.generate(2)
 
 gmsh.write(os.path.dirname(__file__)+'/geometryS.msh')

@@ -42,7 +42,7 @@ class BGS(Algorithm):
 
             self.iteration += 1
             if verified: return True
-            tb.solver.wayBack()
+            else: self.solverWayBack()
         
         return False
 
@@ -69,11 +69,11 @@ class BGS(Algorithm):
     def relaxDisplacement(self):
 
         if self.iteration > 0:
-            tb.interp.disp += self.compute(tb.convMech)
+            tb.Interp.disp += self.compute(tb.ResMech)
 
         else:
-            tb.convMech.omega = self.omega
-            tb.interp.disp += self.omega*tb.convMech.residual
+            tb.ResMech.omega = self.omega
+            tb.Interp.disp += self.omega*tb.ResMech.residual
 
 # |------------------------------------------------|
 # |   Relaxation of Solid Interface Temperature    |
@@ -83,9 +83,9 @@ class BGS(Algorithm):
     def relaxTemperature(self):
 
         if self.iteration > 0:
-            tb.interp.temp += self.compute(tb.convTher)
+            tb.Interp.temp += self.compute(tb.ResTher)
 
         else:
-            tb.convTher.omega = self.omega
-            tb.interp.temp += self.omega*tb.convTher.residual
+            tb.ResTher.omega = self.omega
+            tb.Interp.temp += self.omega*tb.ResTher.residual
     

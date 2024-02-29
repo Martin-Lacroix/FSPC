@@ -33,7 +33,6 @@ class Metafor(object):
 
         # Defines some internal variables
 
-        self.neverRun = True
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
         self.polytope = parm['polytope']
@@ -46,33 +45,29 @@ class Metafor(object):
         if 'interacT' in parm:
             self.interacT = np.atleast_1d(parm['interacT'])
 
-        # Manages time step and restart functions
+        # Create the memory fac used to restart
 
         self.mfac = w.MemoryFac()
         self.metaFac = w.MetaFac(self.metafor)
         self.metaFac.mode(False,False,True)
         self.metaFac.save(self.mfac)
-        self.tsm.setVerbose(False)
 
-# |-------------------------------|
-# |   Calculates One Time Step    |
-# |-------------------------------|
+        # Initialize the integration and restart
+
+        self.maxDivision = 200
+        self.tsm.setInitialTime(0,np.inf)
+
+# |--------------------------------------------|
+# |   Run Metafor in the Current Time Frame    |
+# |--------------------------------------------|
     
     @tb.write_logs
     @tb.compute_time
     def run(self):
 
-        if(self.neverRun):
-            
-            self.neverRun = False
-            self.tsm.setInitialTime(tb.step.time,tb.step.dt)
-            self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-            return self.metafor.getTimeIntegration().integration()
-
-        else:
-
-            self.tsm.setNextTime(tb.step.nexTime(),0,tb.step.dt)
-            return self.metafor.getTimeIntegration().restart(self.mfac)
+        self.tsm.setNextTime(tb.Step.nexTime(),0,tb.Step.dt)
+        self.tsm.setMinimumTimeStep(tb.Step.dt/self.maxDivision)
+        return self.metafor.getTimeIntegration().restart(self.mfac)
 
 # |----------------------------------|
 # |   Neumann Boundary Conditions    |
@@ -164,17 +159,15 @@ class Metafor(object):
         
         return result
 
-# |------------------------------|
-# |   Other Wrapper Functions    |
-# |------------------------------|
+# |------------------------------------------|
+# |   Backup and Update the PFEM Polytope    |
+# |------------------------------------------|
 
     @tb.compute_time
-    def update(self):
+    def updateBackup(self):
 
-        tb.interp.sharePolytope()
-        self.prevPos = self.getPosition()
+        tb.Interp.sharePolytope()
         self.metaFac.save(self.mfac)
-        self.reload = False
 
     def swapIndex(self,element):
 
@@ -184,20 +177,22 @@ class Metafor(object):
         if size == 3: return np.array([[2,1,0]])
         if size == 4: return np.array([[0,3,2],[2,1,0]])
 
-    # Save and exit the simulation
+# |------------------------------|
+# |   Other Wrapper Functions    |
+# |------------------------------|
 
     @tb.write_logs
     @tb.compute_time
     def save(self): self.exporter.execute()
     def getSize(self): return self.FSI.getNumberOfMeshPoints()
 
-    @tb.compute_time
-    def wayBack(self): self.tsm.removeLastStage()
+    @tb.write_logs
     def exit(self): return
+    def wayBack(self): self.tsm.removeLastStage()
 
-# |-------------------------------------|
-# |   Build Facet List from Polytope    |
-# |-------------------------------------|
+# |-----------------------------------------|
+# |   Build the Facet List from Polytope    |
+# |-----------------------------------------|
     
     def getPolytope(self):
 
