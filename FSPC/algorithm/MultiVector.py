@@ -26,12 +26,12 @@ class MVJ(Algorithm):
 
             # Transfer and fluid solver call
 
-            self.transferDirichletSF()
+            self.transferDirichlet()
             if not self.runFluid(): return False
 
             # Transfer and solid solver call
 
-            self.transferNeumannFS()
+            self.transferNeumann()
             if not self.runSolid(): return False
 
             # Compute the coupling residual
@@ -43,8 +43,8 @@ class MVJ(Algorithm):
             # Exit the loop if the solution is converged
 
             self.iteration += 1
-            if verified: self.updateJprev(); return True
-            self.solverWayBack()
+            if verified: self.__updateJprev(); return True
+            self.wayBack()
 
         self.BGS = True
         return False
@@ -53,7 +53,7 @@ class MVJ(Algorithm):
 # |   Compute the Solution Correction    |
 # |--------------------------------------|
 
-    def compute(self,conv):
+    def __compute(self,conv):
     
         V = np.flip(np.transpose(conv.V),axis=1)
         W = np.flip(np.transpose(conv.W),axis=1)
@@ -74,7 +74,7 @@ class MVJ(Algorithm):
 # |   Reset Jacobian and Perform BGS Iteration    |
 # |-----------------------------------------------|
 
-    def reset(self,conv,size):
+    def __reset(self,conv,size):
 
         conv.J = np.zeros((size,size))
         conv.Jprev = np.zeros((size,size))
@@ -83,7 +83,7 @@ class MVJ(Algorithm):
     # Update the previous inverse Jacobian
 
     @tb.only_solid
-    def updateJprev(self):
+    def __updateJprev(self):
 
         if tb.ResMech:
             tb.ResMech.Jprev = np.copy(tb.ResMech.J)
@@ -96,7 +96,7 @@ class MVJ(Algorithm):
 # |-------------------------------------------------|
 
     @tb.conv_mecha
-    def relaxDisplacement(self):
+    def updateDisplacement(self):
 
         disp = tb.Solver.getPosition()
 
@@ -106,7 +106,7 @@ class MVJ(Algorithm):
 
             tb.ResMech.V = list()
             tb.ResMech.W = list()
-            if self.BGS: delta = self.reset(tb.ResMech,disp.size)
+            if self.BGS: delta = self.__reset(tb.ResMech,disp.size)
             else:
 
                 R = np.hstack(-tb.ResMech.residual)
@@ -117,7 +117,7 @@ class MVJ(Algorithm):
 
             tb.ResMech.V.append(np.hstack(tb.ResMech.deltaRes()))
             tb.ResMech.W.append(np.hstack(disp-self.prevDisp))
-            delta = self.compute(tb.ResMech)
+            delta = self.__compute(tb.ResMech)
 
         # Update the pedicted displacement
 
@@ -129,7 +129,7 @@ class MVJ(Algorithm):
 # |------------------------------------------------|
 
     @tb.conv_therm
-    def relaxTemperature(self):
+    def updateTemperature(self):
 
         temp = tb.Solver.getTemperature()
 
@@ -139,7 +139,7 @@ class MVJ(Algorithm):
 
             tb.ResTher.V = list()
             tb.ResTher.W = list()
-            if self.BGS: delta = self.reset(tb.ResTher,temp.size)
+            if self.BGS: delta = self.__reset(tb.ResTher,temp.size)
             else:
 
                 R = np.hstack(-tb.ResTher.residual)
@@ -150,7 +150,7 @@ class MVJ(Algorithm):
             
             tb.ResTher.V.append(np.hstack(tb.ResTher.deltaRes()))
             tb.ResTher.W.append(np.hstack(temp-self.prevTemp))
-            delta = self.compute(tb.ResTher)
+            delta = self.__compute(tb.ResTher)
 
         # Update the pedicted temperature
 

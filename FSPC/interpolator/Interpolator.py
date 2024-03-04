@@ -9,7 +9,7 @@ import numpy as np
 class Interpolator(object):
     def __init__(self):
 
-        self.initializeData()
+        self.__initializeData()
 
         # Share the position vectors between solvers
 
@@ -28,7 +28,7 @@ class Interpolator(object):
 # |----------------------------------------|
 
     @tb.only_solid
-    def initializeData(self):
+    def __initializeData(self):
 
         if tb.ResMech: self.disp = tb.Solver.getPosition()
         if tb.ResTher: self.temp = tb.Solver.getTemperature()
@@ -38,20 +38,6 @@ class Interpolator(object):
     
     def interpData(self):
         raise Exception('No interpolation function defined')
-
-    # Facets from the target interface mesh
-
-    def getFaceList(self):
-
-        if CW.rank == 0:
-            
-            CW.send(tb.Solver.getFacet(),1,tag=7)
-            self.recvFace = CW.recv(source=1,tag=8)
-
-        if CW.rank == 1:
-
-            self.recvFace = CW.recv(source=0,tag=7)
-            CW.send(tb.Solver.getFacet(),0,tag=8)
 
 # |---------------------------------------|
 # |   Apply the Fluid Loading on Solid    |

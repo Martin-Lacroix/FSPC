@@ -32,7 +32,7 @@ class Pfem3D(object):
 
         # Initialize the communication objects
 
-        self.initializeBC()
+        self.__initializeBC()
         vec = w.VectorVectorDouble()
         self.polyIdx = self.mesh.addPolytope(vec)
 
@@ -131,7 +131,7 @@ class Pfem3D(object):
 # |   Backup and Reset the Boundary Conditions    |
 # |-----------------------------------------------|
 
-    def initializeBC(self):
+    def __initializeBC(self):
 
         self.mesh.getNodesIndex('FSInterface',self.FSI)
         self.BC = list()
@@ -149,7 +149,7 @@ class Pfem3D(object):
         vector = w.VectorVectorDouble(faceList)
         self.mesh.updatePoly(self.polyIdx,vector)
         self.mesh.remesh(False)
-        self.initializeBC()
+        self.__initializeBC()
 
         # Update the backup and precompute global matrices
         

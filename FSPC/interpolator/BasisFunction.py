@@ -12,11 +12,12 @@ class RBF(Interpolator):
 
     # Compute the FS mesh interpolation matrix
 
+    @tb.compute_time
     def initialize(self):
 
         Interpolator.__init__(self)
         position = tb.Solver.getPosition()
-        self.computeMapping(position)
+        self.__mapping(position)
 
     # Interpolate recvData and return the result
 
@@ -33,11 +34,11 @@ class RBF(Interpolator):
 # |----------------------------------------------|
 
     @tb.compute_time
-    def computeMapping(self,position):
+    def __mapping(self,position):
 
         self.size = 1+tb.Solver.dim+len(self.recvPos)
-        self.B = self.makeB(position)
-        self.A = self.makeA()
+        self.B = self.__makeB(position)
+        self.A = self.__makeA()
 
         # Fill A and B with radial basis function
 
@@ -56,7 +57,7 @@ class RBF(Interpolator):
 # |   Initialize the A and B Matrices    |
 # |--------------------------------------|
 
-    def makeA(self):
+    def __makeA(self):
 
         N = len(self.recvPos)
         K = range(1+N,self.size)
@@ -71,7 +72,7 @@ class RBF(Interpolator):
 
     # Initialize B with reference mesh positions
 
-    def makeB(self,position):
+    def __makeB(self,position):
 
         N = len(position)
         B = np.ones((N,self.size))

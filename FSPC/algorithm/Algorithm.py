@@ -26,12 +26,12 @@ class Algorithm(object):
         while tb.Step.time < endTime:
             
             tb.Interp.initialize()
-            self.displayTimeStep()
-            self.resetConverg()
+            self.__displayTimeStep()
+            self.__resetConverg()
 
             # Main loop on the FSI coupling iterations
 
-            self.computePredictor(verified)
+            self.__computePredictor(verified)
             verified = self.couplingAlgo()
             tb.Step.updateTime(verified)
 
@@ -43,7 +43,7 @@ class Algorithm(object):
                 tb.Step.updateSave(tb.Solver)
                 self.hasRun = False
 
-            else: self.solverWayBack(); continue
+            else: self.wayBack(); continue
 
         # End of the FSI simulation
 
@@ -78,7 +78,7 @@ class Algorithm(object):
 
     @tb.write_logs
     @tb.compute_time
-    def solverWayBack(self):
+    def wayBack(self):
 
         if self.hasRun: tb.Solver.wayBack()
         self.hasRun = False
@@ -88,13 +88,13 @@ class Algorithm(object):
 # |--------------------------------------------|
 
     @tb.only_solid
-    def computePredictor(self,verified):
+    def __computePredictor(self,verified):
 
         tb.Interp.predTemperature(verified)
         tb.Interp.predDisplacement(verified)
 
     @tb.only_solid
-    def resetConverg(self):
+    def __resetConverg(self):
 
         if tb.ResMech: tb.ResMech.reset()
         if tb.ResTher: tb.ResTher.reset()
@@ -106,9 +106,9 @@ class Algorithm(object):
     def relaxation(self):
 
         self.computeResidual()
-        self.relaxDisplacement()
-        self.relaxTemperature()
-        self.displayResidual()
+        self.updateDisplacement()
+        self.updateTemperature()
+        self.__displayResidual()
 
         # Check for coupling convergence
 
@@ -133,14 +133,14 @@ class Algorithm(object):
 
     # Transfer Dirichlet data Solid to Fluid
 
-    def transferDirichletSF(self):
+    def transferDirichlet(self):
 
         tb.Interp.applyDispSF()
         tb.Interp.applyTempSF()
 
     # Transfer Neumann data Fluid to Solid
 
-    def transferNeumannFS(self):
+    def transferNeumann(self):
 
         tb.Interp.applyLoadFS()
         tb.Interp.applyHeatFS()
@@ -149,7 +149,7 @@ class Algorithm(object):
 # |   Print Convergence Information    |
 # |------------------------------------|
 
-    def displayResidual(self):
+    def __displayResidual(self):
 
         if tb.ResMech:
 
@@ -164,7 +164,7 @@ class Algorithm(object):
             print(iter,eps)
 
     @tb.only_solid
-    def displayTimeStep(self):
+    def __displayTimeStep(self):
 
         L = '\n------------------------------------------'
         timeStep = 'Time Step : {:.3e}'.format(tb.Step.dt)

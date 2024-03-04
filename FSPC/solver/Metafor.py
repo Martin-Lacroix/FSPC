@@ -169,7 +169,7 @@ class Metafor(object):
         tb.Interp.sharePolytope()
         self.metaFac.save(self.mfac)
 
-    def swapIndex(self,element):
+    def __eIndex(self,element):
 
         size = element.getNumberOfNodes()
 
@@ -206,7 +206,7 @@ class Metafor(object):
 
             # Split the square elements in two triangles
 
-            position = self.elemPos(element)[self.swapIndex(element)]
+            position = self.__ePos(element)[self.__eIndex(element)]
             for pos in position: faceList.append(pos.ravel())
 
         return faceList
@@ -215,7 +215,7 @@ class Metafor(object):
 # |   Positions of the Element Nodes    |
 # |-------------------------------------|
 
-    def elemPos(self,element):
+    def __ePos(self,element):
 
         size = element.getNumberOfNodes()
         position = np.zeros((size,self.dim))

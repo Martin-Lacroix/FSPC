@@ -79,8 +79,9 @@ def compute_time(func):
         global clock
         start = time.time()
         result = func(*args,**kwargs)
-        clock[func.__name__] += time.time()-start
-        
+        parent = args[0].__class__.__name__+' : '
+        clock[parent+func.__name__] += time.time()-start
+
         return result
     return wrapper
 
@@ -189,4 +190,4 @@ def printClock():
     print('------------------------------------\n')
     
     for fun,time in clock.items():
-        print('{}{:.5f}'.format(fun.ljust(20),time))
+        print('{}{:.5f}'.format(fun.ljust(25),time))

@@ -17,7 +17,7 @@ class KNN(Interpolator):
 
         Interpolator.__init__(self)
         position = tb.Solver.getPosition()
-        self.computeMapping(position)
+        self.__mapping(position)
         self.H = self.H.tocsr()
 
     # Interpolate recvData and return the result
@@ -31,26 +31,26 @@ class KNN(Interpolator):
 # |----------------------------------------------|
 
     @tb.compute_time
-    def computeMapping(self,position):
+    def __mapping(self,position):
 
         size = tb.Solver.getSize(),len(self.recvPos)
         self.H = sp.dok_matrix(size)
 
-        if self.K == 1: self.search(position)
-        else: self.interpolate(position)
+        if self.K == 1: self.__search(position)
+        else: self.__interpolate(position)
 
 # |------------------------------------|
 # |   Find the K Nearest Neighbours    |
 # |------------------------------------|
  
-    def search(self,position):
+    def __search(self,position):
 
         for i,pos in enumerate(position):
 
             dist = np.linalg.norm(pos-self.recvPos,axis=1)
             self.H[i,np.argmin(dist)] = 1
 
-    def interpolate(self,position):
+    def __interpolate(self,position):
 
         for i,pos in enumerate(position):
 

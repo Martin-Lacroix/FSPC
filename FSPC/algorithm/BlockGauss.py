@@ -25,12 +25,12 @@ class BGS(Algorithm):
 
             # Transfer and fluid solver call
 
-            self.transferDirichletSF()
+            self.transferDirichlet()
             if not self.runFluid(): return False
 
             # Transfer and solid solver call
 
-            self.transferNeumannFS()
+            self.transferNeumann()
             if not self.runSolid(): return False
 
             # Compute the coupling residual
@@ -42,7 +42,7 @@ class BGS(Algorithm):
 
             self.iteration += 1
             if verified: return True
-            else: self.solverWayBack()
+            else: self.wayBack()
         
         return False
 
@@ -50,7 +50,7 @@ class BGS(Algorithm):
 # |   Compute the Solution Correction    |
 # |--------------------------------------|
 
-    def compute(self,conv):
+    def __compute(self,conv):
 
         D = conv.deltaRes()
         A = np.tensordot(D,conv.prevRes)
@@ -66,10 +66,10 @@ class BGS(Algorithm):
 # |-------------------------------------------------|
 
     @tb.conv_mecha
-    def relaxDisplacement(self):
+    def updateDisplacement(self):
 
         if self.iteration > 0:
-            tb.Interp.disp += self.compute(tb.ResMech)
+            tb.Interp.disp += self.__compute(tb.ResMech)
 
         else:
             tb.ResMech.omega = self.omega
@@ -80,10 +80,10 @@ class BGS(Algorithm):
 # |------------------------------------------------|
 
     @tb.conv_therm
-    def relaxTemperature(self):
+    def updateTemperature(self):
 
         if self.iteration > 0:
-            tb.Interp.temp += self.compute(tb.ResTher)
+            tb.Interp.temp += self.__compute(tb.ResTher)
 
         else:
             tb.ResTher.omega = self.omega

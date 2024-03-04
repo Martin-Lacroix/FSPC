@@ -25,12 +25,12 @@ class ILS(Algorithm):
 
             # Transfer and fluid solver call
 
-            self.transferDirichletSF()
+            self.transferDirichlet()
             if not self.runFluid(): return False
 
             # Transfer and solid solver call
 
-            self.transferNeumannFS()
+            self.transferNeumann()
             if not self.runSolid(): return False
 
             # Compute the coupling residual
@@ -42,7 +42,7 @@ class ILS(Algorithm):
 
             self.iteration += 1
             if verified: return True
-            else: self.solverWayBack()
+            else: self.wayBack()
         
         return False
 
@@ -50,7 +50,7 @@ class ILS(Algorithm):
 # |   Compute the Solution Correction    |
 # |--------------------------------------|
 
-    def compute(self,conv):
+    def __compute(self,conv):
         
         V = np.flip(np.transpose(conv.V),axis=1)
         W = np.flip(np.transpose(conv.W),axis=1)
@@ -66,7 +66,7 @@ class ILS(Algorithm):
 # |-------------------------------------------------|
     
     @tb.conv_mecha
-    def relaxDisplacement(self):
+    def updateDisplacement(self):
 
         disp = tb.Solver.getPosition()
 
@@ -81,7 +81,7 @@ class ILS(Algorithm):
         else:
             tb.ResMech.V.append(np.hstack(tb.ResMech.deltaRes()))
             tb.ResMech.W.append(np.hstack(disp-self.prevDisp))
-            delta = self.compute(tb.ResMech)
+            delta = self.__compute(tb.ResMech)
 
         # Update the pedicted displacement
 
@@ -93,7 +93,7 @@ class ILS(Algorithm):
 # |------------------------------------------------|
 
     @tb.conv_therm
-    def relaxTemperature(self):
+    def updateTemperature(self):
 
         temp = tb.Solver.getTemperature()
 
@@ -108,7 +108,7 @@ class ILS(Algorithm):
         else:
             tb.ResTher.V.append(np.hstack(tb.ResTher.deltaRes()))
             tb.ResTher.W.append(np.hstack(temp-self.prevTemp))
-            delta = self.compute(tb.ResTher)
+            delta = self.__compute(tb.ResTher)
 
         # Update the predicted temperature
 
