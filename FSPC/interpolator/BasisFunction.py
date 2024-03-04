@@ -12,7 +12,6 @@ class RBF(Interpolator):
 
     # Compute the FS mesh interpolation matrix
 
-    @tb.compute_time
     def initialize(self):
 
         Interpolator.__init__(self)
