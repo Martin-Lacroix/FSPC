@@ -39,7 +39,7 @@ class Algorithm(object):
 
             if verified:
 
-                tb.Solver.updateBackup()
+                tb.Solver.update()
                 tb.Step.updateSave(tb.Solver)
                 self.hasRun = False
 

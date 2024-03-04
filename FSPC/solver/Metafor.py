@@ -164,7 +164,7 @@ class Metafor(object):
 # |------------------------------------------|
 
     @tb.compute_time
-    def updateBackup(self):
+    def update(self):
 
         tb.Interp.sharePolytope()
         self.metaFac.save(self.mfac)
