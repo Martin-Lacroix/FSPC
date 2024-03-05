@@ -56,22 +56,22 @@ class Algorithm(object):
 
     def runFluid(self):
 
-        verified = None
         if CW.rank == 0:
             
             self.hasRun = True
             verified = tb.Solver.run()
 
+        else: verified = None
         return CW.bcast(verified,root=0)
     
     def runSolid(self):
 
-        verified = None
         if CW.rank == 1:
             
             self.hasRun = True
             verified = tb.Solver.run()
 
+        else: verified = None
         return CW.bcast(verified,root=1)
     
     # Reset the solvers to their last backup state
