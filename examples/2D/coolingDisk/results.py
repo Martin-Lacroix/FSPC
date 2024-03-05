@@ -1,7 +1,7 @@
-from matplotlib import pyplot as plt
-import numpy as np
+import os,sys
+sys.path.append('examples')
+import toolbox as tb
 import gmsh
-import os
 
 # |-------------------------------|
 # |   Data From the Literature    |
@@ -9,7 +9,7 @@ import os
 
 data = list()
 
-# Onate Results
+# Onate results
 
 data.append(
 [[0.00000,180.00000],
@@ -73,31 +73,17 @@ data.append(
 # |   Post Procesing of Results    |
 # |--------------------------------|
 
-gmsh.initialize()
-gmsh.option.setNumber('General.Terminal',0)
+T = [list() for _ in range(3)]
+position = [[0.2,0.28,0],[0.45,0.28,0],[0.7,0.28,0]]
 os.chdir('workspace/metafor')
 
-# Extract the data from the mesh file
+time,directory = tb.readFiles()
+tag = [tb.findNode(directory[0],P) for P in position]
 
-fileList = os.listdir()
-time = [float(F[7:-4]) for F in fileList]
-value = np.zeros((3,len(fileList)))
-index = np.argsort(time)
+for i,file in enumerate(directory):
 
-for i,j in enumerate(index):
+    gmsh.open(file)
+    D = gmsh.view.getModelData(0,i)[2]
+    for i,R in enumerate(T): R.append(D[tag[i]-1][0])
 
-    gmsh.open(fileList[j])
-    nodeVal = gmsh.view.getModelData(1,i)[2]
-    value[0][i] = nodeVal[252][0]
-    value[1][i] = nodeVal[385][0]
-    value[2][i] = nodeVal[518][0]
-
-gmsh.finalize()
-time = np.sort(time)
-
-# Plot the final solution
-
-for D in data: plt.plot(*np.transpose(D))
-for V in value: plt.plot(time,V,'k--')
-plt.grid()
-plt.show()
+tb.plotRef(time,T,data)

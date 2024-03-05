@@ -9,7 +9,7 @@ import gmsh
 
 data = list()
 
-# Marti Results
+# Marti results
 
 data.append(
 [[0.00000,0.000324],

@@ -9,7 +9,7 @@ import gmsh
 
 data = list()
 
-# Onate Results
+# Onate results
 
 data.append(
 [[0.00000,270.00000],

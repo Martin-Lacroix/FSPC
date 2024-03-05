@@ -10,7 +10,7 @@ import gmsh
 
 data = list()
 
-# Bano Results
+# Bano results
 
 data.append(
 [[0.00000,0.000000],

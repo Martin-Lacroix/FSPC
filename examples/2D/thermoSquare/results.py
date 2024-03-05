@@ -1,7 +1,7 @@
-from matplotlib import pyplot as plt
-import numpy as np
+import os,sys
+sys.path.append('examples')
+import toolbox as tb
 import gmsh
-import os
 
 # |-------------------------------|
 # |   Data From the Literature    |
@@ -9,7 +9,7 @@ import os
 
 data = list()
 
-# Long Results
+# Long results
 
 data.append(
 [[0.00000,2000.0000],
@@ -39,29 +39,17 @@ data.append(
 # |   Post Procesing of Results    |
 # |--------------------------------|
 
-gmsh.initialize()
-gmsh.option.setNumber('General.Terminal',0)
+T = list()
+position = [0,0,0]
 os.chdir('workspace/metafor')
 
-# Extract the data from the mesh file
+time,directory = tb.readFiles()
+tag = tb.findNode(directory[0],position)
 
-fileList = os.listdir()
-time = [float(F[7:-4]) for F in fileList]
-value = np.zeros(len(fileList))
-index = np.argsort(time)
+for i,file in enumerate(directory):
 
-for i,j in enumerate(index):
+    gmsh.open(file)
+    temperature = gmsh.view.getModelData(0,i)[2]
+    T.append(temperature[tag-1][0])
 
-    gmsh.open(fileList[j])
-    nodeVal = gmsh.view.getModelData(1,i)[2]
-    value[i] = nodeVal[5300][0]
-
-gmsh.finalize()
-time = np.sort(time)
-
-# Plot the final solution
-
-for D in data: plt.plot(*np.transpose(D))
-plt.plot(time,value,'k--')
-plt.grid()
-plt.show()
+tb.plotRef(time,T,data)

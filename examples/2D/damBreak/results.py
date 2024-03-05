@@ -1,11 +1,15 @@
-from matplotlib import pyplot as plt
-import numpy as np
+import os,sys
+sys.path.append('examples')
+import toolbox as tb
 import gmsh
-import os
+
+# |-------------------------------|
+# |   Data From the Literature    |
+# |-------------------------------|
 
 data = list()
 
-# Cerquaglia Results
+# Cerquaglia results
 
 data.append(
 [[0.00000,0.000000],
@@ -414,29 +418,16 @@ data.append(
 # |   Post Procesing of Results    |
 # |--------------------------------|
 
-gmsh.initialize()
-gmsh.option.setNumber('General.Terminal',0)
+X = list()
+position = [0.292,0.08,0]
 os.chdir('workspace/metafor')
 
-# Extract the data from the mesh file
+time,directory = tb.readFiles()
+tag = tb.findNode(directory[0],position)
 
-fileList = os.listdir()
-time = [float(F[7:-4]) for F in fileList]
-coord = np.zeros((len(fileList),3))
-index = np.argsort(time)
+for file in directory:
 
-for i,j in enumerate(index):
+    gmsh.open(file)
+    X.append(gmsh.model.mesh.getNode(tag)[0][0])
 
-    gmsh.open(fileList[j])
-    coord[i] = gmsh.model.mesh.getNode(4)[0]
-
-gmsh.finalize()
-disp = (coord-coord[0])[:,0]
-time = np.sort(time)
-
-# Plot the final solution
-
-for D in data: plt.plot(*np.transpose(D))
-plt.plot(time,disp,'k--')
-plt.grid()
-plt.show()
+tb.plotRef(time,X-X[0],data)

@@ -3,14 +3,14 @@ import numpy as np
 import re,os
 import gmsh
 
-# |-------------------------------------------|
-# |   Sort the Files in the Current Folder    |
-# |-------------------------------------------|
+# |---------------------------------------|
+# |   Sort the Files in Current Folder    |
+# |---------------------------------------|
 
 def readFiles():
 
     time = list()
-    directory = os.listdir()
+    directory = np.array(os.listdir())
 
     # Recover the time from the file name
 
@@ -22,21 +22,19 @@ def readFiles():
 
     # Sort the list with respect to time
 
-    time.sort()
-    directory.sort()
-    return time,directory
+    IDX = np.argsort(time)
+    time = np.array(time)[IDX]
+    return time,directory[IDX]
 
-# |----------------------------------------------|
-# |   Plot the Results and Reference Solution    |
-# |----------------------------------------------|
+# |-------------------------------------|
+# |   Plot the Results and Reference    |
+# |-------------------------------------|
 
 def plotRef(time,result,reference):
 
+    result = np.atleast_2d(result)
     for R in reference: plt.plot(*np.transpose(R))
-
-    # Plot my own results and compare with the reference
-
-    plt.plot(time,result,'k--')
+    for R in result: plt.plot(time,R,'k--')
     plt.grid()
     plt.show()
 
