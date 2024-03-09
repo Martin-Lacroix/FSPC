@@ -197,6 +197,7 @@ sh.addPhysicalGroup(1,[h[1]],name='Inlet')
 # |--------------------------|
 
 sh.mesh.generate(2)
+gmsh.model.mesh.reverse()
 gmsh.write(os.path.dirname(__file__)+'/geometryF.msh')
 gmsh.fltk.run()
 gmsh.finalize()

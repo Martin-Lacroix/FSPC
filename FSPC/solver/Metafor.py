@@ -34,16 +34,16 @@ class Metafor(object):
         # Defines some internal variables
 
         self.FSI = parm['FSInterface']
-        self.exporter = parm['exporter']
         self.polytope = parm['polytope']
+        self.extractor = parm['extractor']
 
         # Mechanical and thermal interactions
 
-        if 'interacM' in parm:
-            self.interacM = np.atleast_1d(parm['interacM'])
+        if 'interaction_M' in parm:
+            self.interaction_M = np.atleast_1d(parm['interaction_M'])
 
-        if 'interacT' in parm:
-            self.interacT = np.atleast_1d(parm['interacT'])
+        if 'interaction_T' in parm:
+            self.interaction_T = np.atleast_1d(parm['interaction_T'])
 
         # Create the memory fac used to restart
 
@@ -75,7 +75,7 @@ class Metafor(object):
 
     def applyLoading(self,load):
 
-        for interaction in self.interacM:
+        for interaction in self.interaction_M:
             for i,data in enumerate(load):
 
                 node = self.FSI.getMeshPoint(i)
@@ -93,7 +93,7 @@ class Metafor(object):
 
     def applyHeatFlux(self,heat):
 
-        for interaction in self.interacT:
+        for interaction in self.interaction_T:
             for i,data in enumerate(heat):
 
                 node = self.FSI.getMeshPoint(i)
@@ -183,7 +183,7 @@ class Metafor(object):
 
     @tb.write_logs
     @tb.compute_time
-    def save(self): self.exporter.execute()
+    def save(self): self.extractor.extract()
     def getSize(self): return self.FSI.getNumberOfMeshPoints()
 
     @tb.write_logs
@@ -193,7 +193,7 @@ class Metafor(object):
 # |-----------------------------------------|
 # |   Build the Facet List from Polytope    |
 # |-----------------------------------------|
-    
+
     def getPolytope(self):
 
         faceList = list()

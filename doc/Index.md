@@ -179,8 +179,8 @@ The resulting nodal interactions must be provided to FSPC through the parameter 
 <br />
 
 ```python
-parm['interacT'] = heatInt      # Send the heat interaction to FSPC
-parm['interacM'] = loadInt      # Send the mechanical interaction to FSPC
+parm['interaction_T'] = heatInt      # Send the heat interaction to FSPC
+parm['interaction_M'] = loadInt      # Send the mechanical interaction to FSPC
 ```
 
 <br />
@@ -201,7 +201,7 @@ Finally, the user may define an exporter class that will be called by FSPC to wr
 <br />
 
 ```python
-parm['exporter'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
-parm['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
-parm['exporter'].addDataBaseField([TO])                        # Add the temperature field
+parm['extractor'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+parm['extractor'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
+parm['extractor'].addDataBaseField([TO])                        # Add the temperature field
 ```

@@ -1,4 +1,3 @@
-import toolbox.pythonExtractors as py
 import toolbox.gmsh as gmsh
 import wrap as w
 import os
@@ -67,14 +66,17 @@ def getMetafor(parm):
     heat.addProperty(prp2)
     iset.add(heat)
 
+    parm['interaction_T'] = heat
+    parm['polytope'] = heat.getElementSet()
+
     # Boundary conditions
 
-    initcondset = metafor.getInitialConditionSet()
-    initcondset.define(groups['Solid'],w.Field1D(w.TO,w.AB),2000)
+    initset = metafor.getInitialConditionSet()
+    initset.define(groups['Solid'],w.Field1D(w.TO,w.AB),2e3)
 
-    loadingset = domain.getLoadingSet()
-    loadingset.define(groups['Solid'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Solid'],w.Field1D(w.TY,w.RE))
+    loadset = domain.getLoadingSet()
+    loadset.define(groups['Solid'],w.Field1D(w.TX,w.RE))
+    loadset.define(groups['Solid'],w.Field1D(w.TY,w.RE))
 
     # Mechanical and thermal time integration
 
@@ -104,16 +106,15 @@ def getMetafor(parm):
     tscm.setTimeStepDivisionFactor(2)
     tscm.setNbOptiIte(25)
 
-    # Parameters for FSPC
-    
-    parm['interacT'] = heat
-    parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
-    parm['polytope'] = heat.getElementSet()
+    # Nodal GMSH extractor
 
-    initcondset.update(0)
-    extr = py.CurrentValueExtractor(groups['Solid'],w.TO)
-    parm['exporter'].addExtractor(extr)
+    ext = w.GmshNodalExtractor(metafor,'metafor/output')
+    ext.add(1,w.DbNodalValueExtractor(groups['Solid'],w.Field1D(w.TO,w.RE)))
+    parm['extractor'] = ext
+
+    # Build domain and folder
 
     domain.build()
+    parm['FSInterface'] = groups['FSInterface']
+    os.makedirs('metafor')
     return metafor

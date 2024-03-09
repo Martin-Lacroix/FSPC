@@ -96,18 +96,20 @@ def getMetafor(parm):
 
     # Elements for surface traction
 
-    prp3 = w.ElementProperties(w.NodStress2DElement)
-    load1 = w.NodInteraction(3)
-    load1.push(groups['PeigneSide'])
-    load1.push(groups['Clamped'])
-    load1.addProperty(prp3)
-    iset.add(load1)
-
     prp4 = w.ElementProperties(w.NodStress2DElement)
-    load2 = w.NodInteraction(4)
-    load2.push(groups['DiskSide'])
-    load2.addProperty(prp4)
-    iset.add(load2)
+    mast = w.NodInteraction(3)
+    mast.push(groups['DiskSide'])
+    mast.addProperty(prp4)
+    iset.add(mast)
+
+    prp3 = w.ElementProperties(w.NodStress2DElement)
+    slav = w.NodInteraction(4)
+    slav.push(groups['PeigneSide'])
+    slav.addProperty(prp3)
+    iset.add(slav)
+
+    parm['interaction_M'] = [mast,slav]
+    parm['polytope'] = mast.getElementSet()
 
     # Contact properties
 
@@ -127,9 +129,9 @@ def getMetafor(parm):
 
     # Boundary conditions
 
-    loadingset = domain.getLoadingSet()
-    loadingset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
+    loadset = domain.getLoadingSet()
+    loadset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
+    loadset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 
@@ -150,18 +152,16 @@ def getMetafor(parm):
     tscm.setTimeStepDivisionFactor(2)
     tscm.setNbOptiIte(25)
 
-    # Parameters for FSPC
+    # Nodal GMSH extractor
 
-    parm['interacM'] = [load1,load2]
-    parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
-    parm['polytope'] = load1.getElementSet()
+    ext = w.GmshNodalExtractor(metafor,'metafor/output')
+    ext.add(1,w.IFNodalValueExtractor(groups['Disk'],w.IF_EVMS))
+    ext.add(2,w.IFNodalValueExtractor(groups['Peigne'],w.IF_EVMS))
+    parm['extractor'] = ext
 
-    extr = w.IFNodalValueExtractor(groups['Peigne'],w.IF_EVMS)
-    parm['exporter'].addExtractor(extr)
+    # Build domain and folder
 
-    extr = w.IFNodalValueExtractor(groups['Disk'],w.IF_EVMS)
-    parm['exporter'].addExtractor(extr)
-    
     domain.build()
+    parm['FSInterface'] = groups['FSInterface']
+    os.makedirs('metafor')
     return metafor

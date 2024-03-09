@@ -63,12 +63,15 @@ def getMetafor(parm):
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
     iset.add(load)
+
+    parm['interaction_M'] = load
+    parm['polytope'] = None
     
     # Boundary conditions
     
-    loadingset = domain.getLoadingSet()
-    loadingset.define(groups['Base'],w.Field1D(w.TX,w.RE))
-    loadingset.define(groups['Base'],w.Field1D(w.TY,w.RE))
+    loadset = domain.getLoadingSet()
+    loadset.define(groups['Base'],w.Field1D(w.TX,w.RE))
+    loadset.define(groups['Base'],w.Field1D(w.TY,w.RE))
 
     # Mechanical time integration
 
@@ -89,18 +92,16 @@ def getMetafor(parm):
     tscm.setTimeStepDivisionFactor(2)
     tscm.setNbOptiIte(25)
 
-    # Parameters for FSPC
+    # Nodal GMSH extractor
 
-    parm['interacM'] = load
-    parm['FSInterface'] = groups['FSInterface']
-    parm['exporter'] = gmsh.NodalGmshExport('metafor/output.msh',metafor)
-    parm['polytope'] = None
+    ext = w.GmshNodalExtractor(metafor,'metafor/output')
+    ext.add(1,w.IFNodalValueExtractor(groups['Solid'],w.IF_P))
+    ext.add(2,w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS))
+    parm['extractor'] = ext
 
-    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_P)
-    parm['exporter'].addExtractor(extr)
-
-    extr = w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS)
-    parm['exporter'].addExtractor(extr)
+    # Build domain and folder
 
     domain.build()
+    parm['FSInterface'] = groups['FSInterface']
+    os.makedirs('metafor')
     return metafor
