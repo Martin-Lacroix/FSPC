@@ -14,13 +14,13 @@ class PFEM3D(object):
         # Incompressible or weakly compressible solver
 
         if 'WC' in self.problem.getID():
-            
-            self.implicit = False
+
+            self.WC = True
             self.max_division = 200
 
         else:
             
-            self.implicit = True
+            self.WC = False
             self.max_division = 10
 
         # Store important classes and variables
@@ -31,7 +31,7 @@ class PFEM3D(object):
 
         # Initialize the communication objects
 
-        self.POLY = list()
+        self.poly = list()
         self.FSI = w.VectorInt()
         self.reset_interface_BC()
 
@@ -52,8 +52,8 @@ class PFEM3D(object):
         self.problem.setMinTimeStep(tb.Step.dt/self.max_division)
         self.problem.setMaxSimTime(tb.Step.next_time())
 
-        if self.implicit: self.solver.setTimeStep(tb.Step.dt)
-        else: self.solver.computeNextDT()
+        if self.WC: self.solver.computeNextDT()
+        else: self.solver.setTimeStep(tb.Step.dt)
         return self.problem.simulate()
 
 # |------------------------------------|
@@ -62,24 +62,18 @@ class PFEM3D(object):
 
     def apply_displacement(self,disp):
 
-        velocity = (disp-self.get_position())/tb.Step.dt
+        BC = (disp-self.get_position())/tb.Step.dt
+        if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
 
-        if self.implicit:
-            for i in range(self.get_size()):
-                self.BC[i][:self.dim] = velocity[i]
-
-        else:
-            acceler = (velocity-self.get_velocity())/(tb.Step.dt/2)
-
-            for i in range(self.get_size()):
-                self.BC[i][:self.dim] = acceler[i]
+        for i,vector in enumerate(self.BC):
+            for j,value in enumerate(BC[i]): vector[j] = value
 
     # Update the Dirichlet nodal temperature
 
     def apply_temperature(self,temp):
 
-        for i,result in enumerate(temp):
-            self.BC[i][self.dim] = result[0]
+        for i,vector in enumerate(self.BC):
+            vector[self.dim] = temp[i][0]
 
 # |----------------------------------|
 # |   Neumann Boundary Conditions    |
@@ -107,9 +101,10 @@ class PFEM3D(object):
 
         result = np.zeros((self.get_size(),self.dim))
 
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
-                result[j,i] = self.mesh.getNode(k).getCoordinate(i)
+        for i,data in enumerate(result):
+
+            node = self.mesh.getNode(self.FSI[i])
+            for j in range(self.dim): data[j] = node.getCoordinate(j)
 
         return result
 
@@ -118,10 +113,11 @@ class PFEM3D(object):
     def get_velocity(self):
 
         result = np.zeros((self.get_size(),self.dim))
-        
-        for i in range(self.dim):
-            for j,k in enumerate(self.FSI):
-                result[j,i] = self.mesh.getNode(k).getState(i)
+
+        for i,data in enumerate(result):
+
+            node = self.mesh.getNode(self.FSI[i])
+            for j in range(self.dim): data[j] = node.getState(j)
 
         return result
 
@@ -147,8 +143,8 @@ class PFEM3D(object):
         for i,face_list in enumerate(polytope):
             
             vec = w.VectorVectorDouble(face_list)
-            try: self.mesh.updatePoly(self.POLY[i],vec)
-            except: self.POLY.append(self.mesh.addPolytope(vec))
+            try: self.mesh.updatePoly(self.poly[i],vec)
+            except: self.poly.append(self.mesh.addPolytope(vec))
 
 # |------------------------------------------|
 # |   Update the Solver After Convergence    |
@@ -163,7 +159,7 @@ class PFEM3D(object):
 
         # Update the backup and precompute matrices
 
-        if self.implicit: self.solver.precomputeMatrix()
+        if not self.WC: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prev_solution)
 
 # |------------------------------|
