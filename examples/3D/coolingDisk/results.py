@@ -45,8 +45,8 @@ T = list()
 position = [0,0,0.0125]
 os.chdir('workspace/metafor')
 
-time,directory = tb.readFiles()
-tag = tb.findNode(directory[0],position)
+time,directory = tb.read_files()
+tag = tb.find_node(directory[0],position)
 
 for i,file in enumerate(directory):
 
@@ -54,4 +54,4 @@ for i,file in enumerate(directory):
     temperature = gmsh.view.getModelData(0,i)[2]
     T.append(temperature[tag-1][0])
 
-tb.plotRef(time,T,data)
+tb.plot_ref(time,T,data)

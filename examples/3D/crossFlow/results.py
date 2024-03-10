@@ -47,8 +47,8 @@ D = list()
 position = [0.15,0.125,0.1]
 os.chdir('workspace/metafor')
 
-time,directory = tb.readFiles()
-tag = tb.findNode(directory[0],position)
+time,directory = tb.read_files()
+tag = tb.find_node(directory[0],position)
 
 for file in directory:
 
@@ -56,4 +56,4 @@ for file in directory:
     D.append(gmsh.model.mesh.getNode(tag)[0])
 
 disp = np.linalg.norm(D-D[0],axis=1)
-tb.plotRef(time,disp,data)
+tb.plot_ref(time,disp,data)

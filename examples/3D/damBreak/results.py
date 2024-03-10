@@ -201,8 +201,8 @@ F = list()
 position = [0.277,0,0.15]
 os.chdir('workspace/metafor')
 
-time,directory = tb.readFiles()
-tag = tb.findNode(directory[0],position)
+time,directory = tb.read_files()
+tag = tb.find_node(directory[0],position)
 
 for i,file in enumerate(directory):
 
@@ -210,5 +210,5 @@ for i,file in enumerate(directory):
     X.append(gmsh.model.mesh.getNode(tag)[0][0])
     F.append(np.sum(gmsh.view.getModelData(1,i)[2]))
 
-tb.plotRef(time,X-X[0],data)
-tb.plotRef(time,F,force)
+tb.plot_ref(time,X-X[0],data)
+tb.plot_ref(time,F,force)

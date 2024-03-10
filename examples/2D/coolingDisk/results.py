@@ -77,8 +77,8 @@ T = [list() for _ in range(3)]
 position = [[0.2,0.28,0],[0.45,0.28,0],[0.7,0.28,0]]
 os.chdir('workspace/metafor')
 
-time,directory = tb.readFiles()
-tag = [tb.findNode(directory[0],P) for P in position]
+time,directory = tb.read_files()
+tag = [tb.find_node(directory[0],P) for P in position]
 
 for i,file in enumerate(directory):
 
@@ -86,4 +86,4 @@ for i,file in enumerate(directory):
     D = gmsh.view.getModelData(0,i)[2]
     for i,R in enumerate(T): R.append(D[tag[i]-1][0])
 
-tb.plotRef(time,T,data)
+tb.plot_ref(time,T,data)

@@ -422,12 +422,12 @@ X = list()
 position = [0.292,0.08,0]
 os.chdir('workspace/metafor')
 
-time,directory = tb.readFiles()
-tag = tb.findNode(directory[0],position)
+time,directory = tb.read_files()
+tag = tb.find_node(directory[0],position)
 
 for file in directory:
 
     gmsh.open(file)
     X.append(gmsh.model.mesh.getNode(tag)[0][0])
 
-tb.plotRef(time,X-X[0],data)
+tb.plot_ref(time,X-X[0],data)

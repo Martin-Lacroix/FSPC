@@ -22,5 +22,5 @@ include_directories(${PYTHON_INCLUDE_PATH})
 # Link the Swig module with thye Cpp code
 
 set_source_files_properties(${PROJECT_NAME}.i PROPERTIES CPLUSPLUS ON)
-swig_add_library(pyStream LANGUAGE python SOURCES ${PROJECT_NAME}.i)
-swig_link_libraries(pyStream ${PROJECT_NAME} ${PYTHON_LIBRARIES})
+swig_add_library(python_stream LANGUAGE python SOURCES ${PROJECT_NAME}.i)
+swig_link_libraries(python_stream ${PROJECT_NAME} ${PYTHON_LIBRARIES})

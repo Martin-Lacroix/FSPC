@@ -1,13 +1,13 @@
-from .Manager import TimeStep
-from .Manager import Residual
+from .manager import TimeStep
+from .manager import Residual
 
 # Toolbox general utility
 
-from .Toolbox import redirect
-from .Toolbox import simulate
-from .Toolbox import printClock
+from .toolbox import redirect
+from .toolbox import simulate
+from .toolbox import print_clock
 
 # Remove the base modules
 
-del Manager
-del Toolbox
+del manager
+del toolbox

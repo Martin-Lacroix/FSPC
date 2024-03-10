@@ -7,7 +7,7 @@ import gmsh
 # |   Sort the Files in Current Folder    |
 # |---------------------------------------|
 
-def readFiles():
+def read_files():
 
     time = list()
     directory = np.array(os.listdir())
@@ -30,7 +30,7 @@ def readFiles():
 # |   Plot the Results and Reference    |
 # |-------------------------------------|
 
-def plotRef(time,result,reference):
+def plot_ref(time,result,reference):
 
     result = np.atleast_2d(result)
     for R in reference: plt.plot(*np.transpose(R))
@@ -42,17 +42,17 @@ def plotRef(time,result,reference):
 # |   Look For a Node in the Mesh File    |
 # |---------------------------------------|
 
-def findNode(file,position):
+def find_node(file,position):
 
     gmsh.initialize()
     gmsh.option.setNumber('General.Terminal',0)
     gmsh.open(file)
 
-    nodeTags,coord,_ = gmsh.model.mesh.getNodes()
-    coord = coord.reshape(len(nodeTags),3)
+    node_tags,coord,_ = gmsh.model.mesh.getNodes()
+    coord = coord.reshape(len(node_tags),3)
     gmsh.clear()
 
     # Find the tag with minimum distance to position
 
     distance = np.linalg.norm(coord-position,axis=1)
-    return int(nodeTags[np.argmin(distance)])
+    return int(node_tags[np.argmin(distance)])
