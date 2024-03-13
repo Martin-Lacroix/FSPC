@@ -112,10 +112,12 @@ class Algorithm(object):
 
         # Check for coupling convergence
 
-        verified = list()
-        if tb.ResMech: verified.append(tb.ResMech.verified())
-        if tb.ResTher: verified.append(tb.ResTher.verified())
-        return np.all(verified)
+        ok_list = list()
+        if tb.ResMech: ok_list.append(tb.ResMech.check())
+        if tb.ResTher: ok_list.append(tb.ResTher.check())
+
+        if not ok_list: raise Exception('No residual has been set')
+        return np.all(ok_list)
 
 # |------------------------------------|
 # |   Transfer and Update Functions    |

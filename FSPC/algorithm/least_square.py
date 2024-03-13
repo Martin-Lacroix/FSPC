@@ -79,6 +79,7 @@ class ILS(Algorithm):
             delta = self.omega*tb.ResMech.residual
 
         else:
+
             tb.ResMech.V.append(np.hstack(tb.ResMech.delta_res()))
             tb.ResMech.W.append(np.hstack(disp - self.prev_disp))
             delta = self.compute(tb.ResMech)
@@ -106,6 +107,7 @@ class ILS(Algorithm):
             delta = self.omega*tb.ResTher.residual
 
         else:
+            
             tb.ResTher.V.append(np.hstack(tb.ResTher.delta_res()))
             tb.ResTher.W.append(np.hstack(temp - self.prev_temp))
             delta = self.compute(tb.ResTher)

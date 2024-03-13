@@ -9,11 +9,11 @@ import time
 
 class Void(object):
 
-    def __setattr__(self, *_: tuple):
-        raise Exception('The class has not been defined')
+    def __setattr__(self, name: str, _):
+        raise Exception('Set {' + name + '} of empty class')
 
-    def __getattribute__(self, _: str):
-        raise Exception('The class has not been defined')
+    def __getattribute__(self, name: str):
+        raise Exception('Get {' + name + '} of empty class')
 
     def __bool__(self):
         return False
@@ -23,22 +23,22 @@ class Void(object):
 # |--------------------------------------|
 
 global Step
-Step: object = Void()
+Step = Void()
 
 global Algo
-Algo: object = Void()
+Algo = Void()
 
 global Interp
-Interp: object = Void()
+Interp = Void()
 
 global Solver
-Solver: object = Void()
+Solver = Void()
 
 global ResMech
-ResMech: object = Void()
+ResMech = Void()
 
 global ResTher
-ResTher: object = Void()
+ResTher = Void()
 
 # Convert solver prints to Python
 
@@ -60,7 +60,7 @@ clock = collections.defaultdict(float)
 # |--------------------------------------|
 
 def write_logs(func: object):
-    def wrapper(*args: tuple, **kwargs: dict):
+    def wrapper(*args, **kwargs):
 
         rank = str(CW.rank)
         with open('solver_' + rank + '.dat', 'a') as output:
@@ -73,7 +73,7 @@ def write_logs(func: object):
 # Measure the computation time
 
 def compute_time(func: object):
-    def wrapper(*args: tuple, **kwargs: dict):
+    def wrapper(*args, **kwargs):
 
         global clock
         start = time.time()
@@ -87,7 +87,7 @@ def compute_time(func: object):
 # Only accessed by the solid solver
 
 def only_solid(func: object):
-    def wrapper(*args: tuple, **kwargs: dict):
+    def wrapper(*args, **kwargs):
 
         if CW.rank == 1: result = func(*args, **kwargs)
         else: result = None
@@ -98,7 +98,7 @@ def only_solid(func: object):
 # Only accessed when mechanical coupling
 
 def only_mechanical(func: object):
-    def wrapper(*args: tuple, **kwargs: dict):
+    def wrapper(*args, **kwargs):
 
         global ResMech
         if ResMech: result = func(*args, **kwargs)
@@ -110,7 +110,7 @@ def only_mechanical(func: object):
 # Only accessed when thermal coupling
 
 def only_thermal(func: object):
-    def wrapper(*args: tuple, **kwargs: dict):
+    def wrapper(*args, **kwargs):
 
         global ResTher
         if ResTher: result = func(*args, **kwargs)
@@ -123,41 +123,30 @@ def only_thermal(func: object):
 # |   Initialize the Global Classes    |
 # |------------------------------------|
 
-def set_time_step(dt: float, dt_save: float):
-
-    from . import manager
+def set_time_step(step_manager: object):
 
     global Step
-    Step = manager.TimeStep(dt, dt_save)
-    return Step
+    Step = step_manager
 
 def set_algorithm(algorithm: object):
 
     global Algo
     Algo = algorithm
-    return Algo
 
 def set_interpolator(interpolator: object):
 
     global Interp
     Interp = interpolator
-    return Interp
 
-def set_mechanical_res(tol: float):
-
-    from . import manager
+def set_mechanical_res(residual: object):
 
     global ResMech
-    ResMech = manager.Residual(tol)
-    return ResMech
+    ResMech = residual
 
-def set_thermal_res(tol: float):
-
-    from . import manager
+def set_thermal_res(residual: object):
 
     global ResTher
-    ResTher = manager.Residual(tol)
-    return ResTher
+    ResTher = residual
 
 # |----------------------------------------|
 # |   Import and Initialize the Solvers    |

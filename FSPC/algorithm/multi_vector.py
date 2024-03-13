@@ -108,6 +108,7 @@ class MVJ(Algorithm):
             tb.ResMech.V = list()
             tb.ResMech.W = list()
             if self.BGS: delta = self.reset(tb.ResMech)
+
             else:
 
                 R = np.hstack(-tb.ResMech.residual)

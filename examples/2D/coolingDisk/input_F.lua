@@ -45,7 +45,7 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 5e - 3
+Problem.Material.mu = 5e-3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 Problem.Material.epsRad = 0

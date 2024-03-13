@@ -69,14 +69,14 @@ class Residual(object):
         self.residual = result - prediction
 
         res = np.linalg.norm(self.residual, axis=0)
-        den = np.linalg.norm(result , axis=0)
+        den = np.linalg.norm(result, axis=0)
 
         res = res/(den + self.tol)
         self.epsilon = np.linalg.norm(res)
 
-    # Check if the convergence is reached
+    # Check if the convergence criterion is verified
 
-    def verified(self):
+    def check(self):
 
         if self.epsilon < self.tol: return True
         else: return False

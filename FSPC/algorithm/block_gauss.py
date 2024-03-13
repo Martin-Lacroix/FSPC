@@ -72,6 +72,7 @@ class BGS(Algorithm):
             tb.Interp.disp += self.compute(tb.ResMech)
 
         else:
+
             tb.ResMech.omega = self.omega
             tb.Interp.disp += self.omega*tb.ResMech.residual
 
@@ -86,6 +87,7 @@ class BGS(Algorithm):
             tb.Interp.temp += self.compute(tb.ResTher)
 
         else:
+            
             tb.ResTher.omega = self.omega
             tb.Interp.temp += self.omega*tb.ResTher.residual
     
