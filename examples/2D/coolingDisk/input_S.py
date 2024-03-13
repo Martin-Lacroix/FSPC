@@ -25,8 +25,8 @@ def getMetafor(parm):
     
     # Imports the mesh
 
-    mshFile = os.path.join(os.path.dirname(__file__),'geometry_S.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
+    mshFile = os.path.join(os.path.dirname(__file__), 'geometry_S.msh')
+    importer = gmsh.GmshImport(mshFile, domain)
     groups = importer.groups
     importer.execute()
 
@@ -42,23 +42,23 @@ def getMetafor(parm):
     # Solid material parameters
 
     materset = domain.getMaterialSet()
-    materset.define(1,w.TmElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1e7)
-    materset(1).put(w.THERM_EXPANSION,0)
-    materset(1).put(w.HEAT_CAPACITY,100)
-    materset(1).put(w.MASS_DENSITY,950)
-    materset(1).put(w.POISSON_RATIO,0)
-    materset(1).put(w.CONDUCTIVITY,5)
-    materset(1).put(w.DISSIP_TE,0)
-    materset(1).put(w.DISSIP_TQ,0)
+    materset.define(1, w.TmElastHypoMaterial)
+    materset(1).put(w.ELASTIC_MODULUS, 1e7)
+    materset(1).put(w.THERM_EXPANSION, 0)
+    materset(1).put(w.HEAT_CAPACITY, 100)
+    materset(1).put(w.MASS_DENSITY, 950)
+    materset(1).put(w.POISSON_RATIO, 0)
+    materset(1).put(w.CONDUCTIVITY, 5)
+    materset(1).put(w.DISSIP_TE, 0)
+    materset(1).put(w.DISSIP_TQ, 0)
 
     # Finite element properties
 
     prp1 = w.ElementProperties(w.TmVolume2DElement)
-    prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_SRIPR)
-    prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp1.put(w.GRAVITY_Y,-9.81)
-    prp1.put(w.MATERIAL,1)
+    prp1.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_SRIPR)
+    prp1.put(w.STIFFMETHOD, w.STIFF_ANALYTIC)
+    prp1.put(w.GRAVITY_Y, -9.81)
+    prp1.put(w.MATERIAL, 1)
     app.addProperty(prp1)
 
     # Elements for surface heat flux
@@ -84,9 +84,9 @@ def getMetafor(parm):
     # Initial and boundary conditions
 
     initset = metafor.getInitialConditionSet()
-    initset.define(groups['S1'],w.Field1D(w.TO,w.AB),180)
-    initset.define(groups['S2'],w.Field1D(w.TO,w.AB),200)
-    initset.define(groups['S3'],w.Field1D(w.TO,w.AB),220)
+    initset.define(groups['S1'], w.Field1D(w.TO, w.AB), 180)
+    initset.define(groups['S2'], w.Field1D(w.TO, w.AB), 200)
+    initset.define(groups['S3'], w.Field1D(w.TO, w.AB), 220)
 
     # Mechanical and thermal time integration
 
@@ -118,9 +118,9 @@ def getMetafor(parm):
 
     # Nodal GMSH extractor
 
-    ext = w.GmshNodalExtractor(metafor,'metafor/output')
-    ext.add(1,w.DbNodalValueExtractor(groups['Solid'],w.Field1D(w.TO,w.AB)))
-    ext.add(2,w.DbNodalValueExtractor(groups['Solid'],w.Field1D(w.TO,w.RE)))
+    ext = w.GmshNodalExtractor(metafor, 'metafor/output')
+    ext.add(1, w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TO, w.AB)))
+    ext.add(2, w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TO, w.RE)))
     parm['extractor'] = ext
 
     # Build domain and folder

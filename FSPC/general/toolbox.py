@@ -9,12 +9,12 @@ import time
 
 class Void(object):
 
-    def __setattr__(self,*_):
+    def __setattr__(self, *_: tuple):
         raise Exception('The class has not been defined')
 
-    def __getattribute__(self,_):
+    def __getattribute__(self, _: str):
         raise Exception('The class has not been defined')
-    
+
     def __bool__(self):
         return False
 
@@ -23,22 +23,22 @@ class Void(object):
 # |--------------------------------------|
 
 global Step
-Step = Void()
+Step: object = Void()
 
 global Algo
-Algo = Void()
+Algo: object = Void()
 
 global Interp
-Interp = Void()
+Interp: object = Void()
 
 global Solver
-Solver = Void()
+Solver: object = Void()
 
 global ResMech
-ResMech = Void()
+ResMech: object = Void()
 
 global ResTher
-ResTher = Void()
+ResTher: object = Void()
 
 # Convert solver prints to Python
 
@@ -47,7 +47,7 @@ global redirect
 try:
     import python_stream
     redirect = python_stream.Redirect()
-except: redirect = None
+except: redirect = Void()
 
 # Store the computation times of functions
 
@@ -59,49 +59,49 @@ clock = collections.defaultdict(float)
 # |   Define Some Decorator Functions    |
 # |--------------------------------------|
 
-def write_logs(func):
-    def wrapper(*args,**kwargs):
+def write_logs(func: object):
+    def wrapper(*args: tuple, **kwargs: dict):
 
         rank = str(CW.rank)
-        with open('solver_'+rank+'.dat','a') as output:
+        with open('solver_' + rank + '.dat', 'a') as output:
             with stderr(output), stdout(output):
-                result = func(*args,**kwargs)
-        
+                result = func(*args, **kwargs)
+
         return result
     return wrapper
 
 # Measure the computation time
 
-def compute_time(func):
-    def wrapper(*args,**kwargs):
+def compute_time(func: object):
+    def wrapper(*args: tuple, **kwargs: dict):
 
         global clock
         start = time.time()
-        result = func(*args,**kwargs)
-        parent = args[0].__class__.__name__+' : '
-        clock[parent+func.__name__] += time.time()-start
+        result = func(*args, **kwargs)
+        parent = args[0].__class__.__name__ + ' : '
+        clock[parent + func.__name__] += time.time() - start
 
         return result
     return wrapper
 
 # Only accessed by the solid solver
 
-def only_solid(func):
-    def wrapper(*args,**kwargs):
+def only_solid(func: object):
+    def wrapper(*args: tuple, **kwargs: dict):
 
-        if CW.rank == 1: result = func(*args,**kwargs)
+        if CW.rank == 1: result = func(*args, **kwargs)
         else: result = None
-        
+
         return result
     return wrapper
 
 # Only accessed when mechanical coupling
 
-def only_mechanical(func):
-    def wrapper(*args,**kwargs):
+def only_mechanical(func: object):
+    def wrapper(*args: tuple, **kwargs: dict):
 
         global ResMech
-        if ResMech: result = func(*args,**kwargs)
+        if ResMech: result = func(*args, **kwargs)
         else: result = None
 
         return result
@@ -109,11 +109,11 @@ def only_mechanical(func):
 
 # Only accessed when thermal coupling
 
-def only_thermal(func):
-    def wrapper(*args,**kwargs):
+def only_thermal(func: object):
+    def wrapper(*args: tuple, **kwargs: dict):
 
         global ResTher
-        if ResTher: result = func(*args,**kwargs)
+        if ResTher: result = func(*args, **kwargs)
         else: result = None
 
         return result
@@ -123,27 +123,27 @@ def only_thermal(func):
 # |   Initialize the Global Classes    |
 # |------------------------------------|
 
-def set_step(dt,dt_save):
+def set_step(dt: float, dt_save: float):
 
     from . import manager
 
     global Step
-    Step = manager.TimeStep(dt,dt_save)
+    Step = manager.TimeStep(dt, dt_save)
     return Step
 
-def set_algorithm(algorithm,*arg):
+def set_algorithm(algorithm: object, *arg: tuple):
 
     global Algo
     Algo = algorithm(*arg)
     return Algo
 
-def set_interpolator(interpolator,*arg):
+def set_interpolator(interpolator: object, *arg: tuple):
 
     global Interp
     Interp = interpolator(*arg)
     return Interp
 
-def set_mechanical_res(tol):
+def set_mechanical_res(tol: float):
 
     from . import manager
 
@@ -151,7 +151,7 @@ def set_mechanical_res(tol):
     ResMech = manager.Residual(tol)
     return ResMech
 
-def set_thermal_res(tol):
+def set_thermal_res(tol: float):
 
     from . import manager
 
@@ -159,7 +159,7 @@ def set_thermal_res(tol):
     ResTher = manager.Residual(tol)
     return ResTher
 
-def simulate(end_time):
+def simulate(end_time: float):
 
     global Algo
     return Algo.simulate(end_time)
@@ -169,7 +169,7 @@ def simulate(end_time):
 # |----------------------------------------|
 
 @write_logs
-def set_solver(path_F,path_S):
+def set_solver(path_F: str, path_S: str):
 
     global Solver
 
@@ -193,6 +193,6 @@ def print_clock():
     print('\n------------------------------------')
     print('Process {:.0f} : Time Stats'.format(CW.rank))
     print('------------------------------------\n')
-    
-    for fun,time in clock.items():
-        print('{}{:.5f}'.format(fun.ljust(25),time))
+
+    for fun, time in clock.items():
+        print('{}{:.5f}'.format(fun.ljust(25), time))

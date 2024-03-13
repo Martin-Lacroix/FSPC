@@ -8,7 +8,7 @@ import numpy as np
 # |---------------------------------------------------|
 
 class BGS(Algorithm):
-    def __init__(self,max_iter):
+    def __init__(self, max_iter: int):
 
         Algorithm.__init__(self)
         self.max_iter = max_iter
@@ -36,30 +36,30 @@ class BGS(Algorithm):
             # Compute the coupling residual
 
             output = self.relaxation()
-            verified = CW.bcast(output,root=1)
+            verified = CW.bcast(output, root=1)
 
             # Exit the loop if the solution is converged
 
             self.iteration += 1
             if verified: return True
             else: self.way_back()
-        
+
         return False
 
 # |--------------------------------------|
 # |   Compute the Solution Correction    |
 # |--------------------------------------|
 
-    def compute(self,conv):
+    def compute(self, res_class: object):
 
-        D = conv.delta_res()
-        A = np.tensordot(D,conv.prev_res)
+        D = res_class.delta_res()
+        A = np.tensordot(D, res_class.prev_res)
 
         # Update the Aitken relaxation parameter
 
-        conv.omega = -A*conv.omega/np.tensordot(D,D)
-        conv.omega = max(min(conv.omega,1),0)
-        return conv.omega*conv.residual
+        res_class.omega = -A*res_class.omega/np.tensordot(D, D)
+        res_class.omega = max(min(res_class.omega, 1), 0)
+        return res_class.omega*res_class.residual
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |

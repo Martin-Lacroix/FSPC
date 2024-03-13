@@ -11,7 +11,7 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.boundingBox = {0,0,1.5,0.41}
+Problem.Mesh.boundingBox = {0, 0, 1.5, 0.41}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
@@ -33,7 +33,7 @@ Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
 Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'p','velocity'}
+Problem.Extractors[0].whatToWrite = {'p', 'velocity'}
 Problem.Extractors[0].timeBetweenWriting = math.huge
 
 Problem.Extractors[1] = {}
@@ -72,7 +72,7 @@ Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.tolerance = 1e-16
-Problem.Solver.MomContEq.bodyForce = {0,0}
+Problem.Solver.MomContEq.bodyForce = {0, 0}
 
 -- Fluid Structure Interface
 
@@ -82,19 +82,19 @@ Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 -- Boundary Condition Functions
 
-function Problem.IC.initStates(x,y,z)
-    return {0,0,0}
+function Problem.IC.initStates(x, y, z)
+    return {0, 0, 0}
 end
 
-function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
-    return 0,0
+function Problem.Solver.MomContEq.BC.WallV(x, y, z, t)
+    return 0, 0
 end
 
-function Problem.Solver.MomContEq.BC.OutletP(x,y,z,t)
+function Problem.Solver.MomContEq.BC.OutletP(x, y, z, t)
     return 0
 end
 
-function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
+function Problem.Solver.MomContEq.BC.InletVEuler(x, y, z, t)
 
     local vbar = 1
     local tmax = 2
@@ -102,8 +102,8 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x,y,z,t)
     local vx = 1.5*vbar*y*(2*H-y)/(H*H)
 
 	if (t<tmax) then
-        return vx*(1-math.cos(math.pi*t/2))/2,0
+        return vx*(1-math.cos(math.pi*t/2))/2, 0
     else
-        return vx,0
+        return vx, 0
     end
 end

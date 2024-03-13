@@ -25,8 +25,8 @@ def getMetafor(parm):
     
     # Imports the mesh
 
-    mshFile = os.path.join(os.path.dirname(__file__),'geometry_S.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
+    mshFile = os.path.join(os.path.dirname(__file__), 'geometry_S.msh')
+    importer = gmsh.GmshImport(mshFile, domain)
     groups = importer.groups
     importer.execute()
 
@@ -40,18 +40,18 @@ def getMetafor(parm):
     # Material parameters
 
     materset = domain.getMaterialSet()
-    materset.define(1,w.ElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1e6)
-    materset(1).put(w.MASS_DENSITY,2500)
-    materset(1).put(w.POISSON_RATIO,0)
+    materset.define(1, w.ElastHypoMaterial)
+    materset(1).put(w.ELASTIC_MODULUS, 1e6)
+    materset(1).put(w.MASS_DENSITY, 2500)
+    materset(1).put(w.POISSON_RATIO, 0)
     
     # Finite element properties
 
     prp1 = w.ElementProperties(w.Volume2DElement)
-    prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp1.put(w.GRAVITY_Y,-9.81)
-    prp1.put(w.MATERIAL,1)
+    prp1.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_STD)
+    prp1.put(w.STIFFMETHOD, w.STIFF_ANALYTIC)
+    prp1.put(w.GRAVITY_Y, -9.81)
+    prp1.put(w.MATERIAL, 1)
     app.addProperty(prp1)
 
     # Elements for surface traction
@@ -69,8 +69,8 @@ def getMetafor(parm):
     # Boundary conditions
     
     loadset = domain.getLoadingSet()
-    loadset.define(groups['Base'],w.Field1D(w.TX,w.RE))
-    loadset.define(groups['Base'],w.Field1D(w.TY,w.RE))
+    loadset.define(groups['Base'], w.Field1D(w.TX, w.RE))
+    loadset.define(groups['Base'], w.Field1D(w.TY, w.RE))
 
     # Mechanical time integration
 
@@ -93,9 +93,9 @@ def getMetafor(parm):
 
     # Nodal GMSH extractor
 
-    ext = w.GmshNodalExtractor(metafor,'metafor/output')
-    ext.add(1,w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS))
-    ext.add(2,w.DbNodalValueExtractor(groups['Solid'],w.Field1D(w.TX,w.GF1)))
+    ext = w.GmshNodalExtractor(metafor, 'metafor/output')
+    ext.add(1, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
+    ext.add(2, w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TX, w.GF1)))
     parm['extractor'] = ext
 
     # Build domain and folder

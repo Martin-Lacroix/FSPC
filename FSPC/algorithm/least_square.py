@@ -8,7 +8,7 @@ import numpy as np
 # |--------------------------------------------------|
 
 class ILS(Algorithm):
-    def __init__(self,max_iter):
+    def __init__(self, max_iter: int):
 
         Algorithm.__init__(self)
         self.max_iter = max_iter
@@ -36,35 +36,35 @@ class ILS(Algorithm):
             # Compute the coupling residual
 
             output = self.relaxation()
-            verified = CW.bcast(output,root=1)
+            verified = CW.bcast(output, root=1)
 
             # Exit the loop if the solution is converged
 
             self.iteration += 1
             if verified: return True
             else: self.way_back()
-        
+
         return False
 
 # |--------------------------------------|
 # |   Compute the Solution Correction    |
 # |--------------------------------------|
 
-    def compute(self,conv):
-        
-        V = np.flip(np.transpose(conv.V),axis=1)
-        W = np.flip(np.transpose(conv.W),axis=1)
-        R = np.hstack(-conv.residual)
+    def compute(self, res_class: object):
+
+        V = np.flip(np.transpose(res_class.V), axis=1)
+        W = np.flip(np.transpose(res_class.W), axis=1)
+        R = np.hstack(-res_class.residual)
 
         # Return the solution correction
 
-        delta = np.dot(W,np.linalg.lstsq(V,R,-1)[0])-R
-        return np.split(delta,tb.Solver.get_size())
+        delta = np.dot(W, np.linalg.lstsq(V, R, -1)[0]) - R
+        return np.split(delta, tb.Solver.get_size())
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |
 # |-------------------------------------------------|
-    
+
     @tb.only_mechanical
     def update_displacement(self):
 
@@ -80,7 +80,7 @@ class ILS(Algorithm):
 
         else:
             tb.ResMech.V.append(np.hstack(tb.ResMech.delta_res()))
-            tb.ResMech.W.append(np.hstack(disp-self.prev_disp))
+            tb.ResMech.W.append(np.hstack(disp - self.prev_disp))
             delta = self.compute(tb.ResMech)
 
         # Update the pedicted displacement
@@ -107,7 +107,7 @@ class ILS(Algorithm):
 
         else:
             tb.ResTher.V.append(np.hstack(tb.ResTher.delta_res()))
-            tb.ResTher.W.append(np.hstack(temp-self.prev_temp))
+            tb.ResTher.W.append(np.hstack(temp - self.prev_temp))
             delta = self.compute(tb.ResTher)
 
         # Update the predicted temperature

@@ -7,7 +7,7 @@ import numpy as np
 # |-----------------------------------|
 
 class PFEM3D(object):
-    def __init__(self,path):
+    def __init__(self, path: str):
 
         self.problem = w.getProblem(path)
 
@@ -19,7 +19,7 @@ class PFEM3D(object):
             self.max_division = 200
 
         else:
-            
+
             self.WC = False
             self.max_division = 10
 
@@ -44,7 +44,7 @@ class PFEM3D(object):
 # |-----------------------------------------|
 # |   Run PFEM in the Current Time Frame    |
 # |-----------------------------------------|
-    
+
     @tb.write_logs
     @tb.compute_time
     def run(self):
@@ -60,19 +60,19 @@ class PFEM3D(object):
 # |   Dirichlet Boundary Conditions    |
 # |------------------------------------|
 
-    def apply_displacement(self,disp):
+    def apply_displacement(self, disp: np.ndarray):
 
-        BC = (disp-self.get_position())/tb.Step.dt
-        if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
+        BC = (disp - self.get_position())/tb.Step.dt
+        if self.WC: BC = (BC - self.get_velocity())/(tb.Step.dt/2)
 
-        for i,vector in enumerate(self.BC):
-            for j,value in enumerate(BC[i]): vector[j] = value
+        for i, vector in enumerate(self.BC):
+            for j, value in enumerate(BC[i]): vector[j] = value
 
     # Update the Dirichlet nodal temperature
 
-    def apply_temperature(self,temp):
+    def apply_temperature(self, temp: np.ndarray):
 
-        for i,vector in enumerate(self.BC):
+        for i, vector in enumerate(self.BC):
             vector[self.dim] = temp[i][0]
 
 # |----------------------------------|
@@ -82,7 +82,7 @@ class PFEM3D(object):
     def get_loading(self):
 
         vector = w.VectorVectorDouble()
-        self.solver.computeStress('FSInterface',self.FSI,vector)
+        self.solver.computeStress('FSInterface', self.FSI, vector)
         return np.copy(vector)
 
     # Return Thermal boundary conditions
@@ -90,7 +90,7 @@ class PFEM3D(object):
     def get_heatflux(self):
 
         vector = w.VectorVectorDouble()
-        self.solver.computeHeatFlux('FSInterface',self.FSI,vector)
+        self.solver.computeHeatFlux('FSInterface', self.FSI, vector)
         return np.copy(vector)
 
 # |-----------------------------------|
@@ -99,9 +99,9 @@ class PFEM3D(object):
 
     def get_position(self):
 
-        result = np.zeros((self.get_size(),self.dim))
+        result = np.zeros((self.get_size(), self.dim))
 
-        for i,data in enumerate(result):
+        for i, data in enumerate(result):
 
             node = self.mesh.getNode(self.FSI[i])
             for j in range(self.dim): data[j] = node.getCoordinate(j)
@@ -112,9 +112,9 @@ class PFEM3D(object):
 
     def get_velocity(self):
 
-        result = np.zeros((self.get_size(),self.dim))
+        result = np.zeros((self.get_size(), self.dim))
 
-        for i,data in enumerate(result):
+        for i, data in enumerate(result):
 
             node = self.mesh.getNode(self.FSI[i])
             for j in range(self.dim): data[j] = node.getState(j)
@@ -128,22 +128,22 @@ class PFEM3D(object):
     def reset_interface_BC(self):
 
         self.BC = list()
-        self.mesh.getNodesIndex('FSInterface',self.FSI)
+        self.mesh.getNodesIndex('FSInterface', self.FSI)
 
         for i in self.FSI:
 
-            vector = w.VectorDouble(self.dim+1)
+            vector = w.VectorDouble(self.dim + 1)
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 
     # Create or update the exclusion boundary
 
-    def update_polytope(self,polytope):
+    def update_polytope(self, polytope:list):
 
-        for i,face_list in enumerate(polytope):
-            
+        for i, face_list in enumerate(polytope):
+
             vec = w.VectorVectorDouble(face_list)
-            try: self.mesh.updatePoly(self.poly[i],vec)
+            try: self.mesh.updatePoly(self.poly[i], vec)
             except: self.poly.append(self.mesh.addPolytope(vec))
 
 # |------------------------------------------|
@@ -151,7 +151,7 @@ class PFEM3D(object):
 # |------------------------------------------|
 
     @tb.compute_time
-    def update(self,polytope):
+    def update(self, polytope: object):
 
         self.update_polytope(polytope)
         self.mesh.remesh(verboseOutput = False)

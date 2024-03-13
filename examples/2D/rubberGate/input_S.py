@@ -21,8 +21,8 @@ def getMetafor(parm):
     
     # Imports the mesh
 
-    mshFile = os.path.join(os.path.dirname(__file__),'geometry_S.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
+    mshFile = os.path.join(os.path.dirname(__file__), 'geometry_S.msh')
+    importer = gmsh.GmshImport(mshFile, domain)
     groups = importer.groups
     importer.execute()
 
@@ -41,19 +41,19 @@ def getMetafor(parm):
     C2 = G/2.0-C1
 
     materset = domain.getMaterialSet()
-    materset.define(1,w.MooneyRivlinHyperMaterial)
-    materset(1).put(w.MASS_DENSITY,1100)
-    materset(1).put(w.RUBBER_PENAL,K)
-    materset(1).put(w.RUBBER_C1,C1)
-    materset(1).put(w.RUBBER_C2,C2)
+    materset.define(1, w.MooneyRivlinHyperMaterial)
+    materset(1).put(w.MASS_DENSITY, 1100)
+    materset(1).put(w.RUBBER_PENAL, K)
+    materset(1).put(w.RUBBER_C1, C1)
+    materset(1).put(w.RUBBER_C2, C2)
     
     # Finite element properties
 
     prp1 = w.ElementProperties(w.Volume2DElement)
-    prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp1.put(w.STIFFMETHOD,w.STIFF_NUMERIC)
-    prp1.put(w.GRAVITY_Y,-9.81)
-    prp1.put(w.MATERIAL,1)
+    prp1.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_STD)
+    prp1.put(w.STIFFMETHOD, w.STIFF_NUMERIC)
+    prp1.put(w.GRAVITY_Y, -9.81)
+    prp1.put(w.MATERIAL, 1)
     app.addProperty(prp1)
 
     # Elements for surface traction
@@ -69,8 +69,8 @@ def getMetafor(parm):
     # Boundary conditions
     
     loadset = domain.getLoadingSet()
-    loadset.define(groups['Base'],w.Field1D(w.TX,w.RE))
-    loadset.define(groups['Base'],w.Field1D(w.TY,w.RE))
+    loadset.define(groups['Base'], w.Field1D(w.TX, w.RE))
+    loadset.define(groups['Base'], w.Field1D(w.TY, w.RE))
 
     # Mechanical time integration
 
@@ -93,9 +93,9 @@ def getMetafor(parm):
 
     # Nodal GMSH extractor
 
-    ext = w.GmshNodalExtractor(metafor,'metafor/output')
-    ext.add(1,w.IFNodalValueExtractor(groups['Solid'],w.IF_P))
-    ext.add(2,w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS))
+    ext = w.GmshNodalExtractor(metafor, 'metafor/output')
+    ext.add(1, w.IFNodalValueExtractor(groups['Solid'], w.IF_P))
+    ext.add(2, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
     parm['extractor'] = ext
 
     # Build domain and folder

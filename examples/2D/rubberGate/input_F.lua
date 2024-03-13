@@ -11,8 +11,8 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.localHcharGroups = {'FSInterface','FreeSurface','Reservoir'}
-Problem.Mesh.boundingBox = {0,0,0.205,0.14}
+Problem.Mesh.localHcharGroups = {'FSInterface', 'FreeSurface', 'Reservoir'}
+Problem.Mesh.boundingBox = {0, 0, 0.205, 0.14}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
@@ -34,7 +34,7 @@ Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
 Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'p','velocity'}
+Problem.Extractors[0].whatToWrite = {'p', 'velocity'}
 Problem.Extractors[0].timeBetweenWriting = math.huge
 
 Problem.Extractors[1] = {}
@@ -73,7 +73,7 @@ Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.tolerance = 1e-16
-Problem.Solver.MomContEq.bodyForce = {0,-9.81}
+Problem.Solver.MomContEq.bodyForce = {0, -9.81}
 
 -- Fluid Structure Interface
 
@@ -83,14 +83,14 @@ Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 -- Boundary Condition Functions
 
-function Problem.IC.initStates(x,y,z)
-    return {0,0,0}
+function Problem.IC.initStates(x, y, z)
+    return {0, 0, 0}
 end
 
-function Problem.Solver.MomContEq.BC.ReservoirV(x,y,z,t)
-    return 0,0
+function Problem.Solver.MomContEq.BC.ReservoirV(x, y, z, t)
+    return 0, 0
 end
 
-function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
-	return Problem.Mesh.hchar+dist*0.2
+function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
+	return Problem.Mesh.hchar + dist*0.2
 end

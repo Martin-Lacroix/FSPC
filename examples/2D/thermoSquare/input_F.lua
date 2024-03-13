@@ -12,7 +12,7 @@ Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface'}
-Problem.Mesh.boundingBox = {-5,-5,5,5}
+Problem.Mesh.boundingBox = {-5, -5, 5, 5}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1e3
@@ -34,7 +34,7 @@ Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
 Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'T','velocity'}
+Problem.Extractors[0].whatToWrite = {'T', 'velocity'}
 Problem.Extractors[0].timeBetweenWriting = math.huge
 
 Problem.Extractors[1] = {}
@@ -86,7 +86,7 @@ Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-6
 Problem.Solver.MomContEq.tolerance = 1e-16
-Problem.Solver.MomContEq.bodyForce = {0,-10}
+Problem.Solver.MomContEq.bodyForce = {0, -10}
 
 -- Heat Equation
 
@@ -108,22 +108,22 @@ Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 
 -- Boundary Condition Functions
 
-function Problem.IC.initStates(x,y,z)
-	return {0,0,0,1000}
+function Problem.IC.initStates(x, y, z)
+	return {0, 0, 0, 1000}
 end
 
-function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
-	return 0,0
+function Problem.Solver.MomContEq.BC.WallV(x, y, z, t)
+	return 0, 0
 end
 
-function Problem.Solver.MomContEq.BC.FSInterfaceV(x,y,z,t)
-	return 0,0
+function Problem.Solver.MomContEq.BC.FSInterfaceV(x, y, z, t)
+	return 0, 0
 end
 
-function Problem.Solver.HeatEq.BC.WallQ(x,y,z,t)
-    return 0,0
+function Problem.Solver.HeatEq.BC.WallQ(x, y, z, t)
+    return 0, 0
 end
 
-function Problem.Mesh.computeHcharFromDistance(x,y,z,t,dist)
-	return Problem.Mesh.hchar+dist*0.1
+function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
+	return Problem.Mesh.hchar + dist*0.1
 end

@@ -1,4 +1,4 @@
-import os,gmsh
+import os, gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
@@ -17,19 +17,19 @@ d = 0.01
 
 p = list()
 
-p.append(sh.occ.addPoint(L,HS,0,d))
-p.append(sh.occ.addPoint(0,HS,0,d))
-p.append(sh.occ.addPoint(L,HS+HF,0,d))
-p.append(sh.occ.addPoint(0,HS+HF,0,d))
+p.append(sh.occ.addPoint(L, HS, 0, d))
+p.append(sh.occ.addPoint(0, HS, 0, d))
+p.append(sh.occ.addPoint(L, HS + HF, 0, d))
+p.append(sh.occ.addPoint(0, HS + HF, 0, d))
 
 # Lines List
 
 l = list()
 
-l.append(sh.occ.addLine(p[0],p[1]))
-l.append(sh.occ.addLine(p[0],p[2]))
-l.append(sh.occ.addLine(p[2],p[3]))
-l.append(sh.occ.addLine(p[3],p[1]))
+l.append(sh.occ.addLine(p[0], p[1]))
+l.append(sh.occ.addLine(p[0], p[2]))
+l.append(sh.occ.addLine(p[2], p[3]))
+l.append(sh.occ.addLine(p[3], p[1]))
 
 # |------------------------------------|
 # |   Physical Surface and Boundary    |
@@ -41,10 +41,10 @@ sh.occ.synchronize()
 
 # Physical Boundary
 
-sh.addPhysicalGroup(2,[s],name='Fluid')
-sh.addPhysicalGroup(1,[l[0]],name='FSInterface')
-sh.addPhysicalGroup(1,[l[2]],name='FreeSurface')
-sh.addPhysicalGroup(1,[l[1],l[3]],name='Wall')
+sh.addPhysicalGroup(2, [s], name='Fluid')
+sh.addPhysicalGroup(1, l[0:1], name='FSInterface')
+sh.addPhysicalGroup(1, l[2:3], name='FreeSurface')
+sh.addPhysicalGroup(1, [l[1], l[3]], name='Wall')
 
 # |--------------------------|
 # |   Write the Mesh File    |
@@ -52,6 +52,6 @@ sh.addPhysicalGroup(1,[l[1],l[3]],name='Wall')
 
 sh.mesh.generate(2)
 gmsh.model.mesh.reverse()
-gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
+gmsh.write(os.path.dirname(__file__) + '/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

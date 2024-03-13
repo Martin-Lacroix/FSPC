@@ -16,15 +16,15 @@ class Algorithm(object):
 # |-------------------------------------------|
 
     @tb.compute_time
-    def simulate(self,end_time):
-        
+    def simulate(self, end_time: float):
+
         verified = True
         tb.Solver.save()
 
         # Main loop on the FSI coupling time steps
-        
+
         while tb.Step.time < end_time:
-            
+
             tb.Interp.initialize()
             self.display_time_step()
             self.reset_convergence()
@@ -57,23 +57,23 @@ class Algorithm(object):
     def run_fluid(self):
 
         if CW.rank == 0:
-            
+
             self.has_run = True
             verified = tb.Solver.run()
 
         else: verified = None
-        return CW.bcast(verified,root=0)
-    
+        return CW.bcast(verified, root=0)
+
     def run_solid(self):
 
         if CW.rank == 1:
-            
+
             self.has_run = True
             verified = tb.Solver.run()
 
         else: verified = None
-        return CW.bcast(verified,root=1)
-    
+        return CW.bcast(verified, root=1)
+
     # Reset the solvers to their last backup state
 
     @tb.write_logs
@@ -88,7 +88,7 @@ class Algorithm(object):
 # |--------------------------------------------|
 
     @tb.only_solid
-    def compute_predictor(self,verified):
+    def compute_predictor(self, verified: bool):
 
         tb.Interp.predict_temperature(verified)
         tb.Interp.predict_displacement(verified)
@@ -122,16 +122,16 @@ class Algorithm(object):
 # |------------------------------------|
 
     def compute_residual(self):
-        
+
         if tb.ResMech:
 
             disp = tb.Solver.get_position()
-            tb.ResMech.update_res(disp,tb.Interp.disp)
+            tb.ResMech.update_res(disp, tb.Interp.disp)
 
         if tb.ResTher:
-            
+
             temp = tb.Solver.get_temperature()
-            tb.ResTher.update_res(temp,tb.Interp.temp)
+            tb.ResTher.update_res(temp, tb.Interp.temp)
 
     # Transfer Dirichlet data Solid to Fluid
 
@@ -157,13 +157,13 @@ class Algorithm(object):
 
             iter = '[{:.0f}]'.format(self.iteration)
             eps = 'Residual Mech : {:.3e}'.format(tb.ResMech.epsilon)
-            print(iter,eps)
+            print(iter, eps)
 
         if tb.ResTher:
 
             iter = '[{:.0f}]'.format(self.iteration)
             eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
-            print(iter,eps)
+            print(iter, eps)
 
     @tb.only_solid
     def display_time_step(self):
@@ -171,4 +171,4 @@ class Algorithm(object):
         L = '\n------------------------------------------'
         time_step = 'Time Step : {:.3e}'.format(tb.Step.dt)
         time = '\nTime : {:.3e}'.format(tb.Step.time).ljust(20)
-        print(L,time,time_step,L)
+        print(L, time, time_step, L)

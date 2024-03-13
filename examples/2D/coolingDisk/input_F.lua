@@ -11,7 +11,7 @@ Problem.id = 'Boussinesq'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.boundingBox = {0,0,0.9,1}
+Problem.Mesh.boundingBox = {0, 0, 0.9, 1}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
@@ -33,7 +33,7 @@ Problem.Extractors[0] = {}
 Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
 Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'T','velocity'}
+Problem.Extractors[0].whatToWrite = {'T', 'velocity'}
 Problem.Extractors[0].timeBetweenWriting = math.huge
 
 Problem.Extractors[1] = {}
@@ -45,7 +45,7 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 5e-3
+Problem.Material.mu = 5e - 3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 Problem.Material.epsRad = 0
@@ -84,9 +84,9 @@ Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.minRes = 1e-8
-Problem.Solver.MomContEq.bodyForce = {0,-9.81}
+Problem.Solver.MomContEq.bodyForce = {0, -9.81}
 
--- Heat Equation
+--Heat Equation
 
 Problem.Solver.HeatEq = {}
 Problem.Solver.HeatEq.residual = 'Ax_f'
@@ -107,18 +107,18 @@ Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 -- Boundary Condition Functions
 
-function Problem.IC.initStates(x,y,z)
-	return {0,0,0,340}
+function Problem.IC.initStates(x, y, z)
+	return {0, 0, 0, 340}
 end
 
-function Problem.Solver.MomContEq.BC.WallV(x,y,z,t)
-	return 0,0
+function Problem.Solver.MomContEq.BC.WallV(x, y, z, t)
+	return 0, 0
 end
 
-function Problem.Solver.HeatEq.BC.WallQ(x,y,z,t)
-    return 0,0
+function Problem.Solver.HeatEq.BC.WallQ(x, y, z, t)
+    return 0, 0
 end
 
-function Problem.Solver.HeatEq.BC.FreeSurfaceQ(x,y,z,t)
-    return 0,0
+function Problem.Solver.HeatEq.BC.FreeSurfaceQ(x, y, z, t)
+    return 0, 0
 end

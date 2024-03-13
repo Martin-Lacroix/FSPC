@@ -15,13 +15,13 @@ class Interpolator(object):
 
         if CW.rank == 0:
 
-            self.recv_pos = CW.recv(source=1,tag=1)
-            CW.send(tb.Solver.get_position(),1,tag=2)
+            self.recv_pos = CW.recv(source=1, tag=1)
+            CW.send(tb.Solver.get_position(), 1, tag=2)
 
         elif CW.rank == 1:
 
-            CW.send(tb.Solver.get_position(),0,tag=1)
-            self.recv_pos = CW.recv(source=0,tag=2)
+            CW.send(tb.Solver.get_position(), 0, tag=1)
+            self.recv_pos = CW.recv(source=0, tag=2)
 
 # |----------------------------------------|
 # |   Initialize the Interpolation Data    |
@@ -45,10 +45,10 @@ class Interpolator(object):
 
         if CW.rank == 1:
 
-            recv = CW.recv(source=0,tag=3)
+            recv = CW.recv(source=0, tag=3)
             tb.Solver.apply_loading(self.interpolate(recv))
-        
-        else: CW.send(tb.Solver.get_loading(),1,tag=3)
+
+        else: CW.send(tb.Solver.get_loading(), 1, tag=3)
 
     # Apply predicted displacement to the fluid
 
@@ -57,10 +57,10 @@ class Interpolator(object):
 
         if CW.rank == 0:
 
-            recv = CW.recv(source=1,tag=4)
+            recv = CW.recv(source=1, tag=4)
             tb.Solver.apply_displacement(self.interpolate(recv))
 
-        else: CW.send(self.disp,0,tag=4)
+        else: CW.send(self.disp, 0, tag=4)
 
     # Apply actual heat flux to the solid
 
@@ -68,11 +68,11 @@ class Interpolator(object):
     def apply_heatflux(self):
 
         if CW.rank == 1:
-            
-            recv = CW.recv(source=0,tag=5)
+
+            recv = CW.recv(source=0, tag=5)
             tb.Solver.apply_heatflux(self.interpolate(recv))
 
-        else: CW.send(tb.Solver.get_heatflux(),1,tag=5)
+        else: CW.send(tb.Solver.get_heatflux(), 1, tag=5)
 
     # Apply predicted temperature to the fluid
 
@@ -80,19 +80,19 @@ class Interpolator(object):
     def apply_temperature(self):
 
         if CW.rank == 0:
-            
-            recv = CW.recv(source=1,tag=6)
+
+            recv = CW.recv(source=1, tag=6)
             tb.Solver.apply_temperature(self.interpolate(recv))
 
-        else: CW.send(self.temp,0,tag=6)
+        else: CW.send(self.temp, 0, tag=6)
 
 # |---------------------------------------------|
 # |   Predict the Solution for Next Coupling    |
 # |---------------------------------------------|
 
     @tb.only_mechanical
-    def predict_displacement(self,verified):
-        
+    def predict_displacement(self, verified: bool):
+
         if verified:
 
             self.prev_disp = np.copy(self.disp)
@@ -107,8 +107,8 @@ class Interpolator(object):
     # Predictor for the temparature coupling
 
     @tb.only_thermal
-    def predict_temperature(self,verified):
-        
+    def predict_temperature(self, verified):
+
         if verified:
 
             self.prev_temp = np.copy(self.temp)
@@ -128,10 +128,10 @@ class Interpolator(object):
 
         if CW.rank == 0:
 
-            polytope = CW.recv(source=1,tag=7)
+            polytope = CW.recv(source=1, tag=7)
             tb.Solver.update(polytope)
 
         elif CW.rank == 1:
 
-            CW.send(tb.Solver.get_polytope(),0,tag=7)
+            CW.send(tb.Solver.get_polytope(), 0, tag=7)
             tb.Solver.update()

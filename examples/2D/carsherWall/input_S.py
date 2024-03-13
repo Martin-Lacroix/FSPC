@@ -25,8 +25,8 @@ def getMetafor(parm):
     
     # Imports the mesh
 
-    mshFile = os.path.join(os.path.dirname(__file__),'geometry_S.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
+    mshFile = os.path.join(os.path.dirname(__file__), 'geometry_S.msh')
+    importer = gmsh.GmshImport(mshFile, domain)
     groups = importer.groups
     importer.execute()
     
@@ -40,34 +40,34 @@ def getMetafor(parm):
     # Solid material parameters
 
     materset = domain.getMaterialSet()
-    materset.define(1,w.EvpIsoHHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1e7)
-    materset(1).put(w.MASS_DENSITY,8e3)
-    materset(1).put(w.POISSON_RATIO,0)
-    materset(1).put(w.YIELD_NUM,1)
+    materset.define(1, w.EvpIsoHHypoMaterial)
+    materset(1).put(w.ELASTIC_MODULUS, 1e7)
+    materset(1).put(w.MASS_DENSITY, 8e3)
+    materset(1).put(w.POISSON_RATIO, 0)
+    materset(1).put(w.YIELD_NUM, 1)
 
     lawset = domain.getMaterialLawSet()
-    lawset.define(1,w.SwiftIsotropicHardening)
-    lawset(1).put(w.IH_SIGEL,1e5)
-    lawset(1).put(w.IH_B,375)
-    lawset(1).put(w.IH_N,0.2)
+    lawset.define(1, w.SwiftIsotropicHardening)
+    lawset(1).put(w.IH_SIGEL, 1e5)
+    lawset(1).put(w.IH_B, 375)
+    lawset(1).put(w.IH_N, 0.2)
 
     # Contact parameters
 
-    materset.define(2,w.CoulombContactMaterial)
-    materset(2).put(w.COEF_FROT_DYN,0.15)
-    materset(2).put(w.COEF_FROT_STA,0.15)
-    materset(2).put(w.PEN_NORMALE,1e8)
-    materset(2).put(w.PEN_TANGENT,1e8)
-    materset(2).put(w.PROF_CONT,0.01)
+    materset.define(2, w.CoulombContactMaterial)
+    materset(2).put(w.COEF_FROT_DYN, 0.15)
+    materset(2).put(w.COEF_FROT_STA, 0.15)
+    materset(2).put(w.PEN_NORMALE, 1e8)
+    materset(2).put(w.PEN_TANGENT, 1e8)
+    materset(2).put(w.PROF_CONT, 0.01)
 
     # Volume solid properties
 
     prp1 = w.ElementProperties(w.Volume2DElement)
-    prp1.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_STD)
-    prp1.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp1.put(w.GRAVITY_Y,-9.81)
-    prp1.put(w.MATERIAL,1)
+    prp1.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_STD)
+    prp1.put(w.STIFFMETHOD, w.STIFF_ANALYTIC)
+    prp1.put(w.GRAVITY_Y, -9.81)
+    prp1.put(w.MATERIAL, 1)
     app.addProperty(prp1)
 
     # Elements for surface traction
@@ -84,8 +84,8 @@ def getMetafor(parm):
     # Contact properties
 
     prp3 = w.ElementProperties(w.Contact2DElement)
-    prp3.put(w.AREAINCONTACT,w.AIC_ONCE)
-    prp3.put(w.MATERIAL,2)
+    prp3.put(w.AREAINCONTACT, w.AIC_ONCE)
+    prp3.put(w.MATERIAL, 2)
 
     # Contact for Tool and Solid
 
@@ -99,8 +99,8 @@ def getMetafor(parm):
     # Boundary conditions
 
     loadset = domain.getLoadingSet()
-    loadset.define(groups['Contact'],w.Field1D(w.TX,w.RE))
-    loadset.define(groups['Contact'],w.Field1D(w.TY,w.RE))
+    loadset.define(groups['Contact'], w.Field1D(w.TX, w.RE))
+    loadset.define(groups['Contact'], w.Field1D(w.TY, w.RE))
 
     # Mechanical time integration
 
@@ -123,9 +123,9 @@ def getMetafor(parm):
 
     # Nodal GMSH extractor
 
-    ext = w.GmshNodalExtractor(metafor,'metafor/output')
-    ext.add(1,w.IFNodalValueExtractor(groups['Solid'],w.IF_P))
-    ext.add(2,w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS))
+    ext = w.GmshNodalExtractor(metafor, 'metafor/output')
+    ext.add(1, w.IFNodalValueExtractor(groups['Solid'], w.IF_P))
+    ext.add(2, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
     parm['extractor'] = ext
 
     # Build domain and folder

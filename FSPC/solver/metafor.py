@@ -9,12 +9,12 @@ import sys
 # |-----------------------------------|
 
 class Metafor(object):
-    def __init__(self,path):
-        
+    def __init__(self, path: str):
+
         # Convert Metafor into a module
 
         parm = dict()
-        spec = util.spec_from_file_location('module.name',path)
+        spec = util.spec_from_file_location('module.name', path)
         module = util.module_from_spec(spec)
         sys.modules['module.name'] = module
         spec.loader.exec_module(module)
@@ -28,8 +28,8 @@ class Metafor(object):
 
         # Sets the dimension of the interaction
 
-        if self.dim == 2: self.axis = (w.TX,w.TY)
-        if self.dim == 3: self.axis = (w.TX,w.TY,w.TZ)
+        if self.dim == 2: self.axis = (w.TX, w.TY)
+        if self.dim == 3: self.axis = (w.TX, w.TY, w.TZ)
 
         # Defines some internal variables
 
@@ -54,24 +54,24 @@ class Metafor(object):
 
         self.fac = w.MemoryFac()
         self.meta_fac = w.MetaFac(self.metafor)
-        self.meta_fac.mode(False,False,True)
+        self.meta_fac.mode(False, False, True)
         self.meta_fac.save(self.fac)
 
         # Initialize the integration and restart
 
         self.max_division = 200
-        self.tsm.setInitialTime(0,np.inf)
+        self.tsm.setInitialTime(0, np.inf)
         self.metafor.getInitialConditionSet().update(0)
 
 # |--------------------------------------------|
 # |   Run Metafor in the Current Time Frame    |
 # |--------------------------------------------|
-    
+
     @tb.write_logs
     @tb.compute_time
     def run(self):
 
-        self.tsm.setNextTime(tb.Step.next_time(),0,tb.Step.dt)
+        self.tsm.setNextTime(tb.Step.next_time(), 0, tb.Step.dt)
         self.tsm.setMinimumTimeStep(tb.Step.dt/self.max_division)
         return self.metafor.getTimeIntegration().restart(self.fac)
 
@@ -79,31 +79,31 @@ class Metafor(object):
 # |   Neumann Boundary Conditions    |
 # |----------------------------------|
 
-    def apply_loading(self,load):
+    def apply_loading(self, load: np.ndarray):
 
         for interaction in self.interaction_M:
-            for i,data in enumerate(load):
+            for i, data in enumerate(load):
 
                 node = self.FSI.getMeshPoint(i)
 
                 if self.geometry.isAxisymmetric():
-                    interaction.setNodTensorAxi(node,*data)
+                    interaction.setNodTensorAxi(node, *data)
 
                 elif self.geometry.is2D():
-                    interaction.setNodTensor2D(node,*data)
+                    interaction.setNodTensor2D(node, *data)
 
                 elif self.geometry.is3D():
-                    interaction.setNodTensor3D(node,*data)
+                    interaction.setNodTensor3D(node, *data)
 
     # Apply Thermal boundary conditions
 
-    def apply_heatflux(self,heat):
+    def apply_heatflux(self, heat: np.ndarray):
 
         for interaction in self.interaction_T:
-            for i,data in enumerate(heat):
+            for i, data in enumerate(heat):
 
                 node = self.FSI.getMeshPoint(i)
-                interaction.setNodVector(node,*data)
+                interaction.setNodVector(node, *data)
 
 # |-------------------------------------|
 # |   Return Mechanical Nodal Values    |
@@ -111,14 +111,14 @@ class Metafor(object):
 
     def get_position(self):
 
-        result = np.zeros((self.get_size(),self.dim))
+        result = np.zeros((self.get_size(), self.dim))
 
-        for i,axe in enumerate(self.axis):
-            for j,data in enumerate(result):
+        for i, axe in enumerate(self.axis):
+            for j, data in enumerate(result):
 
                 node = self.FSI.getMeshPoint(j)
-                data[i] += node.getValue(w.Field1D(axe,w.AB))
-                data[i] += node.getValue(w.Field1D(axe,w.RE))
+                data[i] += node.getValue(w.Field1D(axe, w.AB))
+                data[i] += node.getValue(w.Field1D(axe, w.RE))
 
         return result
 
@@ -126,14 +126,14 @@ class Metafor(object):
 
     def get_velocity(self):
 
-        result = np.zeros((self.get_size(),self.dim))
+        result = np.zeros((self.get_size(), self.dim))
 
-        for i,axe in enumerate(self.axis):
-            for j,data in enumerate(result):
+        for i, axe in enumerate(self.axis):
+            for j, data in enumerate(result):
 
                 node = self.FSI.getMeshPoint(j)
-                data[i] = node.getValue(w.Field1D(axe,w.GV))
-        
+                data[i] = node.getValue(w.Field1D(axe, w.GV))
+
         return result
 
 # |----------------------------------|
@@ -142,13 +142,13 @@ class Metafor(object):
 
     def get_temperature(self):
 
-        result = np.zeros((self.get_size(),1))
-        
+        result = np.zeros((self.get_size(), 1))
+
         for i in range(self.get_size()):
 
             node = self.FSI.getMeshPoint(i)
-            result[i] += node.getValue(w.Field1D(w.TO,w.AB))
-            result[i] += node.getValue(w.Field1D(w.TO,w.RE))
+            result[i] += node.getValue(w.Field1D(w.TO, w.AB))
+            result[i] += node.getValue(w.Field1D(w.TO, w.RE))
 
         return result
 
@@ -156,13 +156,13 @@ class Metafor(object):
 
     def get_tempgrad(self):
 
-        result = np.zeros((self.get_size(),1))
+        result = np.zeros((self.get_size(), 1))
 
         for i in range(self.get_size()):
 
             node = self.FSI.getMeshPoint(i)
-            result[i] = node.getValue(w.Field1D(w.TO,w.GV))
-        
+            result[i] = node.getValue(w.Field1D(w.TO, w.GV))
+
         return result
 
 # |------------------------------|
@@ -195,19 +195,19 @@ class Metafor(object):
 
     # Correct element node ordering for PFEM3D
 
-    def e_index(self,element):
+    def e_index(self, element: object):
 
         size = element.getNumberOfNodes()
 
-        if size == 2: return np.array([[1,0]])
-        if size == 3: return np.array([[2,1,0]])
-        if size == 4: return np.array([[0,3,2],[2,1,0]])
-        
+        if size == 2: return np.array([[1, 0]])
+        if size == 3: return np.array([[2, 1, 0]])
+        if size == 4: return np.array([[0, 3, 2], [2, 1, 0]])
+
 # |--------------------------------------------|
 # |   Build the Face List of an Element Set    |
 # |--------------------------------------------|
-    
-    def get_facelist(self,elementset):
+
+    def get_facelist(self, elementset: object):
 
         face_list = list()
         for i in range(elementset.size()):
@@ -226,17 +226,17 @@ class Metafor(object):
 # |   Positions of the Nodes in an Element    |
 # |-------------------------------------------|
 
-    def e_pos(self,element):
+    def e_pos(self, element: object):
 
         size = element.getNumberOfNodes()
-        position = np.zeros((size,self.dim))
+        position = np.zeros((size, self.dim))
 
         for i in range(size):
 
             node = element.getNodeI(i)
-            for j,axe in enumerate(self.axis):
+            for j, axe in enumerate(self.axis):
 
-                position[i,j] += node.getValue(w.Field1D(axe,w.AB))
-                position[i,j] += node.getValue(w.Field1D(axe,w.RE))
+                position[i, j] += node.getValue(w.Field1D(axe, w.AB))
+                position[i, j] += node.getValue(w.Field1D(axe, w.RE))
 
         return position

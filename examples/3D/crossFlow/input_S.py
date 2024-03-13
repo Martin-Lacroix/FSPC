@@ -25,8 +25,8 @@ def getMetafor(parm):
     
     # Imports the mesh
 
-    mshFile = os.path.join(os.path.dirname(__file__),'geometry_S.msh')
-    importer = gmsh.GmshImport(mshFile,domain)
+    mshFile = os.path.join(os.path.dirname(__file__), 'geometry_S.msh')
+    importer = gmsh.GmshImport(mshFile, domain)
     groups = importer.groups
     importer.execute()
 
@@ -40,20 +40,20 @@ def getMetafor(parm):
     # Material parameters
 
     materset = domain.getMaterialSet()
-    materset.define(1,w.ElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS,1.23e6)
-    materset(1).put(w.POISSON_RATIO,0.3)
-    materset(1).put(w.MASS_DENSITY,1030)
+    materset.define(1, w.ElastHypoMaterial)
+    materset(1).put(w.ELASTIC_MODULUS, 1.23e6)
+    materset(1).put(w.POISSON_RATIO, 0.3)
+    materset(1).put(w.MASS_DENSITY, 1030)
     
     # Finite element properties
 
     prp = w.ElementProperties(w.Volume3DElement)
-    prp.put(w.CAUCHYMECHVOLINTMETH,w.VES_CMVIM_EAS)
-    prp.put(w.STIFFMETHOD,w.STIFF_ANALYTIC)
-    prp.put(w.TOTAL_LAGRANGIAN,True)
-    prp.put(w.GRAVITY_Z,-9.81)
-    prp.put(w.MATERIAL,1)
-    prp.put(w.PEAS,1e-9)
+    prp.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_EAS)
+    prp.put(w.STIFFMETHOD, w.STIFF_ANALYTIC)
+    prp.put(w.TOTAL_LAGRANGIAN, True)
+    prp.put(w.GRAVITY_Z, -9.81)
+    prp.put(w.MATERIAL, 1)
+    prp.put(w.PEAS, 1e-9)
     app.addProperty(prp)
 
     # Elements for surface traction
@@ -71,9 +71,9 @@ def getMetafor(parm):
     # Boundary conditions
     
     loadset = domain.getLoadingSet()
-    loadset.define(groups['Clamped'],w.Field1D(w.TX,w.RE))
-    loadset.define(groups['Clamped'],w.Field1D(w.TY,w.RE))
-    loadset.define(groups['Clamped'],w.Field1D(w.TZ,w.RE))
+    loadset.define(groups['Clamped'], w.Field1D(w.TX, w.RE))
+    loadset.define(groups['Clamped'], w.Field1D(w.TY, w.RE))
+    loadset.define(groups['Clamped'], w.Field1D(w.TZ, w.RE))
 
     # Mechanical time integration
 
@@ -96,9 +96,9 @@ def getMetafor(parm):
 
     # Nodal GMSH extractor
 
-    ext = w.GmshNodalExtractor(metafor,'metafor/output')
-    ext.add(1,w.IFNodalValueExtractor(groups['Solid'],w.IF_P))
-    ext.add(2,w.IFNodalValueExtractor(groups['Solid'],w.IF_EVMS))
+    ext = w.GmshNodalExtractor(metafor, 'metafor/output')
+    ext.add(1, w.IFNodalValueExtractor(groups['Solid'], w.IF_P))
+    ext.add(2, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
     parm['extractor'] = ext
 
     # Build domain and folder
