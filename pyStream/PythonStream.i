@@ -2,7 +2,7 @@
 
 // Add necessary symbols to generated header
 
-%module pyStream %{
+%module python_stream %{
     #include "PythonStream.h"
 %}
 %include "PythonStream.h"

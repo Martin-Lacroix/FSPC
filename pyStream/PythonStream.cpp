@@ -6,7 +6,7 @@
 // | Convert couts and cerr into python streams    |
 // |-----------------------------------------------|
 
-PyCerrCout::PyCerrCout(std::ostream& ostream, bool err): 
+PyCerrCout::PyCerrCout(std::ostream& ostream, bool err):
 stream(ostream), errstream(err)
 {
     oldbuf = stream.rdbuf();
@@ -18,11 +18,11 @@ PyCerrCout::~PyCerrCout()
     stream.rdbuf(oldbuf);
 }
 
-std::streamsize PyCerrCout::xsputn(const char* input, std::streamsize size)
+std:: streamsize PyCerrCout::xsputn(const char* input, std:: streamsize size)
 {
-    std::string str(input, size);
-    static const std::streamsize maxSize = 1000;
-    std::streamsize written = std::min(size, maxSize);
+    std:: string str(input, size);
+    static const std:: streamsize max_size = 1000;
+    std:: streamsize written = std::min(size, max_size);
 
     // Acquire the global interpreter lock using the Python API
 

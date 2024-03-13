@@ -1,7 +1,7 @@
-from .NearestNeigh import KNN
-from .BasisFunction import RBF
+from .k_neighbour import KNN
+from .basis_function import RBF
 
 # Remove the base modules
 
-del NearestNeigh
-del BasisFunction
+del k_neighbour
+del basis_function

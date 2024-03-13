@@ -24,26 +24,26 @@ The first step is to import the package. The latter initializes MPI for Python a
 
 ```python
 import FSPC                         # Import the FSPC package
-FSPC.setStep(dt,dtSave)             # Initialize the time step manager
-FSPC.setSolver(pathF,pathS)         # Initialize the external solvers
+FSPC.set_step(dt,dt_save)             # Initialize the time step manager
+FSPC.set_solver(path_F,path_S)         # Initialize the external solvers
 ```
 
 | Input             | Type              | Description                                   |
 |-------------------|-------------------|-----------------------------------------------|
 | *dt*              | *float*           | *initial coupling time step*                  |
-| *dtSave*          | *float*           | *time step for saving on the disk*            |
-| *pathF*           | *string*          | *input file path for the fluid solver*        |
-| *pathS*           | *string*          | *input file path for the solid solver*        |
+| *dt_save*          | *float*           | *time step for saving on the disk*            |
+| *path_F*           | *string*          | *input file path for the fluid solver*        |
+| *path_S*           | *string*          | *input file path for the solid solver*        |
 
 <br />
 
-The convergence criterion is managed by the `Residual` class. The latter should be specified both for the displacement and the temperature when relevant. It is important to note that the type of coupling is enabled by the initialization of the associated class such that `setResMech` enables the mechanical coupling and `setResTher` enables the thermal coupling.
+The convergence criterion is managed by the `Residual` class. The latter should be specified both for the displacement and the temperature when relevant. It is important to note that the type of coupling is enabled by the initialization of the associated class such that `set_mechanical_res` enables the mechanical coupling and `set_thermal_res` enables the thermal coupling.
 
 <br />
 
 ```python
-FSPC.setResMech(tolDisp)       # Mechanical convergence criterion
-FSPC.setResTher(tolTemp)       # Thermal convergence criterion
+FSPC.set_mechanical_res(tolDisp)       # Mechanical convergence criterion
+FSPC.set_thermal_res(tolTemp)       # Thermal convergence criterion
 ```
 
 | Input             | Type              | Description                                |
@@ -58,8 +58,8 @@ The tolerance is a relative change in the Dirichlet condition exchanged between 
 <br />
 
 ```python
-FSPC.setInterp(FSPC.interpolator.KNN,k)           # K-nearest neighbours interpolator
-FSPC.setInterp(FSPC.interpolator.RBF,fun)         # Radial basis function interpolator
+FSPC.set_interpolator(FSPC.interpolator.KNN,k)           # K-nearest neighbours interpolator
+FSPC.set_interpolator(FSPC.interpolator.RBF,fun)         # Radial basis function interpolator
 ```
 
 | Input             | Type                | Description                                     |
@@ -74,9 +74,9 @@ Note that there is no required ordering when initializing the classes and the in
 <br />
 
 ```python
-FSPC.setAlgo(FSPC.algorithm.BGS,maxIter)        # Aitken block-Gauss Seidel
-FSPC.setAlgo(FSPC.algorithm.ILS,maxIter)        # IQN with inverse least squares 
-FSPC.setAlgo(FSPC.algorithm.MVJ,maxIter)        # IQN with multi-vector Jacobian
+FSPC.set_algorithm(FSPC.algorithm.BGS,maxIter)        # Aitken block-Gauss Seidel
+FSPC.set_algorithm(FSPC.algorithm.ILS,maxIter)        # IQN with inverse least squares 
+FSPC.set_algorithm(FSPC.algorithm.MVJ,maxIter)        # IQN with multi-vector Jacobian
 ```
 
 | Input             | Type                | Description                                     |
@@ -90,13 +90,13 @@ It is important to note that each `Set` function returns a reference to the clas
 <br />
 
 ```python
-FSPC.general.simulate(endTime)      # Run the FSI simulation
-FSPC.general.printClock()           # Print the final time stats
+FSPC.general.simulate(end_time)      # Run the FSI simulation
+FSPC.general.print_clock()           # Print the final time stats
 ```
 
 | Input             | Type              | Description                                  |
 |-------------------|-------------------|----------------------------------------------|
-| *endTime*         | *float*           | *final simulation time*                      |
+| *end_time*         | *float*           | *final simulation time*                      |
 
 <br />
 
@@ -179,8 +179,8 @@ The resulting nodal interactions must be provided to FSPC through the parameter 
 <br />
 
 ```python
-parm['interacT'] = heatInt      # Send the heat interaction to FSPC
-parm['interacM'] = loadInt      # Send the mechanical interaction to FSPC
+parm['interaction_T'] = heatInt      # Send the heat interaction to FSPC
+parm['interaction_M'] = loadInt      # Send the mechanical interaction to FSPC
 ```
 
 <br />
@@ -201,7 +201,7 @@ Finally, the user may define an exporter class that will be called by FSPC to wr
 <br />
 
 ```python
-parm['exporter'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
-parm['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
-parm['exporter'].addDataBaseField([TO])                        # Add the temperature field
+parm['extractor'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+parm['extractor'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
+parm['extractor'].addDataBaseField([TO])                        # Add the temperature field
 ```
