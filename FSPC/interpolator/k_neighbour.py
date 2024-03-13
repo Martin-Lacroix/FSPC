@@ -3,6 +3,8 @@ from scipy.sparse import dok_matrix
 from ..general import toolbox as tb
 import numpy as np
 
+from scipy import sparse as sp
+
 # |------------------------------------------------|
 # |   Mesh Interpolation K - Nearest Neighbours    |
 # |------------------------------------------------|
@@ -19,7 +21,6 @@ class KNN(Interpolator):
         Interpolator.__init__(self)
         position = tb.Solver.get_position()
         self.mapping(position)
-        self.H = self.H.tocsr()
 
     # Interpolate recv_data and return the result
 
@@ -34,21 +35,20 @@ class KNN(Interpolator):
     @tb.compute_time
     def mapping(self, position: np.ndarray):
 
-        self.H = dok_matrix(tb.Solver.get_size(), len(self.recv_pos))
+        self.H = sp.dok_matrix((len(position), len(self.recv_pos)))
 
-        if self.K == 1: self.search(position)
+        if self.K == 1:
+            for i, pos in enumerate(position):
+
+                dist = np.linalg.norm(pos - self.recv_pos, axis=1)
+                self.H[i, np.argmin(dist)] = 1
+
         else: self.search_K(position)
+        self.H = self.H.tocsr()
 
 # |------------------------------------|
 # |   Find the K Nearest Neighbours    |
 # |------------------------------------|
-
-    def search(self, position: np.ndarray):
-
-        for i, pos in enumerate(position):
-
-            dist = np.linalg.norm(pos - self.recv_pos, axis=1)
-            self.H[i, np.argmin(dist)] = 1
 
     def search_K(self, position: np.ndarray):
 
