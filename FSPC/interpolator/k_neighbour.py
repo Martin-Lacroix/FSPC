@@ -3,11 +3,9 @@ from scipy.sparse import dok_matrix
 from ..general import toolbox as tb
 import numpy as np
 
-from scipy import sparse as sp
-
-# |------------------------------------------------|
-# |   Mesh Interpolation K - Nearest Neighbours    |
-# |------------------------------------------------|
+# |----------------------------------------------|
+# |   Mesh Interpolation K-Nearest Neighbours    |
+# |----------------------------------------------|
 
 class KNN(Interpolator):
     def __init__(self, K: int):
@@ -35,7 +33,7 @@ class KNN(Interpolator):
     @tb.compute_time
     def mapping(self, position: np.ndarray):
 
-        self.H = sp.dok_matrix((len(position), len(self.recv_pos)))
+        self.H = dok_matrix((len(position), len(self.recv_pos)))
 
         if self.K == 1:
             for i, pos in enumerate(position):
