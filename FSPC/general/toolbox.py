@@ -59,37 +59,37 @@ clock = collections.defaultdict(float)
 # |   Define Some Decorator Functions    |
 # |--------------------------------------|
 
-def write_logs(func: object):
+def write_logs(function: object):
     def wrapper(*args, **kwargs):
 
         rank = str(CW.rank)
         with open('solver_' + rank + '.dat', 'a') as output:
             with stderr(output), stdout(output):
-                result = func(*args, **kwargs)
+                result = function(*args, **kwargs)
 
         return result
     return wrapper
 
 # Measure the computation time
 
-def compute_time(func: object):
+def compute_time(function: object):
     def wrapper(*args, **kwargs):
 
         global clock
         start = time.time()
-        result = func(*args, **kwargs)
+        result = function(*args, **kwargs)
         parent = args[0].__class__.__name__ + ' : '
-        clock[parent + func.__name__] += time.time() - start
+        clock[parent + function.__name__] += time.time() - start
 
         return result
     return wrapper
 
 # Only accessed by the solid solver
 
-def only_solid(func: object):
+def only_solid(function: object):
     def wrapper(*args, **kwargs):
 
-        if CW.rank == 1: result = func(*args, **kwargs)
+        if CW.rank == 1: result = function(*args, **kwargs)
         else: result = None
 
         return result
@@ -97,11 +97,11 @@ def only_solid(func: object):
 
 # Only accessed when mechanical coupling
 
-def only_mechanical(func: object):
+def only_mechanical(function: object):
     def wrapper(*args, **kwargs):
 
         global ResMech
-        if ResMech: result = func(*args, **kwargs)
+        if ResMech: result = function(*args, **kwargs)
         else: result = None
 
         return result
@@ -109,11 +109,11 @@ def only_mechanical(func: object):
 
 # Only accessed when thermal coupling
 
-def only_thermal(func: object):
+def only_thermal(function: object):
     def wrapper(*args, **kwargs):
 
         global ResTher
-        if ResTher: result = func(*args, **kwargs)
+        if ResTher: result = function(*args, **kwargs)
         else: result = None
 
         return result
