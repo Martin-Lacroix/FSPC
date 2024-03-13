@@ -123,7 +123,7 @@ def only_thermal(func: object):
 # |   Initialize the Global Classes    |
 # |------------------------------------|
 
-def set_step(dt: float, dt_save: float):
+def set_time_step(dt: float, dt_save: float):
 
     from . import manager
 
@@ -131,16 +131,16 @@ def set_step(dt: float, dt_save: float):
     Step = manager.TimeStep(dt, dt_save)
     return Step
 
-def set_algorithm(algorithm: object, *arg: tuple):
+def set_algorithm(algorithm: object):
 
     global Algo
-    Algo = algorithm(*arg)
+    Algo = algorithm
     return Algo
 
-def set_interpolator(interpolator: object, *arg: tuple):
+def set_interpolator(interpolator: object):
 
     global Interp
-    Interp = interpolator(*arg)
+    Interp = interpolator
     return Interp
 
 def set_mechanical_res(tol: float):
@@ -159,17 +159,12 @@ def set_thermal_res(tol: float):
     ResTher = manager.Residual(tol)
     return ResTher
 
-def simulate(end_time: float):
-
-    global Algo
-    return Algo.simulate(end_time)
-
 # |----------------------------------------|
 # |   Import and Initialize the Solvers    |
 # |----------------------------------------|
 
 @write_logs
-def set_solver(path_F: str, path_S: str):
+def init_solver(path_F: str, path_S: str):
 
     global Solver
 
@@ -177,11 +172,13 @@ def set_solver(path_F: str, path_S: str):
 
         from ..solver.pfem_3D import PFEM3D
         Solver = PFEM3D(path_F)
+        return Solver
 
     elif CW.rank == 1:
 
         from ..solver.metafor import Metafor
         Solver = Metafor(path_S)
+        return Solver
 
 # |--------------------------------------------|
 # |   Print the Summary of Computation Time    |

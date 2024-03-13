@@ -4,7 +4,6 @@ from .manager import Residual
 # Toolbox general utility
 
 from .toolbox import redirect
-from .toolbox import simulate
 from .toolbox import print_clock
 
 # Remove the base modules
