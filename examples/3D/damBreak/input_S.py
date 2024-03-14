@@ -30,6 +30,8 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
+    parm['FSInterface'] = groups['FSInterface']
+
     # Defines the solid domain
 
     iset = domain.getInteractionSet()
@@ -102,6 +104,5 @@ def getMetafor(parm):
 
     domain.build()
     parm['polytope'].activateBoundaryElements()
-    parm['FSInterface'] = groups['FSInterface']
     os.makedirs('metafor')
     return metafor

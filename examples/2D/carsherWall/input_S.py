@@ -29,6 +29,8 @@ def getMetafor(parm):
     importer = gmsh.GmshImport(mshFile, domain)
     groups = importer.groups
     importer.execute()
+
+    parm['FSInterface'] = groups['FSInterface']
     
     # Defines the solid domain
 
@@ -131,6 +133,5 @@ def getMetafor(parm):
     # Build domain and folder
 
     domain.build()
-    parm['FSInterface'] = groups['FSInterface']
     os.makedirs('metafor')
     return metafor

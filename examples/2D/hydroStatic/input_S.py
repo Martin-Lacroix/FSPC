@@ -30,6 +30,8 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
+    parm['FSInterface'] = groups['FSInterface']
+
     # Defines the ball domain
 
     iset = domain.getInteractionSet()
@@ -91,13 +93,12 @@ def getMetafor(parm):
     # Nodal GMSH extractor
 
     ext = w.GmshNodalExtractor(metafor, 'metafor/output')
-    ext.add(2, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
-    ext.add(1, w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TY, w.GF1)))
+    ext.add(1, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
+    ext.add(2, w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TY, w.GF1)))
     parm['extractor'] = ext
 
     # Build domain and folder
 
     domain.build()
-    parm['FSInterface'] = groups['FSInterface']
     os.makedirs('metafor')
     return metafor
