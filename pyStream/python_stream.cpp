@@ -1,4 +1,4 @@
-#include "PythonStream.h"
+#include "python_stream.h"
 #include <Python.h>
 #include <stdio.h>
 

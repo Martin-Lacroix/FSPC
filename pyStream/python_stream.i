@@ -3,6 +3,6 @@
 // Add necessary symbols to generated header
 
 %module python_stream %{
-    #include "PythonStream.h"
+    #include "python_stream.h"
 %}
-%include "PythonStream.h"
+%include "python_stream.h"
