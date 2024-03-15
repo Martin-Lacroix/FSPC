@@ -14,7 +14,8 @@ L3 = 0.8
 R1 = 0.3
 R2 = 0.25
 
-B = 0.13
+Y = -0.01
+B = 0.15
 S = 0.04
 W = 0.02
 
@@ -22,9 +23,9 @@ W = 0.02
 
 d = 0.02
 E = 1e-3
-N = 10
-M = 5
-P = 1
+N = 18
+M = 9
+P = 2
 
 # |--------------------------------|
 # |   Function to Make a Circle    |
@@ -94,16 +95,16 @@ def quad_circle(x,y):
 p = list()
 q = list()
 
-p.append(sh.occ.addPoint(L1, 0, 0, d))
-p.append(sh.occ.addPoint(L1+L2+L3+S, 0, 0, d))
-p.append(sh.occ.addPoint(L1+L2+S/2, S+B, 0, d))
+p.append(sh.occ.addPoint(L1, -R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2+L3+S, -R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S/2, -B, 0, d))
 
-p.append(sh.occ.addPoint(L1, S, 0, d))
-p.append(sh.occ.addPoint(L1+L2, S, 0, d))
-p.append(sh.occ.addPoint(L1+L2, S+B, 0, d))
-p.append(sh.occ.addPoint(L1+L2+S, S+B, 0, d))
-p.append(sh.occ.addPoint(L1+L2+S, S, 0, d))
-p.append(sh.occ.addPoint(L1+L2+L3+S, S, 0, d))
+p.append(sh.occ.addPoint(L1, S-R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2, S-R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2, -B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, -B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, S-R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2+L3+S, S-R1, 0, d))
 
 # Lines list
 
@@ -123,7 +124,7 @@ l.append(sh.occ.addLine(p[3], p[0]))
 # |   Surfaces and Volumes Definition    |
 # |--------------------------------------|
 
-tags = [(2,a) for a in quad_circle(L1+L2-E, S+R2+E)]
+tags = [(2,a) for a in quad_circle(L1+L2-E, Y+E)]
 ext = sh.occ.extrude(tags, -W, 0, 0, [P], recombine=True)
 ext = np.transpose(ext)
 sh.occ.synchronize()
@@ -136,7 +137,7 @@ w = ext[1, idx]
 # Solid tool
 
 k = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(l)])
-rev = sh.occ.revolve([(2,k)], 0, R1, 0, 1, 0, 0, 2*np.pi)[1:]
+rev = sh.occ.revolve([(2,k)], 0, 0, 0, 1, 0, 0, 2*np.pi)[1:]
 rev = np.transpose(rev)
 sh.occ.synchronize()
 

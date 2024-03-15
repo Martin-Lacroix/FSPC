@@ -14,26 +14,26 @@ L3 = 0.8
 R1 = 0.3
 R2 = 0.25
 
-H = 0.1
-B = 0.13
+Y = -0.01
+B = 0.15
+
+L = 0.1
+H = 0.05
+
 R = 0.02
 S = 0.04
-
-D = 0.5
 W = 0.02
 
 # Characteristic size
 
-d = 0.01
+d = 0.02
 E = 1e-3
-N = 101
-M = 5
 
 # |--------------------------------------|
 # |   Surfaces and Volumes Definition    |
 # |--------------------------------------|
 
-v = sh.occ.addCylinder(L1+L2-E, S+R2+E, 0, -W, 0, 0, R2)
+v = sh.occ.addCylinder(L1+L2-E, Y, 0, -W, 0, 0, R2)
 sh.occ.synchronize()
 
 k = sh.getBoundary([(3, v)], 0, 0, 0)
@@ -46,8 +46,8 @@ k = np.transpose(k)[1]
 
 # Inlet and free surface
 
-x = sh.occ.addCylinder(0, R2+H/2, 0, H, 0, 0, H/2)
-sh.occ.rotate([(3, x)], 0, R2+H/2, 0, 1, 0, 0, np.pi/2)
+x = sh.occ.addCylinder(0, 0, 0, L, 0, 0, H)
+sh.occ.rotate([(3, x)], 0, 0, 0, 1, 0, 0, np.pi/2)
 sh.occ.synchronize()
 
 y = sh.getBoundary([(3, x)], 0, 0, 0)
@@ -64,18 +64,18 @@ g = np.transpose(g)[1]
 p = list()
 L = L1+L2+L3+S
 
-p.append(sh.occ.addPoint(L1-R, R2, 0, d))
-p.append(sh.occ.addPoint(L1-R, R2-R, 0, d))
-p.append(sh.occ.addPoint(L1, R2-R, 0, d))
+p.append(sh.occ.addPoint(L1-R, -H, 0, d))
+p.append(sh.occ.addPoint(L1-R, -H-R, 0, d))
+p.append(sh.occ.addPoint(L1, -H-R, 0, d))
 
-p.append(sh.occ.addPoint(L1, S, 0, d))
-p.append(sh.occ.addPoint(L1+L2, S, 0, d))
-p.append(sh.occ.addPoint(L1+L2, S+B, 0, d))
-p.append(sh.occ.addPoint(L1+L2+S/2, S+B, 0, d))
-p.append(sh.occ.addPoint(L1+L2+S, S+B, 0, d))
+p.append(sh.occ.addPoint(L1, S-R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2, S-R1, 0, d))
+p.append(sh.occ.addPoint(L1+L2, -B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S/2, -B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, -B, 0, d))
 
-p.append(sh.occ.addPoint(L1+L2+S, S, 0, d))
-p.append(sh.occ.addPoint(L, S, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, S-R1, 0, d))
+p.append(sh.occ.addPoint(L, S-R1, 0, d))
 
 # Lines list
 
@@ -95,7 +95,7 @@ l.append(sh.occ.addLine(p[8], p[9]))
 # |------------------------------------|
 
 tags = [(1,a) for a in l]
-rev = sh.occ.revolve(tags, 0, R1, 0, 1, 0, 0, 2*np.pi)
+rev = sh.occ.revolve(tags, 0, 0, 0, 1, 0, 0, 2*np.pi)
 rev = np.transpose(rev)
 sh.occ.synchronize()
 
