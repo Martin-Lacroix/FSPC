@@ -50,6 +50,6 @@ for i, file in enumerate(directory):
 
     gmsh.open(file)
     temperature = gmsh.view.getModelData(0, i)[2]
-    T.append(temperature[tag - 1][0])
+    T.append(temperature[tag-1][0])
 
 tb.plot_ref(time, T, data)

@@ -10,10 +10,10 @@ import time
 class Void(object):
 
     def __setattr__(self, name: str, _):
-        raise Exception('Set {' + name + '} of empty class')
+        raise Exception('Set {'+name+'} of empty class')
 
     def __getattribute__(self, name: str):
-        raise Exception('Get {' + name + '} of empty class')
+        raise Exception('Get {'+name+'} of empty class')
 
     def __bool__(self):
         return False
@@ -63,7 +63,7 @@ def write_logs(function: object):
     def wrapper(*args, **kwargs):
 
         rank = str(CW.rank)
-        with open('solver_' + rank + '.dat', 'a') as output:
+        with open('solver_'+rank+'.dat', 'a') as output:
             with stderr(output), stdout(output):
                 result = function(*args, **kwargs)
 
@@ -78,8 +78,8 @@ def compute_time(function: object):
         global clock
         start = time.time()
         result = function(*args, **kwargs)
-        parent = args[0].__class__.__name__ + ' : '
-        clock[parent + function.__name__] += time.time() - start
+        parent = args[0].__class__.__name__+' : '
+        clock[parent+function.__name__] += time.time()-start
 
         return result
     return wrapper

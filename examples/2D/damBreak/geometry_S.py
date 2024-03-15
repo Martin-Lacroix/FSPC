@@ -23,8 +23,8 @@ M = 7
 p = list()
 
 p.append(sh.occ.addPoint(2*L, 0, 0))
-p.append(sh.occ.addPoint(2*L + w, 0, 0))
-p.append(sh.occ.addPoint(2*L + w, h, 0))
+p.append(sh.occ.addPoint(2*L+w, 0, 0))
+p.append(sh.occ.addPoint(2*L+w, h, 0))
 p.append(sh.occ.addPoint(2*L, h, 0))
 
 # Lines List
@@ -63,6 +63,6 @@ sh.addPhysicalGroup(1, l[0:1], name='Base')
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

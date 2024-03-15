@@ -91,5 +91,5 @@ function Problem.Solver.MomContEq.BC.ReservoirV(x, y, z, t)
 end
 
 function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
-	return Problem.Mesh.hchar + dist*0.3
+	return Problem.Mesh.hchar+dist*0.3
 end

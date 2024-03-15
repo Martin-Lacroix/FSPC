@@ -29,27 +29,27 @@ P = 4
 p = list()
 
 p.append(sh.occ.addPoint(0, 0, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, 0, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, B, 0, d))
+p.append(sh.occ.addPoint(L1+L2, 0, 0, d))
+p.append(sh.occ.addPoint(L1+L2, B, 0, d))
 p.append(sh.occ.addPoint(0, B, 0, d))
 p.append(sh.occ.addPoint(0, 0, H, d))
-p.append(sh.occ.addPoint(L1 + L2, 0, H, d))
-p.append(sh.occ.addPoint(L1 + L2, B, H, d))
+p.append(sh.occ.addPoint(L1+L2, 0, H, d))
+p.append(sh.occ.addPoint(L1+L2, B, H, d))
 p.append(sh.occ.addPoint(0, B, H, d))
 
 p.append(sh.occ.addPoint(L1, (B-BS)/2, 0, d))
-p.append(sh.occ.addPoint(L1 + W, (B-BS)/2, 0, d))
-p.append(sh.occ.addPoint(L1 + W, (B + BS)/2, 0, d))
-p.append(sh.occ.addPoint(L1, (B + BS)/2, 0, d))
+p.append(sh.occ.addPoint(L1+W, (B-BS)/2, 0, d))
+p.append(sh.occ.addPoint(L1+W, (B+BS)/2, 0, d))
+p.append(sh.occ.addPoint(L1, (B+BS)/2, 0, d))
 p.append(sh.occ.addPoint(L1, (B-BS)/2, HS, d))
-p.append(sh.occ.addPoint(L1 + W, (B-BS)/2, HS, d))
-p.append(sh.occ.addPoint(L1 + W, (B + BS)/2, HS, d))
-p.append(sh.occ.addPoint(L1, (B + BS)/2, HS, d))
+p.append(sh.occ.addPoint(L1+W, (B-BS)/2, HS, d))
+p.append(sh.occ.addPoint(L1+W, (B+BS)/2, HS, d))
+p.append(sh.occ.addPoint(L1, (B+BS)/2, HS, d))
 
 p.append(sh.occ.addPoint(0, (B-BS)/2, 0, d))
-p.append(sh.occ.addPoint(0, (B + BS)/2, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, (B-BS)/2, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, (B + BS)/2, 0, d))
+p.append(sh.occ.addPoint(0, (B+BS)/2, 0, d))
+p.append(sh.occ.addPoint(L1+L2, (B-BS)/2, 0, d))
+p.append(sh.occ.addPoint(L1+L2, (B+BS)/2, 0, d))
 
 # Lines List
 
@@ -146,7 +146,7 @@ sh.occ.synchronize()
 
 sh.addPhysicalGroup(3, [v], name='Fluid')
 sh.addPhysicalGroup(2, s[6:11], name='FSInterface')
-sh.addPhysicalGroup(2, s[0:1] + s[11:14], name='Inlet')
+sh.addPhysicalGroup(2, s[0:1]+s[11:14], name='Inlet')
 sh.addPhysicalGroup(2, s[2:6], name='Bottom')
 sh.addPhysicalGroup(2, s[1:2], name='Outlet')
 
@@ -154,7 +154,7 @@ sh.addPhysicalGroup(2, s[1:2], name='Outlet')
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-fun = str(d) + ' + 0.1*F1'
+fun = str(d)+'+0.1*F1'
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e3)
 sh.mesh.field.setNumbers(1, 'SurfacesList', s[6:11])
@@ -169,6 +169,6 @@ gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
 # Write the Mesh File
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_F.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

@@ -56,6 +56,6 @@ sh.addPhysicalGroup(1, l, name='FSInterface')
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

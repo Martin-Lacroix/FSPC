@@ -19,13 +19,13 @@ B = 0.13
 R = 0.02
 S = 0.04
 
-h = 0.5
-w = 0.02
+D = 0.5
+W = 0.02
 
 # Characteristic size
 
 d = 0.005
-eps = 1e-3
+E = 1e-3
 N = 101
 M = 5
 
@@ -34,40 +34,44 @@ M = 5
 # |----------------------------------|
 
 p = list()
+q = list()
+
+H = H1+H2+H3
+L = L1+L2+L3+S
 
 p.append(sh.occ.addPoint(0, H1, 0, d))
 p.append(sh.occ.addPoint(L1-R, H1, 0, d))
 p.append(sh.occ.addPoint(L1-R, H1-R, 0, d))
 p.append(sh.occ.addPoint(L1, H1-R, 0, d))
 
-p.append(sh.occ.addPoint(L1, H1 + H2 + R, 0, d))
-p.append(sh.occ.addPoint(L1-R, H1 + H2 + R, 0, d))
-p.append(sh.occ.addPoint(L1-R, H1 + H2, 0, d))
-p.append(sh.occ.addPoint(0, H1 + H2, 0, d))
+p.append(sh.occ.addPoint(L1, H1+H2+R, 0, d))
+p.append(sh.occ.addPoint(L1-R, H1+H2+R, 0, d))
+p.append(sh.occ.addPoint(L1-R, H1+H2, 0, d))
+p.append(sh.occ.addPoint(0, H1+H2, 0, d))
 
 p.append(sh.occ.addPoint(L1, S, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, S, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, S + B, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + S, S + B, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + S, S, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + L3 + S, S, 0, d))
+p.append(sh.occ.addPoint(L1+L2, S, 0, d))
+p.append(sh.occ.addPoint(L1+L2, S+B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, S+B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, S, 0, d))
+p.append(sh.occ.addPoint(L, S, 0, d))
 
-p.append(sh.occ.addPoint(L1, H1 + H2 + H3-S, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, H1 + H2 + H3-S, 0, d))
-p.append(sh.occ.addPoint(L1 + L2, H1 + H2 + H3-S-B, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + S, H1 + H2 + H3-S-B, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + S, H1 + H2 + H3-S, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + L3 + S, H1 + H2 + H3-S, 0, d))
+p.append(sh.occ.addPoint(L1, H-S, 0, d))
+p.append(sh.occ.addPoint(L1+L2, H-S, 0, d))
+p.append(sh.occ.addPoint(L1+L2, H-S-B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, H-S-B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S, H-S, 0, d))
+p.append(sh.occ.addPoint(L, H-S, 0, d))
 
 p.append(sh.occ.addPoint(F, H1, 0, d))
-p.append(sh.occ.addPoint(F, H1 + H2, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + S/2, S + B, 0, d))
-p.append(sh.occ.addPoint(L1 + L2 + S/2, H1 + H2 + H3-S-B, 0, d))
+p.append(sh.occ.addPoint(F, H1+H2, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S/2, S+B, 0, d))
+p.append(sh.occ.addPoint(L1+L2+S/2, H-S-B, 0, d))
 
-p.append(sh.occ.addPoint(L1 + L2-eps, S + eps, 0, d))
-p.append(sh.occ.addPoint(L1 + L2-eps, S + h + eps, 0, d))
-p.append(sh.occ.addPoint(L1 + L2-w-eps, S + eps, 0, d))
-p.append(sh.occ.addPoint(L1 + L2-w-eps, S + h + eps, 0, d))
+q.append(sh.occ.addPoint(L1+L2-E, S+E, 0, d))
+q.append(sh.occ.addPoint(L1+L2-E, S+D+E, 0, d))
+q.append(sh.occ.addPoint(L1+L2-W-E, S+E, 0, d))
+q.append(sh.occ.addPoint(L1+L2-W-E, S+D+E, 0, d))
 
 # Lines List
 
@@ -104,10 +108,10 @@ r.append(sh.occ.addLine(p[20], p[21]))
 
 # Solid square
 
-h.append(sh.occ.addLine(p[26], p[24]))
-h.append(sh.occ.addLine(p[24], p[25]))
-h.append(sh.occ.addLine(p[25], p[27]))
-h.append(sh.occ.addLine(p[27], p[26]))
+h.append(sh.occ.addLine(q[2], q[0]))
+h.append(sh.occ.addLine(q[0], q[1]))
+h.append(sh.occ.addLine(q[1], q[3]))
+h.append(sh.occ.addLine(q[3], q[2]))
 
 # |------------------------------------|
 # |   Physical Surface and Boundary    |
@@ -135,6 +139,6 @@ sh.addPhysicalGroup(1, l, name='Border')
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_F.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

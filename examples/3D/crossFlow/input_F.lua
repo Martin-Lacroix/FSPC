@@ -109,5 +109,5 @@ function Problem.Solver.MomContEq.BC.OutletP(x, y, z, t)
 end
 
 function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
-	return Problem.Mesh.hchar + dist*0.1
+	return Problem.Mesh.hchar+dist*0.1
 end

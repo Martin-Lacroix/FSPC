@@ -24,7 +24,7 @@ class RBF(Interpolator):
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):
 
-        size = (tb.Solver.dim + 1, np.size(recv_data, 1))
+        size = (tb.Solver.dim+1, np.size(recv_data, 1))
         result = np.append(recv_data, np.zeros(size), axis=0)
         result = np.linalg.lstsq(self.A, result, -1)[0]
         return np.dot(self.B, result)
@@ -36,7 +36,7 @@ class RBF(Interpolator):
     @tb.compute_time
     def mapping(self, position: np.ndarray):
 
-        self.size = 1 + tb.Solver.dim + len(self.recv_pos)
+        self.size = 1+tb.Solver.dim+len(self.recv_pos)
         self.B = self.compute_B(position)
         self.A = self.compute_A()
 
@@ -47,10 +47,10 @@ class RBF(Interpolator):
 
         for i, pos in enumerate(self.recv_pos):
 
-            rad = np.linalg.norm(pos - position, axis=1)
+            rad = np.linalg.norm(pos-position, axis=1)
             self.B[K, i] = self.function(rad)
 
-            rad = np.linalg.norm(pos - self.recv_pos, axis=1)
+            rad = np.linalg.norm(pos-self.recv_pos, axis=1)
             self.A[i, N] = self.function(rad)
 
 # |--------------------------------------|
@@ -60,7 +60,7 @@ class RBF(Interpolator):
     def compute_A(self):
 
         N = len(self.recv_pos)
-        K = range(1 + N, self.size)
+        K = range(1+N, self.size)
         A = np.zeros((self.size, self.size))
 
         # Initialize A with target mesh positions
@@ -76,6 +76,6 @@ class RBF(Interpolator):
 
         N = len(position)
         B = np.ones((N, self.size))
-        K = range(1 + len(self.recv_pos), self.size)
+        K = range(1+len(self.recv_pos), self.size)
         B[np.ix_(range(N), K)] = position
         return B

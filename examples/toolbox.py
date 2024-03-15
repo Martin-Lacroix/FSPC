@@ -54,5 +54,5 @@ def find_node(file: str, position: np.ndarray):
 
     # Find the tag with minimum distance to position
 
-    distance = np.linalg.norm(coord - position, axis=1)
+    distance = np.linalg.norm(coord-position, axis=1)
     return int(node_tags[np.argmin(distance)])

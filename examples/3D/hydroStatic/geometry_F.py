@@ -24,13 +24,13 @@ p = list()
 
 p.append(sh.occ.addPoint(L, 0, HS))
 p.append(sh.occ.addPoint(0, 0, HS))
-p.append(sh.occ.addPoint(L, 0, HS + HF))
-p.append(sh.occ.addPoint(0, 0, HS + HF))
+p.append(sh.occ.addPoint(L, 0, HS+HF))
+p.append(sh.occ.addPoint(0, 0, HS+HF))
 
 p.append(sh.occ.addPoint(L, W, HS))
 p.append(sh.occ.addPoint(0, W, HS))
-p.append(sh.occ.addPoint(L, W, HS + HF))
-p.append(sh.occ.addPoint(0, W, HS + HF))
+p.append(sh.occ.addPoint(L, W, HS+HF))
+p.append(sh.occ.addPoint(0, W, HS+HF))
 
 # Lines List
 
@@ -100,6 +100,6 @@ sh.addPhysicalGroup(2, s[5:6], name='FreeSurface')
 # |--------------------------|
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_F.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

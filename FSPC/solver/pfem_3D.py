@@ -62,8 +62,8 @@ class PFEM3D(object):
 
     def apply_displacement(self, disp: np.ndarray):
 
-        BC = (disp - self.get_position())/tb.Step.dt
-        if self.WC: BC = (BC - self.get_velocity())/(tb.Step.dt/2)
+        BC = (disp-self.get_position())/tb.Step.dt
+        if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
 
         for i, vector in enumerate(self.BC):
             for j, value in enumerate(BC[i]): vector[j] = value
@@ -132,7 +132,7 @@ class PFEM3D(object):
 
         for i in self.FSI:
 
-            vector = w.VectorDouble(self.dim + 1)
+            vector = w.VectorDouble(self.dim+1)
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 

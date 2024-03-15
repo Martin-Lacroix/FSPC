@@ -38,7 +38,7 @@ class KNN(Interpolator):
         if self.K == 1:
             for i, pos in enumerate(position):
 
-                dist = np.linalg.norm(pos - self.recv_pos, axis=1)
+                dist = np.linalg.norm(pos-self.recv_pos, axis=1)
                 self.H[i, np.argmin(dist)] = 1
 
         else: self.search_K(position)
@@ -52,7 +52,7 @@ class KNN(Interpolator):
 
         for i, pos in enumerate(position):
 
-            dist = np.linalg.norm(pos - self.recv_pos, axis=1)
+            dist = np.linalg.norm(pos-self.recv_pos, axis=1)
             index = np.argsort(dist)[range(self.K)]
             weight = np.zeros(self.K)
             dist = dist[index]

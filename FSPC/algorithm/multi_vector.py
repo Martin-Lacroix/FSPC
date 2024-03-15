@@ -61,13 +61,13 @@ class MVJ(Algorithm):
 
         # Update the inverse Jacobian
 
-        X = np.transpose(W - np.dot(res_class.prev_J, V))
+        X = np.transpose(W-np.dot(res_class.prev_J, V))
         delta_J = np.transpose(np.linalg.lstsq(V.T, X, -1)[0])
-        res_class.J = res_class.prev_J + delta_J
+        res_class.J = res_class.prev_J+delta_J
 
         # Return the solution correction
 
-        delta = np.dot(res_class.J, R) - R
+        delta = np.dot(res_class.J, R)-R
         return np.split(delta, tb.Solver.get_size())
 
 # |-----------------------------------------------|
@@ -112,13 +112,13 @@ class MVJ(Algorithm):
             else:
 
                 R = np.hstack(-tb.ResMech.residual)
-                delta = np.dot(tb.ResMech.prev_J, R) - R
+                delta = np.dot(tb.ResMech.prev_J, R)-R
                 delta = np.split(delta, tb.Solver.get_size())
 
         else:
 
             tb.ResMech.V.append(np.hstack(tb.ResMech.delta_res()))
-            tb.ResMech.W.append(np.hstack(disp - self.prev_disp))
+            tb.ResMech.W.append(np.hstack(disp-self.prev_disp))
             delta = self.compute(tb.ResMech)
 
         # Update the pedicted displacement
@@ -145,13 +145,13 @@ class MVJ(Algorithm):
             else:
 
                 R = np.hstack(-tb.ResTher.residual)
-                delta = np.dot(tb.ResTher.prev_J, R) - R
+                delta = np.dot(tb.ResTher.prev_J, R)-R
                 delta = np.split(delta, tb.Solver.get_size())
 
         else:
 
             tb.ResTher.V.append(np.hstack(tb.ResTher.delta_res()))
-            tb.ResTher.W.append(np.hstack(temp - self.prev_temp))
+            tb.ResTher.W.append(np.hstack(temp-self.prev_temp))
             delta = self.compute(tb.ResTher)
 
         # Update the pedicted temperature

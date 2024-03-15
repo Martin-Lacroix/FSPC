@@ -51,7 +51,7 @@ sh.mesh.setRecombine(2, s)
 
 sh.addPhysicalGroup(2, [s], name='Solid')
 sh.addPhysicalGroup(1, l[2:3], name='FSInterface')
-sh.addPhysicalGroup(1, l[1:2] + l[3:4], name='Clamped')
+sh.addPhysicalGroup(1, l[1:2]+l[3:4], name='Clamped')
 sh.addPhysicalGroup(1, l[0:1], name='Bottom')
 
 # |--------------------------|
@@ -59,6 +59,6 @@ sh.addPhysicalGroup(1, l[0:1], name='Bottom')
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

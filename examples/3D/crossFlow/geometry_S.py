@@ -26,13 +26,13 @@ P = 4
 p = list()
 
 p.append(sh.occ.addPoint(L1, (B-b)/2, 0))
-p.append(sh.occ.addPoint(L1 + w, (B-b)/2, 0))
-p.append(sh.occ.addPoint(L1 + w, (B + b)/2, 0))
-p.append(sh.occ.addPoint(L1, (B + b)/2, 0))
+p.append(sh.occ.addPoint(L1+w, (B-b)/2, 0))
+p.append(sh.occ.addPoint(L1+w, (B+b)/2, 0))
+p.append(sh.occ.addPoint(L1, (B+b)/2, 0))
 p.append(sh.occ.addPoint(L1, (B-b)/2, h))
-p.append(sh.occ.addPoint(L1 + w, (B-b)/2, h))
-p.append(sh.occ.addPoint(L1 + w, (B + b)/2, h))
-p.append(sh.occ.addPoint(L1, (B + b)/2, h))
+p.append(sh.occ.addPoint(L1+w, (B-b)/2, h))
+p.append(sh.occ.addPoint(L1+w, (B+b)/2, h))
+p.append(sh.occ.addPoint(L1, (B+b)/2, h))
 
 # Lines List
 
@@ -106,6 +106,6 @@ sh.addPhysicalGroup(2, s[1:], name='FSInterface')
 # |--------------------------|
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

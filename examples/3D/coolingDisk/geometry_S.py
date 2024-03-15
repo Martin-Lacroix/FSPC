@@ -13,7 +13,7 @@ HF = 0.05
 
 # Volumes List
 
-v = sh.occ.addSphere(0, 0, HS + HF, RS)
+v = sh.occ.addSphere(0, 0, HS+HF, RS)
 sh.occ.synchronize()
 
 g = sh.getBoundary([(3, v)], 0, 0, 0)[0][1]
@@ -31,6 +31,6 @@ sh.addPhysicalGroup(2, [g], name='FSInterface')
 # |--------------------------|
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

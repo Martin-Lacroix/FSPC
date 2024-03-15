@@ -210,5 +210,5 @@ for i, file in enumerate(directory):
     X.append(gmsh.model.mesh.getNode(tag)[0][0])
     F.append(np.sum(gmsh.view.getModelData(1, i)[2]))
 
-tb.plot_ref(time, X - X[0], data)
+tb.plot_ref(time, X-X[0], data)
 tb.plot_ref(time, F, force)

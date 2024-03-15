@@ -104,6 +104,6 @@ sh.addPhysicalGroup(2, s[0:4], name='Clamped')
 # |--------------------------|
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

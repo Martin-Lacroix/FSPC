@@ -51,7 +51,7 @@ s = list()
 g = list()
 
 k.append(sh.occ.addCurveLoop([l[2], l[3]]))
-k.append(sh.occ.addCurveLoop([ - l[4], -l[5]]))
+k.append(sh.occ.addCurveLoop([-l[4], -l[5]]))
 g.append(sh.occ.addCurveLoop([l[0], l[3], l[1], l[5]]))
 g.append(sh.occ.addCurveLoop([l[1], l[2], l[0], l[4]]))
 
@@ -76,6 +76,6 @@ sh.addPhysicalGroup(2, s[0:1], name='Clamped')
 # |--------------------------|
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

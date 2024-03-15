@@ -26,15 +26,15 @@ def Quad_Circle(x):
     A = 0.6*R
     p = list()
 
-    p.append(sh.occ.addPoint(x, HF + HS, 0))
-    p.append(sh.occ.addPoint(x, HF + HS - R, 0))
-    p.append(sh.occ.addPoint(x + R, HF + HS, 0))
-    p.append(sh.occ.addPoint(x, HF + HS + R, 0))
-    p.append(sh.occ.addPoint(x - R, HF + HS, 0))
-    p.append(sh.occ.addPoint(x, HF + HS - A, 0))
-    p.append(sh.occ.addPoint(x + A, HF + HS, 0))
-    p.append(sh.occ.addPoint(x, HF + HS + A, 0))
-    p.append(sh.occ.addPoint(x - A, HF + HS, 0))
+    p.append(sh.occ.addPoint(x, HF+HS, 0))
+    p.append(sh.occ.addPoint(x, HF+HS-R, 0))
+    p.append(sh.occ.addPoint(x+R, HF+HS, 0))
+    p.append(sh.occ.addPoint(x, HF+HS+R, 0))
+    p.append(sh.occ.addPoint(x-R, HF+HS, 0))
+    p.append(sh.occ.addPoint(x, HF+HS-A, 0))
+    p.append(sh.occ.addPoint(x+A, HF+HS, 0))
+    p.append(sh.occ.addPoint(x, HF+HS+A, 0))
+    p.append(sh.occ.addPoint(x-A, HF+HS, 0))
 
     # Lines List
 
@@ -89,14 +89,14 @@ v, c = Quad_Circle(0.7)
 sh.addPhysicalGroup(2, s, name='S1')
 sh.addPhysicalGroup(2, u, name='S2')
 sh.addPhysicalGroup(2, v, name='S3')
-sh.addPhysicalGroup(2, s + u + v, name='Solid')
-sh.addPhysicalGroup(1, l + h + c, name='FSInterface')
+sh.addPhysicalGroup(2, s+u+v, name='Solid')
+sh.addPhysicalGroup(1, l+h+c, name='FSInterface')
 
 # |--------------------------|
 # |   Write the Mesh File    |
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

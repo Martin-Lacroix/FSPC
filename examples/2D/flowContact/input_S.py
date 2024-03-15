@@ -47,7 +47,7 @@ def getMetafor(parm):
 
     E = 200
     v = 0.3
-    G = E/(2*(1 + v))
+    G = E/(2*(1+v))
     K = E/(3*(1-2*v))
 
     materset = domain.getMaterialSet()
@@ -60,7 +60,7 @@ def getMetafor(parm):
 
     E = 100
     v = 0.3
-    G = E/(2*(1 + v))
+    G = E/(2*(1+v))
     K = E/(3*(1-2*v))
 
     materset.define(2, w.NeoHookeanHyperPk2Material)

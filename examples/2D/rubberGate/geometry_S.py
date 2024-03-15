@@ -12,7 +12,7 @@ L1 = 0.1
 
 # Characteristic size
 
-eps = 1e-5
+E = 1e-5
 N = 60
 M = 5
 
@@ -23,9 +23,9 @@ M = 5
 p = list()
 
 p.append(sh.occ.addPoint(L1, H, 0))
-p.append(sh.occ.addPoint(L1 + S, H, 0))
-p.append(sh.occ.addPoint(L1, eps, 0))
-p.append(sh.occ.addPoint(L1 + S, eps, 0))
+p.append(sh.occ.addPoint(L1+S, H, 0))
+p.append(sh.occ.addPoint(L1, E, 0))
+p.append(sh.occ.addPoint(L1+S, E, 0))
 
 # # Lines List
 
@@ -63,6 +63,6 @@ sh.addPhysicalGroup(1, l[1:2], name='Base')
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

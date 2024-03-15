@@ -15,7 +15,7 @@ class TimeStep(object):
         self.next = self.dt_save = dt_save
 
     def next_time(self):
-        return self.time + self.dt
+        return self.time+self.dt
 
     # Update next save time and export results if needed
 
@@ -23,7 +23,7 @@ class TimeStep(object):
 
         if self.time >= self.next: tb.Solver.save()
         next = math.floor(self.time/self.dt_save)
-        self.next = (next + 1)*self.dt_save
+        self.next = (next+1)*self.dt_save
 
     # Update the current coupling time step
 
@@ -51,7 +51,7 @@ class Residual(object):
         self.reset()
 
     def delta_res(self):
-        return self.residual - self.prev_res
+        return self.residual-self.prev_res
 
     # Reset all the convergence indicators
 
@@ -66,12 +66,12 @@ class Residual(object):
     def update_res(self, result: np.ndarray, prediction: np.ndarray):
 
         self.prev_res = np.copy(self.residual)
-        self.residual = result - prediction
+        self.residual = result-prediction
 
         res = np.linalg.norm(self.residual, axis=0)
         den = np.linalg.norm(result, axis=0)
 
-        res = res/(den + self.tol)
+        res = res/(den+self.tol)
         self.epsilon = np.linalg.norm(res)
 
     # Check if the convergence criterion is verified

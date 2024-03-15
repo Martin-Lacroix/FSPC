@@ -84,6 +84,6 @@ for i, file in enumerate(directory):
 
     gmsh.open(file)
     D = gmsh.view.getModelData(0, i)[2]
-    for i, R in enumerate(T): R.append(D[tag[i] - 1][0])
+    for i, R in enumerate(T): R.append(D[tag[i]-1][0])
 
 tb.plot_ref(time, T, data)

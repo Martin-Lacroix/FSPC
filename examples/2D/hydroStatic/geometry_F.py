@@ -19,8 +19,8 @@ p = list()
 
 p.append(sh.occ.addPoint(L, HS, 0, d))
 p.append(sh.occ.addPoint(0, HS, 0, d))
-p.append(sh.occ.addPoint(L, HS + HF, 0, d))
-p.append(sh.occ.addPoint(0, HS + HF, 0, d))
+p.append(sh.occ.addPoint(L, HS+HF, 0, d))
+p.append(sh.occ.addPoint(0, HS+HF, 0, d))
 
 # Lines List
 
@@ -44,7 +44,7 @@ sh.occ.synchronize()
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, l[0:1], name='FSInterface')
 sh.addPhysicalGroup(1, l[2:3], name='FreeSurface')
-sh.addPhysicalGroup(1, l[1:2] + l[3:4], name='Wall')
+sh.addPhysicalGroup(1, l[1:2]+l[3:4], name='Wall')
 
 # |--------------------------|
 # |   Write the Mesh File    |
@@ -52,6 +52,6 @@ sh.addPhysicalGroup(1, l[1:2] + l[3:4], name='Wall')
 
 sh.mesh.generate(2)
 gmsh.model.mesh.reverse()
-gmsh.write(os.path.dirname(__file__) + '/geometry_F.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

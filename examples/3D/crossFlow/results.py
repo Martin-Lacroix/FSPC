@@ -55,5 +55,5 @@ for file in directory:
     gmsh.open(file)
     D.append(gmsh.model.mesh.getNode(tag)[0])
 
-disp = np.linalg.norm(D - D[0], axis=1)
+disp = np.linalg.norm(D-D[0], axis=1)
 tb.plot_ref(time, disp, data)

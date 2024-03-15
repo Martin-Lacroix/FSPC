@@ -7,16 +7,16 @@ gmsh.initialize()
 # |---------------------------|
 
 R = 0.25
-L = 0.15 + R
+L = 0.15+R
 H = -0.125
 
-L1 = 0.25 + R
+L1 = 0.25+R
 L2 = 0.6-2*R
 
 D1 = 3.75-10*R
 D2 = 1.25
 
-HB = 0.75 + H + 5*R
+HB = 0.75+H+5*R
 RB = 0.375
 
 # Characteristic size
@@ -35,47 +35,47 @@ p = list()
 q = list()
 r = list()
 
-p.append(sh.occ.addPoint(-(L + L1 + L2), H-5*R, 0, d))
-p.append(sh.occ.addPoint(-(L + L1 + L2), H + 5*R, 0, d))
+p.append(sh.occ.addPoint(-(L+L1+L2), H-5*R, 0, d))
+p.append(sh.occ.addPoint(-(L+L1+L2), H+5*R, 0, d))
 
-p.append(sh.occ.addPoint(-L, H + 5*R, 0, d))
-p.append(sh.occ.addPoint(-L, H + 4*R, 0, d))
-p.append(sh.occ.addPoint(-L, H + 3*R, 0, d))
+p.append(sh.occ.addPoint(-L, H+5*R, 0, d))
+p.append(sh.occ.addPoint(-L, H+4*R, 0, d))
+p.append(sh.occ.addPoint(-L, H+3*R, 0, d))
 
-p.append(sh.occ.addPoint(-(L + L2), H + 3*R, 0, d))
-p.append(sh.occ.addPoint(-(L + L2), H + 2*R, 0, d))
-p.append(sh.occ.addPoint(-(L + L2), H + R, 0, d))
+p.append(sh.occ.addPoint(-(L+L2), H+3*R, 0, d))
+p.append(sh.occ.addPoint(-(L+L2), H+2*R, 0, d))
+p.append(sh.occ.addPoint(-(L+L2), H+R, 0, d))
 
-p.append(sh.occ.addPoint(-L, H + R, 0, d))
+p.append(sh.occ.addPoint(-L, H+R, 0, d))
 p.append(sh.occ.addPoint(-L, H, 0, d))
 p.append(sh.occ.addPoint(-L, H-R, 0, d))
 
-p.append(sh.occ.addPoint(-(L + L2), H-R, 0, d))
-p.append(sh.occ.addPoint(-(L + L2), H-2*R, 0, d))
-p.append(sh.occ.addPoint(-(L + L2), H-3*R, 0, d))
+p.append(sh.occ.addPoint(-(L+L2), H-R, 0, d))
+p.append(sh.occ.addPoint(-(L+L2), H-2*R, 0, d))
+p.append(sh.occ.addPoint(-(L+L2), H-3*R, 0, d))
 
 p.append(sh.occ.addPoint(-L, H-3*R, 0, d))
 p.append(sh.occ.addPoint(-L, H-4*R, 0, d))
 p.append(sh.occ.addPoint(-L, H-5*R, 0, d))
 
-q.append(sh.occ.addPoint(L + L1 + L2, -H-5*R, 0, d))
-q.append(sh.occ.addPoint(L + L1 + L2, -H + 5*R, 0, d))
+q.append(sh.occ.addPoint(L+L1+L2, -H-5*R, 0, d))
+q.append(sh.occ.addPoint(L+L1+L2, -H+5*R, 0, d))
 
-q.append(sh.occ.addPoint(L, -H + 5*R, 0, d))
-q.append(sh.occ.addPoint(L, -H + 4*R, 0, d))
-q.append(sh.occ.addPoint(L, -H + 3*R, 0, d))
+q.append(sh.occ.addPoint(L, -H+5*R, 0, d))
+q.append(sh.occ.addPoint(L, -H+4*R, 0, d))
+q.append(sh.occ.addPoint(L, -H+3*R, 0, d))
 
-q.append(sh.occ.addPoint(L + L2, -H + 3*R, 0, d))
-q.append(sh.occ.addPoint(L + L2, -H + 2*R, 0, d))
-q.append(sh.occ.addPoint(L + L2, -H + R, 0, d))
+q.append(sh.occ.addPoint(L+L2, -H+3*R, 0, d))
+q.append(sh.occ.addPoint(L+L2, -H+2*R, 0, d))
+q.append(sh.occ.addPoint(L+L2, -H+R, 0, d))
 
-q.append(sh.occ.addPoint(L, -H + R, 0, d))
+q.append(sh.occ.addPoint(L, -H+R, 0, d))
 q.append(sh.occ.addPoint(L, -H, 0, d))
 q.append(sh.occ.addPoint(L, -H-R, 0, d))
 
-q.append(sh.occ.addPoint(L + L2, -H-R, 0, d))
-q.append(sh.occ.addPoint(L + L2, -H-2*R, 0, d))
-q.append(sh.occ.addPoint(L + L2, -H-3*R, 0, d))
+q.append(sh.occ.addPoint(L+L2, -H-R, 0, d))
+q.append(sh.occ.addPoint(L+L2, -H-2*R, 0, d))
+q.append(sh.occ.addPoint(L+L2, -H-3*R, 0, d))
 
 q.append(sh.occ.addPoint(L, -H-3*R, 0, d))
 q.append(sh.occ.addPoint(L, -H-4*R, 0, d))
@@ -162,9 +162,9 @@ sh.addPhysicalGroup(2, [x, y], name='Wall')
 sh.addPhysicalGroup(2, [x, y, z], name='Solid')
 
 sh.addPhysicalGroup(1, c, name='Circle')
-sh.addPhysicalGroup(1, l + h, name='Side')
-sh.addPhysicalGroup(1, l[0:1] + h[0:1], name='Clamped')
-sh.addPhysicalGroup(1, l[1:] + h[1:] + c, name='FSInterface')
+sh.addPhysicalGroup(1, l+h, name='Side')
+sh.addPhysicalGroup(1, l[0:1]+h[0:1], name='Clamped')
+sh.addPhysicalGroup(1, l[1:]+h[1:]+c, name='FSInterface')
 
 # |--------------------------|
 # |   Write the Mesh File    |
@@ -174,6 +174,6 @@ gmsh.option.setNumber('Mesh.RecombineAll', 1)
 gmsh.option.setNumber('Mesh.Algorithm', 6)
 sh.mesh.generate(2)
 
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

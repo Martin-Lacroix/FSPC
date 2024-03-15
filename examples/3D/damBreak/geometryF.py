@@ -129,13 +129,13 @@ sh.occ.synchronize()
 sh.addPhysicalGroup(3, [v], name='Fluid')
 sh.addPhysicalGroup(2, [s[1], s[4]], name='FreeSurface')
 sh.addPhysicalGroup(2, [s[6], s[12], s[13]], name='FSInterface')
-sh.addPhysicalGroup(2, [s[0], s[2], s[3], s[5]] + s[7:12], name='Reservoir')
+sh.addPhysicalGroup(2, [s[0], s[2], s[3], s[5]]+s[7:12], name='Reservoir')
 
 # |----------------------------------------|
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-fun = str(d) + ' + 0.4*F1'
+fun = str(d)+'+0.4*F1'
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e3)
 sh.mesh.field.setNumbers(1, 'SurfacesList', s)
@@ -150,6 +150,6 @@ gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
 # Write the Mesh File
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__) + '/geometry_F.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

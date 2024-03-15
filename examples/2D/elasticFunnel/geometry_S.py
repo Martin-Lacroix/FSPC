@@ -24,13 +24,13 @@ P = 5
 p = list()
 
 p.append(sh.occ.addPoint(-R, H, 0))
-p.append(sh.occ.addPoint(-(R + s), H, 0))
+p.append(sh.occ.addPoint(-(R+s), H, 0))
 p.append(sh.occ.addPoint(-R, 0, 0))
-p.append(sh.occ.addPoint(-(R + s), 0, 0))
+p.append(sh.occ.addPoint(-(R+s), 0, 0))
 p.append(sh.occ.addPoint(R, H, 0))
-p.append(sh.occ.addPoint(R + s, H, 0))
+p.append(sh.occ.addPoint(R+s, H, 0))
 p.append(sh.occ.addPoint(R, 0, 0))
-p.append(sh.occ.addPoint(R + s, 0, 0))
+p.append(sh.occ.addPoint(R+s, 0, 0))
 p.append(sh.occ.addPoint(0, 0, 0))
 
 # Lines List
@@ -84,14 +84,14 @@ for a in s: sh.mesh.setRecombine(2, a)
 # Physical Boundary
 
 sh.addPhysicalGroup(2, s, name='Solid')
-sh.addPhysicalGroup(1, l[3:4] + l[7:8] + l[9:10], name='FSInterface')
-sh.addPhysicalGroup(1, l[0:1] + l[6:7], name='Base')
+sh.addPhysicalGroup(1, l[3:4]+l[7:8]+l[9:10], name='FSInterface')
+sh.addPhysicalGroup(1, l[0:1]+l[6:7], name='Base')
 
 # |--------------------------|
 # |   Write the Mesh File    |
 # |--------------------------|
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__) + '/geometry_S.msh')
+gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

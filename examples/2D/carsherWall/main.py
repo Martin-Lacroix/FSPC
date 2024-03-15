@@ -3,8 +3,8 @@ import FSPC
 
 # Path to the solver input files
 
-path_F = path.dirname(__file__) + '/input_F.lua'
-path_S = path.dirname(__file__) + '/input_S.py'
+path_F = path.dirname(__file__)+'/input_F.lua'
+path_S = path.dirname(__file__)+'/input_S.py'
 FSPC.init_solver(path_F, path_S)
 
 # Set the coupling algorithm

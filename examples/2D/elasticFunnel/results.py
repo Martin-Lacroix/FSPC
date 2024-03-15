@@ -323,5 +323,5 @@ for file in directory:
     gmsh.open(file)
     Y.append(gmsh.model.mesh.getNode(tag)[0][1])
 
-tb.plot_ref(time, Y - Y[0], data)
+tb.plot_ref(time, Y-Y[0], data)
 

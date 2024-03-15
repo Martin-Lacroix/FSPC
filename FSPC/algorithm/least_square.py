@@ -58,7 +58,7 @@ class ILS(Algorithm):
 
         # Return the solution correction
 
-        delta = np.dot(W, np.linalg.lstsq(V, R, -1)[0]) - R
+        delta = np.dot(W, np.linalg.lstsq(V, R, -1)[0])-R
         return np.split(delta, tb.Solver.get_size())
 
 # |-------------------------------------------------|
@@ -81,7 +81,7 @@ class ILS(Algorithm):
         else:
 
             tb.ResMech.V.append(np.hstack(tb.ResMech.delta_res()))
-            tb.ResMech.W.append(np.hstack(disp - self.prev_disp))
+            tb.ResMech.W.append(np.hstack(disp-self.prev_disp))
             delta = self.compute(tb.ResMech)
 
         # Update the pedicted displacement
@@ -109,7 +109,7 @@ class ILS(Algorithm):
         else:
             
             tb.ResTher.V.append(np.hstack(tb.ResTher.delta_res()))
-            tb.ResTher.W.append(np.hstack(temp - self.prev_temp))
+            tb.ResTher.W.append(np.hstack(temp-self.prev_temp))
             delta = self.compute(tb.ResTher)
 
         # Update the predicted temperature
