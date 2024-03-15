@@ -84,8 +84,8 @@ for a in s: sh.mesh.setRecombine(2, a)
 # Physical Boundary
 
 sh.addPhysicalGroup(2, s, name='Solid')
-sh.addPhysicalGroup(1, [l[3], l[7], l[9]], name='FSInterface')
-sh.addPhysicalGroup(1, [l[0], l[6]], name='Base')
+sh.addPhysicalGroup(1, l[3:4] + l[7:8] + l[9:10], name='FSInterface')
+sh.addPhysicalGroup(1, l[0:1] + l[6:7], name='Base')
 
 # |--------------------------|
 # |   Write the Mesh File    |

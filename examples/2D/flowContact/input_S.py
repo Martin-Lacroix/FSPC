@@ -36,7 +36,7 @@ def getMetafor(parm):
 
     iset = domain.getInteractionSet()
     app1 = w.FieldApplicator(1)
-    app1.push(groups['Peigne'])
+    app1.push(groups['Wall'])
     iset.add(app1)
 
     app2 = w.FieldApplicator(2)
@@ -100,14 +100,13 @@ def getMetafor(parm):
 
     prp4 = w.ElementProperties(w.NodStress2DElement)
     nod1 = w.NodInteraction(3)
-    nod1.push(groups['DiskSide'])
+    nod1.push(groups['Circle'])
     nod1.addProperty(prp4)
     iset.add(nod1)
 
     prp3 = w.ElementProperties(w.NodStress2DElement)
     nod2 = w.NodInteraction(4)
-    nod2.push(groups['PeigneSide'])
-    nod2.push(groups['Clamped'])
+    nod2.push(groups['Side'])
     nod2.addProperty(prp3)
     iset.add(nod2)
 
@@ -123,9 +122,9 @@ def getMetafor(parm):
     # Defines the contact entities
 
     ci = w.DdContactInteraction(5)
-    ci.setTool(groups['PeigneSide'])
+    ci.setTool(groups['Side'])
     ci.setSmoothNormals(False)
-    ci.push(groups['DiskSide'])
+    ci.push(groups['Circle'])
     ci.setSinglePass()
     ci.addProperty(prp5)
     iset.add(ci)
@@ -158,8 +157,8 @@ def getMetafor(parm):
     # Nodal GMSH extractor
 
     ext = w.GmshNodalExtractor(metafor, 'metafor/output')
-    ext.add(1, w.IFNodalValueExtractor(groups['Disk'], w.IF_EVMS))
-    ext.add(2, w.IFNodalValueExtractor(groups['Peigne'], w.IF_EVMS))
+    ext.add(1, w.IFNodalValueExtractor(groups['Solid'], w.IF_P))
+    ext.add(2, w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
     parm['extractor'] = ext
 
     # Build domain and folder

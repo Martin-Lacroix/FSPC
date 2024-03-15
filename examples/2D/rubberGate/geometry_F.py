@@ -54,12 +54,12 @@ s = sh.occ.addPlaneSurface([k])
 sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(l[2], N)
 
-# Boundary Domains
+# Physical Boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, l[4:5], name='FreeSurface')
 sh.addPhysicalGroup(1, l[2:3], name='FSInterface')
-sh.addPhysicalGroup(1, [l[0], l[3]] + l[5:7], name='Reservoir')
+sh.addPhysicalGroup(1, l[0:1] + l[3:4] + l[5:7], name='Reservoir')
 
 # |----------------------------------------|
 # |   Mesh Characteristic Size Function    |

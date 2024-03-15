@@ -32,6 +32,8 @@ Q = 15
 # |----------------------------------|
 
 p = list()
+q = list()
+r = list()
 
 p.append(sh.occ.addPoint(-(L + L1 + L2), H-5*R, 0, d))
 p.append(sh.occ.addPoint(-(L + L1 + L2), H + 5*R, 0, d))
@@ -56,32 +58,32 @@ p.append(sh.occ.addPoint(-L, H-3*R, 0, d))
 p.append(sh.occ.addPoint(-L, H-4*R, 0, d))
 p.append(sh.occ.addPoint(-L, H-5*R, 0, d))
 
-p.append(sh.occ.addPoint(L + L1 + L2, -H-5*R, 0, d))
-p.append(sh.occ.addPoint(L + L1 + L2, -H + 5*R, 0, d))
+q.append(sh.occ.addPoint(L + L1 + L2, -H-5*R, 0, d))
+q.append(sh.occ.addPoint(L + L1 + L2, -H + 5*R, 0, d))
 
-p.append(sh.occ.addPoint(L, -H + 5*R, 0, d))
-p.append(sh.occ.addPoint(L, -H + 4*R, 0, d))
-p.append(sh.occ.addPoint(L, -H + 3*R, 0, d))
+q.append(sh.occ.addPoint(L, -H + 5*R, 0, d))
+q.append(sh.occ.addPoint(L, -H + 4*R, 0, d))
+q.append(sh.occ.addPoint(L, -H + 3*R, 0, d))
 
-p.append(sh.occ.addPoint(L + L2, -H + 3*R, 0, d))
-p.append(sh.occ.addPoint(L + L2, -H + 2*R, 0, d))
-p.append(sh.occ.addPoint(L + L2, -H + R, 0, d))
+q.append(sh.occ.addPoint(L + L2, -H + 3*R, 0, d))
+q.append(sh.occ.addPoint(L + L2, -H + 2*R, 0, d))
+q.append(sh.occ.addPoint(L + L2, -H + R, 0, d))
 
-p.append(sh.occ.addPoint(L, -H + R, 0, d))
-p.append(sh.occ.addPoint(L, -H, 0, d))
-p.append(sh.occ.addPoint(L, -H-R, 0, d))
+q.append(sh.occ.addPoint(L, -H + R, 0, d))
+q.append(sh.occ.addPoint(L, -H, 0, d))
+q.append(sh.occ.addPoint(L, -H-R, 0, d))
 
-p.append(sh.occ.addPoint(L + L2, -H-R, 0, d))
-p.append(sh.occ.addPoint(L + L2, -H-2*R, 0, d))
-p.append(sh.occ.addPoint(L + L2, -H-3*R, 0, d))
+q.append(sh.occ.addPoint(L + L2, -H-R, 0, d))
+q.append(sh.occ.addPoint(L + L2, -H-2*R, 0, d))
+q.append(sh.occ.addPoint(L + L2, -H-3*R, 0, d))
 
-p.append(sh.occ.addPoint(L, -H-3*R, 0, d))
-p.append(sh.occ.addPoint(L, -H-4*R, 0, d))
-p.append(sh.occ.addPoint(L, -H-5*R, 0, d))
+q.append(sh.occ.addPoint(L, -H-3*R, 0, d))
+q.append(sh.occ.addPoint(L, -H-4*R, 0, d))
+q.append(sh.occ.addPoint(L, -H-5*R, 0, d))
 
-p.append(sh.occ.addPoint(-RB, HB, 0, d))
-p.append(sh.occ.addPoint(0, HB, 0, d))
-p.append(sh.occ.addPoint(RB, HB, 0, d))
+r.append(sh.occ.addPoint(-RB, HB, 0, d))
+r.append(sh.occ.addPoint(0, HB, 0, d))
+r.append(sh.occ.addPoint(RB, HB, 0, d))
 
 # Lines List
 
@@ -89,6 +91,7 @@ l = list()
 h = list()
 c = list()
 
+l.append(sh.occ.addLine(p[1], p[0]))
 l.append(sh.occ.addLine(p[0], p[16]))
 l.append(sh.occ.addCircleArc(p[14], p[15], p[16]))
 l.append(sh.occ.addLine(p[14], p[13]))
@@ -100,41 +103,36 @@ l.append(sh.occ.addCircleArc(p[7], p[6], p[5]))
 l.append(sh.occ.addLine(p[5], p[4]))
 l.append(sh.occ.addCircleArc(p[2], p[3], p[4]))
 l.append(sh.occ.addLine(p[2], p[1]))
-l.append(sh.occ.addLine(p[1], p[0]))
 
-h.append(sh.occ.addLine(p[17], p[18]))
-h.append(sh.occ.addLine(p[18], p[19]))
-h.append(sh.occ.addCircleArc(p[21], p[20], p[19]))
-h.append(sh.occ.addLine(p[21], p[22]))
-h.append(sh.occ.addCircleArc(p[22], p[23], p[24]))
-h.append(sh.occ.addLine(p[24], p[25]))
-h.append(sh.occ.addCircleArc(p[27], p[26], p[25]))
-h.append(sh.occ.addLine(p[27], p[28]))
-h.append(sh.occ.addCircleArc(p[28], p[29], p[30]))
-h.append(sh.occ.addLine(p[30], p[31]))
-h.append(sh.occ.addCircleArc(p[33], p[32], p[31]))
-h.append(sh.occ.addLine(p[33], p[17]))
+h.append(sh.occ.addLine(q[1], q[0]))
+h.append(sh.occ.addLine(q[0], q[16]))
+h.append(sh.occ.addCircleArc(q[16], q[15], q[14]))
+h.append(sh.occ.addLine(q[14], q[13]))
+h.append(sh.occ.addCircleArc(q[11], q[12], q[13]))
+h.append(sh.occ.addLine(q[11], q[10]))
+h.append(sh.occ.addCircleArc(q[10], q[9], q[8]))
+h.append(sh.occ.addLine(q[8], q[7]))
+h.append(sh.occ.addCircleArc(q[5], q[6], q[7]))
+h.append(sh.occ.addLine(q[5], q[4]))
+h.append(sh.occ.addCircleArc(q[4], q[3], q[2]))
+h.append(sh.occ.addLine(q[2], q[1]))
 
-c.append(sh.occ.addCircleArc(p[36], p[35], p[34]))
-c.append(sh.occ.addCircleArc(p[34], p[35], p[36]))
+c.append(sh.occ.addCircleArc(r[2], r[1], r[0]))
+c.append(sh.occ.addCircleArc(r[0], r[1], r[2]))
 
 # |------------------------------------|
 # |   Physical Surface and Boundary    |
 # |------------------------------------|
 
-k = list()
-s = list()
+x = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(l)])
+y = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(h)])
+z = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(c)])
 
-k.append(sh.occ.addCurveLoop(l))
-k.append(sh.occ.addCurveLoop(h))
-k.append(sh.occ.addCurveLoop(c))
-
-for a in k: s.append(sh.occ.addPlaneSurface([a]))
+#for a in k: s.append(sh.occ.addPlaneSurface([a]))
 sh.occ.synchronize()
 
-sh.mesh.setAlgorithm(2, s[0], 8)
-sh.mesh.setAlgorithm(2, s[1], 8)
-sh.mesh.setReverse(2, s[2])
+sh.mesh.setReverse(2, y)
+sh.mesh.setReverse(2, z)
 sh.occ.synchronize()
 
 # Transfinite Mesh
@@ -142,42 +140,31 @@ sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(c[0], N)
 sh.mesh.setTransfiniteCurve(c[1], N)
 
-sh.mesh.setTransfiniteCurve(l[1], M)
-sh.mesh.setTransfiniteCurve(l[3], M)
-sh.mesh.setTransfiniteCurve(l[5], M)
-sh.mesh.setTransfiniteCurve(l[7], M)
-sh.mesh.setTransfiniteCurve(l[9], M)
+for i in (2,4,6,8,10):
 
-sh.mesh.setTransfiniteCurve(h[2], M)
-sh.mesh.setTransfiniteCurve(h[4], M)
-sh.mesh.setTransfiniteCurve(h[6], M)
-sh.mesh.setTransfiniteCurve(h[8], M)
-sh.mesh.setTransfiniteCurve(h[10], M)
+    sh.mesh.setTransfiniteCurve(l[i], M)
+    sh.mesh.setTransfiniteCurve(h[i], M)
 
-sh.mesh.setTransfiniteCurve(l[2], P)
-sh.mesh.setTransfiniteCurve(l[4], P)
-sh.mesh.setTransfiniteCurve(l[6], P)
-sh.mesh.setTransfiniteCurve(l[8], P)
+for i in (3,5,7,9):
 
-sh.mesh.setTransfiniteCurve(h[3], P)
-sh.mesh.setTransfiniteCurve(h[5], P)
-sh.mesh.setTransfiniteCurve(h[7], P)
-sh.mesh.setTransfiniteCurve(h[9], P)
+    sh.mesh.setTransfiniteCurve(l[i], P)
+    sh.mesh.setTransfiniteCurve(h[i], P)
 
-sh.mesh.setTransfiniteCurve(l[0], Q)
-sh.mesh.setTransfiniteCurve(l[10], Q)
+for i in (1,11):
 
-sh.mesh.setTransfiniteCurve(h[1], Q)
-sh.mesh.setTransfiniteCurve(h[11], Q)
+    sh.mesh.setTransfiniteCurve(l[i], Q)
+    sh.mesh.setTransfiniteCurve(h[i], Q)
 
-# Boundaries
+# Physical Boundary
 
-sh.addPhysicalGroup(2, s[2:3], name='Disk')
-sh.addPhysicalGroup(2, s[0:2], name='Peigne')
-sh.addPhysicalGroup(1, l[:11] + h[1:], name='PeigneSide')
-sh.addPhysicalGroup(1, l[:11] + h[1:] + c, name='FSInterface')
-sh.addPhysicalGroup(1, [l[11], h[0]], name='Clamped')
-sh.addPhysicalGroup(1, c, name='DiskSide')
+sh.addPhysicalGroup(2, [z], name='Disk')
+sh.addPhysicalGroup(2, [x, y], name='Wall')
+sh.addPhysicalGroup(2, [x, y, z], name='Solid')
+
+sh.addPhysicalGroup(1, c, name='Circle')
+sh.addPhysicalGroup(1, l + h, name='Side')
+sh.addPhysicalGroup(1, l[0:1] + h[0:1], name='Clamped')
+sh.addPhysicalGroup(1, l[1:] + h[1:] + c, name='FSInterface')
 
 # |--------------------------|
 # |   Write the Mesh File    |

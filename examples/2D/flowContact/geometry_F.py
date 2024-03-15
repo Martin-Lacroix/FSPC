@@ -131,15 +131,6 @@ q.append(sh.occ.addLine(p[37], p[0]))
 c.append(sh.occ.addCircleArc(p[34], p[35], p[36]))
 c.append(sh.occ.addCircleArc(p[36], p[35], p[34]))
 
-# Closing polytope line
-
-L = sh.occ.addLine(p[0], p[1])
-R = sh.occ.addLine(p[17], p[18])
-
-sh.occ.synchronize()
-sh.mesh.setTransfiniteCurve(L, 1)
-sh.mesh.setTransfiniteCurve(R, 1)
-
 # |------------------------------------|
 # |   Physical Surface and Boundary    |
 # |------------------------------------|
@@ -156,39 +147,26 @@ sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(c[0], N)
 sh.mesh.setTransfiniteCurve(c[1], N)
 
-sh.mesh.setTransfiniteCurve(l[1], M)
-sh.mesh.setTransfiniteCurve(l[3], M)
-sh.mesh.setTransfiniteCurve(l[5], M)
-sh.mesh.setTransfiniteCurve(l[7], M)
-sh.mesh.setTransfiniteCurve(l[9], M)
+for i in (1,3,5,7,9):
 
-sh.mesh.setTransfiniteCurve(r[1], M)
-sh.mesh.setTransfiniteCurve(r[3], M)
-sh.mesh.setTransfiniteCurve(r[5], M)
-sh.mesh.setTransfiniteCurve(r[7], M)
-sh.mesh.setTransfiniteCurve(r[9], M)
+    sh.mesh.setTransfiniteCurve(l[i], M)
+    sh.mesh.setTransfiniteCurve(r[i], M)
 
-sh.mesh.setTransfiniteCurve(l[2], P)
-sh.mesh.setTransfiniteCurve(l[4], P)
-sh.mesh.setTransfiniteCurve(l[6], P)
-sh.mesh.setTransfiniteCurve(l[8], P)
+for i in (2,4,6,8):
 
-sh.mesh.setTransfiniteCurve(r[2], P)
-sh.mesh.setTransfiniteCurve(r[4], P)
-sh.mesh.setTransfiniteCurve(r[6], P)
-sh.mesh.setTransfiniteCurve(r[8], P)
+    sh.mesh.setTransfiniteCurve(l[i], P)
+    sh.mesh.setTransfiniteCurve(r[i], P)
 
-sh.mesh.setTransfiniteCurve(l[0], Q)
-sh.mesh.setTransfiniteCurve(l[10], Q)
+for i in (0,10):
 
-sh.mesh.setTransfiniteCurve(r[0], Q)
-sh.mesh.setTransfiniteCurve(r[10], Q)
+    sh.mesh.setTransfiniteCurve(l[i], Q)
+    sh.mesh.setTransfiniteCurve(r[i], Q)
 
 # Physical Boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, q[1:2], name='FreeSurface')
-sh.addPhysicalGroup(1, [h[0], h[2], q[0], q[2]], name='Wall')
+sh.addPhysicalGroup(1, h[0:1] + h[2:3] + q[0:1] + q[2:3], name='Wall')
 sh.addPhysicalGroup(1, l + r + c, name='FSInterface')
 sh.addPhysicalGroup(1, h[1:2], name='Inlet')
 
