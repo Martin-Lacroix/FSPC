@@ -30,7 +30,7 @@ p.append(sh.occ.addPoint(R, -R, 0, d))
 p.append(sh.occ.addPoint(R, R, 0, d))
 p.append(sh.occ.addPoint(-R, R, 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 h = list()
@@ -83,7 +83,7 @@ sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
 gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
 
-# Write the Mesh File
+# Write the mesh
 
 sh.mesh.generate(2)
 gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')

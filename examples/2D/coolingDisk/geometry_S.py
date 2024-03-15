@@ -21,7 +21,7 @@ M = 5
 # |   Function to Make a Circle    |
 # |--------------------------------|
 
-def Quad_Circle(x):
+def quad_circle(x):
 
     A = 0.6*R
     p = list()
@@ -36,7 +36,7 @@ def Quad_Circle(x):
     p.append(sh.occ.addPoint(x, HF+HS+A, 0))
     p.append(sh.occ.addPoint(x-A, HF+HS, 0))
 
-    # Lines List
+    # Lines list
 
     l = list()
     c = list()
@@ -69,7 +69,7 @@ def Quad_Circle(x):
     for a in k: s.append(sh.occ.addPlaneSurface([a]))
     sh.occ.synchronize()
 
-    # Transfinite Mesh
+    # Transfinite mesh
 
     for a in c: sh.mesh.setTransfiniteCurve(a, N)
     for a in l[:4]: sh.mesh.setTransfiniteCurve(a, N)
@@ -82,9 +82,9 @@ def Quad_Circle(x):
 # |   Physical Surface and Boundary    |
 # |------------------------------------|
 
-s, l = Quad_Circle(0.2)
-u, h = Quad_Circle(0.45)
-v, c = Quad_Circle(0.7)
+s, l = quad_circle(0.2)
+u, h = quad_circle(0.45)
+v, c = quad_circle(0.7)
 
 sh.addPhysicalGroup(2, s, name='S1')
 sh.addPhysicalGroup(2, u, name='S2')

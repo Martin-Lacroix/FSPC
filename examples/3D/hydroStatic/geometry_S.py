@@ -31,7 +31,7 @@ p.append(sh.occ.addPoint(0, W, 0))
 p.append(sh.occ.addPoint(L, W, HS))
 p.append(sh.occ.addPoint(0, W, HS))
 
-# Lines List
+# Lines list
 
 l = list()
 
@@ -84,7 +84,7 @@ sh.mesh.setTransfiniteCurve(l[11], M)
 for a in s: sh.mesh.setTransfiniteSurface(a)
 for a in s: sh.mesh.setRecombine(2, a)
 
-# Volumes List
+# Volumes list
 
 h = sh.occ.addSurfaceLoop(s)
 v = sh.occ.addVolume([h])
@@ -93,7 +93,7 @@ sh.occ.synchronize()
 sh.mesh.setTransfiniteVolume(v)
 sh.mesh.setRecombine(3, v)
 
-# Physical Surface
+# Physical surface
 
 sh.addPhysicalGroup(3, [v], name='Solid')
 sh.addPhysicalGroup(2, s[5:6], name='FSInterface')

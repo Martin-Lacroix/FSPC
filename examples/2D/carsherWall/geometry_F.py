@@ -73,7 +73,7 @@ q.append(sh.occ.addPoint(L1+L2-E, S+D+E, 0, d))
 q.append(sh.occ.addPoint(L1+L2-W-E, S+E, 0, d))
 q.append(sh.occ.addPoint(L1+L2-W-E, S+D+E, 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 h = list()
@@ -126,7 +126,7 @@ sh.mesh.setTransfiniteCurve(h[1], N)
 sh.mesh.setTransfiniteCurve(h[2], M)
 sh.mesh.setTransfiniteCurve(h[3], N)
 
-# Physical Boundary
+# Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, h, name='FSInterface')

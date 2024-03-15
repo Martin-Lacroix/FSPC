@@ -33,7 +33,7 @@ p.append(sh.occ.addPoint(BX, CY+BH, 0, d))
 p.append(sh.occ.addPoint(CX+A, CY-BH, 0, d))
 p.append(sh.occ.addPoint(CX+A, CY+BH, 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 
@@ -58,7 +58,7 @@ sh.mesh.setTransfiniteCurve(l[3], M)
 sh.mesh.setTransfiniteSurface(s)
 sh.mesh.setRecombine(2, s)
 
-# Physical Boundary
+# Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Solid')
 sh.addPhysicalGroup(1, l[3:4], name='Clamped')

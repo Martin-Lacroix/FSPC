@@ -32,7 +32,7 @@ p.append(sh.occ.addPoint(0, W, HS))
 p.append(sh.occ.addPoint(L, W, HS+HF))
 p.append(sh.occ.addPoint(0, W, HS+HF))
 
-# Lines List
+# Lines list
 
 l = list()
 
@@ -82,13 +82,13 @@ sh.mesh.setTransfiniteCurve(l[9], M)
 sh.mesh.setTransfiniteCurve(l[10], M)
 sh.mesh.setTransfiniteCurve(l[11], M)
 
-# Volumes List
+# Volumes list
 
 h = sh.occ.addSurfaceLoop(s)
 v = sh.occ.addVolume([h])
 sh.occ.synchronize()
 
-# Physical Surface
+# Physical surface
 
 sh.addPhysicalGroup(3, [v], name='Fluid')
 sh.addPhysicalGroup(2, s[0:4], name='Wall')

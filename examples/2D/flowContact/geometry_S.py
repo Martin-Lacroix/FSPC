@@ -85,7 +85,7 @@ r.append(sh.occ.addPoint(-RB, HB, 0, d))
 r.append(sh.occ.addPoint(0, HB, 0, d))
 r.append(sh.occ.addPoint(RB, HB, 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 h = list()
@@ -128,14 +128,11 @@ x = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(l)])
 y = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(h)])
 z = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(c)])
 
-#for a in k: s.append(sh.occ.addPlaneSurface([a]))
 sh.occ.synchronize()
-
 sh.mesh.setReverse(2, y)
 sh.mesh.setReverse(2, z)
-sh.occ.synchronize()
 
-# Transfinite Mesh
+# Transfinite mesh
 
 sh.mesh.setTransfiniteCurve(c[0], N)
 sh.mesh.setTransfiniteCurve(c[1], N)
@@ -155,7 +152,7 @@ for i in (1,11):
     sh.mesh.setTransfiniteCurve(l[i], Q)
     sh.mesh.setTransfiniteCurve(h[i], Q)
 
-# Physical Boundary
+# Physical boundary
 
 sh.addPhysicalGroup(2, [z], name='Disk')
 sh.addPhysicalGroup(2, [x, y], name='Wall')

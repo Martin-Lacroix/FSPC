@@ -60,7 +60,7 @@ q.append(sh.occ.addPoint(L1+L2-E, S+H2+E, 0, d))
 q.append(sh.occ.addPoint(L1+L2-W-E, S+E, 0, d))
 q.append(sh.occ.addPoint(L1+L2-W-E, S+H2+E, 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 r = list()
@@ -112,7 +112,7 @@ sh.mesh.setTransfiniteCurve(h[3], N)
 sh.mesh.setTransfiniteSurface(s[0])
 sh.mesh.setRecombine(2, s[0])
 
-# Boundaries
+# Physical boundary
 
 sh.addPhysicalGroup(2, s[1:3], name='Tool')
 sh.addPhysicalGroup(2, s[0:1], name='Solid')

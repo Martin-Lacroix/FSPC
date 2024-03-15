@@ -27,7 +27,7 @@ p.append(sh.occ.addPoint(2*L+w, 0, 0))
 p.append(sh.occ.addPoint(2*L+w, h, 0))
 p.append(sh.occ.addPoint(2*L, h, 0))
 
-# Lines List
+# Lines list
 
 l = list()
 
@@ -52,7 +52,7 @@ sh.mesh.setTransfiniteCurve(l[3], N)
 sh.mesh.setTransfiniteSurface(s)
 sh.mesh.setRecombine(2, s)
 
-# Physical Boundary
+# Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Solid')
 sh.addPhysicalGroup(1, l[1:], name='FSInterface')

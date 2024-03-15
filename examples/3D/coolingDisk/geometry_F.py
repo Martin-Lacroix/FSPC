@@ -35,7 +35,7 @@ p.append(sh.occ.addPoint(RF, 0, HF+HS+RS, d))
 p.append(sh.occ.addPoint(-RF, 0, HF+HS+RS, d))
 p.append(sh.occ.addPoint(0, RF, HF+HS+RS, d))
 
-# # Lines List
+# # Lines list
 
 l = list()
 c = list()
@@ -83,7 +83,7 @@ k.append(sh.occ.addCurveLoop([c[6], l[5], c[11], l[4]]))
 for a in k: s.append(sh.occ.addBSplineFilling(a))
 sh.occ.synchronize()
 
-# Volumes List
+# Volumes list
 
 h = sh.occ.addSurfaceLoop(s[:6])
 u = sh.occ.addSphere(0, 0, HS+HF, RS)
@@ -96,7 +96,7 @@ sh.occ.remove([(3, u)])
 sh.mesh.setSize(p, d)
 sh.occ.synchronize()
 
-# Physical Surface
+# Physical surface
 
 sh.addPhysicalGroup(3, [v], name='Fluid')
 sh.addPhysicalGroup(2, [g], name='FSInterface')

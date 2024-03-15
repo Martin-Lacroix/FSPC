@@ -88,7 +88,7 @@ p.append(sh.occ.addPoint(-(L+L1+L2), H+5*R+D2, 0, d))
 p.append(sh.occ.addPoint(L+L1+L2, H+5*R+D2, 0, d))
 p.append(sh.occ.addPoint(L+L1+L2, H-(5*R+D1), 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 r = list()
@@ -142,7 +142,7 @@ k.append(sh.occ.addCurveLoop(l+h+r+q))
 s = sh.occ.addPlaneSurface([k[1], -k[0]])
 sh.occ.synchronize()
 
-# Transfinite Mesh
+# Transfinite mesh
 
 sh.mesh.setTransfiniteCurve(c[0], N)
 sh.mesh.setTransfiniteCurve(c[1], N)
@@ -162,7 +162,7 @@ for i in (0,10):
     sh.mesh.setTransfiniteCurve(l[i], Q)
     sh.mesh.setTransfiniteCurve(r[i], Q)
 
-# Physical Boundary
+# Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, q[1:2], name='FreeSurface')

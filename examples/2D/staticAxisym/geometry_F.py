@@ -26,7 +26,7 @@ p.append(sh.occ.addPoint(0, HS, 0, d))
 p.append(sh.occ.addPoint(L, HS+HF, 0, d))
 p.append(sh.occ.addPoint(0, HS+HF, 0, d))
 
-# Lines List
+# Lines list
 
 l = list()
 
@@ -45,7 +45,7 @@ s = sh.occ.addPlaneSurface([k])
 sh.occ.synchronize()
 sh.mesh.setTransfiniteCurve(l[3], N)
 
-# Physical Boundary
+# Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, l[0:1], name='FSInterface')
