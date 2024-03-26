@@ -7,8 +7,8 @@ import os
 # |-------------------------------------|
 
 workspace = os.getcwd()
-folderList = ['metafor','pfem']
-workspace = os.path.join(workspace,'workspace/')
+folderList = ['metafor', 'pfem']
+workspace = os.path.join(workspace, 'workspace/')
 folderList = [workspace+F for F in folderList]
 
 # Loops over all the msh files
@@ -21,7 +21,7 @@ for folder in folderList:
 
     # Sort the output files
 
-    for i,F in enumerate(file):
+    for i, F in enumerate(file):
 
         fileName = os.path.splitext(F)[0]
         time[i] = float(fileName[fileName.index('_')+1:])
@@ -31,9 +31,9 @@ for folder in folderList:
 
     # Rename and convert the files
 
-    for i,F in enumerate(file):
+    for i, F in enumerate(file):
 
         if 'msh' not in F: break
         msh = meshio.gmsh.read(F)
         fileName = 'convert_'+str(i)+'.vtu'
-        meshio.write(fileName,msh,file_format='vtu')
+        meshio.write(fileName, msh, file_format='vtu')

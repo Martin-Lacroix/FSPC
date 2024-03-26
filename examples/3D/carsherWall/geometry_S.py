@@ -15,9 +15,9 @@ R1 = 0.3
 R2 = 0.25
 
 Y = -0.01
-B = 0.15
 S = 0.04
 W = 0.02
+B = 0.2
 
 # Characteristic size
 

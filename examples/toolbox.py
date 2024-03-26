@@ -30,7 +30,7 @@ def read_files():
 # |   Plot the Results and Reference    |
 # |-------------------------------------|
 
-def plot_ref(time:list, result:list, reference:list):
+def plot_ref(time: list, result: list, reference: list):
 
     result = np.atleast_2d(result)
     for R in reference: plt.plot(*np.transpose(R))

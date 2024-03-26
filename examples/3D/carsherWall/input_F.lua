@@ -16,9 +16,9 @@ Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
+Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 0.02
-Problem.Mesh.gammaFS = 0.3
+Problem.Mesh.gammaFS = 0.5
 Problem.Mesh.minHeightFactor = 1e-3
 
 Problem.Mesh.addOnFS = true
@@ -91,8 +91,8 @@ end
 
 function Problem.Solver.MomContEq.BC.InletVEuler(x, y, z, t)
 
-	local vmax = 5
-	local tmax = 0.5
+	local tmax = 1
+	local vmax = 10
 	local vt = (t/tmax)*vmax
 	local r = math.abs(y)
 	local R = 0.05
