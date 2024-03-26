@@ -1,57 +1,25 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
 from mpi4py.MPI import COMM_WORLD as CW
+from typing import Callable
 import time
-
-# |------------------------------------|
-# |   Empty Class Raising Exception    |
-# |------------------------------------|
-
-class Void(object):
-
-    def __setattr__(self, name: str, _):
-        raise Exception('Set {'+name+'} of empty class')
-
-    def __getattribute__(self, name: str):
-        raise Exception('Get {'+name+'} of empty class')
-
-    def __bool__(self):
-        return False
 
 # |--------------------------------------|
 # |   Initialize the Global Variables    |
 # |--------------------------------------|
 
-global Step
-Step = Void()
-
-global Algo
-Algo = Void()
-
-global Interp
-Interp = Void()
-
-global Solver
-Solver = Void()
-
-global ResMech
-ResMech = Void()
-
-global ResTher
-ResTher = Void()
+has_mecha = False
+has_therm = False
 
 # Convert solver prints to Python
-
-global redirect
 
 try:
     import python_stream
     redirect = python_stream.Redirect()
-except: redirect = Void()
+except: redirect = None
 
 # Store the computation times of functions
 
-global clock
 import collections
 clock = collections.defaultdict(float)
 
@@ -59,64 +27,54 @@ clock = collections.defaultdict(float)
 # |   Define Some Decorator Functions    |
 # |--------------------------------------|
 
-def write_logs(function: object):
-    def wrapper(*args, **kwargs):
+def write_logs(function: Callable):
+    def wrapper(*args):
 
         rank = str(CW.rank)
         with open('solver_'+rank+'.dat', 'a') as output:
             with stderr(output), stdout(output):
-                result = function(*args, **kwargs)
+                return function(*args)
 
-        return result
     return wrapper
 
-# Measure the computation time
+# Measure the computation time of functions
 
-def compute_time(function: object):
-    def wrapper(*args, **kwargs):
+def compute_time(function: Callable):
+    def wrapper(*args):
 
-        global clock
         start = time.time()
-        result = function(*args, **kwargs)
+        result = function(*args)
         parent = args[0].__class__.__name__+' : '
         clock[parent+function.__name__] += time.time()-start
 
         return result
     return wrapper
 
-# Only accessed by the solid solver
+# Function called by the solid solver
 
-def only_solid(function: object):
-    def wrapper(*args, **kwargs):
+def only_solid(function: Callable):
+    def wrapper(*args):
 
-        if CW.rank == 1: result = function(*args, **kwargs)
-        else: result = None
+        if CW.rank == 1: return function(*args)
 
-        return result
     return wrapper
 
-# Only accessed when mechanical coupling
+# Function called when mechanical coupling
 
-def only_mechanical(function: object):
-    def wrapper(*args, **kwargs):
+def only_mechanical(function: Callable):
+    def wrapper(*args):
 
-        global ResMech
-        if ResMech: result = function(*args, **kwargs)
-        else: result = None
+        if has_mecha: return function(*args)
 
-        return result
     return wrapper
 
-# Only accessed when thermal coupling
+# Function called when thermal coupling
 
-def only_thermal(function: object):
-    def wrapper(*args, **kwargs):
+def only_thermal(function: Callable):
+    def wrapper(*args):
 
-        global ResTher
-        if ResTher: result = function(*args, **kwargs)
-        else: result = None
+        if has_therm: return function(*args)
 
-        return result
     return wrapper
 
 # |------------------------------------|
@@ -140,13 +98,17 @@ def set_interpolator(interpolator: object):
 
 def set_mechanical_res(residual: object):
 
-    global ResMech
+    global ResMech, has_mecha
+
     ResMech = residual
+    has_mecha = True
 
 def set_thermal_res(residual: object):
 
-    global ResTher
+    global ResTher, has_therm
+
     ResTher = residual
+    has_therm = True
 
 # |----------------------------------------|
 # |   Import and Initialize the Solvers    |
@@ -161,13 +123,13 @@ def init_solver(path_F: str, path_S: str):
 
         from ..solver.pfem_3D import PFEM3D
         Solver = PFEM3D(path_F)
-        return Solver
 
     elif CW.rank == 1:
 
         from ..solver.metafor import Metafor
         Solver = Metafor(path_S)
-        return Solver
+
+    return Solver
 
 # |--------------------------------------------|
 # |   Print the Summary of Computation Time    |
@@ -175,10 +137,9 @@ def init_solver(path_F: str, path_S: str):
 
 def print_clock():
 
-    global clock
     print('\n------------------------------------')
     print('Process {:.0f} : Time Stats'.format(CW.rank))
     print('------------------------------------\n')
 
-    for fun, time in clock.items():
-        print('{}{:.5f}'.format(fun.ljust(25), time))
+    for key, value in clock.items():
+        print('{}{:.5f}'.format(key.ljust(25), value))

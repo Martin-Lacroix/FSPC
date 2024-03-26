@@ -30,10 +30,10 @@ class Interpolator(object):
     @tb.only_solid
     def initialize_variable(self):
 
-        if tb.ResMech:
+        if tb.has_mecha:
             self.disp = tb.Solver.get_position()
 
-        if tb.ResTher:
+        if tb.has_therm:
             self.temp = tb.Solver.get_temperature()
 
 # |------------------------------------------|

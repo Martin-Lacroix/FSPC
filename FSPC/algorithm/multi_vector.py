@@ -86,10 +86,10 @@ class MVJ(Algorithm):
     @tb.only_solid
     def update_prevJ(self):
 
-        if tb.ResMech:
+        if tb.has_mecha:
             tb.ResMech.prev_J = np.copy(tb.ResMech.J)
 
-        if tb.ResTher:
+        if tb.has_therm:
             tb.ResTher.prev_J = np.copy(tb.ResTher.J)
 
 # |-------------------------------------------------|

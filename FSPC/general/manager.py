@@ -57,8 +57,8 @@ class Residual(object):
 
     def reset(self):
 
-        self.prev_res = None
-        self.residual = None
+        self.prev_res = np.ndarray(0)
+        self.residual = np.ndarray(0)
         self.epsilon = np.inf
 
     # Update the current and previous residual

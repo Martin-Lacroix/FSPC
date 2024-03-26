@@ -138,7 +138,7 @@ class PFEM3D(object):
 
     # Create or update the exclusion boundary
 
-    def update_polytope(self, polytope:list):
+    def update_polytope(self, polytope: list):
 
         for i, face_list in enumerate(polytope):
 
@@ -151,7 +151,7 @@ class PFEM3D(object):
 # |------------------------------------------|
 
     @tb.compute_time
-    def update(self, polytope: object):
+    def update(self, polytope: list):
 
         self.update_polytope(polytope)
         self.mesh.remesh(verboseOutput = False)

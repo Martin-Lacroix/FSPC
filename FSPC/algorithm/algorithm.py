@@ -61,7 +61,7 @@ class Algorithm(object):
             self.has_run = True
             verified = tb.Solver.run()
 
-        else: verified = None
+        else: verified = False
         return CW.bcast(verified, root=0)
 
     def run_solid(self):
@@ -71,7 +71,7 @@ class Algorithm(object):
             self.has_run = True
             verified = tb.Solver.run()
 
-        else: verified = None
+        else: verified = False
         return CW.bcast(verified, root=1)
 
     # Reset the solvers to their last backup state
@@ -96,8 +96,8 @@ class Algorithm(object):
     @tb.only_solid
     def reset_convergence(self):
 
-        if tb.ResMech: tb.ResMech.reset()
-        if tb.ResTher: tb.ResTher.reset()
+        if tb.has_mecha: tb.ResMech.reset()
+        if tb.has_therm: tb.ResTher.reset()
 
     # Update the predicted interface solution
 
@@ -113,8 +113,8 @@ class Algorithm(object):
         # Check for coupling convergence
 
         ok_list = list()
-        if tb.ResMech: ok_list.append(tb.ResMech.check())
-        if tb.ResTher: ok_list.append(tb.ResTher.check())
+        if tb.has_mecha: ok_list.append(tb.ResMech.check())
+        if tb.has_therm: ok_list.append(tb.ResTher.check())
 
         if not ok_list: raise Exception('No residual has been set')
         return np.all(ok_list)
@@ -125,12 +125,12 @@ class Algorithm(object):
 
     def compute_residual(self):
 
-        if tb.ResMech:
+        if tb.has_mecha:
 
             disp = tb.Solver.get_position()
             tb.ResMech.update_res(disp, tb.Interp.disp)
 
-        if tb.ResTher:
+        if tb.has_therm:
 
             temp = tb.Solver.get_temperature()
             tb.ResTher.update_res(temp, tb.Interp.temp)
@@ -155,13 +155,13 @@ class Algorithm(object):
 
     def display_residual(self):
 
-        if tb.ResMech:
+        if tb.has_mecha:
 
             iter = '[{:.0f}]'.format(self.iteration)
             eps = 'Residual Mech : {:.3e}'.format(tb.ResMech.epsilon)
             print(iter, eps)
 
-        if tb.ResTher:
+        if tb.has_therm:
 
             iter = '[{:.0f}]'.format(self.iteration)
             eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
