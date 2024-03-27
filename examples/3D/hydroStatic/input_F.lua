@@ -9,7 +9,7 @@ Problem.id = 'IncompNewtonNoT'
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.remeshAlgo = 'CGAL'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.boundingBox = {0, 0, -10, 1, 1, 1}
 Problem.Mesh.exclusionZones = {}
