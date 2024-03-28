@@ -4,9 +4,9 @@ import numpy as np
 import wrap as w
 import sys
 
-# |-----------------------------------|
-# |   Initializes the Solid Wraper    |
-# |-----------------------------------|
+# |---------------------------------------|
+# |   Solid Solver Wrapper for Metafor    |
+# |---------------------------------------|
 
 class Metafor(object):
     def __init__(self, path: str):

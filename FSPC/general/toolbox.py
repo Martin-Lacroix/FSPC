@@ -11,13 +11,6 @@ import time
 has_mecha = False
 has_therm = False
 
-# Convert solver prints to Python
-
-try:
-    import python_stream
-    redirect = python_stream.Redirect()
-except: redirect = None
-
 # Store the computation times of functions
 
 import collections
@@ -77,63 +70,9 @@ def only_thermal(function: Callable):
 
     return wrapper
 
-# |------------------------------------|
-# |   Initialize the Global Classes    |
-# |------------------------------------|
-
-def set_time_step(step_manager: object):
-
-    global Step
-    Step = step_manager
-
-def set_algorithm(algorithm: object):
-
-    global Algo
-    Algo = algorithm
-
-def set_interpolator(interpolator: object):
-
-    global Interp
-    Interp = interpolator
-
-def set_mechanical_res(residual: object):
-
-    global ResMech, has_mecha
-
-    ResMech = residual
-    has_mecha = True
-
-def set_thermal_res(residual: object):
-
-    global ResTher, has_therm
-
-    ResTher = residual
-    has_therm = True
-
-# |----------------------------------------|
-# |   Import and Initialize the Solvers    |
-# |----------------------------------------|
-
-@write_logs
-def init_solver(path_F: str, path_S: str):
-
-    global Solver
-
-    if CW.rank == 0:
-
-        from ..solver.pfem_3D import PFEM3D
-        Solver = PFEM3D(path_F)
-
-    elif CW.rank == 1:
-
-        from ..solver.metafor import Metafor
-        Solver = Metafor(path_S)
-
-    return Solver
-
-# |--------------------------------------------|
-# |   Print the Summary of Computation Time    |
-# |--------------------------------------------|
+# |----------------------------------------------|
+# |   Print the Computation Time of Functions    |
+# |----------------------------------------------|
 
 def print_clock():
 

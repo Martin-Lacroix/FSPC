@@ -1,12 +1,12 @@
-from .manager import TimeStep
-from .manager import Residual
-
-# Toolbox general utility
-
-from .toolbox import redirect
 from .toolbox import print_clock
-
-# Remove the base modules
-
-del manager
 del toolbox
+
+# Disk exporter and time step manager
+
+from .time_manager import TimeStep
+del time_manager
+
+# Convergence and residual manager
+
+from .residual_manager import Residual
+del residual_manager

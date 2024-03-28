@@ -2,9 +2,9 @@ from ..general import toolbox as tb
 import pfem3Dw as w
 import numpy as np
 
-# |-----------------------------------|
-# |   Initializes the Fluid Wraper    |
-# |-----------------------------------|
+# |--------------------------------------|
+# |   Fluid Solver Wrapper for PFEM3D    |
+# |--------------------------------------|
 
 class PFEM3D(object):
     def __init__(self, path: str):
