@@ -14,6 +14,12 @@ class BGS(Algorithm):
         self.max_iter = max_iter
         self.omega = 0.5
 
+    @tb.only_solid
+    def initialize(self):
+
+        if tb.has_mecha: self.aitk_mecha = self.omega
+        if tb.has_therm: self.aitk_therm = self.omega
+
 # |--------------------------------------|
 # |   Coupling Algorithm at Each Step    |
 # |--------------------------------------|
@@ -23,43 +29,32 @@ class BGS(Algorithm):
         self.iteration = 0
         while self.iteration < self.max_iter:
 
-            # Transfer and fluid solver call
+            # Data transfer and fluid solver run
 
             self.transfer_dirichlet()
             if not self.run_fluid(): return False
 
-            # Transfer and solid solver call
+            # Data transfer and solid solver run
 
             self.transfer_neumann()
-            if not self.run_solid(): return False
+            if not self.run_solid():
+
+                if CW.rank == 0: tb.Solver.way_back()
+                return False
 
             # Compute the coupling residual
 
-            output = self.relaxation()
-            verified = CW.bcast(output, root=1)
-
-            # Exit the loop if the solution is converged
-
+            verified = self.relaxation()
+            verified = CW.bcast(verified, root=1)
             self.iteration += 1
+
+            # Return true if the solution is converged
+
+            if hasattr(self, 'update'): self.update(verified)
             if verified: return True
-            else: self.way_back()
+            tb.Solver.way_back()
 
         return False
-
-# |--------------------------------------|
-# |   Compute the Solution Correction    |
-# |--------------------------------------|
-
-    def compute(self, res_class: object):
-
-        D = res_class.delta_res()
-        A = np.tensordot(D, res_class.prev_res)
-
-        # Update the Aitken relaxation parameter
-
-        res_class.omega = -A*res_class.omega/np.tensordot(D, D)
-        res_class.omega = max(min(res_class.omega, 1), 0)
-        return res_class.omega*res_class.residual
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |
@@ -69,12 +64,17 @@ class BGS(Algorithm):
     def update_displacement(self):
 
         if self.iteration > 0:
-            tb.Interp.disp += self.compute(tb.ResMech)
 
-        else:
+            D = tb.ResMech.delta_res()
+            A = np.tensordot(D, tb.ResMech.prev_res)
 
-            tb.ResMech.omega = self.omega
-            tb.Interp.disp += self.omega*tb.ResMech.residual
+            # Update the Aitken relaxation parameter
+
+            self.aitk_mecha = -A*self.aitk_mecha/np.tensordot(D, D)
+            self.aitk_mecha = max(min(self.aitk_mecha, 1), 0)
+
+        else: self.aitk_mecha = self.omega
+        tb.Interp.disp += self.aitk_mecha*tb.ResMech.residual
 
 # |------------------------------------------------|
 # |   Relaxation of Solid Interface Temperature    |
@@ -84,10 +84,14 @@ class BGS(Algorithm):
     def update_temperature(self):
 
         if self.iteration > 0:
-            tb.Interp.temp += self.compute(tb.ResTher)
 
-        else:
-            
-            tb.ResTher.omega = self.omega
-            tb.Interp.temp += self.omega*tb.ResTher.residual
-    
+            D = tb.ResTher.delta_res()
+            A = np.tensordot(D, tb.ResTher.prev_res)
+
+            # Update the Aitken relaxation parameter
+
+            self.aitk_therm = -A*self.aitk_therm/np.tensordot(D, D)
+            self.aitk_therm = max(min(self.aitk_therm, 1), 0)
+
+        else: self.aitk_therm = self.omega
+        tb.Interp.temp += self.aitk_therm*tb.ResTher.residual

@@ -13,7 +13,6 @@ R = 0.025
 
 # Characteristic size
 
-d = 0.0045
 N = 9
 M = 5
 

@@ -10,15 +10,8 @@ import numpy as np
 class RBF(Interpolator):
     def __init__(self, func: Callable):
 
-        self.function = func
-
-    # Compute the FS mesh interpolation matrix
-
-    def initialize(self):
-
         Interpolator.__init__(self)
-        position = tb.Solver.get_position()
-        self.mapping(position)
+        self.function = func
 
     # Interpolate recv_data and return the result
 

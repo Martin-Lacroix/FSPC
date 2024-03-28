@@ -7,18 +7,12 @@ import numpy as np
 # |---------------------------------|
 
 class Algorithm(object):
-    def __init__(self):
-
-        self.has_run = False
-
-# |-------------------------------------------|
-# |   Start the Fluid-Structure Simulation    |
-# |-------------------------------------------|
 
     @tb.compute_time
     def simulate(self, end_time: float):
 
-        verified = True
+        self.verified = True
+        if hasattr(self, 'initialize'): self.initialize()
         tb.Solver.save()
 
         # Main loop on the FSI coupling time steps
@@ -26,24 +20,21 @@ class Algorithm(object):
         while tb.Step.time < end_time:
 
             tb.Interp.initialize()
-            self.display_time_step()
+            tb.Step.display_time_step()
             self.reset_convergence()
 
             # Main loop on the FSI coupling iterations
 
-            self.compute_predictor(verified)
-            verified = self.coupling_algorithm()
-            tb.Step.update_time(verified)
+            self.compute_predictor()
+            self.verified = self.coupling_algorithm()
+            tb.Step.update_time(self.verified)
 
             # Update the solvers for the next time step
 
-            if verified:
+            if self.verified:
 
                 tb.Interp.update_solver()
                 tb.Step.update_exporter()
-                self.has_run = False
-
-            else: self.way_back(); continue
 
         # End of the FSI simulation
 
@@ -58,8 +49,8 @@ class Algorithm(object):
 
         if CW.rank == 0:
 
-            self.has_run = True
             verified = tb.Solver.run()
+            if not verified: tb.Solver.way_back()
 
         else: verified = False
         return CW.bcast(verified, root=0)
@@ -68,30 +59,21 @@ class Algorithm(object):
 
         if CW.rank == 1:
 
-            self.has_run = True
             verified = tb.Solver.run()
+            if not verified: tb.Solver.way_back()
 
         else: verified = False
         return CW.bcast(verified, root=1)
-
-    # Reset the solvers to their last backup state
-
-    @tb.write_logs
-    @tb.compute_time
-    def way_back(self):
-
-        if self.has_run: tb.Solver.way_back()
-        self.has_run = False
 
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |
 # |--------------------------------------------|
 
     @tb.only_solid
-    def compute_predictor(self, verified: bool):
+    def compute_predictor(self):
 
-        tb.Interp.predict_temperature(verified)
-        tb.Interp.predict_displacement(verified)
+        tb.Interp.predict_temperature(self.verified)
+        tb.Interp.predict_displacement(self.verified)
 
     @tb.only_solid
     def reset_convergence(self):
@@ -115,8 +97,6 @@ class Algorithm(object):
         ok_list = list()
         if tb.has_mecha: ok_list.append(tb.ResMech.check())
         if tb.has_therm: ok_list.append(tb.ResTher.check())
-
-        if not ok_list: raise Exception('No residual has been set')
         return np.all(ok_list)
 
 # |------------------------------------|
@@ -157,20 +137,11 @@ class Algorithm(object):
 
         if tb.has_mecha:
 
-            iter = '[{:.0f}]'.format(self.iteration)
             eps = 'Residual Mech : {:.3e}'.format(tb.ResMech.epsilon)
-            print(iter, eps)
+            print('[{:.0f}]'.format(self.iteration), eps)
 
         if tb.has_therm:
 
-            iter = '[{:.0f}]'.format(self.iteration)
             eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
-            print(iter, eps)
+            print('[{:.0f}]'.format(self.iteration), eps)
 
-    @tb.only_solid
-    def display_time_step(self):
-
-        L = '\n------------------------------------------'
-        time_step = 'Time Step : {:.3e}'.format(tb.Step.dt)
-        time = '\nTime : {:.3e}'.format(tb.Step.time).ljust(20)
-        print(L, time, time_step, L)

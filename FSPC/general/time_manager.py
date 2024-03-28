@@ -38,3 +38,15 @@ class TimeStep(object):
             self.time += self.dt
             self.dt = math.pow(self.division, 1/7)*self.dt
             self.dt = min(self.dt, self.max_dt)
+
+# |----------------------------------|
+# |   Print the Current Time Step    |
+# |----------------------------------|
+
+    @tb.only_solid
+    def display_time_step(self):
+
+        current = 'Time : {:.3e}'.format(self.time).ljust(20)
+        print('\n------------------------------------------')
+        print(current, 'Time Step : {:.3e}'.format(self.dt))
+        print('------------------------------------------')

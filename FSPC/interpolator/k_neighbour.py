@@ -10,15 +10,8 @@ import numpy as np
 class KNN(Interpolator):
     def __init__(self, K: int):
 
-        self.K = int(abs(K))
-
-    # Compute the FS mesh interpolation matrix
-
-    def initialize(self):
-
         Interpolator.__init__(self)
-        position = tb.Solver.get_position()
-        self.mapping(position)
+        self.K = int(abs(K))
 
     # Interpolate recv_data and return the result
 

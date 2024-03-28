@@ -7,34 +7,29 @@ import numpy as np
 # |------------------------------------|
 
 class Interpolator(object):
-    def __init__(self):
 
-        self.initialize_variable()
+    def initialize(self):
 
-        # Share the position vectors between solvers
+        position = tb.Solver.get_position()
+
+        # Share the position vector between solvers
 
         if CW.rank == 0:
 
             self.recv_pos = CW.recv(source=1, tag=1)
-            CW.send(tb.Solver.get_position(), 1, tag=2)
+            CW.send(position, 1, tag=2)
 
         elif CW.rank == 1:
 
-            CW.send(tb.Solver.get_position(), 0, tag=1)
+            self.disp = np.copy(position)
+            if tb.has_therm: self.temp = tb.Solver.get_temperature()
+
+            CW.send(position, 0, tag=1)
             self.recv_pos = CW.recv(source=0, tag=2)
 
-# |----------------------------------------|
-# |   Initialize the Interpolation Data    |
-# |----------------------------------------|
+        # Compute the FS mesh interpolation matrix
 
-    @tb.only_solid
-    def initialize_variable(self):
-
-        if tb.has_mecha:
-            self.disp = tb.Solver.get_position()
-
-        if tb.has_therm:
-            self.temp = tb.Solver.get_temperature()
+        if hasattr(self, 'mapping'): self.mapping(position)
 
 # |------------------------------------------|
 # |   Communicate the Boundary Conditions    |

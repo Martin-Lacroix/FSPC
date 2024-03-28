@@ -1,65 +1,43 @@
-from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
-from .algorithm import Algorithm
+from .block_gauss import BGS
 import numpy as np
 
-# |--------------------------------------------------|
-# |   Interface Quasi-Newton Inverse Least Square    |
-# |--------------------------------------------------|
+# |--------------------------------------------|
+# |   Class of Approximate Inverse Jacobian    |
+# |--------------------------------------------|
 
-class ILS(Algorithm):
-    def __init__(self, max_iter: int):
+class InvJacobian(object):
+    def __init__(self):
 
-        Algorithm.__init__(self)
-        self.max_iter = max_iter
-        self.omega = 0.5
+        self.V = list()
+        self.W = list()
 
-# |--------------------------------------|
-# |   Coupling Algorithm at Each Step    |
-# |--------------------------------------|
+    # Compute the solution correction
 
-    def coupling_algorithm(self):
+    def delta(self, residual: np.ndarray):
 
-        self.iteration = 0
-        while self.iteration < self.max_iter:
-
-            # Transfer and fluid solver call
-
-            self.transfer_dirichlet()
-            if not self.run_fluid(): return False
-
-            # Transfer and solid solver call
-
-            self.transfer_neumann()
-            if not self.run_solid(): return False
-
-            # Compute the coupling residual
-
-            output = self.relaxation()
-            verified = CW.bcast(output, root=1)
-
-            # Exit the loop if the solution is converged
-
-            self.iteration += 1
-            if verified: return True
-            else: self.way_back()
-
-        return False
-
-# |--------------------------------------|
-# |   Compute the Solution Correction    |
-# |--------------------------------------|
-
-    def compute(self, res_class: object):
-
-        V = np.flip(np.transpose(res_class.V), axis=1)
-        W = np.flip(np.transpose(res_class.W), axis=1)
-        R = np.hstack(-res_class.residual)
+        V = np.flip(np.transpose(self.V), axis=1)
+        W = np.flip(np.transpose(self.W), axis=1)
+        R = np.hstack(-residual)
 
         # Return the solution correction
 
         delta = np.dot(W, np.linalg.lstsq(V, R, -1)[0])-R
         return np.split(delta, tb.Solver.get_size())
+
+# |--------------------------------------------------|
+# |   Interface Quasi-Newton Inverse Least Square    |
+# |--------------------------------------------------|
+
+class ILS(BGS):
+    def __init__(self, max_iter: int):
+        BGS.__init__(self, max_iter)
+
+    @tb.only_solid
+    def initialize(self):
+
+        if tb.has_mecha: self.jac_mecha = InvJacobian()
+        if tb.has_therm: self.jac_therm = InvJacobian()
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |
@@ -74,15 +52,15 @@ class ILS(Algorithm):
 
         if self.iteration == 0:
 
-            tb.ResMech.V = list()
-            tb.ResMech.W = list()
+            self.jac_mecha.V = list()
+            self.jac_mecha.W = list()
             delta = self.omega*tb.ResMech.residual
 
         else:
 
-            tb.ResMech.V.append(np.hstack(tb.ResMech.delta_res()))
-            tb.ResMech.W.append(np.hstack(disp-self.prev_disp))
-            delta = self.compute(tb.ResMech)
+            self.jac_mecha.V.append(np.hstack(tb.ResMech.delta_res()))
+            self.jac_mecha.W.append(np.hstack(disp-self.prev_disp))
+            delta = self.jac_mecha.delta(tb.ResMech.residual)
 
         # Update the pedicted displacement
 
@@ -102,15 +80,15 @@ class ILS(Algorithm):
 
         if self.iteration == 0:
 
-            tb.ResTher.V = list()
-            tb.ResTher.W = list()
+            self.jac_mecha.V = list()
+            self.jac_mecha.W = list()
             delta = self.omega*tb.ResTher.residual
 
         else:
-            
-            tb.ResTher.V.append(np.hstack(tb.ResTher.delta_res()))
-            tb.ResTher.W.append(np.hstack(temp-self.prev_temp))
-            delta = self.compute(tb.ResTher)
+
+            self.jac_mecha.V.append(np.hstack(tb.ResTher.delta_res()))
+            self.jac_mecha.W.append(np.hstack(temp-self.prev_temp))
+            delta = self.jac_mecha.delta(tb.ResTher.residual)
 
         # Update the predicted temperature
 

@@ -15,8 +15,8 @@ Problem.Mesh.boundingBox = {0, 0, 0.9, 1}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.4
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.hchar = 0.0075
 Problem.Mesh.minHeightFactor = 1e-3
