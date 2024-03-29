@@ -88,7 +88,7 @@ class Interpolator(object):
     @tb.only_mechanical
     def predict_displacement(self, verified: bool):
 
-        if verified:
+        if not hasattr(self, 'prev_disp') or verified:
 
             self.prev_disp = np.copy(self.disp)
             self.velocity_disp = tb.Solver.get_velocity()
@@ -102,9 +102,9 @@ class Interpolator(object):
     # Predictor for the temparature coupling
 
     @tb.only_thermal
-    def predict_temperature(self, verified):
+    def predict_temperature(self, verified: bool):
 
-        if verified:
+        if not hasattr(self, 'prev_temp') or verified:
 
             self.prev_temp = np.copy(self.temp)
             self.velocity_temp = tb.Solver.get_tempgrad()

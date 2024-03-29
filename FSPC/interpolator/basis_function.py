@@ -1,6 +1,5 @@
 from .interpolator import Interpolator
 from ..general import toolbox as tb
-from typing import Callable
 import numpy as np
 
 # |------------------------------------------------|
@@ -8,7 +7,7 @@ import numpy as np
 # |------------------------------------------------|
 
 class RBF(Interpolator):
-    def __init__(self, func: Callable):
+    def __init__(self, func: tb.Callable):
 
         Interpolator.__init__(self)
         self.function = func

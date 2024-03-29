@@ -165,22 +165,6 @@ class Metafor(object):
 
         return result
 
-# |------------------------------|
-# |   Other Wrapper Functions    |
-# |------------------------------|
-
-    @tb.compute_time
-    def update(self): self.meta_fac.save(self.fac)
-
-    @tb.write_logs
-    @tb.compute_time
-    def save(self): self.extractor.extract()
-    def get_size(self): return self.FSI.getNumberOfMeshPoints()
-
-    @tb.write_logs
-    def exit(self): return
-    def way_back(self): self.tsm.removeLastStage()
-
 # |--------------------------------------------|
 # |   Build the Facet List of the Polytopes    |
 # |--------------------------------------------|
@@ -240,3 +224,21 @@ class Metafor(object):
                 position[i, j] += node.getValue(w.Field1D(axe, w.RE))
 
         return position
+
+# |------------------------------------|
+# |   Other Miscellaneous Functions    |
+# |------------------------------------|
+
+    @tb.compute_time
+    def update(self): self.meta_fac.save(self.fac)
+
+    @tb.compute_time
+    def way_back(self): self.tsm.removeLastStage()
+
+    @tb.write_logs
+    @tb.compute_time
+    def save(self): self.extractor.extract()
+
+    # Return the number of nodes at the interface
+
+    def get_size(self): return self.FSI.getNumberOfMeshPoints()

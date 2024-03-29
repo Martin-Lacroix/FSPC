@@ -58,8 +58,12 @@ class ILS(BGS):
 
         else:
 
-            self.jac_mecha.V.append(np.hstack(tb.ResMech.delta_res()))
-            self.jac_mecha.W.append(np.hstack(disp-self.prev_disp))
+            W = np.hstack(disp-self.prev_disp)
+            V = np.hstack(tb.ResMech.residual-tb.ResMech.prev_res)
+
+            self.jac_mecha.W.append(W)
+            self.jac_mecha.V.append(V)
+
             delta = self.jac_mecha.delta(tb.ResMech.residual)
 
         # Update the pedicted displacement
@@ -86,9 +90,13 @@ class ILS(BGS):
 
         else:
 
-            self.jac_mecha.V.append(np.hstack(tb.ResTher.delta_res()))
-            self.jac_mecha.W.append(np.hstack(temp-self.prev_temp))
-            delta = self.jac_mecha.delta(tb.ResTher.residual)
+            W = np.hstack(temp-self.prev_temp)
+            V = np.hstack(tb.ResTher.residual-tb.ResTher.prev_res)
+
+            self.jac_therm.W.append(W)
+            self.jac_therm.V.append(V)
+
+            delta = self.jac_therm.delta(tb.ResTher.residual)
 
         # Update the predicted temperature
 

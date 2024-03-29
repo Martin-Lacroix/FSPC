@@ -25,21 +25,34 @@ class BGS(Algorithm):
 # |--------------------------------------|
 
     def coupling_algorithm(self):
-
+        
+        verified = False
         self.iteration = 0
+
         while self.iteration < self.max_iter:
 
-            # Data transfer and fluid solver run
+            # Dirichlet transfer and fluid solver run
 
             self.transfer_dirichlet()
-            if not self.run_fluid(): return False
 
-            # Data transfer and solid solver run
+            if CW.rank == 0:
+
+                verified = tb.Solver.run()
+                if not verified: tb.Solver.way_back()
+
+            verified = CW.bcast(verified, root=0)
+            if not verified: return False
+
+            # Neumann transfer and solid solver run
 
             self.transfer_neumann()
-            if not self.run_solid():
 
-                if CW.rank == 0: tb.Solver.way_back()
+            if CW.rank == 1: verified = tb.Solver.run()
+            verified = CW.bcast(verified, root=1)
+
+            if not verified:
+                
+                tb.Solver.way_back()
                 return False
 
             # Compute the coupling residual
@@ -65,7 +78,7 @@ class BGS(Algorithm):
 
         if self.iteration > 0:
 
-            D = tb.ResMech.delta_res()
+            D = tb.ResMech.residual-tb.ResMech.prev_res
             A = np.tensordot(D, tb.ResMech.prev_res)
 
             # Update the Aitken relaxation parameter
@@ -85,7 +98,7 @@ class BGS(Algorithm):
 
         if self.iteration > 0:
 
-            D = tb.ResTher.delta_res()
+            D = tb.ResTher.residual-tb.ResTher.prev_res
             A = np.tensordot(D, tb.ResTher.prev_res)
 
             # Update the Aitken relaxation parameter

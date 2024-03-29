@@ -1,4 +1,3 @@
-from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
 import numpy as np
 
@@ -11,7 +10,7 @@ class Algorithm(object):
     @tb.compute_time
     def simulate(self, end_time: float):
 
-        self.verified = True
+        self.verified = False
         if hasattr(self, 'initialize'): self.initialize()
         tb.Solver.save()
 
@@ -35,35 +34,6 @@ class Algorithm(object):
 
                 tb.Interp.update_solver()
                 tb.Step.update_exporter()
-
-        # End of the FSI simulation
-
-        CW.barrier()
-        tb.Solver.exit()
-
-# |-----------------------------------------|
-# |   Run and Restore the Solver Backups    |
-# |-----------------------------------------|
-
-    def run_fluid(self):
-
-        if CW.rank == 0:
-
-            verified = tb.Solver.run()
-            if not verified: tb.Solver.way_back()
-
-        else: verified = False
-        return CW.bcast(verified, root=0)
-
-    def run_solid(self):
-
-        if CW.rank == 1:
-
-            verified = tb.Solver.run()
-            if not verified: tb.Solver.way_back()
-
-        else: verified = False
-        return CW.bcast(verified, root=1)
 
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |

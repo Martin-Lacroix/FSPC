@@ -10,9 +10,6 @@ class Residual(object):
         self.tol = tol
         self.reset()
 
-    def delta_res(self):
-        return self.residual-self.prev_res
-
     # Reset all the convergence indicators
 
     def reset(self):

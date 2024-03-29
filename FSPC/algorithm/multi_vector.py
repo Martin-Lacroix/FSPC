@@ -1,4 +1,3 @@
-from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
 from .block_gauss import BGS
 import numpy as np
@@ -50,9 +49,7 @@ class InvJacobian(object):
 
 class MVJ(BGS):
     def __init__(self, max_iter: int):
-        
         BGS.__init__(self, max_iter)
-        self.make_BGS = True
 
     @tb.only_solid
     def initialize(self):
@@ -62,8 +59,6 @@ class MVJ(BGS):
     
     @tb.only_solid
     def update(self, verified):
-
-        self.make_BGS = False
 
         if not verified: return
         if tb.has_mecha: self.jac_mecha.update()
@@ -85,7 +80,7 @@ class MVJ(BGS):
             self.jac_mecha.V = list()
             self.jac_mecha.W = list()
 
-            if not self.verified or self.make_BGS:
+            if not self.verified:
 
                 self.jac_mecha.set_zero(tb.ResMech.residual.size)
                 delta = self.omega*tb.ResMech.residual
@@ -98,8 +93,12 @@ class MVJ(BGS):
 
         else:
 
-            self.jac_mecha.V.append(np.hstack(tb.ResMech.delta_res()))
-            self.jac_mecha.W.append(np.hstack(disp-self.prev_disp))
+            W = np.hstack(disp-self.prev_disp)
+            V = np.hstack(tb.ResMech.residual-tb.ResMech.prev_res)
+
+            self.jac_mecha.W.append(W)
+            self.jac_mecha.V.append(V)
+
             delta = self.jac_mecha.delta(tb.ResMech.residual)
 
         # Update the pedicted displacement
@@ -123,7 +122,7 @@ class MVJ(BGS):
             self.jac_therm.V = list()
             self.jac_therm.W = list()
 
-            if not self.verified or self.make_BGS:
+            if not self.verified:
 
                 self.jac_therm.set_zero(tb.ResTher.residual.size)
                 delta = self.omega*tb.ResTher.residual
@@ -136,8 +135,12 @@ class MVJ(BGS):
 
         else:
 
-            self.jac_therm.V.append(np.hstack(tb.ResTher.delta_res()))
-            self.jac_therm.W.append(np.hstack(temp-self.prev_temp))
+            W = np.hstack(temp-self.prev_temp)
+            V = np.hstack(tb.ResTher.residual-tb.ResTher.prev_res)
+
+            self.jac_therm.W.append(W)
+            self.jac_therm.V.append(V)
+
             delta = self.jac_therm.delta(tb.ResTher.residual)
 
         # Update the pedicted temperature
