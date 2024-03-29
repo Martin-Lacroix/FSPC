@@ -40,15 +40,12 @@ class Metafor(object):
 
         if 'polytope' in parm:
             self.polytope = np.atleast_1d(parm['polytope'])
-        else: self.polytope = list()
 
         if 'interaction_M' in parm:
             self.interaction_M = np.atleast_1d(parm['interaction_M'])
-        else: self.interaction_M = list()
 
         if 'interaction_T' in parm:
             self.interaction_T = np.atleast_1d(parm['interaction_T'])
-        else: self.interaction_T = list()
 
         # Create the memory fac used to restart
 
@@ -171,7 +168,9 @@ class Metafor(object):
 
     def get_polytope(self):
 
+        if not hasattr(self, 'polytope'): return list()
         face_list = list()
+
         for elementset in self.polytope:
             face_list.append(self.get_facelist(elementset))
 
