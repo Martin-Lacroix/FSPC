@@ -16,7 +16,7 @@ class PFEM3D(object):
         if 'WC' in self.problem.getID():
 
             self.WC = True
-            self.max_division = 200
+            self.max_division = 1000
 
         else:
 
