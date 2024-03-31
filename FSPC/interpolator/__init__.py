@@ -3,8 +3,8 @@ del interpolator
 
 # Mesh interpolation K-nearest neighbours
 
-from .k_neighbour import KNN
-del k_neighbour
+from .linear_projection import LEP
+del linear_projection
 
 # Mesh interpolation radial basis functions
 

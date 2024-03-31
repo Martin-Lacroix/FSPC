@@ -14,7 +14,7 @@ FSPC.set_algorithm(algorithm)
 
 # Set the interface interpolator
 
-interpolator = FSPC.interpolator.KNN(1)
+interpolator = FSPC.interpolator.LEP()
 FSPC.set_interpolator(interpolator)
 
 # Set the time step manager
