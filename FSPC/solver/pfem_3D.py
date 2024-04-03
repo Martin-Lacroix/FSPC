@@ -162,11 +162,15 @@ class PFEM3D(object):
         if not self.WC: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prev_solution)
 
-    # Bring back the solver to its previous state
+    # Backup the solver state if needed
 
     @tb.compute_time
     def way_back(self):
-        self.problem.loadSolution(self.prev_solution)
+
+        if self.problem.getCurrentSimStep() > self.prev_solution.step:
+            self.problem.loadSolution(self.prev_solution)
+
+    # Export the current solution into a file
 
     @tb.write_logs
     @tb.compute_time

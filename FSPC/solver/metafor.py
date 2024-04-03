@@ -231,8 +231,18 @@ class Metafor(object):
     @tb.compute_time
     def update(self): self.meta_fac.save(self.fac)
 
+    # Backup the solver state if needed
+
     @tb.compute_time
-    def way_back(self): self.tsm.removeLastStage()
+    def way_back(self):
+
+        stm = self.metafor.getStageManager()
+        if stm.getCurNumStage() < 0: return
+
+        if stm.getNumbOfStage()-stm.getCurNumStage() > 1:
+            self.tsm.removeLastStage()
+
+    # Export the current solution into a file
 
     @tb.write_logs
     @tb.compute_time

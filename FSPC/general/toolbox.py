@@ -71,6 +71,36 @@ def only_thermal(function: Callable):
 
     return wrapper
 
+# |------------------------------------|
+# |   Run the Fluid or Solid Solver    |
+# |------------------------------------|
+
+def run_fluid():
+
+    global Solver
+    verified = False
+
+    if is_fluid():
+
+        verified = Solver.run()
+        if not verified: print('Failed to solve PFEM3D')
+
+    return CW.bcast(verified, root=0)
+
+# The simulation state is shared with MPI
+
+def run_solid():
+
+    global Solver
+    verified = False
+
+    if is_solid():
+
+        verified = Solver.run()
+        if not verified: print('Failed to solve Metafor')
+
+    return CW.bcast(verified, root=1)
+
 # |----------------------------------------------|
 # |   Print the Computation Time of Functions    |
 # |----------------------------------------------|
