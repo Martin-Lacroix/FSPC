@@ -14,12 +14,12 @@ class Interpolator(object):
 
         # Share the position vector between solvers
 
-        if CW.rank == 0:
+        if tb.is_fluid():
 
             self.recv_pos = CW.recv(source=1, tag=1)
             CW.send(position, 1, tag=2)
 
-        elif CW.rank == 1:
+        elif tb.is_solid():
 
             self.disp = np.copy(position)
             if tb.has_therm: self.temp = tb.Solver.get_temperature()
@@ -38,7 +38,7 @@ class Interpolator(object):
     @tb.only_mechanical
     def apply_loading(self):
 
-        if CW.rank == 1:
+        if tb.is_solid():
 
             recv = CW.recv(source=0, tag=3)
             tb.Solver.apply_loading(self.interpolate(recv))
@@ -50,7 +50,7 @@ class Interpolator(object):
     @tb.only_mechanical
     def apply_displacement(self):
 
-        if CW.rank == 0:
+        if tb.is_fluid():
 
             recv = CW.recv(source=1, tag=4)
             tb.Solver.apply_displacement(self.interpolate(recv))
@@ -62,7 +62,7 @@ class Interpolator(object):
     @tb.only_thermal
     def apply_heatflux(self):
 
-        if CW.rank == 1:
+        if tb.is_solid():
 
             recv = CW.recv(source=0, tag=5)
             tb.Solver.apply_heatflux(self.interpolate(recv))
@@ -74,7 +74,7 @@ class Interpolator(object):
     @tb.only_thermal
     def apply_temperature(self):
 
-        if CW.rank == 0:
+        if tb.is_fluid():
 
             recv = CW.recv(source=1, tag=6)
             tb.Solver.apply_temperature(self.interpolate(recv))
@@ -121,12 +121,12 @@ class Interpolator(object):
 
     def update_solver(self):
 
-        if CW.rank == 0:
+        if tb.is_fluid():
 
             polytope = CW.recv(source=1, tag=7)
             tb.Solver.update(polytope)
 
-        elif CW.rank == 1:
+        elif tb.is_solid():
 
             CW.send(tb.Solver.get_polytope(), 0, tag=7)
             tb.Solver.update()

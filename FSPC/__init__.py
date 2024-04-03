@@ -1,5 +1,4 @@
 from .general import toolbox
-from mpi4py.MPI import COMM_WORLD as CW
 
 # Import the base FSPC modules
 
@@ -39,7 +38,7 @@ def set_thermal_res(residual: general.Residual):
 
     toolbox.has_therm = True
     toolbox.__setattr__('ResTher', residual)
-    
+
 # |-------------------------------------|
 # |   Initialize the Solver Wrappers    |
 # |-------------------------------------|
@@ -47,12 +46,12 @@ def set_thermal_res(residual: general.Residual):
 @toolbox.write_logs
 def init_solver(path_F: str, path_S: str):
 
-    if CW.rank == 0:
+    if toolbox.is_fluid():
 
         from .solver.pfem_3D import PFEM3D
         toolbox.__setattr__('Solver', PFEM3D(path_F))
 
-    elif CW.rank == 1:
+    if toolbox.is_solid():
 
         from .solver.metafor import Metafor
         toolbox.__setattr__('Solver', Metafor(path_S))

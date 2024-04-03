@@ -1,4 +1,4 @@
-from .toolbox import print_clock
+from .toolbox import print_clock, is_fluid, is_solid
 del toolbox
 
 # Disk exporter and time step manager

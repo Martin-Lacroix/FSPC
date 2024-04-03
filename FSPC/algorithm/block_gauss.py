@@ -35,23 +35,23 @@ class BGS(Algorithm):
 
             self.transfer_dirichlet()
 
-            if CW.rank == 0:
-
-                verified = tb.Solver.run()
-                if not verified: tb.Solver.way_back()
-
+            if tb.is_fluid(): verified = tb.Solver.run()
             verified = CW.bcast(verified, root=0)
-            if not verified: return False
+
+            if not verified:
+
+                if tb.is_fluid(): tb.Solver.way_back()
+                return False
 
             # Neumann transfer and solid solver run
 
             self.transfer_neumann()
 
-            if CW.rank == 1: verified = tb.Solver.run()
+            if tb.is_solid(): verified = tb.Solver.run()
             verified = CW.bcast(verified, root=1)
 
             if not verified:
-                
+
                 tb.Solver.way_back()
                 return False
 
