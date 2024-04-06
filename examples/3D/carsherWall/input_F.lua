@@ -94,10 +94,10 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x, y, z, t)
 	local tmax = 1
 	local vmax = 10
 	local vt = (t/tmax)*vmax
-	local r = math.abs(y)
+	local r = math.sqrt(y*y+z*z)
 	local R = 0.05
 
-	if (t<tmax) then
+	if (t < tmax) then
 		local v = vt*(1-(r*r)/(R*R))
 		return v, 0, 0
 	else

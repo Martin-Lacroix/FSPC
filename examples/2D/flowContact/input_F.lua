@@ -93,7 +93,7 @@ function Problem.Solver.MomEq.BC.InletVEuler(x, y, z, t)
 	local r = math.abs(x)
 	local R = 1
 
-	if (t<tmax) then
+	if (t < tmax) then
 		local a = amax*(1-(r*r)/(R*R))
 		return 0, a
 

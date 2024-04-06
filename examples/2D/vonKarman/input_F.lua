@@ -101,7 +101,7 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x, y, z, t)
     local H = 0.41/2
     local vx = 1.5*vbar*y*(2*H-y)/(H*H)
 
-	if (t<tmax) then
+	if (t < tmax) then
         return vx*(1-math.cos(math.pi*t/2))/2, 0
     else
         return vx, 0
