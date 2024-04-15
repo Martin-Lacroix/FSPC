@@ -201,7 +201,7 @@ Finally, the user may define an exporter class that will be called by FSPC to wr
 <br />
 
 ```python
-parm['extractor'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
-parm['extractor'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
-parm['extractor'].addDataBaseField([TO])                        # Add the temperature field
+parm['exporter'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
+parm['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
+parm['exporter'].addDataBaseField([TO])                        # Add the temperature field
 ```

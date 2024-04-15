@@ -114,7 +114,7 @@ sh.addPhysicalGroup(2, s, name='Border')
 # |--------------------------|
 
 sh.mesh.generate(3)
-sh.mesh.removeDuplicateNodes()
+#sh.mesh.removeDuplicateNodes()
 
 gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()

@@ -34,7 +34,7 @@ class Metafor(object):
         # Defines some internal variables
 
         self.FSI = parm['FSInterface']
-        self.extractor = parm['extractor']
+        self.exporter = parm['exporter']
 
         # Mechanical and thermal interactions
 
@@ -246,7 +246,7 @@ class Metafor(object):
 
     @tb.write_logs
     @tb.compute_time
-    def save(self): self.extractor.extract()
+    def save(self): self.exporter.write()
 
     # Return the number of nodes at the interface
 

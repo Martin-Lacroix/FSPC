@@ -6,7 +6,9 @@ import FSPC
 
 path_F = path.dirname(__file__)+'/input_F.lua'
 path_S = path.dirname(__file__)+'/input_S.py'
-FSPC.init_solver(path_F, path_S)
+solver = FSPC.init_solver(path_F, path_S)
+
+if FSPC.CW.rank == 0: solver.max_division = 1
 
 # Set the coupling algorithm
 
