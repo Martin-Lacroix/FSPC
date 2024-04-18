@@ -9,7 +9,7 @@ Problem.id = 'Boussinesq'
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.remeshAlgo = 'GMSH'
+Problem.Mesh.remeshAlgo = 'GMSH_Falla'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.boundingBox = {-5, -5, 5, 5}

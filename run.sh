@@ -25,8 +25,6 @@ export SCRIPT=${PWD}/examples/2D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/damBreak/main.py
 # export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
 
-# export SCRIPT=${PWD}/examples/AorticValveRound/main.py
-
 # Clean output folder
 
 rm -rf workspace
