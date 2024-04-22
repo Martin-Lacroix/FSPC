@@ -9,7 +9,7 @@ Problem.id = 'IncompNewtonNoT'
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.remeshAlgo = 'GMSH_Falla'
+Problem.Mesh.remeshAlgo = 'GMSH_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface', 'Reservoir', 'FreeSurface'}
 Problem.Mesh.boundingBox = {-4, -4, 4, 6.25}
