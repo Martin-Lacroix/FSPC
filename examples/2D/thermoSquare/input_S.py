@@ -111,7 +111,7 @@ def getMetafor(parm):
     # Nodal GMSH exporter
 
     ext = w.GmshExporter(metafor, 'metafor/output')
-    ext.add(1, w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TO, w.RE)))
+    ext.add(w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TO, w.RE)))
     parm['exporter'] = ext
 
     # Build domain and folder
