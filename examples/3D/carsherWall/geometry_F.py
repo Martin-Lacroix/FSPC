@@ -12,9 +12,9 @@ L2 = 0.5
 L3 = 0.8
 
 R1 = 0.3
-R2 = 0.25
+R2 = 0.24
 
-Y = -0.01
+Y = -0.02
 H = 0.05
 L = 0.1
 B = 0.2
@@ -114,7 +114,7 @@ sh.addPhysicalGroup(2, s, name='Border')
 # |--------------------------|
 
 sh.mesh.generate(3)
-#sh.mesh.removeDuplicateNodes()
+sh.mesh.removeDuplicateNodes()
 
 gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
 gmsh.fltk.run()

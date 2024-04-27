@@ -43,7 +43,7 @@ def getMetafor(parm):
 
     materset = domain.getMaterialSet()
     materset.define(1, w.EvpIsoHHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS, 1e7)
+    materset(1).put(w.ELASTIC_MODULUS, 1e6)
     materset(1).put(w.MASS_DENSITY, 8e3)
     materset(1).put(w.POISSON_RATIO, 0)
     materset(1).put(w.YIELD_NUM, 1)
@@ -127,8 +127,8 @@ def getMetafor(parm):
     # Nodal GMSH exporter
 
     ext = w.GmshExporter(metafor, 'metafor/output')
-    ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_P))
     ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
+    ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EPL))
     parm['exporter'] = ext
 
     # Build domain and folder

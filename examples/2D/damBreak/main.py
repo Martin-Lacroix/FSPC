@@ -1,5 +1,4 @@
 import os.path as path
-import numpy as np
 import FSPC
 
 # Path to the solver input files
