@@ -3,6 +3,9 @@ import numpy as np
 import re, os
 import gmsh
 
+gmsh.initialize()
+gmsh.option.setNumber('General.Terminal', 0)
+
 # |---------------------------------------|
 # |   Sort the Files in Current Folder    |
 # |---------------------------------------|
@@ -44,8 +47,6 @@ def plot_ref(time: list, result: list, reference: list):
 
 def find_node(file: str, position: np.ndarray):
 
-    gmsh.initialize()
-    gmsh.option.setNumber('General.Terminal', 0)
     gmsh.open(file)
 
     node_tags, coord, _ = gmsh.model.mesh.getNodes()
