@@ -166,10 +166,10 @@ class Metafor(object):
 # |   Build the Facet List of the Polytopes    |
 # |--------------------------------------------|
 
-    def get_polytope(self):
+    def get_surface_mesh(self):
 
-        if not hasattr(self, 'polytope'): return list()
         face_list = list()
+        if not hasattr(self, 'polytope'): return face_list
 
         for elementset in self.polytope:
             face_list.append(self.get_facelist(elementset))

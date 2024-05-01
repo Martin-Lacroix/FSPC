@@ -151,9 +151,9 @@ class PFEM3D(object):
 # |------------------------------------|
 
     @tb.compute_time
-    def update(self, polytope: list):
+    def update(self, surface_mesh: list):
 
-        self.update_polytope(polytope)
+        self.update_polytope(surface_mesh)
         self.mesh.remesh(verboseOutput = False)
         self.reset_interface_BC()
 

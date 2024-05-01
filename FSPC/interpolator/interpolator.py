@@ -123,10 +123,10 @@ class Interpolator(object):
 
         if tb.is_fluid():
 
-            polytope = CW.recv(source=1, tag=7)
-            tb.Solver.update(polytope)
+            surface_mesh = CW.recv(source=1, tag=7)
+            tb.Solver.update(surface_mesh)
 
         elif tb.is_solid():
 
-            CW.send(tb.Solver.get_polytope(), 0, tag=7)
+            CW.send(tb.Solver.get_surface_mesh(), 0, tag=7)
             tb.Solver.update()
