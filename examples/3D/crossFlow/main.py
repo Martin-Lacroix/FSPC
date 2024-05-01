@@ -29,5 +29,5 @@ FSPC.set_mechanical_res(residual)
 
 # Start the FSI simulation
 
-algorithm.simulate(2e-3)
+algorithm.simulate(2)
 FSPC.general.print_clock()
