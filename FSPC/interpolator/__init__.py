@@ -1,12 +1,12 @@
 from .interpolator import Interpolator
 del interpolator
 
-# Mesh interpolation K-nearest neighbours
+# Linear element projection interpolation
 
 from .linear_projection import LEP
 del linear_projection
 
-# Mesh interpolation radial basis functions
+# Thin plate spline mesh interpolation
 
-from .basis_function import RBF
-del basis_function
+from .thin_plate_spline import TPS
+del thin_plate_spline

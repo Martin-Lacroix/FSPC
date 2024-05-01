@@ -4,7 +4,7 @@ from ..general import toolbox as tb
 import numpy as np
 
 # |----------------------------------------------|
-# |   Mesh Interpolation K-Nearest Neighbours    |
+# |   Linear Element Projection Interpolation    |
 # |----------------------------------------------|
 
 class LEP(Interpolator):

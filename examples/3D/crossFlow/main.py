@@ -1,5 +1,4 @@
 import os.path as path
-import numpy as np
 import FSPC
 
 # Path to the solver input files
@@ -15,8 +14,7 @@ FSPC.set_algorithm(algorithm)
 
 # Set the interface interpolator
 
-RBF = lambda r: np.square(r/0.01)*np.ma.log(r/0.01)
-interpolator = FSPC.interpolator.RBF(RBF)
+interpolator = FSPC.interpolator.TPS(0.01)
 FSPC.set_interpolator(interpolator)
 
 # Set the time step manager
@@ -31,5 +29,5 @@ FSPC.set_mechanical_res(residual)
 
 # Start the FSI simulation
 
-algorithm.simulate(2)
+algorithm.simulate(2e-3)
 FSPC.general.print_clock()
