@@ -23,7 +23,6 @@ class TPS(Interpolator):
     def __init__(self, radius: float):
 
         Interpolator.__init__(self)
-    
         
         self.pool = mp.Pool(mp.cpu_count())
         self.radius = radius
