@@ -49,7 +49,7 @@ def getMetafor(parm):
     materset(1).put(w.YIELD_NUM, 1)
 
     # Defines an isotropic hardening
-    
+
     lawset = domain.getMaterialLawSet()
     lawset.define(1, w.SwiftIsotropicHardening)
     lawset(1).put(w.IH_SIGEL, 1e6)
