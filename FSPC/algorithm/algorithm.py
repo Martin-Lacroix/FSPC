@@ -1,3 +1,4 @@
+from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
 import numpy as np
 
@@ -31,7 +32,8 @@ class Algorithm(object):
             # Update the solvers for the next time step
 
             if self.verified:
-
+                
+                self.check_rupture()
                 tb.Interp.update_solver()
                 tb.Step.update_exporter()
 
@@ -115,3 +117,18 @@ class Algorithm(object):
             eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
             print('[{:.0f}]'.format(self.iteration), eps)
 
+# |----------------------------------|
+# |   2D Rupture Interface Update    |
+# |----------------------------------|
+
+    def check_rupture(self):
+
+        if CW.rank == 0:
+
+            position = CW.recv(source=1, tag=8)
+            tb.Solver.check_rupture(position)
+
+        if CW.rank == 1:
+            
+            tb.Solver.check_rupture()
+            CW.send(tb.Solver.get_position(), 0, tag=8)

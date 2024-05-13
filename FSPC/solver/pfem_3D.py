@@ -183,3 +183,54 @@ class PFEM3D(object):
     # Print the time stats at destruction
 
     def __del__(self): self.problem.displayTimeStats()
+
+# |----------------------------------|
+# |   2D Rupture Interface Update    |
+# |----------------------------------|
+
+    @tb.compute_time
+    def check_rupture(self, recv_pos: np.ndarray):
+
+        epsilon = 1e-6
+        position = self.get_position()
+        p_ext = self.solver.getPExt()
+
+        tags = w.VectorInt(1)
+        for i, tag in enumerate(self.mesh.getTagNames()):
+            if(tag == "FSInterface"): tags[0] = i
+
+        # Remove broken nodes from the FS interface
+
+        for i, pos in enumerate(position):
+
+            dist = np.linalg.norm(pos-recv_pos, axis=1)
+            node = self.mesh.getNode(self.FSI[i])
+
+            if(np.min(dist) > epsilon):
+
+                if(node.isFree()):
+                    self.mesh.nextRemove.push_back(self.FSI[i])
+
+                else:
+                    node.m_isOnFreeSurface = True
+                    node.m_isBound = False
+                    node.m_tags.clear()
+
+        # Add new solid nodes on the FS interface
+
+        for i, pos in enumerate(recv_pos):
+
+            dist = np.linalg.norm(pos-position, axis=1)
+            vector_pos = w.ArrayDouble3()
+            states = w.VectorDouble(3)
+
+            vector_pos[0] = pos[0]
+            vector_pos[1] = pos[1]
+            vector_pos[2] = 0
+
+            states[0] = 0
+            states[1] = 0
+            states[2] = p_ext
+
+            if(np.min(dist) > epsilon):
+                self.mesh.addBoundaryNode(vector_pos, states, tags)

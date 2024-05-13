@@ -32,9 +32,10 @@ class Metafor(object):
         if self.dim == 3: self.axis = (w.TX, w.TY, w.TZ)
 
         # Defines some internal variables
-
+        
         self.FSI = parm['FSInterface']
         self.exporter = parm['exporter']
+        self.rupture = parm['rupture']
 
         # Mechanical and thermal interactions
 
@@ -251,3 +252,34 @@ class Metafor(object):
     # Return the number of nodes at the interface
 
     def get_size(self): return self.FSI.getNumberOfMeshPoints()
+
+# |----------------------------------|
+# |   2D Rupture Interface Update    |
+# |----------------------------------|
+    
+    @tb.compute_time
+    def check_rupture(self):
+
+        self.rupture.checkRuptureCriterion()
+        elementset = self.interaction_M[0].getElementSet()
+        elementset.activateBoundaryElements()
+
+        if not hasattr(self, 'polytope'):
+            for poly in self.polytope: poly.activateBoundaryElements()
+
+        # Update the nodes in the FS interface (need FSInterface = Interaction_M)
+
+        pointset = set()
+        self.FSI.cleanMeshPoints(self.geometry.getMesh())
+
+        for i in range(elementset.size()):
+
+            element1D = elementset.getElement(i)
+            if not element1D.getEnabled(): continue
+            curve = element1D.getMyMesh()
+
+            for j in range(curve.getNbOfDownPoints()):
+                pointset.add(curve.getDownPoint(j))
+
+        for point in pointset:
+            self.FSI.addMeshPoint(point)
