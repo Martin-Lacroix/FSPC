@@ -35,7 +35,7 @@ class TPS(Interpolator):
         zeros = np.zeros((1+tb.Solver.dim, np.size(recv_data, 1)))
         result = np.vstack((recv_data, zeros))
 
-        result = scipy.linalg.solve(self.A, result, assume_a='sym')
+        result = np.linalg.lstsq(self.A, result, rcond=None)[0]
         return np.dot(self.B, result)
 
 # |-----------------------------------------------|
