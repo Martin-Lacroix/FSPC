@@ -19,7 +19,7 @@ class InvJacobian(object):
 
         self.prev_J = np.copy(self.J)
 
-    def set_zero(self, size):
+    def set_zero(self, size: int):
 
         self.J = np.zeros((size, size))
         self.prev_J = np.zeros((size, size))
@@ -58,7 +58,7 @@ class MVJ(BGS):
         if tb.has_therm: self.jac_therm = InvJacobian()
     
     @tb.only_solid
-    def update(self, verified):
+    def update(self, verified: bool):
 
         if not verified: return
         if tb.has_mecha: self.jac_mecha.update()

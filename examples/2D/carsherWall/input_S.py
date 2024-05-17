@@ -22,6 +22,58 @@ def getMetafor(parm):
     domain = metafor.getDomain()
     domain.getGeometry().setDimPlaneStrain(1)
     metafor.getSolverManager().setSolver(w.DSSolver())
+
+    # Make the revolution tool
+
+    L1 = 0.3
+    L2 = 0.5
+    L3 = 0.8
+    R1 = 0.3
+
+    B = 0.15
+    S = 0.04
+
+    geometry = domain.getGeometry()
+    pointset = geometry.getPointSet()
+
+    # Points list
+
+    pointset.define(1, L1+L2+L3+S, S-R1, 0)
+    pointset.define(2, L1+L2+S, S-R1, 0)
+    pointset.define(3, L1+L2+S, -B, 0)
+    pointset.define(4, L1+L2+S/2, S/2-B, 0)
+    pointset.define(5, L1+L2, -B, 0)
+    pointset.define(6, L1+L2, S-R1, 0)
+    pointset.define(7, L1, S-R1, 0)
+
+    pointset.define(8, L1, R1-S, 0)
+    pointset.define(9, L1+L2, R1-S, 0)
+    pointset.define(10, L1+L2, B, 0)
+    pointset.define(11, L1+L2+S/2, B-S/2, 0)
+    pointset.define(12, L1+L2+S, B, 0)
+    pointset.define(13, L1+L2+S, R1-S, 0)
+    pointset.define(14, L1+L2+L3+S, R1-S, 0)
+
+    # Curve list
+
+    curveset = geometry.getCurveSet()
+
+    curveset.add(w.Line(1, pointset(1), pointset(2)))
+    curveset.add(w.Line(2, pointset(2), pointset(3)))
+    curveset.add(w.Arc(3, pointset(3), pointset(4), pointset(5)))
+    curveset.add(w.Line(4, pointset(5), pointset(6)))
+    curveset.add(w.Line(5, pointset(6), pointset(7)))
+
+    curveset.add(w.Line(6, pointset(8), pointset(9)))
+    curveset.add(w.Line(7, pointset(9), pointset(10)))
+    curveset.add(w.Arc(8, pointset(10), pointset(11), pointset(12)))
+    curveset.add(w.Line(9, pointset(12), pointset(13)))
+    curveset.add(w.Line(10, pointset(13), pointset(14)))
+
+    # Generate the contact tool
+
+    wireset = geometry.getWireSet()
+    wireset.add(w.Wire(1, [curveset(i) for i in range(1, 11)]))
     
     # Imports the mesh
 
@@ -92,7 +144,7 @@ def getMetafor(parm):
     # Contact for Tool and Solid
 
     ci = w.RdContactInteraction(3)
-    ci.setTool(groups['Contact'])
+    ci.setTool(wireset(1))
     ci.setSmoothNormals(False)
     ci.push(groups['Solid'])
     ci.addProperty(prp3)
@@ -101,8 +153,8 @@ def getMetafor(parm):
     # Boundary conditions
 
     loadset = domain.getLoadingSet()
-    loadset.define(groups['Contact'], w.Field1D(w.TX, w.RE))
-    loadset.define(groups['Contact'], w.Field1D(w.TY, w.RE))
+    loadset.define(wireset(1), w.Field1D(w.TX, w.RE))
+    loadset.define(wireset(1), w.Field1D(w.TY, w.RE))
 
     # Mechanical time integration
 

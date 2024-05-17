@@ -5,7 +5,10 @@ import FSPC
 
 path_F = path.dirname(__file__)+'/input_F.lua'
 path_S = path.dirname(__file__)+'/input_S.py'
-FSPC.init_solver(path_F, path_S)
+
+solver = FSPC.init_solver(path_F, path_S)
+if FSPC.general.is_fluid(): solver.max_division = 1
+if FSPC.general.is_solid(): solver.max_division = 1000
 
 # Set the coupling algorithm
 
@@ -14,7 +17,7 @@ FSPC.set_algorithm(algorithm)
 
 # Set the interface interpolator
 
-interpolator = FSPC.interpolator.TPS(0.01)
+interpolator = FSPC.interpolator.TPS(0.05)
 FSPC.set_interpolator(interpolator)
 
 # Set the time step manager

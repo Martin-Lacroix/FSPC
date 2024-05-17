@@ -11,7 +11,7 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.boundingBox = {0, 0.04, 1.56, 0.6}
+Problem.Mesh.boundingBox = {0, -0.26, 1.64, 0.26}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
@@ -94,7 +94,7 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x, y, z, t)
 	local vmax = 5
 	local tmax = 0.5
 	local vt = (t/tmax)*vmax
-	local r = math.abs(y-0.25)
+	local r = math.abs(y)
 	local R = 0.05
 
 	if (t < tmax) then

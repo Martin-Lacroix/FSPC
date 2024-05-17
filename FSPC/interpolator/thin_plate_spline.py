@@ -2,10 +2,9 @@ from .interpolator import Interpolator
 from ..general import toolbox as tb
 from functools import partial
 
-# Linear algebra parallelization library
+#  Process-based parallelization
 
 import multiprocessing as mp
-import scipy.linalg
 import numpy as np
 
 # Thin plate spline radial basis function
