@@ -96,7 +96,7 @@ def getMetafor(parm):
     materset = domain.getMaterialSet()
     materset.define(1, w.EvpIsoHHypoMaterial)
     materset(1).put(w.ELASTIC_MODULUS, 1e7)
-    materset(1).put(w.MASS_DENSITY, 8e3)
+    materset(1).put(w.MASS_DENSITY, 1e3)
     materset(1).put(w.POISSON_RATIO, 0)
     materset(1).put(w.YIELD_NUM, 1)
 
@@ -108,11 +108,14 @@ def getMetafor(parm):
 
     # Contact parameters
 
+    penalty = 1e8
+    friction = 0.15
+
     materset.define(2, w.CoulombContactMaterial)
-    materset(2).put(w.COEF_FROT_DYN, 0.15)
-    materset(2).put(w.COEF_FROT_STA, 0.15)
-    materset(2).put(w.PEN_NORMALE, 1e8)
-    materset(2).put(w.PEN_TANGENT, 1e8)
+    materset(2).put(w.PEN_TANGENT, friction*penalty)
+    materset(2).put(w.COEF_FROT_DYN, friction)
+    materset(2).put(w.COEF_FROT_STA, friction)
+    materset(2).put(w.PEN_NORMALE, penalty)
     materset(2).put(w.PROF_CONT, 0.01)
 
     # Volume solid properties
@@ -138,7 +141,7 @@ def getMetafor(parm):
     # Contact properties
 
     prp3 = w.ElementProperties(w.Contact2DElement)
-    prp3.put(w.AREAINCONTACT, w.AIC_ONCE)
+    prp3.put(w.AREAINCONTACT, w.AIC)
     prp3.put(w.MATERIAL, 2)
 
     # Contact for Tool and Solid
@@ -178,8 +181,8 @@ def getMetafor(parm):
     # Nodal GMSH exporter
 
     ext = w.GmshExporter(metafor, 'metafor/output')
-    ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_P))
     ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
+    ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EPL))
     parm['exporter'] = ext
 
     # Build domain and folder

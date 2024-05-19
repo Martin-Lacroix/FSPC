@@ -12,18 +12,18 @@ Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'GMSH_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.boundingBox = {0, -0.26, 1.64, 0.26}
-Problem.Mesh.exclusionZones = {}
+Problem.Mesh.exclusionZones = {{0.8, -0.26, 0.84, -0.15},{0.8, 0.15, 0.84, 0.26}}
 
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.5
 Problem.Mesh.hchar = 0.005
-Problem.Mesh.gammaFS = 0.3
-Problem.Mesh.minHeightFactor = 1e-3
+Problem.Mesh.gammaFS = 0.2
+Problem.Mesh.minHeightFactor = 1e-2
 
 Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = false
+Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = true
 
 -- Extractor Parameters

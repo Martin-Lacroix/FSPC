@@ -61,7 +61,7 @@ def getMetafor(parm):
     # Generate the contact tool
 
     wireset = geometry.getWireSet()
-    wireset.add(w.Wire(1, [curveset(1), curveset(2), curveset(3), curveset(4), curveset(5)]))
+    wireset.add(w.Wire(1, [curveset(i) for i in range(1, 6)]))
 
     surfaceset = geometry.getSurfaceSet()
     surfaceset.add(w.RevolutionSurface(1, curveset(6), wireset(1)))
@@ -107,9 +107,9 @@ def getMetafor(parm):
     penalty = 1e8
 
     materset.define(2, w.CoulombContactMaterial)
+    materset(2).put(w.PEN_TANGENT, friction*penalty)
     materset(2).put(w.COEF_FROT_DYN, friction)
     materset(2).put(w.COEF_FROT_STA, friction)
-    materset(2).put(w.PEN_TANGENT, friction*penalty)
     materset(2).put(w.PEN_NORMALE, penalty)
     materset(2).put(w.PROF_CONT, 0.01)
 
@@ -136,7 +136,7 @@ def getMetafor(parm):
     # Contact properties
 
     prp3 = w.ElementProperties(w.Contact3DElement)
-    prp3.put(w.AREAINCONTACT, w.AIC_ONCE)
+    prp3.put(w.AREAINCONTACT, w.AIC)
     prp3.put(w.MATERIAL, 2)
 
     # Contact for Tool and Solid
