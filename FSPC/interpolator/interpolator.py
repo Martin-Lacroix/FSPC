@@ -55,12 +55,7 @@ class Interpolator(object):
             recv = CW.recv(source=1, tag=4)
             tb.Solver.apply_displacement(self.interpolate(recv))
 
-            print('Recv =', np.sum(np.abs(recv)))
-
-        else:
-            
-            print('\nDisp =', np.sum(np.abs(self.disp)))
-            CW.send(self.disp, 0, tag=4)
+        else: CW.send(self.disp, 0, tag=4)
 
     # Apply actual heat flux to the solid
 
