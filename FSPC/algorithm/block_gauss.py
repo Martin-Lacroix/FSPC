@@ -28,18 +28,21 @@ class BGS(Algorithm):
 
         self.iteration = 0
 
-        if tb.is_fluid():
-            for i in range(len(tb.Solver.BC)):
-                for j in range(tb.Solver.BC[i].size()):
-                    tb.Solver.BC[i][j] = 0
-
         while self.iteration < self.max_iter:
 
             tb.Solver.way_back()
 
             # Dirichlet transfer and fluid solver run
 
-            if self.iteration > 0: self.transfer_dirichlet()
+            self.transfer_dirichlet()
+
+            # if tb.is_fluid():
+            #     total_BC = 0
+            #     for i in range(len(tb.Solver.BC)):
+            #         for j in range(tb.Solver.BC[i].size()):
+            #             total_BC += np.abs(tb.Solver.BC[i][j])
+            #     print('total_BS =', total_BC, '\n')
+
             if not tb.run_fluid(): break
 
             # Neumann transfer and solid solver run

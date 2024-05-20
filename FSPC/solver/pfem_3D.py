@@ -138,7 +138,7 @@ class PFEM3D(object):
 
         for i in self.FSI:
 
-            vector = w.VectorDouble(self.dim+1)
+            vector = w.VectorDouble(self.dim+1, 0)
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 

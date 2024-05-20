@@ -55,7 +55,12 @@ class Interpolator(object):
             recv = CW.recv(source=1, tag=4)
             tb.Solver.apply_displacement(self.interpolate(recv))
 
-        else: CW.send(self.disp, 0, tag=4)
+            print('Recv =', np.sum(np.abs(recv)))
+
+        else:
+            
+            print('\nDisp =', np.sum(np.abs(self.disp)))
+            CW.send(self.disp, 0, tag=4)
 
     # Apply actual heat flux to the solid
 
@@ -80,6 +85,30 @@ class Interpolator(object):
             tb.Solver.apply_temperature(self.interpolate(recv))
 
         else: CW.send(self.temp, 0, tag=6)
+
+# |---------------------------------------------|
+# |   Predict the Solution for Next Coupling    |
+# |---------------------------------------------|
+
+    @tb.only_mechanical
+    def predict_displacement(self, verified: bool):
+
+        if not hasattr(self, 'prev_disp') or verified:
+
+            self.prev_disp = np.copy(self.disp)
+
+        else: self.disp = np.copy(self.prev_disp)
+
+    # Predictor for the temparature coupling
+
+    @tb.only_thermal
+    def predict_temperature(self, verified: bool):
+
+        if not hasattr(self, 'prev_temp') or verified:
+
+            self.prev_temp = np.copy(self.temp)
+
+        else: self.temp = np.copy(self.prev_temp)
 
 # |------------------------------------------|
 # |   Update the Solver After Convergence    |
