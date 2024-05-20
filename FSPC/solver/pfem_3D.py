@@ -21,7 +21,7 @@ class PFEM3D(object):
         else:
 
             self.WC = False
-            self.max_division = 10
+            self.max_division = 1
 
         # Store important classes and variables
 
@@ -83,7 +83,10 @@ class PFEM3D(object):
 
         vector = w.VectorVectorDouble()
         self.solver.computeStress('FSInterface', self.FSI, vector)
-        return np.copy(vector)
+        load = np.copy(vector)
+
+        if not hasattr(self, 'prev_load'): return load/2
+        else: return (load+self.prev_load)/2
 
     # Return Thermal boundary conditions
 
@@ -91,7 +94,10 @@ class PFEM3D(object):
 
         vector = w.VectorVectorDouble()
         self.solver.computeHeatFlux('FSInterface', self.FSI, vector)
-        return np.copy(vector)
+        heat = np.copy(vector)
+
+        if not hasattr(self, 'prev_heat'): return heat/2
+        else: return (heat+self.prev_heat)/2
 
 # |-----------------------------------|
 # |   Return Position and Velocity    |
@@ -161,6 +167,19 @@ class PFEM3D(object):
 
         if not self.WC: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prev_solution)
+        vector = w.VectorVectorDouble()
+
+        # Compute the initial load on the interface
+
+        if tb.has_mecha:
+
+            self.solver.computeStress('FSInterface', self.FSI, vector)
+            self.prev_load = np.copy(vector)
+
+        if tb.has_therm:
+
+            self.solver.computeHeatFlux('FSInterface', self.FSI, vector)
+            self.prev_heat = np.copy(vector)
 
     # Backup the solver state if needed
 

@@ -104,7 +104,7 @@ def getMetafor(parm):
     # Contact parameters
 
     friction = 0.15
-    penalty = 1e8
+    penalty = 1e7
 
     materset.define(2, w.CoulombContactMaterial)
     materset(2).put(w.PEN_TANGENT, friction*penalty)

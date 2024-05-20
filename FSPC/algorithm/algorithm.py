@@ -24,7 +24,6 @@ class Algorithm(object):
 
             # Main loop on the FSI coupling iterations
 
-            self.compute_predictor()
             self.verified = self.coupling_algorithm()
             tb.Step.update_time(self.verified)
 
@@ -38,12 +37,6 @@ class Algorithm(object):
 # |--------------------------------------------|
 # |   Interpolator Functions and Relaxation    |
 # |--------------------------------------------|
-
-    @tb.only_solid
-    def compute_predictor(self):
-
-        tb.Interp.predict_temperature(self.verified)
-        tb.Interp.predict_displacement(self.verified)
 
     @tb.only_solid
     def reset_convergence(self):

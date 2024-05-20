@@ -81,40 +81,6 @@ class Interpolator(object):
 
         else: CW.send(self.temp, 0, tag=6)
 
-# |---------------------------------------------|
-# |   Predict the Solution for Next Coupling    |
-# |---------------------------------------------|
-
-    @tb.only_mechanical
-    def predict_displacement(self, verified: bool):
-
-        if not hasattr(self, 'prev_disp') or verified:
-
-            self.prev_disp = np.copy(self.disp)
-            self.velocity_disp = tb.Solver.get_velocity()
-            self.disp += tb.Step.dt*self.velocity_disp
-
-        else:
-
-            self.disp = np.copy(self.prev_disp)
-            self.disp += tb.Step.dt*self.velocity_disp
-
-    # Predictor for the temparature coupling
-
-    @tb.only_thermal
-    def predict_temperature(self, verified: bool):
-
-        if not hasattr(self, 'prev_temp') or verified:
-
-            self.prev_temp = np.copy(self.temp)
-            self.velocity_temp = tb.Solver.get_tempgrad()
-            self.temp += tb.Step.dt*self.velocity_temp
-
-        else:
-
-            self.temp = np.copy(self.prev_temp)
-            self.temp += tb.Step.dt*self.velocity_temp
-
 # |------------------------------------------|
 # |   Update the Solver After Convergence    |
 # |------------------------------------------|
