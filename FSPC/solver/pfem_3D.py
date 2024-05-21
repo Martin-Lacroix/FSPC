@@ -189,6 +189,8 @@ class PFEM3D(object):
         if self.problem.getCurrentSimStep() > self.prev_solution.step:
             self.problem.loadSolution(self.prev_solution)
 
+        print('PFEM ==>', self.problem.getCurrentSimTime())
+
     # Export the current solution into a file
 
     @tb.write_logs
