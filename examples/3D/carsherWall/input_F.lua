@@ -65,7 +65,6 @@ Problem.Solver.coeffDTincrease = 1
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-
 Problem.Solver.MomContEq.sparseSolverPStep = 'LLT'
 Problem.Solver.MomContEq.sparseSolverLibPStep = 'MKL'
 
