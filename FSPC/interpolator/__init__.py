@@ -10,3 +10,8 @@ del linear_projection
 
 from .thin_plate_spline import TPS
 del thin_plate_spline
+
+# Nearest neighbour mesh interpolation
+
+from .nearest_neighbour import NNI
+del nearest_neighbour

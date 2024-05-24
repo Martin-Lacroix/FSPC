@@ -3,16 +3,20 @@ from scipy.sparse import dok_matrix
 from ..general import toolbox as tb
 import numpy as np
 
-# |----------------------------------------------|
-# |   Linear Element Projection Interpolation    |
-# |----------------------------------------------|
+# |--------------------------------|
+# |   Linear Element Projection    |
+# |--------------------------------|
 
 class LEP(Interpolator):
-    def __init__(self):
+    def __init__(self, elem_type: int):
 
         Interpolator.__init__(self)
-        if tb.Solver.dim == 2: self.element = Line()
-        if tb.Solver.dim == 3: self.element = Triangle()
+
+        match elem_type:
+
+            case 2: self.element = Line()
+            case 3: self.element = Triangle()
+            case _: raise Exception('Invalid element type')
 
     # Interpolate recv_data and return the result
 

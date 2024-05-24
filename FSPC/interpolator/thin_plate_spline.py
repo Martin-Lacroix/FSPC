@@ -7,16 +7,9 @@ from functools import partial
 import multiprocessing as mp
 import numpy as np
 
-# Thin plate spline radial basis function
-
-def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
-
-    r = np.linalg.norm(position-recv, axis=1)/R
-    return np.square(r)*np.ma.log(r)
-
-# |-------------------------------------------|
-# |   Thin Plate Spline Mesh Interpolation    |
-# |-------------------------------------------|
+# |--------------------------------------|
+# |   Thin Plate Spline Interpolation    |
+# |--------------------------------------|
 
 class TPS(Interpolator):
     def __init__(self, radius: float):
@@ -36,6 +29,12 @@ class TPS(Interpolator):
 
         result = np.linalg.lstsq(self.A, result, rcond=None)[0]
         return np.dot(self.B, result)
+    
+    @staticmethod
+    def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
+
+        r = np.linalg.norm(position-recv, axis=1)/R
+        return np.square(r)*np.ma.log(r)
 
 # |-----------------------------------------------|
 # |   Mapping Matrix from Recv_Pos to Position    |
@@ -68,7 +67,7 @@ class TPS(Interpolator):
 
         # Evaluate the radial basis function in parallel
 
-        RBF = partial(basis_func, recv=self.recv_pos, R=self.radius)
+        RBF = partial(self.basis_func, recv=self.recv_pos, R=self.radius)
 
         self.B[np.ix_(K, N)] = self.pool.map(RBF, position)
         self.A[np.ix_(N, N)] = self.pool.map(RBF, self.recv_pos)
