@@ -15,15 +15,15 @@ Problem.Mesh.boundingBox = {0, -0.26,-0.26, 1.56, 0.26, 0.26}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.5
+Problem.Mesh.omega = 0.7
+Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 0.02
-Problem.Mesh.gammaFS = 0.5
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.minHeightFactor = 1e-2
 
 Problem.Mesh.addOnFS = true
 Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = false
+Problem.Mesh.deleteFlyingNodes = true
 Problem.Mesh.deleteBoundElements = true
 
 -- Extractor Parameters
@@ -65,6 +65,9 @@ Problem.Solver.coeffDTincrease = 1
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
+
+Problem.Solver.MomContEq.sparseSolverPStep = 'LLT'
+Problem.Solver.MomContEq.sparseSolverLibPStep = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25

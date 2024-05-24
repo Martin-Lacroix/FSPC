@@ -108,7 +108,7 @@ def getMetafor(parm):
 
     # Contact parameters
 
-    penalty = 1e8
+    penalty = 1e7
     friction = 0.15
 
     materset.define(2, w.CoulombContactMaterial)
@@ -141,7 +141,7 @@ def getMetafor(parm):
     # Contact properties
 
     prp3 = w.ElementProperties(w.Contact2DElement)
-    prp3.put(w.AREAINCONTACT, w.AIC)
+    prp3.put(w.AREAINCONTACT, w.AIC_ONCE)
     prp3.put(w.MATERIAL, 2)
 
     # Contact for Tool and Solid
@@ -149,7 +149,7 @@ def getMetafor(parm):
     ci = w.RdContactInteraction(3)
     ci.setTool(wireset(1))
     ci.setSmoothNormals(False)
-    ci.push(groups['Solid'])
+    ci.push(groups['FSInterface'])
     ci.addProperty(prp3)
     iset.add(ci)
 

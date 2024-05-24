@@ -36,6 +36,8 @@ def getMetafor(parm):
     geometry = domain.getGeometry()
     pointset = geometry.getPointSet()
 
+    # Points and curves list
+
     pointset.define(1, L1+L2+L3+S, S-R1, 0)
     pointset.define(2, L1+L2+S, S-R1, 0)
     pointset.define(3, L1+L2+S, -B, 0)
@@ -104,12 +106,12 @@ def getMetafor(parm):
     # Contact parameters
 
     friction = 0.15
-    penalty = 1e8
+    penalty = 1e7
 
     materset.define(2, w.CoulombContactMaterial)
-    materset(2).put(w.PEN_TANGENT, friction*penalty)
     materset(2).put(w.COEF_FROT_DYN, friction)
     materset(2).put(w.COEF_FROT_STA, friction)
+    materset(2).put(w.PEN_TANGENT, friction*penalty)
     materset(2).put(w.PEN_NORMALE, penalty)
     materset(2).put(w.PROF_CONT, 0.01)
 
@@ -136,7 +138,7 @@ def getMetafor(parm):
     # Contact properties
 
     prp3 = w.ElementProperties(w.Contact3DElement)
-    prp3.put(w.AREAINCONTACT, w.AIC)
+    prp3.put(w.AREAINCONTACT, w.AIC_ONCE)
     prp3.put(w.MATERIAL, 2)
 
     # Contact for Tool and Solid
@@ -144,7 +146,7 @@ def getMetafor(parm):
     ci = w.RdContactInteraction(3)
     ci.setTool(sideset(1))
     ci.setSmoothNormals(False)
-    ci.push(groups['Solid'])
+    ci.push(groups['Contact'])
     ci.addProperty(prp3)
     iset.add(ci)
 
