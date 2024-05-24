@@ -70,7 +70,7 @@ class Metafor(object):
 
         self.tsm.setNextTime(tb.Step.next_time(), 0, tb.Step.dt)
         self.tsm.setMinimumTimeStep(tb.Step.dt/self.max_division)
-        return self.metafor.getTimeIntegration().restart(self.fac)
+        return self.metafor.getTimeIntegration().integration()
 
 # |----------------------------------|
 # |   Neumann Boundary Conditions    |
@@ -233,13 +233,17 @@ class Metafor(object):
 
     # Backup the solver state if needed
 
+    @tb.write_logs
     @tb.compute_time
     def way_back(self):
 
         stm = self.metafor.getStageManager()
-        if stm.getCurNumStage() < 0: return
+        stage = stm.getCurNumStage()
 
-        if stm.getNumbOfStage()-stm.getCurNumStage() > 1:
+        if self.metafor.getCurrentStepNo() > self.fac.getStepNo():
+            self.metafor.restart(self.fac)
+
+        if not (stage < 0) and (stm.getNumbOfStage()-stage > 1):
             self.tsm.removeLastStage()
 
     # Export the current solution into a file
