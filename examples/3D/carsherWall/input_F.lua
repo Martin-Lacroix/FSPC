@@ -52,7 +52,7 @@ Problem.Material.rho = 1000
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'FracStep'
+Problem.Solver.id = 'PSPG'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -63,10 +63,14 @@ Problem.Solver.coeffDTincrease = 1
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U_P'
-Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.nlAlgo = 'NR'
+
 Problem.Solver.MomContEq.sparseSolverPStep = 'LLT'
 Problem.Solver.MomContEq.sparseSolverLibPStep = 'MKL'
+
+Problem.Solver.MomContEq.sparseSolver = 'LU'
+Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25

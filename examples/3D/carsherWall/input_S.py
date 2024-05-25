@@ -1,4 +1,5 @@
 import toolbox.gmsh as gmsh
+import toolbox.fac as fac
 import wrap as w
 import os
 
@@ -146,7 +147,7 @@ def getMetafor(parm):
     ci = w.RdContactInteraction(3)
     ci.setTool(sideset(1))
     ci.setSmoothNormals(False)
-    ci.push(groups['Contact'])
+    ci.push(groups['FSInterface'])
     ci.addProperty(prp3)
     iset.add(ci)
 
@@ -178,13 +179,43 @@ def getMetafor(parm):
 
     # Nodal GMSH exporter
 
-    ext = w.GmshExporter(metafor, 'metafor/output')
-    ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
-    ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EPL))
-    parm['exporter'] = ext
+    # ext = w.GmshExporter(metafor, 'metafor/output')
+    # ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
+    # ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EPL))
+    # parm['exporter'] = ext
+
+    parm['exporter'] = Exporter(metafor, groups['Solid'])
 
     # Build domain and folder
 
     domain.build()
     os.makedirs('metafor')
     return metafor
+
+class Exporter(object):
+    def __init__(self, metafor, grp):
+
+        # Make the Fac exporter
+
+        self.fac = fac.FacManager(metafor)
+        self.step = 0
+
+        # Make the Gmsh exporter
+
+        self.gmsh_exp = gmsh.GmshExporter(metafor, 'output')
+        self.gmsh_exp.add(w.IFNodalValueExtractor(grp, w.IF_EVMS))
+        self.gmsh_exp.add(w.IFNodalValueExtractor(grp, w.IF_EPL))
+
+    def write(self):
+
+        os.chdir('metafor')
+
+        # Write the current Fac
+
+        self.fac.saveCustom(str(self.step).zfill(9))
+        self.step += 1
+
+        # Write the current Gmsh
+
+        self.gmsh_exp.write()
+        os.chdir('..')
