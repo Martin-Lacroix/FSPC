@@ -2,7 +2,7 @@
 
 <br />
 
-FSPC provides some classes able to perform FSI simulation by partitioned coupling of a fluid (PFEM) and a structural (Metafor) solver. This package uses MPI for the communication between them, and assumes that the solvers are available in your path. An example of how to run your Python script with FSPC is provided bellow.
+FSPC provides some classes able to perform FSI simulation by partitioned coupling of a fluid and a structural solver. This package uses MPI for the communication between them, and assumes that the solvers are available in your path. An example of how to run your Python script with FSPC is provided bellow.
 
 <br />
 
@@ -18,85 +18,105 @@ mpiexec ${OPTION} -n 2 python ${SCRIPT} -k ${CPU_PER_PROC}
 
 <br />
 
-The first step is to import the package. The latter initializes MPI for Python and provides a method to initialize the external solver wrappers with their respective input files. At that point, the script is run on two MPI processes. One may then initialize some internal classes.
+The first step is to import the package with `import FSPC`. The latter initializes MPI and provides a method to initialize the external solver wrappers with their respective input files. At that point, the script is run on two MPI processes. You may call `FSPC.general.is_fluid` or `FSPC.general.is_solid` to check if the current MPI process is related to the fluid of the solid solver.
 
 <br />
 
 ```python
-import FSPC                         # Import the FSPC package
-FSPC.set_step(dt,dt_save)             # Initialize the time step manager
-FSPC.set_solver(path_F,path_S)         # Initialize the external solvers
+solver = FSPC.init_solver(path_F, path_S)
 ```
 
-| Input             | Type              | Description                                   |
-|-------------------|-------------------|-----------------------------------------------|
-| *dt*              | *float*           | *initial coupling time step*                  |
-| *dt_save*          | *float*           | *time step for saving on the disk*            |
-| *path_F*           | *string*          | *input file path for the fluid solver*        |
-| *path_S*           | *string*          | *input file path for the solid solver*        |
+| Input             | Type              | Description                                    |
+|-------------------|-------------------|------------------------------------------------|
+| *path_F*          | *string*          | *path to the input file of the fluid solver*   |
+| *path_S*          | *string*          | *path to the input file of the solid solver*   |
 
 <br />
 
-The convergence criterion is managed by the `Residual` class. The latter should be specified both for the displacement and the temperature when relevant. It is important to note that the type of coupling is enabled by the initialization of the associated class such that `set_mechanical_res` enables the mechanical coupling and `set_thermal_res` enables the thermal coupling.
+The algorithm is set as follows. The class `BGS` holds for block-Gauss Seidel with Aitken relaxation and possesses and internal parameter `algorithm.omega` for the initial value of the relaxation, which is `0.5` by default. The class `ILS` holds for interface quasi-Newton with inverse least squares and will perform a `BGS` iteration when no previous residual vector is available. The class `MVJ` holds for interface quasi-Newton with multi-vector Jacobian and is an improved version of the `ILS` that reuses the Jacobian from the previous time step when computing the current one.
 
 <br />
 
 ```python
-FSPC.set_mechanical_res(tolDisp)       # Mechanical convergence criterion
-FSPC.set_thermal_res(tolTemp)       # Thermal convergence criterion
+algorithm = FSPC.algorithm.BGS(max_iter)
+algorithm = FSPC.algorithm.ILS(max_iter)
+algorithm = FSPC.algorithm.MVJ(max_iter)
+
+FSPC.set_algorithm(algorithm)
 ```
 
-| Input             | Type              | Description                                |
-|-------------------|-------------------|--------------------------------------------|
-| *tolDisp*         | *float*           | *tolerance for the displacement FSI*       |
-| *tolTemp*         | *float*           | *tolerance for the temperature FSI*        |
+| Input             | Type                | Description                      |
+|-------------------|---------------------|----------------------------------|
+| *max_iter*        | *int*               | *maximum number of iterations*   |
 
 <br />
 
-The tolerance is a relative change in the Dirichlet condition exchanged between the solver, so the position for the mechanical coupling and the temperature for the thermal coupling. The `Interpolator` class manages the data transfer between the two interface meshes associated with the fluid and solid structure. The `KNN` uses a simple interpolation between the k nearest neighbour nodes in the target mesh. The `RBF` performs an interpolation based on user-defined radial basis functions, the latter can be defined as a simple lambda function.
-
-<br />
-
-```python
-FSPC.set_interpolator(FSPC.interpolator.KNN,k)           # K-nearest neighbours interpolator
-FSPC.set_interpolator(FSPC.interpolator.RBF,fun)         # Radial basis function interpolator
-```
-
-| Input             | Type                | Description                                     |
-|-------------------|---------------------|-------------------------------------------------|
-| *k*               | *int*               | *number of nearest neighbours*                  |
-| *fun*             | *function*          | *radial basis function for nodal distance*      |
-
-<br />
-
-Note that there is no required ordering when initializing the classes and the interpolator may be initialized before the `Convergence` class. Finally, the last step is the initialization of the`Algorithm` class. The simplest one is the block Gauss–Seidel `BGS` method. Moreover, two interface quasi-Newton methods are available, with inverse least square `ILS` and multi-vector Jacobian `MVJ` respectively.
+The interpolator is used to transfer nodal data from one solver to another. The class `NNS` holds for nearest neighbour search and is valid for matching meshes. The class `LEP` holds for linear element projection and is an extension of the `NNS` for non-matching meshes that uses projections into virtual 2-node segments or 3-node triangle elements to interpolate the data with the shape functions. The `TPS` is a radial-basis function interpolation with thin plate spline. The latter is more robust but involves more computations.
 
 <br />
 
 ```python
-FSPC.set_algorithm(FSPC.algorithm.BGS,maxIter)        # Aitken block-Gauss Seidel
-FSPC.set_algorithm(FSPC.algorithm.ILS,maxIter)        # IQN with inverse least squares 
-FSPC.set_algorithm(FSPC.algorithm.MVJ,maxIter)        # IQN with multi-vector Jacobian
+interpolator = FSPC.interpolator.NNS()
+interpolator = FSPC.interpolator.LEP(elem_type)
+interpolator = FSPC.interpolator.TPS(radius)
+
+FSPC.set_interpolator(interpolator)
 ```
 
 | Input             | Type                | Description                                     |
 |-------------------|---------------------|-------------------------------------------------|
-| *maxIter*         | *int*               | *maximum number of iterations*                  |
+| *elem_type*         | *int*               | *type of element for projection*                  |
+| *radius*         | *float*               | *characteristic radius of the RBF*                  |
 
 <br />
 
-It is important to note that each `Set` function returns a reference to the class created. Thereby, some additional parameters such as the initial Aitken relaxation factor can be modified by the user. This is achieved by assigning a new value to the corresponding attribute, for instance `algorithm.omega = 0.5` is the default Aitken parameter. The simulation can be started with the `simulate` function provided by the `general` module. It is also possible to print the time stats at the end of the simulation and compare the computation time for the fluid and the solid processes.
+The time step manager is responsible for adapting the time step during the simulation as well as exporting the current solution when asked by the user. The `TimeStep` class may also prematurely end the simulation if the time step reaches a critically small value.
 
 <br />
 
 ```python
-FSPC.general.simulate(end_time)      # Run the FSI simulation
-FSPC.general.print_clock()           # Print the final time stats
+step = FSPC.general.TimeStep(dt, dt_save)
+FSPC.set_time_step(step)
 ```
 
-| Input             | Type              | Description                                  |
-|-------------------|-------------------|----------------------------------------------|
-| *end_time*         | *float*           | *final simulation time*                      |
+| Input             | Type                | Description                                     |
+|-------------------|---------------------|-------------------------------------------------|
+| *dt*         | *float*               | *initial coupling time step*                  |
+| *st_save*         | *float*               | *time step for saving on the disk*                  |
+
+<br />
+
+The residual manager is responsible for checking the convergence of the fluid-structure coupling algorithm. The `Residual` class must be defined for enabling the corresponding coupling type. For instance, calling `FSPC.set_mechanical_res` with a valid input will enable the mechanical coupling. In the same way, calling `FSPC.set_thermal_res` will enable the thermal coupling. Both couplings may also be enabled together for a thermo-mechanical fluid-structure simulation.
+
+<br />
+
+```python
+residual = FSPC.general.Residual(tol_disp)
+FSPC.set_mechanical_res(residual)
+
+residual = FSPC.general.Residual(tol_temp)
+FSPC.set_thermal_res(residual)
+```
+
+| Input             | Type                | Description                                     |
+|-------------------|---------------------|-------------------------------------------------|
+| *tol_disp*         | *float*               | *tolerance for the displacement*                  |
+| *tol_temp*         | *float*               | *tolerance for the temperature*                  |
+
+<br />
+
+Once all the other classes have been set in FSPC, you may call `algorithm.simulate` to start the simulation for the desired duration. The computation time of different functions are computed during the simulation and can be displayed in the terminal at the end.
+
+<br />
+
+```python
+algorithm.simulate(end_time)
+FSPC.general.print_clock()
+```
+
+| Input             | Type                | Description                                     |
+|-------------------|---------------------|-------------------------------------------------|
+| *end_time*         | *float*               | *final simulation time*                  |
 
 <br />
 
@@ -104,25 +124,37 @@ FSPC.general.print_clock()           # Print the final time stats
 
 <br />
 
-The input file for the fluid solver is the standard Lua for [PFEM3D](https://github.com/ImperatorS79/PFEM3D). Because the time step and total simulation time are controlled by FSPC, the related variables in `Problem.Solver` are not used. It is also recommended setting the parameter `adaptDT` to `true` and disabling the automatic remeshing because FSPC is already performing a remeshing at the end of each coupling time step.
+The input file for the fluid solver is the standard Lua for [PFEM3D](https://github.com/ImperatorS79/PFEM3D). First, it is mandatory to disable the automatic remeshing in PFEM3D because FSPC will automatically call the remeshing function at the end of each coupling time step and update its internal variables accordingly. Thereby, letting the following variable to `true` may lead to incorrect results.
 
 <br />
 
 ```lua
-Problem.autoRemeshing = false       -- Disable the automatic remeshing
-Problem.Solver.adaptDT = true       -- Enable adaptive time step
+Problem.autoRemeshing = false
 ```
 
 <br />
 
-In order to enable the FSI coupling, it is mandatory to give the name `FSInterface` to the physical group representing your fluid-structure interface in Gmsh, and activate the external boundary conditions on this interface. This allows FSPC to dynamically enforce a Dirichlet condition on the nodes of this physical group.
+In order to enable the FSI coupling, it is mandatory to give the name `FSInterface` to the physical group representing your fluid-structure interface, and activate the external boundary conditions on this interface. This allows FSPC to dynamically enforce a Dirichlet condition on the nodes. For instance, the external temperature and velocity conditions are enabled for an incompressible fluid as follows.
 
 <br />
 
 ```lua
-Problem.Mesh.mshFile = 'geometry.msh'                   -- Load the fluid mesh
-Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true      -- Enable thermal coupling
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true   -- Enable mechanical coupling
+Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+```
+
+<br />
+
+Because the progress of the fluid-structure simulation is managed by FSPC, some parameters in PFEM3D are not used. However, the fluid solver may still require them to be initialized in the Lua file. It is recommended to give them a high value to ensure that nothing disrupts the coupling. The list of unused parameters is given below.
+
+<br />
+
+```lua
+Problem.simulationTime = math.huge
+Problem.Extractors.timeBetweenWriting = math.huge
+
+Problem.Solver.maxDT = math.huge
+Problem.Solver.initialDT = math.huge
 ```
 
 <br />
@@ -131,77 +163,66 @@ Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true   -- Enable mechanical cou
 
 <br />
 
-The input file for the solid solver is the standard Python for [Metafor](http://metafor.ltas.ulg.ac.be/dokuwiki/). Because FSPC manages the time step and simulation time, the functions `tsm.setInitialTime` and `tsm.setNextTime` must be discarded from your Metafor input file, but all other functions can be used safely. Moreover, FSPC has only been tested with Gmsh import.
+The input file for the solid solver is the standard Python for [Metafor](http://metafor.ltas.ulg.ac.be/dokuwiki/). The Metafor wrapper is imported with `import wrap as w`. The following example shows how to load a Gmsh file in Metafor and set the mandatory parameters for FSPC.
 
 <br />
 
 ```python
-import toolbox.gmsh as gmsh                             # Import the Gmsh toolbox
-importer = gmsh.GmshImport('geometry.msh',domain)       # Load the mesh file
-importer.execute()                                      # Translate the mesh into Metafor
+import toolbox.gmsh as gmsh
+
+metafor = w.Metafor()
+importer = w.GmshImport('geometry.msh', metafor.getDomain())
+importer.execute()
 ```
 
 <br />
 
-The object `domain` refers to the Metafor domain. The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSInterface` entry of the parameter dictionary retrieved from `getMetafor(parm)`. An example with the Gmsh importer:
+The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSInterface` entry of the parameter dictionary retrieved from `getMetafor(parm)`.
 
 <br />
 
 ```python
-groups = importer.groups                            # Dict of all physical groups in Gmsh
-parm['FSInterface'] = groups['myInterface']         # myInterace is the FSI physical group
+groups = importer.groups
+parm['FSInterface'] = groups['myInterface']
 ```
 
 <br />
 
-The FSI coupling is performed with the help of a nodal interaction allowing to dynamically set a Dirichlet condition on the corresponding nodes. Note that each interaction must be specified independently for each type of element. Moreover, thermal and mechanical interaction classes are stored in different objects. 
+The coupling is performed with the help of a nodal interaction allowing to dynamically set a Neumann condition on the corresponding nodes. Note that each interaction must be specified independently for each type of element. The following example shows how to define a mechanical interaction compatible with FSPC.
 
 <br />
 
 ```python
-prp = ElementProperties(NodStress2DElement)         # Nodal stress interaction elements
-loadInt = NodInteraction(1)                         # Object of mechanical interaction
-loadInt.push(groups['FSInterface'])                 # Add the nodes from the interface
-loadInt.addProperty(prp)                            # Add the element poroperty
-```
+prp = ElementProperties(NodStress2DElement)
 
-```python
-prp = ElementProperties(NodHeatFlux2DElement)       # Nodal flux interaction elements
-heatInt = NodInteraction(2)                         # Object of thermal interaction
-heatInt.push(groups['FSInterface'])                 # Add the nodes from the interface
-heatInt.addProperty(prp)                            # Add the element poroperty
+interaction_M = NodInteraction(1)
+interaction_M.push(groups['FSInterface'])
+interaction_M.addProperty(prp)
 ```
 
 <br />
 
-The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `ResMech` is defined in FSPC, the algorithm will look for `loadInt` in Metafor and if `ResTher` is defined, it will look for the corresponding `heatInt` interaction.
+The resulting nodal interactions must be provided to FSPC through the parameter dictionary. Note that the type of coupling must be consistent with the one defined in the main Python script, meaning that if `FSPC.set_mechanical_res` has been called in the main script, FSPC will look for `interaction_M` within Metafor. Equivalently, if `FSPC.set_thermal_res` has been called, it will look for the corresponding `interaction_T` interaction.
 
 <br />
 
 ```python
-parm['interaction_T'] = heatInt      # Send the heat interaction to FSPC
-parm['interaction_M'] = loadInt      # Send the mechanical interaction to FSPC
+parm['interaction_M'] = interaction_M
+parm['interaction_T'] = interaction_T
 ```
 
 <br />
 
-In some cases, the PFEM remeshing may generate fluid elements or nodes within the solid domain and invalidate the simulation. This can be prevented by defining a dynamic exclusion zone formed by the exterior boundaries of the solid mesh. The element set of the exclusion zone is communicated to the fluid solver by the parameter `polytope` and will follow the evolution of the solid boundary during the simulation. The following example uses the interaction `myInteraction` which contains a closed surface mesh.
+Finally, the user may define an exporter class that will be called by FSPC to write the current state of the solution on the disk. This class must contain the `write` function that should be callable during the simulation. Metafor already contains a built-in class with such method, allowing to export the current solution in a Gmsh file.
 
 <br />
 
 ```python
-parm['polytope'] = myInteraction.getElementSet()        # Exclusion zone formed by an element set
-metafor.getDomain().build()                             # Initialize the elements in Metafor
+ext = w.GmshExporter(metafor, 'output')
+ext.add(w.IFNodalValueExtractor(groups['Solid'], w.IF_EVMS))
+parm['exporter'] = ext
 ```
 
 <br />
 
-Finally, the user may define an exporter class that will be called by FSPC to write the current state of the solution on the disk. This class must contain an `execute` function that should be callable during the simulation. Metafor already contains a built-in class with such method, allowing to export the current solution in a Gmsh file.
-
-<br />
-
-```python
-parm['exporter'] = gmsh.NodalGmshExport('output.msh',metafor)       # Create the Gmsh exporter class
-parm['exporter'].addInternalField([IF_EVMS,IF_P])              # Add the stress and pressure fields
-parm['exporter'].addDataBaseField([TO])                        # Add the temperature field
-```
+It is important to note that because FSPC manages the progress of the fluid-structure simulation, you should not initialize or call `setInitialTime` and `setNextTime` from `metafor.getTimeStepManager` in the input file.

@@ -8,22 +8,22 @@ export PYTHONPATH=${PWD}/../PFEM3D/build/bin:${PYTHONPATH}
 
 # Path to the Python script
 
-# export SCRIPT=${PWD}/examples/2D/damBreak/main.py
-export SCRIPT=${PWD}/examples/2D/carsherWall/main.py
-# export SCRIPT=${PWD}/examples/2D/coolingDisk/main.py
-# export SCRIPT=${PWD}/examples/2D/elasticFunnel/main.py
-# export SCRIPT=${PWD}/examples/2D/flowContact/main.py
-# export SCRIPT=${PWD}/examples/2D/hydroStatic/main.py
-# export SCRIPT=${PWD}/examples/2D/rubberGate/main.py
-# export SCRIPT=${PWD}/examples/2D/staticAxisym/main.py
-# export SCRIPT=${PWD}/examples/2D/thermoSquare/main.py
-# export SCRIPT=${PWD}/examples/2D/vonKarman/main.py
+# export SCRIPT=${PWD}/examples/2D/clamped_axisym/main.py
+# export SCRIPT=${PWD}/examples/2D/clamped_beam/main.py
+export SCRIPT=${PWD}/examples/2D/dam_break/main.py
+# export SCRIPT=${PWD}/examples/2D/mooney_hyper/main.py
+# export SCRIPT=${PWD}/examples/2D/pipe_obstacle/main.py
+# export SCRIPT=${PWD}/examples/2D/pipe_squeezed/main.py
+# export SCRIPT=${PWD}/examples/2D/thermo_disk/main.py
+# export SCRIPT=${PWD}/examples/2D/thermo_square/main.py
+# export SCRIPT=${PWD}/examples/2D/vertical_container/main.py
+# export SCRIPT=${PWD}/examples/2D/von_karman/main.py
 
-# export SCRIPT=${PWD}/examples/3D/carsherWall/main.py
-# export SCRIPT=${PWD}/examples/3D/coolingDisk/main.py
-# export SCRIPT=${PWD}/examples/3D/crossFlow/main.py
-# export SCRIPT=${PWD}/examples/3D/damBreak/main.py
-# export SCRIPT=${PWD}/examples/3D/hydroStatic/main.py
+# export SCRIPT=${PWD}/examples/3D/bending_flap/main.py
+# export SCRIPT=${PWD}/examples/3D/clamped_beam/main.py
+# export SCRIPT=${PWD}/examples/3D/dam_break/main.py
+# export SCRIPT=${PWD}/examples/3D/pipe_obstacle/main.py
+# export SCRIPT=${PWD}/examples/3D/thermo_sphere/main.py
 
 # Clean output folder
 
