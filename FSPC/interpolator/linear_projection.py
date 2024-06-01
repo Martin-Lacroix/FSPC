@@ -16,7 +16,6 @@ class LEP(Interpolator):
 
             case 2: self.element = Line()
             case 3: self.element = Triangle()
-            case _: raise Exception('Invalid element type')
 
     # Interpolate recv_data and return the result
 

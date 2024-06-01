@@ -1,6 +1,7 @@
 from ..general import toolbox as tb
 import pfem3Dw as w
 import numpy as np
+import atexit
 
 # |--------------------------------------|
 # |   Fluid Solver Wrapper for PFEM3D    |
@@ -10,6 +11,7 @@ class PFEM3D(object):
     def __init__(self, path: str):
 
         self.problem = w.getProblem(path)
+        atexit.register(self.print_clock)
 
         # Incompressible or weakly compressible solver
 
@@ -182,4 +184,5 @@ class PFEM3D(object):
 
     # Print the time stats at destruction
 
-    def __del__(self): self.problem.displayTimeStats()
+    @tb.write_logs
+    def print_clock(self): self.problem.displayTimeStats()

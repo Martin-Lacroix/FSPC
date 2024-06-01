@@ -1,5 +1,6 @@
+from mpi4py.MPI import COMM_WORLD as CW
 from . import toolbox as tb
-import math
+import math, sys
 
 # |------------------------------------------|
 # |   Disk Exporter and Time Step Manager    |
@@ -9,6 +10,8 @@ class TimeStep(object):
     def __init__(self, dt: float, dt_save: float):
 
         self.time = 0
+        self.min_dt = 1e-9
+
         self.max_dt = self.dt = dt
         self.next = self.dt_save = dt_save
 
@@ -27,10 +30,13 @@ class TimeStep(object):
 
     def update_time(self, verified: bool):
 
-        if not verified:
+        if not verified and (self.dt < self.min_dt):
 
-            self.dt /= 2
-            if self.dt < 1e-9: raise Exception('Reached minimal time step')
+            CW.Barrier()
+            if tb.is_solid(): print('Reached minimal time step')
+            sys.exit()
+
+        elif not verified: self.dt /= 2
 
         else:
 
