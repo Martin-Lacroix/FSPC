@@ -17,6 +17,22 @@ def is_solid(): return CW.rank == 1
 import collections
 clock = collections.defaultdict(float)
 
+# |------------------------------------------|
+# |   Class Preventing Attribute Creation    |
+# |------------------------------------------|
+
+class Frozen(object):
+    __is_frozen = False
+
+    def __init__(self): self.__is_frozen = True
+
+    def __setattr__(self, name: str, value):
+
+        if self.__is_frozen and not hasattr(self, name):
+            raise Exception('Attribute creation not allowed')
+
+        else: self.__dict__[name] = value
+
 # |--------------------------------------|
 # |   Define Some Decorator Functions    |
 # |--------------------------------------|

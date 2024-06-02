@@ -6,7 +6,16 @@ import numpy as np
 # |   Parent FSI Interpolator Class    |
 # |------------------------------------|
 
-class Interpolator(object):
+class Interpolator(tb.Frozen):
+
+    def __init__(self):
+
+        self.__setattr__('time', 0)
+        self.__setattr__('disp', np.ndarray(0))
+        self.__setattr__('temp', np.ndarray(0))
+        self.__setattr__('recv_pos', np.ndarray(0))
+
+        tb.Frozen.__init__(self)
 
     def initialize(self):
 
@@ -88,32 +97,16 @@ class Interpolator(object):
     @tb.only_mechanical
     def predict_displacement(self, verified: bool):
 
-        if not hasattr(self, 'prev_disp') or verified:
-
-            self.prev_disp = np.copy(self.disp)
-            self.velocity_disp = tb.Solver.get_velocity()
-            self.disp += tb.Step.dt*self.velocity_disp
-
-        else:
-
+        if not verified and hasattr(self, 'prev_disp'):
             self.disp = np.copy(self.prev_disp)
-            self.disp += tb.Step.dt*self.velocity_disp
 
     # Predictor for the temparature coupling
 
     @tb.only_thermal
     def predict_temperature(self, verified: bool):
 
-        if not hasattr(self, 'prev_temp') or verified:
-
-            self.prev_temp = np.copy(self.temp)
-            self.velocity_temp = tb.Solver.get_tempgrad()
-            self.temp += tb.Step.dt*self.velocity_temp
-
-        else:
-
+        if not verified and hasattr(self, 'prev_temp'):
             self.temp = np.copy(self.prev_temp)
-            self.temp += tb.Step.dt*self.velocity_temp
 
 # |------------------------------------------|
 # |   Update the Solver After Convergence    |

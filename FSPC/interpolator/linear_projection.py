@@ -10,12 +10,13 @@ import numpy as np
 class LEP(Interpolator):
     def __init__(self, elem_type: int):
 
-        Interpolator.__init__(self)
-
         match elem_type:
 
-            case 2: self.element = Line()
-            case 3: self.element = Triangle()
+            case 2: self.__setattr__('element', Line())
+            case 3: self.__setattr__('element', Triangle())
+
+        self.__setattr__('H', np.ndarray(0))
+        Interpolator.__init__(self)
 
     # Interpolate recv_data and return the result
 
@@ -51,7 +52,7 @@ class LEP(Interpolator):
 # |   Linear 2D and 3D Finite Elements    |
 # |---------------------------------------|
 
-class Line(object):
+class Line(tb.Frozen):
 
     def evaluate(self, parm: np.ndarray):
 
@@ -65,7 +66,7 @@ class Line(object):
         B = np.array(pos-np.sum(node, axis=0)/2)
         return np.linalg.lstsq(np.transpose(A), B, -1)[0]
 
-class Triangle(object):
+class Triangle(tb.Frozen):
 
     def evaluate(self, parm: np.ndarray):
 

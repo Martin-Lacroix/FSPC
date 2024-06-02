@@ -8,7 +8,7 @@ import sys
 # |   Solid Solver Wrapper for Metafor    |
 # |---------------------------------------|
 
-class Metafor(object):
+class Metafor(tb.Frozen):
     def __init__(self, path: str):
 
         # Convert Metafor into a module
@@ -21,44 +21,37 @@ class Metafor(object):
 
         # Actually initialize Metafor from file
 
-        self.metafor = module.getMetafor(parm)
-        self.geometry = self.metafor.getDomain().getGeometry()
-        self.dim = self.geometry.getDimension().getNdim()
-        self.tsm = self.metafor.getTimeStepManager()
+        self.__setattr__('metafor', module.getMetafor(parm))
+        self.__setattr__('max_division', 200)
 
-        # Sets the dimension of the interaction
-
-        if self.dim == 2: self.axis = (w.TX, w.TY)
-        if self.dim == 3: self.axis = (w.TX, w.TY, w.TZ)
+        self.__dict__.update(parm)
+        self.__dict__['FSI'] = self.__dict__.pop('FSInterface')
 
         # Defines some internal variables
 
-        self.FSI = parm['FSInterface']
-        self.exporter = parm['exporter']
+        self.__setattr__('geometry', self.metafor.getDomain().getGeometry())
+        self.__setattr__('dim', self.geometry.getDimension().getNdim())
+        self.__setattr__('tsm', self.metafor.getTimeStepManager())
 
-        # Mechanical and thermal interactions
+        # Sets the dimension of the interaction
 
-        if 'polytope' in parm:
-            self.polytope = np.atleast_1d(parm['polytope'])
-
-        if 'interaction_M' in parm:
-            self.interaction_M = np.atleast_1d(parm['interaction_M'])
-
-        if 'interaction_T' in parm:
-            self.interaction_T = np.atleast_1d(parm['interaction_T'])
+        if self.dim == 2: self.__setattr__('axis', (w.TX, w.TY))
+        if self.dim == 3: self.__setattr__('axis', (w.TX, w.TY, w.TZ))
 
         # Create the memory fac used to restart
 
-        self.fac = w.MemoryFac()
-        self.meta_fac = w.MetaFac(self.metafor)
+        self.__setattr__('fac', w.MemoryFac())
+        self.__setattr__('meta_fac', w.MetaFac(self.metafor))
+
         self.meta_fac.mode(False, False, True)
         self.meta_fac.save(self.fac)
 
         # Initialize the integration and restart
 
-        self.max_division = 200
         self.tsm.setInitialTime(0, np.inf)
         self.metafor.getInitialConditionSet().update(0)
+
+        tb.Frozen.__init__(self)
 
 # |--------------------------------------------|
 # |   Run Metafor in the Current Time Frame    |
@@ -78,7 +71,7 @@ class Metafor(object):
 
     def apply_loading(self, load: np.ndarray):
 
-        for interaction in self.interaction_M:
+        for interaction in np.atleast_1d(self.interaction_M):
             for i, data in enumerate(load):
 
                 node = self.FSI.getMeshPoint(i)
@@ -96,7 +89,7 @@ class Metafor(object):
 
     def apply_heatflux(self, heat: np.ndarray):
 
-        for interaction in self.interaction_T:
+        for interaction in np.atleast_1d(self.interaction_T):
             for i, data in enumerate(heat):
 
                 node = self.FSI.getMeshPoint(i)
@@ -171,7 +164,7 @@ class Metafor(object):
         face_list = list()
         if not hasattr(self, 'polytope'): return face_list
 
-        for elementset in self.polytope:
+        for elementset in np.atleast_1d(self.polytope):
             face_list.append(self.get_facelist(elementset))
 
         return face_list

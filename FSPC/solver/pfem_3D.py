@@ -7,41 +7,44 @@ import atexit
 # |   Fluid Solver Wrapper for PFEM3D    |
 # |--------------------------------------|
 
-class PFEM3D(object):
+class PFEM3D(tb.Frozen):
     def __init__(self, path: str):
 
-        self.problem = w.getProblem(path)
-        atexit.register(self.print_clock)
+        self.__setattr__('pfem', w.getProblem(path))
 
         # Incompressible or weakly compressible solver
 
-        if 'WC' in self.problem.getID():
+        if 'WC' in self.pfem.getID():
 
-            self.WC = True
-            self.max_division = 1000
+            self.__setattr__('WC', True)
+            self.__setattr__('max_division', 1000)
 
         else:
 
-            self.WC = False
-            self.max_division = 10
+            self.__setattr__('WC', False)
+            self.__setattr__('max_division', 1)
 
         # Store important classes and variables
 
-        self.mesh = self.problem.getMesh()
-        self.solver = self.problem.getSolver()
-        self.dim = self.mesh.getDim()
+        self.__setattr__('mesh', self.pfem.getMesh())
+        self.__setattr__('solver', self.pfem.getSolver())
+        self.__setattr__('dim', self.mesh.getDim())
 
         # Initialize the communication objects
 
-        self.poly = list()
-        self.FSI = w.VectorInt()
+        self.__setattr__('poly', list())
+        self.__setattr__('FSI', w.VectorInt())
+
         self.reset_interface_BC()
+        atexit.register(self.print_clock)
 
         # Save the current mesh for next way back
 
-        self.prev_solution = w.SolutionData()
-        self.problem.copySolution(self.prev_solution)
-        self.problem.displayParams()
+        self.__setattr__('prev_solution', w.SolutionData())
+        self.pfem.copySolution(self.prev_solution)
+        self.pfem.displayParams()
+
+        tb.Frozen.__init__(self)
 
 # |-----------------------------------------|
 # |   Run PFEM in the Current Time Frame    |
@@ -51,12 +54,12 @@ class PFEM3D(object):
     @tb.compute_time
     def run(self):
 
-        self.problem.setMinTimeStep(tb.Step.dt/self.max_division)
-        self.problem.setMaxSimTime(tb.Step.next_time())
+        self.pfem.setMinTimeStep(tb.Step.dt/self.max_division)
+        self.pfem.setMaxSimTime(tb.Step.next_time())
 
         if self.WC: self.solver.computeNextDT()
         else: self.solver.setTimeStep(tb.Step.dt)
-        return self.problem.simulate()
+        return self.pfem.simulate()
 
 # |----------------------------------------|
 # |   Get Dirichlet Boundary Conditions    |
@@ -129,7 +132,7 @@ class PFEM3D(object):
 
     def reset_interface_BC(self):
 
-        self.BC = list()
+        self.__setattr__('BC', list())
         self.mesh.getNodesIndex('FSInterface', self.FSI)
 
         for i in self.FSI:
@@ -162,21 +165,21 @@ class PFEM3D(object):
         # Update the backup and precompute matrices
 
         if not self.WC: self.solver.precomputeMatrix()
-        self.problem.copySolution(self.prev_solution)
+        self.pfem.copySolution(self.prev_solution)
 
     # Backup the solver state if needed
 
     @tb.compute_time
     def way_back(self):
 
-        if self.problem.getCurrentSimStep() > self.prev_solution.step:
-            self.problem.loadSolution(self.prev_solution)
+        if self.pfem.getCurrentSimStep() > self.prev_solution.step:
+            self.pfem.loadSolution(self.prev_solution)
 
     # Export the current solution into a file
 
     @tb.write_logs
     @tb.compute_time
-    def save(self): self.problem.dump()
+    def save(self): self.pfem.dump()
 
     # Return the number of nodes at the interface
 
@@ -185,4 +188,4 @@ class PFEM3D(object):
     # Print the time stats at destruction
 
     @tb.write_logs
-    def print_clock(self): self.problem.displayTimeStats()
+    def print_clock(self): self.pfem.displayTimeStats()

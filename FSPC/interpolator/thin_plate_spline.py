@@ -13,11 +13,14 @@ import numpy as np
 
 class TPS(Interpolator):
     def __init__(self, radius: float):
+        
+        self.__setattr__('radius', radius)
+        self.__setattr__('pool', mp.Pool(mp.cpu_count()))
+
+        self.__setattr__('A', np.ndarray(0))
+        self.__setattr__('B', np.ndarray(0))
 
         Interpolator.__init__(self)
-        
-        self.pool = mp.Pool(mp.cpu_count())
-        self.radius = radius
 
     # Interpolate recv_data and return the result
 

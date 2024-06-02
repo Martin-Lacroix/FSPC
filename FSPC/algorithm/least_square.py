@@ -6,11 +6,13 @@ import numpy as np
 # |   Class of Approximate Inverse Jacobian    |
 # |--------------------------------------------|
 
-class InvJacobian(object):
+class InvJacobian(tb.Frozen):
     def __init__(self):
 
-        self.V = list()
-        self.W = list()
+        self.__setattr__('V', list())
+        self.__setattr__('W', list())
+
+        tb.Frozen.__init__(self)
 
     # Compute the solution correction
 
@@ -31,13 +33,16 @@ class InvJacobian(object):
 
 class ILS(BGS):
     def __init__(self, max_iter: int):
+
+        self.__setattr__('prev_disp', np.ndarray(0))
+        self.__setattr__('prev_temp', np.ndarray(0))
+
+        if tb.is_solid():
+
+            self.__setattr__('jac_mecha', InvJacobian())
+            self.__setattr__('jac_therm', InvJacobian())
+
         BGS.__init__(self, max_iter)
-
-    @tb.only_solid
-    def initialize(self):
-
-        if tb.has_mecha: self.jac_mecha = InvJacobian()
-        if tb.has_therm: self.jac_therm = InvJacobian()
 
 # |-------------------------------------------------|
 # |   Relaxation of Solid Interface Displacement    |

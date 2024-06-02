@@ -10,15 +10,18 @@ import numpy as np
 class BGS(Algorithm):
     def __init__(self, max_iter: int):
 
+        self.__setattr__('max_iter', max_iter)
+        self.__setattr__('iteration', 0)
+        self.__setattr__('omega', 0.5)
+
+        # Initialize the Aitken relaxation parameters
+
+        if tb.is_solid():
+
+            self.__setattr__('aitk_mecha', self.omega)
+            self.__setattr__('aitk_therm', self.omega)
+
         Algorithm.__init__(self)
-        self.max_iter = max_iter
-        self.omega = 0.5
-
-    @tb.only_solid
-    def initialize(self):
-
-        if tb.has_mecha: self.aitk_mecha = self.omega
-        if tb.has_therm: self.aitk_therm = self.omega
 
 # |--------------------------------------|
 # |   Coupling Algorithm at Each Step    |
@@ -70,8 +73,12 @@ class BGS(Algorithm):
 
             # Update the Aitken relaxation parameter
 
-            self.aitk_mecha = -A*self.aitk_mecha/np.tensordot(D, D)
-            self.aitk_mecha = max(min(self.aitk_mecha, 1), 0)
+            with np.errstate(divide='ignore', invalid='ignore'):
+
+                A *= np.nan_to_num(-self.aitk_mecha/np.tensordot(D, D))
+                self.aitk_mecha = max(min(A, 1), 0)
+
+        # Use the default relaxation at first iteration
 
         else: self.aitk_mecha = self.omega
         tb.Interp.disp += self.aitk_mecha*tb.ResMech.residual
@@ -90,8 +97,12 @@ class BGS(Algorithm):
 
             # Update the Aitken relaxation parameter
 
-            self.aitk_therm = -A*self.aitk_therm/np.tensordot(D, D)
-            self.aitk_therm = max(min(self.aitk_therm, 1), 0)
+            with np.errstate(divide='ignore', invalid='ignore'):
+
+                A *= np.nan_to_num(-self.aitk_therm/np.tensordot(D, D))
+                self.aitk_therm = max(min(A, 1), 0)
+
+        # Use the default relaxation at first iteration
 
         else: self.aitk_therm = self.omega
         tb.Interp.temp += self.aitk_therm*tb.ResTher.residual

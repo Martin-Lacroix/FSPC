@@ -10,6 +10,7 @@ import numpy as np
 class NNI(Interpolator):
     def __init__(self):
 
+        self.__setattr__('H', np.ndarray(0))
         Interpolator.__init__(self)
 
     # Interpolate recv_data and return the result

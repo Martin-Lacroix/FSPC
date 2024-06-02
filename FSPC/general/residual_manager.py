@@ -1,14 +1,22 @@
+from . import toolbox as tb
 import numpy as np
 
 # |---------------------------------------|
 # |   Convergence and Residual Manager    |
 # |---------------------------------------|
 
-class Residual(object):
+class Residual(tb.Frozen):
     def __init__(self, tol: float):
 
-        self.tol = tol
-        self.reset()
+        self.__setattr__('tolerance', tol)
+        self.__setattr__('epsilon', np.inf)
+
+        # Current and previous residual vectors
+
+        self.__setattr__('residual', np.ndarray(0))
+        self.__setattr__('prev_res', np.ndarray(0))
+
+        tb.Frozen.__init__(self)
 
     # Reset all the convergence indicators
 
@@ -28,13 +36,13 @@ class Residual(object):
         res = np.linalg.norm(self.residual, axis=0)
         den = np.linalg.norm(result, axis=0)
 
-        res = res/(den+self.tol)
+        res = res/(den+self.tolerance)
         self.epsilon = np.linalg.norm(res)
 
     # Check if the convergence criterion is verified
 
     def check(self):
 
-        if self.epsilon < self.tol: return True
+        if self.epsilon < self.tolerance: return True
         else: return False
     

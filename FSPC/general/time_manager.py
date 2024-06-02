@@ -6,14 +6,23 @@ import math, sys
 # |   Disk Exporter and Time Step Manager    |
 # |------------------------------------------|
 
-class TimeStep(object):
+class TimeStep(tb.Frozen):
     def __init__(self, dt: float, dt_save: float):
 
-        self.time = 0
-        self.min_dt = 1e-9
+        self.__setattr__('dt', dt)
+        self.__setattr__('time', 0)
 
-        self.max_dt = self.dt = dt
-        self.next = self.dt_save = dt_save
+        # Time step for writing results on the disk
+
+        self.__setattr__('dt_save', dt_save)
+        self.__setattr__('next_save', dt_save)
+
+        # Maximum and minimum coupling time step
+
+        self.__setattr__('max_dt', dt)
+        self.__setattr__('min_dt', 1e-9)
+
+        tb.Frozen.__init__(self)
 
     def next_time(self):
         return self.time+self.dt
@@ -22,9 +31,9 @@ class TimeStep(object):
 
     def update_exporter(self):
 
-        if self.time >= self.next: tb.Solver.save()
-        next = math.floor(self.time/self.dt_save)
-        self.next = (next+1)*self.dt_save
+        if self.time >= self.next_save: tb.Solver.save()
+        next_save = math.floor(self.time/self.dt_save)
+        self.next_save = (next_save+1)*self.dt_save
 
     # Update the current coupling time step
 

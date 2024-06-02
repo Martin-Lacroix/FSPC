@@ -5,7 +5,12 @@ import numpy as np
 # |   Parent FSI Algorithm Class    |
 # |---------------------------------|
 
-class Algorithm(object):
+class Algorithm(tb.Frozen):
+
+    def __init__(self):
+        
+        self.__setattr__('verified', False)
+        tb.Frozen.__init__(self)
 
     @tb.compute_time
     def simulate(self, end_time: float):
