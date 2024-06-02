@@ -15,8 +15,6 @@ class Algorithm(tb.Frozen):
     @tb.compute_time
     def simulate(self, end_time: float):
 
-        self.verified = False
-        if hasattr(self, 'initialize'): self.initialize()
         tb.Solver.save()
 
         # Main loop on the FSI coupling time steps

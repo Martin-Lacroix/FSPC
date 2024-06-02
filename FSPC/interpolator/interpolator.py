@@ -10,11 +10,17 @@ class Interpolator(tb.Frozen):
 
     def __init__(self):
 
-        self.__setattr__('time', 0)
-        self.__setattr__('disp', np.ndarray(0))
-        self.__setattr__('temp', np.ndarray(0))
-        self.__setattr__('recv_pos', np.ndarray(0))
+        if tb.is_solid():
 
+            self.__setattr__('disp', np.ndarray(0))
+            self.__setattr__('temp', np.ndarray(0))
+            self.__setattr__('prev_disp', tb.Solver.get_position())
+            self.__setattr__('prev_temp', tb.Solver.get_temperature())
+
+            self.__setattr__('prev_disp', np.ndarray(0))
+            self.__setattr__('prev_temp', np.ndarray(0))
+
+        self.__setattr__('recv_pos', np.ndarray(0))
         tb.Frozen.__init__(self)
 
     def initialize(self):
@@ -30,8 +36,8 @@ class Interpolator(tb.Frozen):
 
         elif tb.is_solid():
 
-            self.disp = np.copy(position)
-            if tb.has_therm: self.temp = tb.Solver.get_temperature()
+            if tb.has_mecha: self.disp = np.copy(position)
+            if tb.has_therm: self.temp = tb.Solver.get_temperature() # Bad
 
             CW.send(position, 0, tag=1)
             self.recv_pos = CW.recv(source=0, tag=2)
@@ -97,7 +103,10 @@ class Interpolator(tb.Frozen):
     @tb.only_mechanical
     def predict_displacement(self, verified: bool):
 
-        if not verified and hasattr(self, 'prev_disp'):
+        if len(self.prev_disp) == 0:
+            self.prev_disp = np.copy(self.disp) # Bad
+
+        if not verified:
             self.disp = np.copy(self.prev_disp)
 
     # Predictor for the temparature coupling
@@ -105,7 +114,10 @@ class Interpolator(tb.Frozen):
     @tb.only_thermal
     def predict_temperature(self, verified: bool):
 
-        if not verified and hasattr(self, 'prev_temp'):
+        if len(self.prev_temp) == 0:
+            self.prev_temp = np.copy(self.temp) # Bad
+
+        if not verified:
             self.temp = np.copy(self.prev_temp)
 
 # |------------------------------------------|
