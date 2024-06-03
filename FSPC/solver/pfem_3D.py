@@ -27,13 +27,13 @@ class PFEM3D(tb.Frozen):
         # Store important classes and variables
 
         self.__setattr__('mesh', self.pfem.getMesh())
-        self.__setattr__('solver', self.pfem.getSolver())
         self.__setattr__('dim', self.mesh.getDim())
 
         # Initialize the communication objects
 
         self.__setattr__('poly', list())
         self.__setattr__('FSI', w.VectorInt())
+        self.__setattr__('BC', list())
 
         self.reset_interface_BC()
         atexit.register(self.print_clock)
@@ -57,8 +57,8 @@ class PFEM3D(tb.Frozen):
         self.pfem.setMinTimeStep(tb.Step.dt/self.max_division)
         self.pfem.setMaxSimTime(tb.Step.next_time())
 
-        if self.WC: self.solver.computeNextDT()
-        else: self.solver.setTimeStep(tb.Step.dt)
+        if self.WC: self.pfem.getSolver().computeNextDT()
+        else: self.pfem.getSolver().setTimeStep(tb.Step.dt)
         return self.pfem.simulate()
 
 # |----------------------------------------|
@@ -86,16 +86,20 @@ class PFEM3D(tb.Frozen):
 
     def get_loading(self):
 
+        solver = self.pfem.getSolver()
         vector = w.VectorVectorDouble()
-        self.solver.computeStress('FSInterface', self.FSI, vector)
+
+        solver.computeStress('FSInterface', self.FSI, vector)
         return np.copy(vector)
 
     # Return Thermal boundary conditions
 
     def get_heatflux(self):
 
+        solver = self.pfem.getSolver()
         vector = w.VectorVectorDouble()
-        self.solver.computeHeatFlux('FSInterface', self.FSI, vector)
+
+        solver.computeHeatFlux('FSInterface', self.FSI, vector)
         return np.copy(vector)
 
 # |-----------------------------------|
@@ -132,7 +136,7 @@ class PFEM3D(tb.Frozen):
 
     def reset_interface_BC(self):
 
-        self.__setattr__('BC', list())
+        self.BC.clear()
         self.mesh.getNodesIndex('FSInterface', self.FSI)
 
         for i in self.FSI:
@@ -164,7 +168,7 @@ class PFEM3D(tb.Frozen):
 
         # Update the backup and precompute matrices
 
-        if not self.WC: self.solver.precomputeMatrix()
+        if not self.WC: self.pfem.getSolver().precomputeMatrix()
         self.pfem.copySolution(self.prev_solution)
 
     # Backup the solver state if needed
