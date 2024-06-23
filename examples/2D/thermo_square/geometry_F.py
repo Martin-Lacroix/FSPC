@@ -11,8 +11,8 @@ R = 2
 
 # Characteristic size
 
-d = 0.05
-N = 101
+d = 0.1
+N = 51
 
 # |----------------------------------|
 # |   Points and Lines Definition    |

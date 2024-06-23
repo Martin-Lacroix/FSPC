@@ -23,7 +23,7 @@ class PFEM3D(object):
         else:
 
             self.WC = False
-            self.max_division = 10
+            self.max_division = 1
 
         # Store important classes and variables
 

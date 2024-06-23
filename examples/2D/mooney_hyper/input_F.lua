@@ -11,20 +11,20 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'CGAL_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.localHcharGroups = {'FSInterface', 'FreeSurface', 'Reservoir'}
+Problem.Mesh.localHcharGroups = {'Refine', 'FSInterface', 'FreeSurface'}
 Problem.Mesh.boundingBox = {0, 0, 0.205, 0.14}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.7
-Problem.Mesh.gamma = 0.4
+Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 1e-3
-Problem.Mesh.gammaFS = 0.4
+Problem.Mesh.gammaFS = 0.3
 Problem.Mesh.minHeightFactor = 1e-3
 
 Problem.Mesh.addOnFS = true
-Problem.Mesh.keepFluidElements = true
-Problem.Mesh.deleteFlyingNodes = false
+Problem.Mesh.deleteFlyingNodes = true
+Problem.Mesh.keepFluidElements = false
 Problem.Mesh.deleteBoundElements = true
 
 -- Extractor Parameters
@@ -53,7 +53,7 @@ Problem.Material.rho = 1000
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.id = 'FracStep'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -64,9 +64,8 @@ Problem.Solver.coeffDTincrease = 1
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.nlAlgo = 'NR'
-Problem.Solver.MomContEq.residual = 'Ax_f'
-Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'U_P'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
@@ -91,6 +90,10 @@ function Problem.Solver.MomContEq.BC.ReservoirV(x, y, z, t)
     return 0, 0
 end
 
+function Problem.Solver.MomContEq.BC.RefineV(x, y, z, t)
+    return 0, 0
+end
+
 function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
-	return Problem.Mesh.hchar+dist*0.2
+	return Problem.Mesh.hchar+dist*0.1
 end

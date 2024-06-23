@@ -237,16 +237,14 @@ class Metafor(object):
     @tb.compute_time
     def way_back(self):
 
+        stm = self.metafor.getStageManager()
         check_step = self.metafor.getCurrentStepNo() > self.fac.getStepNo()
         check_time = self.metafor.getLastTime() > self.metafor.getCurrentTime()
 
         if check_step or check_time:
             self.metafor.restart(self.fac)
 
-        stm = self.metafor.getStageManager()
-        check_stage = stm.getNumbOfStage()-stm.getCurNumStage() > 1
-
-        if not (stm.getCurNumStage() < 0) and check_stage:
+        if not (stm.getCurNumStage() < 0) and (stm.getNumbOfStage() > 1):
             self.tsm.removeLastStage()
 
     # Export the current solution into a file

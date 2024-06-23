@@ -15,10 +15,10 @@ Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.boundingBox = {-5, -5, 5, 5}
 Problem.Mesh.exclusionZones = {}
 
-Problem.Mesh.alpha = 1e3
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.05
+Problem.Mesh.alpha = 1.2
+Problem.Mesh.omega = 1.0
+Problem.Mesh.gamma = 0.3
+Problem.Mesh.hchar = 0.1
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.minHeightFactor = 1e-3
 
@@ -71,9 +71,9 @@ Problem.Solver.id = 'FracStep'
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
+Problem.Solver.solveHeatFirst = true
 Problem.Solver.coeffDTDecrease = 2
 Problem.Solver.coeffDTincrease = 1
-Problem.Solver.solveHeatFirst = true
 
 -- Momentum Continuity Equation
 
@@ -93,7 +93,6 @@ Problem.Solver.MomContEq.bodyForce = {0, -10}
 Problem.Solver.HeatEq = {}
 Problem.Solver.HeatEq.residual = 'Ax_f'
 Problem.Solver.HeatEq.nlAlgo = 'Picard'
-Problem.Solver.HeatEq.sparseSolver = 'CG'
 
 Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-6

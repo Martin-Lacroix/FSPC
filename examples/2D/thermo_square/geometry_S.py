@@ -7,8 +7,7 @@ gmsh.initialize()
 # |---------------------------|
 
 R = 2
-d = 0.05
-N = 101
+N = 51
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -16,10 +15,10 @@ N = 101
 
 p = list()
 
-p.append(sh.occ.addPoint(-R, -R, 0, d))
-p.append(sh.occ.addPoint(R, -R, 0, d))
-p.append(sh.occ.addPoint(R, R, 0, d))
-p.append(sh.occ.addPoint(-R, R, 0, d))
+p.append(sh.occ.addPoint(-R, -R, 0))
+p.append(sh.occ.addPoint(R, -R, 0))
+p.append(sh.occ.addPoint(R, R, 0))
+p.append(sh.occ.addPoint(-R, R, 0))
 
 # Lines list
 

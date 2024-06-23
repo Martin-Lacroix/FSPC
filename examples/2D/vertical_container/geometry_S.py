@@ -13,7 +13,7 @@ s = 0.2
 # Characteristic size
 
 d = 0.05
-N = 160
+N = 161
 M = 80
 P = 5
 

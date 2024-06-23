@@ -16,7 +16,6 @@ L2 = 0.1
 
 d = 1e-3
 E = 1e-5
-N = 80
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -42,33 +41,34 @@ l.append(sh.occ.addLine(p[5], p[6]))
 l.append(sh.occ.addLine(p[4], p[5]))
 l.append(sh.occ.addLine(p[4], p[3]))
 l.append(sh.occ.addLine(p[3], p[0]))
-l.append(sh.occ.addLine(p[1], p[2]))
+
+h = list()
+h.append(sh.occ.addLine(p[1], p[2]))
 
 # |------------------------------------|
 # |   Physical Surface and Boundary    |
 # |------------------------------------|
 
-k = sh.occ.addCurveLoop(l[:6])
+k = sh.occ.addCurveLoop(l)
 s = sh.occ.addPlaneSurface([k])
-
 sh.occ.synchronize()
-sh.mesh.setTransfiniteCurve(l[2], N)
 
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, l[4:5], name='FreeSurface')
 sh.addPhysicalGroup(1, l[2:3], name='FSInterface')
-sh.addPhysicalGroup(1, l[0:1]+l[3:4]+l[5:7], name='Reservoir')
+sh.addPhysicalGroup(1, l[0:1]+l[5:6], name='Reservoir')
+sh.addPhysicalGroup(1, h+l[3:4], name='Refine')
 
 # |----------------------------------------|
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-fun = str(d)+'+0.2*F1'
+fun = str(d)+'+0.1*F1'
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e4)
-sh.mesh.field.setNumbers(1, 'CurvesList', l)
+sh.mesh.field.setNumbers(1, 'CurvesList', l[2:5]+h)
 
 sh.mesh.field.add('MathEval', 2)
 sh.mesh.field.setString(2, 'F', fun)
