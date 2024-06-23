@@ -9,7 +9,7 @@ Problem.id = 'Boussinesq'
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.remeshAlgo = 'CGAL_Edge'
+Problem.Mesh.remeshAlgo = 'Tetgen_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.boundingBox = {-0.1, -0.1, 0, 0.1, 0.1, 1}
 Problem.Mesh.exclusionZones = {}

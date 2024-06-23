@@ -9,17 +9,17 @@ Problem.id = 'IncompNewtonNoT'
 -- Mesh Parameters
 
 Problem.Mesh = {}
-Problem.Mesh.remeshAlgo = 'CGAL_Edge'
+Problem.Mesh.remeshAlgo = 'Tetgen_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.boundingBox = {0, 0, 0, 0.35, 0.25, 0.4}
 Problem.Mesh.exclusionZones = {}
 
-Problem.Mesh.alpha = 1e3
+Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.7
-Problem.Mesh.gamma = 0.5
+Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 2e-3
-Problem.Mesh.gammaFS = 0.5
+Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.minHeightFactor = 1e-3
 
 Problem.Mesh.addOnFS = true
@@ -66,7 +66,6 @@ Problem.Solver.coeffDTincrease = 1
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.residual = 'U_P'
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.sparseSolverPstep = 'CG'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
