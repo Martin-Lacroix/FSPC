@@ -11,7 +11,7 @@ HS = 0.014
 HF = 0.05
 RF = 0.1
 
-d = 3.7e-3
+d = 3e-3
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -101,11 +101,24 @@ sh.occ.synchronize()
 sh.addPhysicalGroup(3, [v], name='Fluid')
 sh.addPhysicalGroup(2, [g], name='FSInterface')
 sh.addPhysicalGroup(2, s[0:1], name='FreeSurface')
-sh.addPhysicalGroup(2, s[1:], name='Wall')
+sh.addPhysicalGroup(2, s[1:], name='Container')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# |----------------------------------------|
+# |   Mesh Characteristic Size Function    |
+# |----------------------------------------|
+
+sh.mesh.field.add('Distance', 1)
+sh.mesh.field.setNumber(1, 'Sampling', 1e3)
+sh.mesh.field.setNumbers(1, 'SurfacesList', [g])
+
+sh.mesh.field.add('MathEval', 2)
+sh.mesh.field.setString(2, 'F', str(d)+'+0.05*F1')
+
+sh.mesh.field.setAsBackgroundMesh(2)
+gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
+gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
+
+# Write the mesh
 
 sh.mesh.generate(3)
 gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')

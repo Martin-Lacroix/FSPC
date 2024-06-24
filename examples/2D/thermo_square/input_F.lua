@@ -48,20 +48,20 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 Problem.Material = {}
 Problem.Material.rho = 1
 Problem.Material.mu = 0.71
-Problem.Material.gamma = 0
-Problem.Material.epsRad = 0
-Problem.Material.sigmaRad = 0
 Problem.Material.R = 8.31446261815324
 Problem.Material.alphaLin = 0.071
-Problem.Material.DgammaDT = 0
 Problem.Material.Tinf = 1000
-Problem.Material.DmuDT = 0
-Problem.Material.DcpDT = 0
-Problem.Material.DkDT = 0
 Problem.Material.Tr = 1e3
 Problem.Material.cp = 1
 Problem.Material.k = 1
-Problem.Material.h = 1
+
+Problem.Material.gamma = 0
+Problem.Material.epsRad = 0
+Problem.Material.sigmaRad = 0
+Problem.Material.DgammaDT = 0
+Problem.Material.DmuDT = 0
+Problem.Material.DcpDT = 0
+Problem.Material.DkDT = 0
 
 -- Solver Parameters
 

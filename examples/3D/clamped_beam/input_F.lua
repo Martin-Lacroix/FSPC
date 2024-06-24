@@ -11,13 +11,14 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'Tetgen_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.boundingBox = {0, 0, -10, 1, 1, 1}
+Problem.Mesh.localHcharGroups = {'FSInterface'}
+Problem.Mesh.boundingBox = {-0.2, -0.2, 0, 0.2, 0.2, 0.64}
 Problem.Mesh.exclusionZones = {}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.5
 Problem.Mesh.gamma = 0.6
-Problem.Mesh.hchar = 0.05
+Problem.Mesh.hchar = 0.01
 Problem.Mesh.gammaFS = 0.6
 Problem.Mesh.minHeightFactor = 1e-3
 
@@ -45,14 +46,14 @@ Problem.Extractors[1].timeBetweenWriting = math.huge
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 1e+3
+Problem.Material.mu = 1e-3
 Problem.Material.gamma = 0
 Problem.Material.rho = 1000
 
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.id = 'FracStep'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -64,12 +65,13 @@ Problem.Solver.coeffDTincrease = 1
 
 Problem.Solver.MomContEq = {}
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
-Problem.Solver.MomContEq.residual = 'Ax_f'
-Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomContEq.residual = 'U_P'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
+Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-8
+Problem.Solver.MomContEq.tolerance = 1e-16
 Problem.Solver.MomContEq.bodyForce = {0, 0, -9.81}
 
 -- Fluid Structure Interface
@@ -86,4 +88,8 @@ end
 
 function Problem.Solver.MomContEq.BC.WallV(x, y, z, t)
 	return 0, 0, 0
+end
+
+function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
+	return Problem.Mesh.hchar+dist*0.05
 end

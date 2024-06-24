@@ -75,13 +75,12 @@ sh.addPhysicalGroup(1, l[3:5], name='FreeSurface')
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-fun = str(d)+'+0.1*F1'
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e4)
 sh.mesh.field.setNumbers(1, 'CurvesList', l)
 
 sh.mesh.field.add('MathEval', 2)
-sh.mesh.field.setString(2, 'F', fun)
+sh.mesh.field.setString(2, 'F', str(d)+'+0.1*F1')
 
 sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)

@@ -14,12 +14,12 @@ FSPC.set_algorithm(algorithm)
 
 # Set the interface interpolator
 
-interpolator = FSPC.interpolator.TPS(0.01)
+interpolator = FSPC.interpolator.LEP(3)
 FSPC.set_interpolator(interpolator)
 
 # Set the time step manager
 
-step = FSPC.general.TimeStep(1e-2, 0.05)
+step = FSPC.general.TimeStep(1e-4, 1e-4)
 FSPC.set_time_step(step)
 
 # Set the convergence manager
@@ -29,5 +29,5 @@ FSPC.set_mechanical_res(residual)
 
 # Start the FSI simulation
 
-algorithm.simulate(20)
+algorithm.simulate(0.01)
 FSPC.general.print_clock()

@@ -6,15 +6,11 @@ gmsh.initialize()
 # |   Mesh Size Parameters    |
 # |---------------------------|
 
-L = 1
-W = 1
-HF = 0.2
-HS = 0.02
-
-# Characteristic size
-
-M = 21
-N = 6
+L = 0.2
+W = 0.2
+HF = 0.6
+HS = 0.04
+d = 0.01
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -22,15 +18,15 @@ N = 6
 
 p = list()
 
-p.append(sh.occ.addPoint(L, 0, HS))
-p.append(sh.occ.addPoint(0, 0, HS))
-p.append(sh.occ.addPoint(L, 0, HS+HF))
-p.append(sh.occ.addPoint(0, 0, HS+HF))
+p.append(sh.occ.addPoint(L, -W, HS, d))
+p.append(sh.occ.addPoint(-L, -W, HS, d))
+p.append(sh.occ.addPoint(L, -W, HS+HF, d))
+p.append(sh.occ.addPoint(-L, -W, HS+HF, d))
 
-p.append(sh.occ.addPoint(L, W, HS))
-p.append(sh.occ.addPoint(0, W, HS))
-p.append(sh.occ.addPoint(L, W, HS+HF))
-p.append(sh.occ.addPoint(0, W, HS+HF))
+p.append(sh.occ.addPoint(L, W, HS, d))
+p.append(sh.occ.addPoint(-L, W, HS, d))
+p.append(sh.occ.addPoint(L, W, HS+HF, d))
+p.append(sh.occ.addPoint(-L, W, HS+HF, d))
 
 # Lines list
 
@@ -68,20 +64,6 @@ k.append(sh.occ.addCurveLoop([l[6], l[11], l[2], l[10]]))
 for a in k: s.append(sh.occ.addPlaneSurface([a]))
 sh.occ.synchronize()
 
-sh.mesh.setTransfiniteCurve(l[1], N)
-sh.mesh.setTransfiniteCurve(l[3], N)
-sh.mesh.setTransfiniteCurve(l[5], N)
-sh.mesh.setTransfiniteCurve(l[7], N)
-
-sh.mesh.setTransfiniteCurve(l[0], M)
-sh.mesh.setTransfiniteCurve(l[2], M)
-sh.mesh.setTransfiniteCurve(l[4], M)
-sh.mesh.setTransfiniteCurve(l[6], M)
-sh.mesh.setTransfiniteCurve(l[8], M)
-sh.mesh.setTransfiniteCurve(l[9], M)
-sh.mesh.setTransfiniteCurve(l[10], M)
-sh.mesh.setTransfiniteCurve(l[11], M)
-
 # Volumes list
 
 h = sh.occ.addSurfaceLoop(s)
@@ -95,9 +77,22 @@ sh.addPhysicalGroup(2, s[0:4], name='Wall')
 sh.addPhysicalGroup(2, s[4:5], name='FSInterface')
 sh.addPhysicalGroup(2, s[5:6], name='FreeSurface')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# |----------------------------------------|
+# |   Mesh Characteristic Size Function    |
+# |----------------------------------------|
+
+sh.mesh.field.add('Distance', 1)
+sh.mesh.field.setNumber(1, 'Sampling', 1e3)
+sh.mesh.field.setNumbers(1, 'SurfacesList', s[4:5])
+
+sh.mesh.field.add('MathEval', 2)
+sh.mesh.field.setString(2, 'F', tr(d)+'+0.05*F1')
+
+sh.mesh.field.setAsBackgroundMesh(2)
+gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
+gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
+
+# Write the mesh
 
 sh.mesh.generate(3)
 gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')

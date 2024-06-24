@@ -6,14 +6,14 @@ gmsh.initialize()
 # |   Mesh Size Parameters    |
 # |---------------------------|
 
-L = 1
-W = 1
-HS = 0.02
+L = 0.2
+W = 0.2
+HS = 0.04
 
 # Characteristic size
 
-M = 11
-N = 1
+M = 41
+N = 5
 
 # |----------------------------------|
 # |   Points and Lines Definition    |
@@ -21,15 +21,15 @@ N = 1
 
 p = list()
 
-p.append(sh.occ.addPoint(L, 0, 0))
-p.append(sh.occ.addPoint(0, 0, 0))
-p.append(sh.occ.addPoint(L, 0, HS))
-p.append(sh.occ.addPoint(0, 0, HS))
+p.append(sh.occ.addPoint(-L, -W, 0))
+p.append(sh.occ.addPoint(L, -W, 0))
+p.append(sh.occ.addPoint(-L, -W, HS))
+p.append(sh.occ.addPoint(L, -W, HS))
 
+p.append(sh.occ.addPoint(-L, W, 0))
 p.append(sh.occ.addPoint(L, W, 0))
-p.append(sh.occ.addPoint(0, W, 0))
+p.append(sh.occ.addPoint(-L, W, HS))
 p.append(sh.occ.addPoint(L, W, HS))
-p.append(sh.occ.addPoint(0, W, HS))
 
 # Lines list
 
@@ -57,7 +57,7 @@ l.append(sh.occ.addLine(p[3], p[7]))
 k = list()
 s = list()
 
-k.append(sh.occ.addCurveLoop([l[0], l[1], l[2], l[3]]))
+k.append(sh.occ.addCurveLoop([l[3], l[2], l[1], l[0]]))
 k.append(sh.occ.addCurveLoop([l[7], l[6], l[5], l[4]]))
 k.append(sh.occ.addCurveLoop([l[5], l[10], l[1], l[8]]))
 k.append(sh.occ.addCurveLoop([l[9], l[3], l[11], l[7]]))
@@ -104,6 +104,7 @@ sh.addPhysicalGroup(2, s[0:4], name='Clamped')
 # |--------------------------|
 
 sh.mesh.generate(3)
+gmsh.model.mesh.reverse()
 gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()

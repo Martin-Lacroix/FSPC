@@ -135,13 +135,12 @@ sh.addPhysicalGroup(2, s[0:1]+s[2:3]+s[3:4]+s[5:6]+s[7:12], name='Reservoir')
 # |   Mesh Characteristic Size Function    |
 # |----------------------------------------|
 
-fun = str(d)+'+0.4*F1'
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e3)
 sh.mesh.field.setNumbers(1, 'SurfacesList', s)
 
 sh.mesh.field.add('MathEval', 2)
-sh.mesh.field.setString(2, 'F', fun)
+sh.mesh.field.setString(2, 'F', str(d)+'+0.4*F1')
 
 sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
