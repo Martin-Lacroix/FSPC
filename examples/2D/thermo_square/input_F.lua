@@ -62,6 +62,7 @@ Problem.Material.DgammaDT = 0
 Problem.Material.DmuDT = 0
 Problem.Material.DcpDT = 0
 Problem.Material.DkDT = 0
+Problem.Material.h = 0
 
 -- Solver Parameters
 

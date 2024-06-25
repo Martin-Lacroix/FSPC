@@ -109,10 +109,7 @@ plt.plot(*np.transpose(
 [0.940858, -0.01585], [0.947367, -0.01300], [0.956694, -0.01197],
 [0.960398, -0.00866], [0.967855, -0.00729], [0.975306, -0.00524],
 [0.990227, -0.00330], [0.995815, -0.00182]]))
-from matplotlib import pyplot as plt
-from natsort import natsorted
-import numpy as np
-import os, gmsh
+
 # Results from Zhu
 
 plt.plot(*np.transpose(

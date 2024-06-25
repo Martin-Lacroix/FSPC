@@ -128,7 +128,7 @@ for file in directory:
 
     time.append(float(file.replace('.msh', '').replace('output_', '')))
     distance = gmsh.model.mesh.getNode(412)[0][1]+2.45
-    result.append(np.linalg.norm(distance))
+    result.append(distance)
 
 # Plot the results on the graph
 
