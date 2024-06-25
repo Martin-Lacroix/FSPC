@@ -3,9 +3,7 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 L1 = 0.3
 L2 = 0.5
@@ -19,19 +17,16 @@ S = 0.04
 W = 0.02
 B = 0.2
 
-# Characteristic size
-
 d = 0.02
 E = 1e-3
 N = 18
 M = 9
 P = 2
 
-# |--------------------------------|
-# |   Function to Make a Circle    |
-# |--------------------------------|
-
-def quad_circle(x,y):
+def quad_circle(x: float, y: float):
+    '''
+    Return the surface and curves of a meshed disk
+    '''
 
     A = 0.6*R2
     p = list()
@@ -88,16 +83,14 @@ def quad_circle(x,y):
     for a in s: sh.mesh.setRecombine(2, a)
     return s
 
-# |--------------------------------------|
-# |   Surfaces and Volumes Definition    |
-# |--------------------------------------|
+# Surfaces list
 
-tags = [(2,a) for a in quad_circle(L1+L2-E, Y+E)]
+tags = [(2, a) for a in quad_circle(L1+L2-E, Y+E)]
 ext = sh.occ.extrude(tags, -W, 0, 0, [P], recombine=True)
 ext = np.transpose(ext)
 sh.occ.synchronize()
 
-idx = np.argwhere(ext[0]==3).flatten()
+idx = np.argwhere(ext[0] == 3).flatten()
 s = sh.getBoundary(np.transpose(ext[:, idx]), 1, 0, 0)
 s = np.transpose(s)[1]
 w = ext[1, idx]

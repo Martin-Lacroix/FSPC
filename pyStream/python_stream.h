@@ -1,9 +1,7 @@
 #include <iostream>
 #include <streambuf>
 
-// |-----------------------------------------------|
-// | Convert couts and cerr into python streams    |
-// |-----------------------------------------------|
+// Convert couts and cerr into python streams
 
 class PyCerrCout: public std::basic_streambuf<char>
 {
@@ -24,9 +22,7 @@ class PyCerrCout: public std::basic_streambuf<char>
     virtual std::char_traits<char>:: int_type overflow(int input);
 };
 
-// |-----------------------------------------------|
-// | Redirect all cpp terminal prints to Python    |
-// |-----------------------------------------------|
+// Redirect all cpp terminal prints to Python
 
 class Redirect
 {

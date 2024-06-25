@@ -1,28 +1,28 @@
 from .interpolator import Interpolator
 from ..general import toolbox as tb
 from functools import partial
-
-#  Process-based parallelization
-
-import multiprocessing as mp
 import numpy as np
 
-# |--------------------------------------|
-# |   Thin Plate Spline Interpolation    |
-# |--------------------------------------|
+# Thin plate spline radial basis function interpolation class
 
 class TPS(Interpolator):
     def __init__(self, radius: float):
+        '''
+        Initialize the thin plate spline interpolation class
+        '''
 
         Interpolator.__init__(self)
         
+        import multiprocessing as mp
+
         self.pool = mp.Pool(mp.cpu_count())
         self.radius = radius
 
-    # Interpolate recv_data and return the result
-
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):
+        '''
+        Return the interpolation from the source to the target mesh
+        '''
 
         zeros = np.zeros((1+tb.Solver.dim, np.size(recv_data, 1)))
         result = np.vstack((recv_data, zeros))
@@ -32,16 +32,18 @@ class TPS(Interpolator):
     
     @staticmethod
     def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
+        '''
+        Return the value of the thin plate spline at the nodes
+        '''
 
         r = np.linalg.norm(position-recv, axis=1)/R
         return np.square(r)*np.ma.log(r)
 
-# |-----------------------------------------------|
-# |   Mapping Matrix from Recv_Pos to Position    |
-# |-----------------------------------------------|
-
     @tb.compute_time
     def mapping(self, position: np.ndarray):
+        '''
+        Compute the interpolation matrices from the source to the target
+        '''
 
         size = 1+len(self.recv_pos)+tb.Solver.dim
         self.B = np.zeros((len(position), size))

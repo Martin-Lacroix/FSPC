@@ -3,9 +3,7 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 R = 2.25
 H = 3.75
@@ -13,15 +11,11 @@ B = 4.87
 h = 2.5
 b = 1.3
 
-# Characteristic size
-
 d = 0.05
 N = 161
 M = 80
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 
@@ -49,9 +43,7 @@ h.append(sh.occ.addLine(p[1], p[5]))
 h.append(sh.occ.addLine(p[5], p[4]))
 h.append(sh.occ.addLine(p[4], p[0]))
 
-# |------------------------------------|
-# |   Physical Surface and Boundary    |
-# |------------------------------------|
+# Physical surface
 
 k = sh.occ.addCurveLoop(h)
 s = sh.occ.addPlaneSurface([k])
@@ -68,9 +60,7 @@ sh.addPhysicalGroup(1, l, name='FSInterface')
 sh.addPhysicalGroup(1, h[0:3:2], name='Reservoir')
 sh.addPhysicalGroup(1, h[1:4:2], name='FreeSurface')
 
-# |----------------------------------------|
-# |   Mesh Characteristic Size Function    |
-# |----------------------------------------|
+# Mesh characteristic size
 
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e4)

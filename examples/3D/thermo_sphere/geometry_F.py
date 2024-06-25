@@ -2,9 +2,7 @@ import os, gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 RS = 0.0125
 HS = 0.014
@@ -13,9 +11,7 @@ RF = 0.1
 
 d = 3e-3
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 
@@ -35,7 +31,7 @@ p.append(sh.occ.addPoint(RF, 0, HF+HS+RS, d))
 p.append(sh.occ.addPoint(-RF, 0, HF+HS+RS, d))
 p.append(sh.occ.addPoint(0, RF, HF+HS+RS, d))
 
-# # Lines list
+# Lines list
 
 l = list()
 c = list()
@@ -62,9 +58,7 @@ l.append(sh.occ.addLine(p[8], p[14]))
 l.append(sh.occ.addLine(p[7], p[13]))
 l.append(sh.occ.addLine(p[11], p[9]))
 
-# |--------------------------------------|
-# |   Surfaces and Volumes Definition    |
-# |--------------------------------------|
+# Surfaces list
 
 k = list()
 s = list()
@@ -103,9 +97,7 @@ sh.addPhysicalGroup(2, [g], name='FSInterface')
 sh.addPhysicalGroup(2, s[0:1], name='FreeSurface')
 sh.addPhysicalGroup(2, s[1:], name='Container')
 
-# |----------------------------------------|
-# |   Mesh Characteristic Size Function    |
-# |----------------------------------------|
+# Mesh characteristic size
 
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e3)

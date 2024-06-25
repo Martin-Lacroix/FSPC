@@ -3,12 +3,13 @@ from ..general import toolbox as tb
 from .algorithm import Algorithm
 import numpy as np
 
-# |---------------------------------------------------|
-# |   Block-Gauss Seidel Aitken Dynamic Relaxation    |
-# |---------------------------------------------------|
+# Block-Gauss Seidel Aitken dynamic relaxation class
 
 class BGS(Algorithm):
     def __init__(self, max_iter: int):
+        '''
+        Initialize block-Gauss Seidel Aitken dynamic relaxation class
+        '''
 
         Algorithm.__init__(self)
         self.max_iter = max_iter
@@ -16,15 +17,17 @@ class BGS(Algorithm):
 
     @tb.only_solid
     def initialize(self):
+        '''
+        Reset the Aitken relaxation parameter to its default value
+        '''
 
         if tb.has_mecha: self.aitk_mecha = self.omega
         if tb.has_therm: self.aitk_therm = self.omega
 
-# |--------------------------------------|
-# |   Coupling Algorithm at Each Step    |
-# |--------------------------------------|
-
     def coupling_algorithm(self):
+        '''
+        Run the fluid-structure coupling for the current time step
+        '''
 
         self.iteration = 0
 
@@ -56,12 +59,11 @@ class BGS(Algorithm):
         tb.Solver.way_back()
         return False
 
-# |-------------------------------------------------|
-# |   Relaxation of Solid Interface Displacement    |
-# |-------------------------------------------------|
-
     @tb.only_mechanical
     def update_displacement(self):
+        '''
+        Compute the displacement predictor at the solid interface
+        '''
 
         if self.iteration > 0:
 
@@ -76,12 +78,11 @@ class BGS(Algorithm):
         else: self.aitk_mecha = self.omega
         tb.Interp.disp += self.aitk_mecha*tb.ResMech.residual
 
-# |------------------------------------------------|
-# |   Relaxation of Solid Interface Temperature    |
-# |------------------------------------------------|
-
     @tb.only_thermal
     def update_temperature(self):
+        '''
+        Compute the temperature predictor at the solid interface
+        '''
 
         if self.iteration > 0:
 

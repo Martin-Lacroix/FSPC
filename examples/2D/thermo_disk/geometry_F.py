@@ -2,9 +2,7 @@ import os, gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 L = 0.9
 HF = 0.25
@@ -12,14 +10,10 @@ HS = 0.03
 R = 0.025
 C = 0.2
 
-# Characteristic size
-
 d = 0.0075
 N = 11
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 
@@ -65,9 +59,7 @@ r.append(sh.occ.addCircleArc(p[11], p[9], p[10]))
 u.append(sh.occ.addCircleArc(p[13], p[12], p[14]))
 u.append(sh.occ.addCircleArc(p[14], p[12], p[13]))
 
-# |------------------------------------|
-# |   Physical Surface and Boundary    |
-# |------------------------------------|
+# Physical surface
 
 k = sh.occ.addCurveLoop(l[:4])
 s = sh.occ.addPlaneSurface([k])
@@ -87,9 +79,7 @@ sh.addPhysicalGroup(1, h+r+u, name='FSInterface')
 sh.addPhysicalGroup(1, l[2:3], name='FreeSurface')
 sh.addPhysicalGroup(1, l[:2]+l[3:], name='Wall')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# Write the mesh file
 
 sh.mesh.generate(2)
 gmsh.model.mesh.reverse()

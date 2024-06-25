@@ -4,14 +4,13 @@ import numpy as np
 import wrap as w
 import sys
 
-# |---------------------------------------|
-# |   Solid Solver Wrapper for Metafor    |
-# |---------------------------------------|
+# Solid solver wrapper class for Metafor
 
-class Metafor(object):
+class Solver(object):
     def __init__(self, path: str):
-
-        # Convert Metafor into a module
+        '''
+        Initialize the solid solver wrapper class
+        '''
 
         parm = dict()
         spec = util.spec_from_file_location('module.name', path)
@@ -19,7 +18,7 @@ class Metafor(object):
         sys.modules['module.name'] = module
         spec.loader.exec_module(module)
 
-        # Actually initialize Metafor from file
+        # Actually initialize Metafor from a file
 
         self.metafor = module.getMetafor(parm)
         self.geometry = self.metafor.getDomain().getGeometry()
@@ -60,23 +59,21 @@ class Metafor(object):
         self.tsm.setInitialTime(0, np.inf)
         self.metafor.getInitialConditionSet().update(0)
 
-# |--------------------------------------------|
-# |   Run Metafor in the Current Time Frame    |
-# |--------------------------------------------|
-
     @tb.write_logs
     @tb.compute_time
     def run(self):
+        '''
+        Run the solid solver within the current time step
+        '''
 
         self.tsm.setNextTime(tb.Step.next_time(), 0, tb.Step.dt)
         self.tsm.setMinimumTimeStep(tb.Step.dt/self.max_division)
         return self.metafor.getTimeIntegration().integration()
 
-# |----------------------------------|
-# |   Neumann Boundary Conditions    |
-# |----------------------------------|
-
     def apply_loading(self, load: np.ndarray):
+        '''
+        Apply the loading from the fluid to the solid interface
+        '''
 
         for interaction in self.interaction_M:
             for i, data in enumerate(load):
@@ -92,9 +89,10 @@ class Metafor(object):
                 elif self.geometry.is3D():
                     interaction.setNodTensor3D(node, *data)
 
-    # Apply Thermal boundary conditions
-
     def apply_heatflux(self, heat: np.ndarray):
+        '''
+        Apply the heat flux from the fluid to the solid interface
+        '''
 
         for interaction in self.interaction_T:
             for i, data in enumerate(heat):
@@ -102,11 +100,10 @@ class Metafor(object):
                 node = self.FSI.getMeshPoint(i)
                 interaction.setNodVector(node, *data)
 
-# |-------------------------------------|
-# |   Return Mechanical Nodal Values    |
-# |-------------------------------------|
-
     def get_position(self):
+        '''
+        Return the nodal positions of the solid interface
+        '''
 
         result = np.zeros((self.get_size(), self.dim))
 
@@ -119,9 +116,10 @@ class Metafor(object):
 
         return result
 
-    # Computes the nodal velocity result
-
     def get_velocity(self):
+        '''
+        Return the nodal velocity of the solid interface
+        '''
 
         result = np.zeros((self.get_size(), self.dim))
 
@@ -133,11 +131,10 @@ class Metafor(object):
 
         return result
 
-# |----------------------------------|
-# |   Return Thermal Nodal Values    |
-# |----------------------------------|
-
     def get_temperature(self):
+        '''
+        Return the nodal temperature of the solid interface
+        '''
 
         result = np.zeros((self.get_size(), 1))
 
@@ -149,9 +146,10 @@ class Metafor(object):
 
         return result
 
-    # Computes the nodal temperature velocity
-
     def get_tempgrad(self):
+        '''
+        Return the nodal temperature rate of the solid interface
+        '''
 
         result = np.zeros((self.get_size(), 1))
 
@@ -162,11 +160,10 @@ class Metafor(object):
 
         return result
 
-# |--------------------------------------------|
-# |   Build the Facet List of the Polytopes    |
-# |--------------------------------------------|
-
     def get_surface_mesh(self):
+        '''
+        Return the list of elements forming the polytope
+        '''
 
         face_list = list()
         if not hasattr(self, 'polytope'): return face_list
@@ -176,9 +173,10 @@ class Metafor(object):
 
         return face_list
 
-    # Correct element node ordering for PFEM3D
-
     def e_index(self, element: object):
+        '''
+        Split the quadangle elements into triangle elements
+        '''
 
         size = element.getNumberOfNodes()
 
@@ -186,11 +184,10 @@ class Metafor(object):
         if size == 3: return np.array([[2, 1, 0]])
         if size == 4: return np.array([[0, 3, 2], [2, 1, 0]])
 
-# |--------------------------------------------|
-# |   Build the Face List of an Element Set    |
-# |--------------------------------------------|
-
     def get_facelist(self, elementset: object):
+        '''
+        Return the list of elements forming the elementset
+        '''
 
         face_list = list()
         for i in range(elementset.size()):
@@ -205,11 +202,10 @@ class Metafor(object):
 
         return face_list
 
-# |-------------------------------------------|
-# |   Positions of the Nodes in an Element    |
-# |-------------------------------------------|
-
     def e_pos(self, element: object):
+        '''
+        Return the positions on the nodes forming the element
+        '''
 
         size = element.getNumberOfNodes()
         position = np.zeros((size, self.dim))
@@ -224,18 +220,20 @@ class Metafor(object):
 
         return position
 
-# |------------------------------------|
-# |   Other Miscellaneous Functions    |
-# |------------------------------------|
-
     @tb.compute_time
-    def update(self): self.meta_fac.save(self.fac)
+    def update(self):
+        '''
+        Store the current state of the solver into the memory
+        '''
 
-    # Backup the solver state if needed
+        self.meta_fac.save(self.fac)
 
     @tb.write_logs
     @tb.compute_time
     def way_back(self):
+        '''
+        Revert back the solver to its last converged FSI state
+        '''
 
         stm = self.metafor.getStageManager()
         check_step = self.metafor.getCurrentStepNo() > self.fac.getStepNo()
@@ -247,12 +245,18 @@ class Metafor(object):
         if not (stm.getCurNumStage() < 0) and (stm.getNumbOfStage() > 1):
             self.tsm.removeLastStage()
 
-    # Export the current solution into a file
-
     @tb.write_logs
     @tb.compute_time
-    def save(self): self.exporter.write()
+    def save(self):
+        '''
+        Write the current solid solution on the disk
+        '''
+        
+        self.exporter.write()
 
-    # Return the number of nodes at the interface
-
-    def get_size(self): return self.FSI.getNumberOfMeshPoints()
+    def get_size(self):
+        '''
+        Return the number of nodes on the solid interface mesh
+        '''
+        
+        return self.FSI.getNumberOfMeshPoints()

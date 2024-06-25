@@ -3,12 +3,13 @@ import pfem3Dw as w
 import numpy as np
 import atexit
 
-# |--------------------------------------|
-# |   Fluid Solver Wrapper for PFEM3D    |
-# |--------------------------------------|
+# Fluid solver wrapper class for PFEM3D
 
-class PFEM3D(object):
+class Solver(object):
     def __init__(self, path: str):
+        '''
+        Initialize the fluid solver wrapper class
+        '''
 
         self.problem = w.getProblem(path)
         atexit.register(self.print_clock)
@@ -43,13 +44,12 @@ class PFEM3D(object):
         self.problem.copySolution(self.prev_solution)
         self.problem.displayParams()
 
-# |-----------------------------------------|
-# |   Run PFEM in the Current Time Frame    |
-# |-----------------------------------------|
-
     @tb.write_logs
     @tb.compute_time
     def run(self):
+        '''
+        Run the fluid solver within the current time step
+        '''
 
         self.problem.setMinTimeStep(tb.Step.dt/self.max_division)
         self.problem.setMaxSimTime(tb.Step.next_time())
@@ -58,11 +58,10 @@ class PFEM3D(object):
         else: self.solver.setTimeStep(tb.Step.dt)
         return self.problem.simulate()
 
-# |----------------------------------------|
-# |   Get Dirichlet Boundary Conditions    |
-# |----------------------------------------|
-
     def apply_displacement(self, disp: np.ndarray):
+        '''
+        Apply the displacement from the solid to the fluid interface
+        '''
 
         BC = (disp-self.get_position())/tb.Step.dt
         if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
@@ -70,36 +69,36 @@ class PFEM3D(object):
         for i, vector in enumerate(self.BC):
             for j, value in enumerate(BC[i]): vector[j] = value
 
-    # Update the Dirichlet nodal temperature
-
     def apply_temperature(self, temp: np.ndarray):
+        '''
+        Apply the temperature from the solid to the fluid interface
+        '''
 
         for i, vector in enumerate(self.BC):
             vector[self.dim] = temp[i][0]
 
-# |--------------------------------------|
-# |   Get Neumann Boundary Conditions    |
-# |--------------------------------------|
-
     def get_loading(self):
+        '''
+        Return the nodal loading of the fluid interface
+        '''
 
         vector = w.VectorVectorDouble()
         self.solver.computeStress('FSInterface', self.FSI, vector)
         return np.copy(vector)
 
-    # Return Thermal boundary conditions
-
     def get_heatflux(self):
+        '''
+        Return the nodal heat flux of the fluid interface
+        '''
 
         vector = w.VectorVectorDouble()
         self.solver.computeHeatFlux('FSInterface', self.FSI, vector)
         return np.copy(vector)
 
-# |-----------------------------------|
-# |   Return Position and Velocity    |
-# |-----------------------------------|
-
     def get_position(self):
+        '''
+        Return the nodal positions of the fluid interface
+        '''
 
         result = np.zeros((self.get_size(), self.dim))
 
@@ -110,9 +109,10 @@ class PFEM3D(object):
 
         return result
 
-    # Computes the nodal velocity vector
-
     def get_velocity(self):
+        '''
+        Return the nodal velocity of the fluid interface
+        '''
 
         result = np.zeros((self.get_size(), self.dim))
 
@@ -123,11 +123,10 @@ class PFEM3D(object):
 
         return result
 
-# |-------------------------------------------|
-# |   Reset the FSI and Boundary Condition    |
-# |-------------------------------------------|
-
     def reset_interface_BC(self):
+        '''
+        Destroy and create the nodal exterior state container
+        '''
 
         self.BC = list()
         self.mesh.getNodesIndex('FSInterface', self.FSI)
@@ -138,9 +137,10 @@ class PFEM3D(object):
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 
-    # Create or update the exclusion boundary
-
     def update_polytope(self, polytope: list):
+        '''
+        Update the polytope list using the solid boundary
+        '''
 
         for i, face_list in enumerate(polytope):
 
@@ -148,12 +148,11 @@ class PFEM3D(object):
             try: self.mesh.updatePoly(self.poly[i], vec)
             except: self.poly.append(self.mesh.addPolytope(vec))
 
-# |------------------------------------|
-# |   Other Miscellaneous Functions    |
-# |------------------------------------|
-
     @tb.compute_time
     def update(self, surface_mesh: list):
+        '''
+        Remesh and store the current state of the solver
+        '''
 
         self.update_polytope(surface_mesh)
         self.mesh.remesh(verboseOutput = False)
@@ -164,25 +163,35 @@ class PFEM3D(object):
         if not self.WC: self.solver.precomputeMatrix()
         self.problem.copySolution(self.prev_solution)
 
-    # Backup the solver state if needed
-
     @tb.compute_time
     def way_back(self):
+        '''
+        Revert back the solver to its last converged FSI state
+        '''
 
         if self.problem.getCurrentSimStep() > self.prev_solution.step:
             self.problem.loadSolution(self.prev_solution)
 
-    # Export the current solution into a file
-
     @tb.write_logs
     @tb.compute_time
-    def save(self): self.problem.dump()
+    def save(self):
+        '''
+        Write the current fluid solution on the disk
+        '''
 
-    # Return the number of nodes at the interface
+        self.problem.dump()
 
-    def get_size(self): return self.FSI.size()
+    def get_size(self):
+        '''
+        Return the number of nodes on the fluid interface mesh
+        '''
 
-    # Print the time stats at destruction
+        return self.FSI.size()
 
     @tb.write_logs
-    def print_clock(self): self.problem.displayTimeStats()
+    def print_clock(self):
+        '''
+        Print the computation times measured during the simulation
+        '''
+
+        self.problem.displayTimeStats()

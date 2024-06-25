@@ -3,27 +3,29 @@ from scipy.sparse import dok_matrix
 from ..general import toolbox as tb
 import numpy as np
 
-# |--------------------------------------|
-# |   Nearest Neighbour Interpolation    |
-# |--------------------------------------|
+# Nearest neighbour interpolation class
 
 class NNI(Interpolator):
     def __init__(self):
+        '''
+        Initialize the nearest neighbour interpolation class
+        '''
 
         Interpolator.__init__(self)
 
-    # Interpolate recv_data and return the result
-
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):
-        return self.H.dot(recv_data)
+        '''
+        Return the interpolation from the source to the target mesh
+        '''
 
-# |----------------------------------------------|
-# |   Mapping Matrix from RecvPos to Position    |
-# |----------------------------------------------|
+        return self.H.dot(recv_data)
 
     @tb.compute_time
     def mapping(self, position: np.ndarray):
+        '''
+        Compute the interpolation matrices from the source to the target
+        '''
 
         self.H = dok_matrix((len(position), len(self.recv_pos)))
 

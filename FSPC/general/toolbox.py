@@ -4,9 +4,7 @@ from mpi4py.MPI import COMM_WORLD as CW
 from typing import Callable
 import time
 
-# |--------------------------------------|
-# |   Initialize the Global Variables    |
-# |--------------------------------------|
+# Global variables for fluid-structure coupling
 
 has_mecha = False
 has_therm = False
@@ -17,11 +15,13 @@ def is_solid(): return CW.rank == 1
 import collections
 clock = collections.defaultdict(float)
 
-# |--------------------------------------|
-# |   Define Some Decorator Functions    |
-# |--------------------------------------|
+# Definition of the global function decorators
 
 def write_logs(function: Callable):
+    '''
+    Decorator that copy the print calls into a file
+    '''
+
     def wrapper(*args):
 
         rank = str(CW.rank)
@@ -31,9 +31,11 @@ def write_logs(function: Callable):
 
     return wrapper
 
-# Measure the computation time of functions
-
 def compute_time(function: Callable):
+    '''
+    Decorator that measures the computation time of a function
+    '''
+
     def wrapper(*args):
 
         start = time.time()
@@ -44,38 +46,43 @@ def compute_time(function: Callable):
         return result
     return wrapper
 
-# Function called by the solid solver
-
 def only_solid(function: Callable):
+    '''
+    Decorator that restricts the function call to the solid rank
+    '''
+
     def wrapper(*args):
 
         if is_solid(): return function(*args)
 
     return wrapper
 
-# Function called when mechanical coupling
-
 def only_mechanical(function: Callable):
+    '''
+    Decorator that restricts the function call to mechanical coupling
+    '''
+
     def wrapper(*args):
 
         if has_mecha: return function(*args)
 
     return wrapper
 
-# Function called when thermal coupling
-
 def only_thermal(function: Callable):
+    '''
+    Decorator that restricts the function call to thermal coupling
+    '''
+
     def wrapper(*args):
 
         if has_therm: return function(*args)
 
     return wrapper
 
-# |------------------------------------|
-# |   Run the Fluid or Solid Solver    |
-# |------------------------------------|
-
 def run_fluid():
+    '''
+    Run the fluid solver within the current time step
+    '''
 
     global Solver
     verified = False
@@ -87,9 +94,10 @@ def run_fluid():
 
     return CW.bcast(verified, root=0)
 
-# The simulation state is shared with MPI
-
 def run_solid():
+    '''
+    Run the solid solver within the current time step
+    '''
 
     global Solver
     verified = False
@@ -101,11 +109,10 @@ def run_solid():
 
     return CW.bcast(verified, root=1)
 
-# |----------------------------------------------|
-# |   Print the Computation Time of Functions    |
-# |----------------------------------------------|
-
 def print_clock():
+    '''
+    Print the computation times measured during the simulation
+    '''
 
     print('\n------------------------------------')
     print('Process {:.0f} : Time Stats'.format(CW.rank))

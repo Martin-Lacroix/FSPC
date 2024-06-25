@@ -2,12 +2,13 @@ from mpi4py.MPI import COMM_WORLD as CW
 from . import toolbox as tb
 import math, sys
 
-# |------------------------------------------|
-# |   Disk Exporter and Time Step Manager    |
-# |------------------------------------------|
+# Disk exporter and time step manager class
 
 class TimeStep(object):
     def __init__(self, dt: float, dt_save: float):
+        '''
+        Initialize the disk exporter and time step manager class
+        '''
 
         self.time = 0
         self.min_dt = 1e-9
@@ -16,19 +17,25 @@ class TimeStep(object):
         self.next = self.dt_save = dt_save
 
     def next_time(self):
+        '''
+        Return the physical time at the end of the current step
+        '''
+
         return self.time+self.dt
 
-    # Update next save time and export results if needed
-
     def update_exporter(self):
+        '''
+        Update the time step for the disk exporter
+        '''
 
         if self.time >= self.next: tb.Solver.save()
         next = math.floor(self.time/self.dt_save)
         self.next = (next+1)*self.dt_save
 
-    # Update the current coupling time step
-
     def update_time(self, verified: bool):
+        '''
+        Update the time step for the coupling algorithm
+        '''
 
         if not verified and (self.dt < self.min_dt):
 
@@ -44,12 +51,11 @@ class TimeStep(object):
             self.dt = math.pow(2, 1/7)*self.dt
             self.dt = min(self.dt, self.max_dt)
 
-# |----------------------------------|
-# |   Print the Current Time Step    |
-# |----------------------------------|
-
     @tb.only_solid
     def display_time_step(self):
+        '''
+        Print the current time step and physical time
+        '''
 
         current = 'Time : {:.3e}'.format(self.time).ljust(20)
         print('\n------------------------------------------')

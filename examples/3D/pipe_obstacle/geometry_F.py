@@ -3,9 +3,7 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 L1 = 0.3
 L2 = 0.5
@@ -23,14 +21,10 @@ R = 0.02
 S = 0.04
 W = 0.02
 
-# Characteristic size
-
 d = 0.01
 E = 1e-3
 
-# |--------------------------------------|
-# |   Surfaces and Volumes Definition    |
-# |--------------------------------------|
+# Surfaces list
 
 v = sh.occ.addCylinder(L1+L2-E, Y, 0, -W, 0, 0, R2)
 sh.occ.synchronize()
@@ -56,9 +50,7 @@ sh.mesh.setSize(g, d)
 y = np.transpose(y)[1]
 g = np.transpose(g)[1]
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 L = L1+L2+L3+S
@@ -89,9 +81,7 @@ l.append(sh.occ.addCircleArc(p[5], p[6], p[7]))
 l.append(sh.occ.addLine(p[7], p[8]))
 l.append(sh.occ.addLine(p[8], p[9]))
 
-# |------------------------------------|
-# |   Physical Surface and Boundary    |
-# |------------------------------------|
+# Physical surface
 
 tags = [(1,a) for a in l]
 rev = sh.occ.revolve(tags, 0, 0, 0, 1, 0, 0, 2*np.pi)
@@ -109,9 +99,7 @@ sh.addPhysicalGroup(2, y[1:2], name='FreeSurface')
 sh.addPhysicalGroup(2, y[2:3], name='Inlet')
 sh.addPhysicalGroup(2, s, name='Border')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# Write the mesh file
 
 sh.mesh.generate(3)
 sh.mesh.removeDuplicateNodes()

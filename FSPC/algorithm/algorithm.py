@@ -1,14 +1,15 @@
 from ..general import toolbox as tb
 import numpy as np
 
-# |---------------------------------|
-# |   Parent FSI Algorithm Class    |
-# |---------------------------------|
+# Base fluid-structure coupling algorithm class
 
 class Algorithm(object):
 
     @tb.compute_time
     def simulate(self, end_time: float):
+        '''
+        Run the fluid-structure simulation algorithm
+        '''
 
         self.verified = False
         if hasattr(self, 'initialize'): self.initialize()
@@ -35,27 +36,30 @@ class Algorithm(object):
                 tb.Interp.update_solver()
                 tb.Step.update_exporter()
 
-# |--------------------------------------------|
-# |   Interpolator Functions and Relaxation    |
-# |--------------------------------------------|
-
     @tb.only_solid
     def compute_predictor(self):
+        '''
+        Predict the future solution at the solid interface
+        '''
 
         tb.Interp.predict_temperature(self.verified)
         tb.Interp.predict_displacement(self.verified)
 
     @tb.only_solid
     def reset_convergence(self):
+        '''
+        Reset the residual attributes to their default values
+        '''
 
         if tb.has_mecha: tb.ResMech.reset()
         if tb.has_therm: tb.ResTher.reset()
 
-    # Update the predicted interface solution
-
     @tb.only_solid
     @tb.compute_time
     def relaxation(self):
+        '''
+        Compute the predicted solution at the solid interface
+        '''
 
         self.compute_residual()
         self.update_displacement()
@@ -69,11 +73,10 @@ class Algorithm(object):
         if tb.has_therm: ok_list.append(tb.ResTher.check())
         return np.all(ok_list)
 
-# |------------------------------------|
-# |   Transfer and Update Functions    |
-# |------------------------------------|
-
     def compute_residual(self):
+        '''
+        Compute the residual of the solution at the solid interface
+        '''
 
         if tb.has_mecha:
 
@@ -85,25 +88,26 @@ class Algorithm(object):
             temp = tb.Solver.get_temperature()
             tb.ResTher.update_res(temp, tb.Interp.temp)
 
-    # Transfer Dirichlet data Solid to Fluid
-
     def transfer_dirichlet(self):
+        '''
+        Interpolate the solution from the solid to the fluid interface
+        '''
 
         tb.Interp.apply_displacement()
         tb.Interp.apply_temperature()
 
-    # Transfer Neumann data Fluid to Solid
-
     def transfer_neumann(self):
+        '''
+        Interpolate the solution from the fluid to the solid interface
+        '''
 
         tb.Interp.apply_loading()
         tb.Interp.apply_heatflux()
 
-# |------------------------------------|
-# |   Print Convergence Information    |
-# |------------------------------------|
-
     def display_residual(self):
+        '''
+        Print the current state of the convergence criterion
+        '''
 
         if tb.has_mecha:
 

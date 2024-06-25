@@ -27,7 +27,7 @@ FSPC.set_time_step(step)
 residual = FSPC.general.Residual(1e-6)
 FSPC.set_thermal_res(residual)
 
-# Start the FSI simulation
+# Start the fluid-structure simulation
 
 algorithm.simulate(10)
 FSPC.general.print_clock()

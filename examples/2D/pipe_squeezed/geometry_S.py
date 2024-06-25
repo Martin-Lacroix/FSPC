@@ -2,9 +2,7 @@ import os, gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 R = 0.25
 L = 0.15+R
@@ -19,17 +17,13 @@ D2 = 1.25
 HB = 0.75+H+5*R
 RB = 0.375
 
-# Characteristic size
-
 d = 0.04
 N = 30
 M = 25
 P = 4
 Q = 15
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 q = list()
@@ -120,9 +114,7 @@ h.append(sh.occ.addLine(q[2], q[1]))
 c.append(sh.occ.addCircleArc(r[2], r[1], r[0]))
 c.append(sh.occ.addCircleArc(r[0], r[1], r[2]))
 
-# |------------------------------------|
-# |   Physical Surface and Boundary    |
-# |------------------------------------|
+# Physical surface
 
 x = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(l)])
 y = sh.occ.addPlaneSurface([sh.occ.addCurveLoop(h)])
@@ -163,9 +155,7 @@ sh.addPhysicalGroup(1, l+h, name='Side')
 sh.addPhysicalGroup(1, l[0:1]+h[0:1], name='Clamped')
 sh.addPhysicalGroup(1, l[1:]+h[1:]+c, name='FSInterface')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# Write the mesh file
 
 gmsh.option.setNumber('Mesh.RecombineAll', 1)
 gmsh.option.setNumber('Mesh.Algorithm', 6)

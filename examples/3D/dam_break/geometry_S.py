@@ -2,22 +2,16 @@ import os, gmsh
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 S = 0.15
 L = 0.146
 R = 0.015
 A = 2*L
 
-# Characteristic size
-
 d = 0.005
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 
@@ -42,9 +36,7 @@ l.append(sh.occ.addCircleArc(p[2], p[1], p[0]))
 l.append(sh.occ.addCircleArc(p[3], p[4], p[5]))
 l.append(sh.occ.addCircleArc(p[5], p[4], p[3]))
 
-# |--------------------------------------|
-# |   Surfaces and Volumes Definition    |
-# |--------------------------------------|
+# Surfaces list
 
 k = list()
 s = list()
@@ -71,9 +63,7 @@ sh.addPhysicalGroup(3, [v], name='Solid')
 sh.addPhysicalGroup(2, s[1:], name='FSInterface')
 sh.addPhysicalGroup(2, s[0:1], name='Clamped')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# Write the mesh file
 
 sh.mesh.generate(3)
 gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')

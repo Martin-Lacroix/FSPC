@@ -2,12 +2,13 @@ from ..general import toolbox as tb
 from .block_gauss import BGS
 import numpy as np
 
-# |--------------------------------------------|
-# |   Class of Approximate Inverse Jacobian    |
-# |--------------------------------------------|
+# Inverse least squares approximate Jacobian class
 
 class InvJacobian(object):
     def __init__(self):
+        '''
+        Initialize the approximate inverse Jacobian class
+        '''
 
         self.V = list()
         self.W = list()
@@ -16,17 +17,24 @@ class InvJacobian(object):
         self.prev_J = np.ndarray(0)
 
     def update(self):
+        '''
+        Copy the current Jacobian into the previous Jacobian
+        '''
 
         self.prev_J = np.copy(self.J)
 
     def set_zero(self, size: int):
+        '''
+        Reset the class attributes to their default values
+        '''
 
         self.J = np.zeros((size, size))
         self.prev_J = np.zeros((size, size))
 
-    # Compute the solution correction
-
     def delta(self, residual: np.ndarray):
+        '''
+        Compute the predictor increment using the previous Jacobian
+        '''
 
         V = np.flip(np.transpose(self.V), axis=1)
         W = np.flip(np.transpose(self.W), axis=1)
@@ -38,38 +46,45 @@ class InvJacobian(object):
         correction = np.transpose(np.linalg.lstsq(V.T, X, -1)[0])
         self.J = self.prev_J+correction
 
-        # Return the solution correction
+        # Return the solution correction increment
 
         delta = np.dot(self.J, R)-R
         return np.split(delta, tb.Solver.get_size())
 
-# |---------------------------------------------------|
-# |   Interface Quasi-Newton Multi-Vector Jacobian    |
-# |---------------------------------------------------|
+# Interface quasi-Newton with multi-vector Jacobian class
 
 class MVJ(BGS):
     def __init__(self, max_iter: int):
+        '''
+        Initialize the interface quasi-Newton with multi-vector Jacobian class
+        '''
+
         BGS.__init__(self, max_iter)
 
     @tb.only_solid
     def initialize(self):
+        '''
+        Reset the class attributes to their default values
+        '''
 
         if tb.has_mecha: self.jac_mecha = InvJacobian()
         if tb.has_therm: self.jac_therm = InvJacobian()
     
     @tb.only_solid
     def update(self, verified: bool):
+        '''
+        Copy the current Jacobian into the previous Jacobian
+        '''
 
         if not verified: return
         if tb.has_mecha: self.jac_mecha.update()
         if tb.has_therm: self.jac_therm.update()
 
-# |-------------------------------------------------|
-# |   Relaxation of Solid Interface Displacement    |
-# |-------------------------------------------------|
-
     @tb.only_mechanical
     def update_displacement(self):
+        '''
+        Update the predicted displacement with the predictor increment
+        '''
 
         disp = tb.Solver.get_position()
 
@@ -106,12 +121,11 @@ class MVJ(BGS):
         tb.Interp.disp += delta
         self.prev_disp = np.copy(disp)
 
-# |------------------------------------------------|
-# |   Relaxation of Solid Interface Temperature    |
-# |------------------------------------------------|
-
     @tb.only_thermal
     def update_temperature(self):
+        '''
+        Update the predicted temperature with the predictor increment
+        '''
 
         temp = tb.Solver.get_temperature()
 

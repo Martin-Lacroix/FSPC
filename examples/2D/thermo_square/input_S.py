@@ -2,12 +2,11 @@ import toolbox.gmsh as gmsh
 import wrap as w
 import os
 
-# |------------------------------------------|
-# |   Initialization and Input Parameters    |
-# |------------------------------------------|
-
 metafor = None
 def getMetafor(parm):
+    '''
+    Initialize and return the metafor object
+    '''
 
     global metafor
     if metafor: return metafor
@@ -108,7 +107,7 @@ def getMetafor(parm):
     tscm.setTimeStepDivisionFactor(2)
     tscm.setNbOptiIte(25)
 
-    # Nodal GMSH exporter
+    # Nodal Gmsh exporter
 
     ext = w.GmshExporter(metafor, 'metafor/output')
     ext.add(w.DbNodalValueExtractor(groups['Solid'], w.Field1D(w.TO, w.RE)))

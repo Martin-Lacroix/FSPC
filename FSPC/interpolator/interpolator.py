@@ -2,13 +2,14 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
 import numpy as np
 
-# |------------------------------------|
-# |   Parent FSI Interpolator Class    |
-# |------------------------------------|
+# Base fluid-structure interpolation class
 
 class Interpolator(object):
 
     def initialize(self):
+        '''
+        Initialize the base fluid-structure interpolation class
+        '''
 
         position = tb.Solver.get_position()
 
@@ -27,16 +28,15 @@ class Interpolator(object):
             CW.send(position, 0, tag=1)
             self.recv_pos = CW.recv(source=0, tag=2)
 
-        # Compute the FS mesh interpolation matrix
+        # Compute the fluid-structure mesh interpolation matrix
 
         if hasattr(self, 'mapping'): self.mapping(position)
 
-# |------------------------------------------|
-# |   Communicate the Boundary Conditions    |
-# |------------------------------------------|
-
     @tb.only_mechanical
     def apply_loading(self):
+        '''
+        Apply the loading from the fluid to the solid interface
+        '''
 
         if tb.is_solid():
 
@@ -45,10 +45,11 @@ class Interpolator(object):
 
         else: CW.send(tb.Solver.get_loading(), 1, tag=3)
 
-    # Apply predicted displacement to the fluid
-
     @tb.only_mechanical
     def apply_displacement(self):
+        '''
+        Apply the displacement from the solid to the fluid interface
+        '''
 
         if tb.is_fluid():
 
@@ -57,10 +58,11 @@ class Interpolator(object):
 
         else: CW.send(self.disp, 0, tag=4)
 
-    # Apply actual heat flux to the solid
-
     @tb.only_thermal
     def apply_heatflux(self):
+        '''
+        Apply the heat flux from the fluid to the solid interface
+        '''
 
         if tb.is_solid():
 
@@ -69,10 +71,11 @@ class Interpolator(object):
 
         else: CW.send(tb.Solver.get_heatflux(), 1, tag=5)
 
-    # Apply predicted temperature to the fluid
-
     @tb.only_thermal
     def apply_temperature(self):
+        '''
+        Apply the temperature from the solid to the fluid interface
+        '''
 
         if tb.is_fluid():
 
@@ -81,12 +84,11 @@ class Interpolator(object):
 
         else: CW.send(self.temp, 0, tag=6)
 
-# |---------------------------------------------|
-# |   Predict the Solution for Next Coupling    |
-# |---------------------------------------------|
-
     @tb.only_mechanical
     def predict_displacement(self, verified: bool):
+        '''
+        Predict the future displacement of the solid interface
+        '''
 
         if not hasattr(self, 'prev_disp') or verified:
 
@@ -99,10 +101,11 @@ class Interpolator(object):
             self.disp = np.copy(self.prev_disp)
             self.disp += tb.Step.dt*self.velocity_disp
 
-    # Predictor for the temparature coupling
-
     @tb.only_thermal
     def predict_temperature(self, verified: bool):
+        '''
+        Predict the future temperature of the solid interface
+        '''
 
         if not hasattr(self, 'prev_temp') or verified:
 
@@ -115,11 +118,10 @@ class Interpolator(object):
             self.temp = np.copy(self.prev_temp)
             self.temp += tb.Step.dt*self.velocity_temp
 
-# |------------------------------------------|
-# |   Update the Solver After Convergence    |
-# |------------------------------------------|
-
     def update_solver(self):
+        '''
+        Update the solver after convergence of the coupling
+        '''
 
         if tb.is_fluid():
 

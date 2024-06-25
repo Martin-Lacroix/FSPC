@@ -2,9 +2,7 @@
 #include <Python.h>
 #include <stdio.h>
 
-// |-----------------------------------------------|
-// | Convert couts and cerr into python streams    |
-// |-----------------------------------------------|
+// Convert couts and cerr into python streams
 
 PyCerrCout::PyCerrCout(std::ostream& ostream, bool err):
 stream(ostream), errstream(err)

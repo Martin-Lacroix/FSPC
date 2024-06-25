@@ -30,7 +30,7 @@ FSPC.set_thermal_res(residual)
 residual = FSPC.general.Residual(1e-6)
 FSPC.set_mechanical_res(residual)
 
-# Start the FSI simulation
+# Start the fluid-structure simulation
 
 algorithm.simulate(3)
 FSPC.general.print_clock()

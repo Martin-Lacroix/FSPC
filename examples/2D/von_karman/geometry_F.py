@@ -3,9 +3,7 @@ import numpy as np
 from gmsh import model as sh
 gmsh.initialize()
 
-# |---------------------------|
-# |   Mesh Size Parameters    |
-# |---------------------------|
+# Mesh Parameters
 
 L = 1.5
 H = 0.41
@@ -15,16 +13,12 @@ CY = 0.2
 BX = 0.6
 BH = 0.01
 
-# Characteristic size
-
 d = 4e-3
 LN = 376
 N = 88
 M = 6
 
-# |----------------------------------|
-# |   Points and Lines Definition    |
-# |----------------------------------|
+# Points list
 
 p = list()
 A = np.sqrt(np.square(R)-np.square(BH))
@@ -60,9 +54,7 @@ r.append(sh.occ.addLine(p[8], p[6]))
 r.append(sh.occ.addLine(p[6], p[7]))
 r.append(sh.occ.addLine(p[7], p[9]))
 
-# |------------------------------------|
-# |   Physical Surface and Boundary    |
-# |------------------------------------|
+# Physical surface
 
 k = sh.occ.addCurveLoop(l)
 u = sh.occ.addCurveLoop(h+r)
@@ -81,9 +73,7 @@ sh.addPhysicalGroup(1, l[1:2], name='Outlet')
 sh.addPhysicalGroup(1, l[0:1]+l[2:3]+h, name='Wall')
 sh.addPhysicalGroup(1, l[3:4], name='Inlet')
 
-# |--------------------------|
-# |   Write the Mesh File    |
-# |--------------------------|
+# Write the mesh file
 
 sh.mesh.generate(2)
 gmsh.option.setNumber('Mesh.SaveParametric', 1)

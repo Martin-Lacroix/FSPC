@@ -20,11 +20,10 @@ os.environ['PYTHONPATH'] += base+'/../PFEM3D/build/bin:'
 if os.path.exists('workspace'): shutil.rmtree('workspace')
 os.mkdir('workspace')
 
-# |-----------------------------------------|
-# |   Function to Run a Single Test-Case    |
-# |-----------------------------------------|
-
 def run_test(case_name: str):
+    '''
+    Run a single test-case on two specific CPU sockets
+    '''
 
     rank = mp.current_process()._identity[0]
     cpu_bind = [(rank-1)+(rank-1), rank+(rank-1)]
@@ -48,6 +47,6 @@ def run_test(case_name: str):
 
 # Run the battery on all available physical cores
 
-n_proc = psutil.cpu_count(logical=False)
+n_proc = psutil.cpu_count(logical = False)
 pool = mp.Pool(n_proc//2)
 pool.map(run_test, case_name)

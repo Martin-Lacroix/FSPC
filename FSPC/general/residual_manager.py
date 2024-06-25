@@ -1,26 +1,29 @@
 import numpy as np
 
-# |---------------------------------------|
-# |   Convergence and Residual Manager    |
-# |---------------------------------------|
+# Coupling convergence and residual manager class
 
 class Residual(object):
     def __init__(self, tol: float):
+        '''
+        Initialize the coupling convergence and residual manager class
+        '''
 
         self.tol = tol
         self.reset()
 
-    # Reset all the convergence indicators
-
     def reset(self):
+        '''
+        Reset the class attributes to their default values
+        '''
 
         self.prev_res = np.ndarray(0)
         self.residual = np.ndarray(0)
         self.epsilon = np.inf
 
-    # Update the current and previous residual
-
     def update_res(self, result: np.ndarray, prediction: np.ndarray):
+        '''
+        Compute the residual and update the convergence criterion
+        '''
 
         self.prev_res = np.copy(self.residual)
         self.residual = result-prediction
@@ -31,9 +34,10 @@ class Residual(object):
         res = res/(den+self.tol)
         self.epsilon = np.linalg.norm(res)
 
-    # Check if the convergence criterion is verified
-
     def check(self):
+        '''
+        Returns true if the convergence criterion is satisfied
+        '''
 
         if self.epsilon < self.tol: return True
         else: return False
