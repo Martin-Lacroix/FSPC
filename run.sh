@@ -24,6 +24,7 @@ export SCRIPT=${PWD}/examples/2D/dam_break/main.py
 # export SCRIPT=${PWD}/examples/3D/dam_break/main.py
 # export SCRIPT=${PWD}/examples/3D/pipe_obstacle/main.py
 # export SCRIPT=${PWD}/examples/3D/thermo_sphere/main.py
+export SCRIPT=${PWD}/examples/3D/sloshing_flap/main.py
 
 # Clean output folder
 

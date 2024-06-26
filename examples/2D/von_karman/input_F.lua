@@ -30,7 +30,7 @@ Problem.Mesh.deleteBoundElements = false
 
 Problem.Extractors = {}
 Problem.Extractors[0] = {}
-Problem.Extractors[0].kind = 'Gmsh'
+Problem.Extractors[0].kind = 'GMSH'
 Problem.Extractors[0].writeAs = 'NodesElements'
 Problem.Extractors[0].outputFile = 'pfem/output.msh'
 Problem.Extractors[0].whatToWrite = {'p', 'velocity'}
