@@ -92,7 +92,7 @@ function Problem.Solver.MomContEq.BC.ContainerV(x, y, z, t)
     local W = 2*math.pi/1.6507
     local A = 4*math.pi/180
 
-    local theta_dt = (A*W)*math.sin(W*t)
+    local theta_dt = (A*W)*math.cos(W*t)
     local theta = math.atan(z, x)
 
     local x_dt = -r*math.sin(theta)*theta_dt

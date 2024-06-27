@@ -81,7 +81,7 @@ def getMetafor(parm):
     A = 4
     W = 2*np.pi/1.6507
 
-    theta = lambda t: 4*np.sin(W*t)
+    theta = lambda t: A*np.sin(W*t)
     fct = w.PythonOneParameterFunction(theta)
 
     loadset = domain.getLoadingSet()
