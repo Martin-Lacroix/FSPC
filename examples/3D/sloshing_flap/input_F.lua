@@ -11,7 +11,6 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'Tetgen_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.localHcharGroups = {'FSInterface', 'FreeSurface'}
 Problem.Mesh.boundingBox = {-1, -0.028, -1, 1, 0.028, 1}
 Problem.Mesh.exclusionZones = {}
 
@@ -73,7 +72,7 @@ Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.gammaFS = 0.5
 Problem.Solver.MomContEq.minRes = 1e-6
 Problem.Solver.MomContEq.tolerance = 1e-16
-Problem.Solver.MomContEq.bodyForce = {0, 0, 0}
+Problem.Solver.MomContEq.bodyForce = {0, 0, -9.81}
 
 -- Fluid Structure Interface
 
@@ -100,8 +99,4 @@ function Problem.Solver.MomContEq.BC.ContainerV(x, y, z, t)
     local z_dt = r*math.cos(theta)*theta_dt
 
     return x_dt, 0, z_dt
-end
-
-function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
-	return Problem.Mesh.hchar+dist*0.1
 end

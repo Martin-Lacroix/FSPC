@@ -166,19 +166,6 @@ sh.addPhysicalGroup(2, s[4:8], name='FreeSurface')
 sh.addPhysicalGroup(2, s[8:12]+r[:1], name='FSInterface')
 sh.addPhysicalGroup(2, s[:4]+s[12:]+r[1:], name='Container')
 
-# Mesh characteristic size
-
-sh.mesh.field.add('Distance', 1)
-sh.mesh.field.setNumber(1, 'Sampling', 1e3)
-sh.mesh.field.setNumbers(1, 'SurfacesList', s[4:12]+r[:1])
-
-sh.mesh.field.add('MathEval', 2)
-sh.mesh.field.setString(2, 'F', str(d)+'+0.1*F1')
-
-sh.mesh.field.setAsBackgroundMesh(2)
-gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
-gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
-
 # Write the mesh
 
 sh.mesh.generate(3)
