@@ -1,4 +1,3 @@
-from mpi4py.MPI import COMM_WORLD as CW
 from . import toolbox as tb
 import math, sys
 
@@ -39,7 +38,7 @@ class TimeStep(object):
 
         if not verified and (self.dt < self.min_dt):
 
-            CW.Barrier()
+            tb.CW.Barrier()
             if tb.is_solid(): print('Reached minimal time step')
             sys.exit()
 

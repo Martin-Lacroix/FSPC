@@ -1,4 +1,3 @@
-from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
 from .algorithm import Algorithm
 import numpy as np
@@ -48,7 +47,7 @@ class BGS(Algorithm):
             # Compute the coupling residual
 
             verified = self.relaxation()
-            verified = CW.bcast(verified, root=1)
+            verified = tb.CW.bcast(verified, root=1)
             self.iteration += 1
 
             # Return true if the solution is converged

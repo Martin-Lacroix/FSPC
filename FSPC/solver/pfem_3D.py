@@ -1,7 +1,6 @@
 from ..general import toolbox as tb
 import pfem3Dw as w
 import numpy as np
-import atexit
 
 # Fluid solver wrapper class for PFEM3D
 
@@ -11,8 +10,9 @@ class Solver(object):
         Initialize the fluid solver wrapper class
         '''
 
-        self.problem = w.getProblem(path)
+        import atexit
         atexit.register(self.print_clock)
+        self.problem = w.getProblem(path)
 
         # Incompressible or weakly compressible solver
 

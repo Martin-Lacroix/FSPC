@@ -3,6 +3,15 @@ from ..general import toolbox as tb
 from functools import partial
 import numpy as np
 
+# Check if Pytorch and CUDA are available
+
+try:
+    
+    import torch as tr
+    if not tr.cuda.is_available(): raise Exception('CUDA not found')
+
+except: raise Exception('Pytorch package not found')
+
 # Thin plate spline radial basis function interpolation class
 
 class TPS(Interpolator):
@@ -26,11 +35,16 @@ class TPS(Interpolator):
         Return the interpolation from the source to the target mesh
         '''
 
-        zeros = np.zeros((1+tb.Solver.dim, np.size(recv_data, 1)))
-        result = np.vstack((recv_data, zeros))
+        size = 1+tb.Solver.dim, np.size(recv_data, 1)
+        zeros = tr.zeros((size), device='cuda')
 
-        result = np.linalg.lstsq(self.A, result, rcond=None)[0]
-        return np.dot(self.B, result)
+        result = tr.from_numpy(recv_data).to(device='cuda')
+        result = tr.vstack((result, zeros))
+
+        # Solve the linear system on GPU and send it to the CPU
+
+        result = tr.linalg.lstsq(self.A, result).solution
+        return tr.matmul(self.B, result).cpu().numpy()
     
     @staticmethod
     def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
@@ -48,8 +62,8 @@ class TPS(Interpolator):
         '''
 
         size = 1+len(self.recv_pos)+tb.Solver.dim
-        self.B = np.zeros((len(position), size))
-        self.A = np.zeros((size, size))
+        B = np.zeros((len(position), size))
+        A = np.zeros((size, size))
 
         # Index ranges for an efficient vectorization
 
@@ -59,19 +73,26 @@ class TPS(Interpolator):
 
         # Initialize A without the basis function
 
-        self.A[len(self.recv_pos), N] = 1
-        self.A[N, len(self.recv_pos)] = 1
-        self.A[np.ix_(N, L)] = self.recv_pos
-        self.A[np.ix_(L, N)] = np.transpose(self.recv_pos)
+        A[len(self.recv_pos), N] = 1
+        A[N, len(self.recv_pos)] = 1
+        A[np.ix_(N, L)] = self.recv_pos
+        A[np.ix_(L, N)] = np.transpose(self.recv_pos)
 
         # Initialize B without the basis function
 
-        self.B[np.ix_(K, L)] = position
-        self.B[K, len(self.recv_pos)] = 1
+        B[np.ix_(K, L)] = position
+        B[K, len(self.recv_pos)] = 1
 
         # Evaluate the radial basis function in parallel
 
         RBF = partial(self.basis_func, recv=self.recv_pos, R=self.radius)
 
-        self.B[np.ix_(K, N)] = self.pool.map(RBF, position)
-        self.A[np.ix_(N, N)] = self.pool.map(RBF, self.recv_pos)
+        B[np.ix_(K, N)] = self.pool.map(RBF, position)
+        A[np.ix_(N, N)] = self.pool.map(RBF, self.recv_pos)
+
+        # Move the interpolation matrices to the GPU
+
+        tr.cuda.empty_cache()
+
+        self.A = tr.from_numpy(A).to(device='cuda')
+        self.B = tr.from_numpy(B).to(device='cuda')

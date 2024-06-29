@@ -6,10 +6,19 @@ del interpolator
 from .linear_projection import LEP
 del linear_projection
 
-# Thin plate spline radial basis function interpolation class
+# Thin plate spline interpolation class on GPU
 
-from .thin_plate_spline import TPS
-del thin_plate_spline
+try:
+
+    from .plate_spline_cuda import TPS
+    del plate_spline_cuda
+
+# Thin plate spline interpolation class on CPU
+
+except:
+
+    from .thin_plate_spline import TPS
+    del thin_plate_spline
 
 # Nearest neighbour interpolation class
 
