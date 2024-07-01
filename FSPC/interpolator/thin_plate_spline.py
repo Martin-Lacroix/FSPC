@@ -26,7 +26,7 @@ class TPS(Interpolator):
         atexit.register(self.pool.close)
 
     @tb.compute_time
-    def interpolate(self, recv_data: np.ndarray):
+    def interpolate(self, recv_data: pt.Tensor):
         '''
         Return the interpolation from the source to the target mesh
         '''
@@ -35,19 +35,19 @@ class TPS(Interpolator):
         result = pt.vstack((recv_data, zeros))
 
         result = pt.linalg.lstsq(self.A, result).solution
-        return pt.matmul(self.B, result).numpy()
+        return pt.matmul(self.B, result)
     
     @staticmethod
-    def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
+    def basis_func(position: pt.Tensor, recv: pt.Tensor, R: float):
         '''
         Return the value of the thin plate spline at the nodes
         '''
 
-        r = np.linalg.norm(position-recv, axis=1)/R
-        return np.square(r)*np.ma.log(r)
+        r = pt.norm(position-recv, dim=1)/R
+        return pt.square(r)*pt.log(r+1e-9)
 
     @tb.compute_time
-    def mapping(self, position: np.ndarray):
+    def mapping(self, position: pt.Tensor):
         '''
         Compute the interpolation matrices from the source to the target
         '''
@@ -76,13 +76,7 @@ class TPS(Interpolator):
 
         # Evaluate the radial basis function in parallel
 
-        RBF = partial(self.basis_func, recv=self.recv_pos.numpy(), R=self.radius)
+        RBF = partial(self.basis_func, recv=self.recv_pos, R=self.radius)
 
-        # self.B[np.ix_(K, N)] = self.pool.map(RBF, position)
-        # self.A[np.ix_(N, N)] = self.pool.map(RBF, recv_pos)
-
-        for i, line in enumerate(self.pool.map(RBF, position.numpy())): # Bad
-            self.B[K[i], N] = pt.from_numpy(line)
-
-        for i, line in enumerate(self.pool.map(RBF, self.recv_pos.numpy())): # Bad
-            self.A[N[i], N] = pt.from_numpy(line)
+        self.B[np.ix_(K, N)] = pt.stack(self.pool.map(RBF, position))
+        self.A[np.ix_(N, N)] = pt.stack(self.pool.map(RBF, self.recv_pos))

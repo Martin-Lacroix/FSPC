@@ -86,13 +86,13 @@ class Solver(object):
                 node = self.FSI.getMeshPoint(i)
 
                 if self.geometry.isAxisymmetric():
-                    interaction.setNodTensorAxi(node, *data)
+                    interaction.setNodTensorAxi(node, *data.numpy())
 
                 elif self.geometry.is2D():
-                    interaction.setNodTensor2D(node, *data)
+                    interaction.setNodTensor2D(node, *data.numpy())
 
                 elif self.geometry.is3D():
-                    interaction.setNodTensor3D(node, *data)
+                    interaction.setNodTensor3D(node, *data.numpy())
 
     def apply_heatflux(self, heat: np.ndarray):
         '''
@@ -103,14 +103,14 @@ class Solver(object):
             for i, data in enumerate(heat):
 
                 node = self.FSI.getMeshPoint(i)
-                interaction.setNodVector(node, *data)
+                interaction.setNodVector(node, *data.numpy())
 
     def get_position(self):
         '''
         Return the nodal positions of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), self.dim))
+        result = pt.zeros((self.get_size(), self.dim))
 
         for i, axe in enumerate(self.axis):
             for j, data in enumerate(result):
@@ -119,14 +119,14 @@ class Solver(object):
                 data[i] += node.getValue(w.Field1D(axe, w.AB))
                 data[i] += node.getValue(w.Field1D(axe, w.RE))
 
-        return pt.from_numpy(result)
+        return result
 
     def get_velocity(self):
         '''
         Return the nodal velocity of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), self.dim))
+        result = pt.zeros((self.get_size(), self.dim))
 
         for i, axe in enumerate(self.axis):
             for j, data in enumerate(result):
@@ -134,14 +134,14 @@ class Solver(object):
                 node = self.FSI.getMeshPoint(j)
                 data[i] = node.getValue(w.Field1D(axe, w.GV))
 
-        return pt.from_numpy(result)
+        return result
 
     def get_temperature(self):
         '''
         Return the nodal temperature of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), 1))
+        result = pt.zeros((self.get_size(), 1))
 
         for i in range(self.get_size()):
 
@@ -156,7 +156,7 @@ class Solver(object):
         Return the nodal temperature rate of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), 1))
+        result = pt.zeros((self.get_size(), 1))
 
         for i in range(self.get_size()):
 

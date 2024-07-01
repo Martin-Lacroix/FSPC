@@ -68,11 +68,11 @@ class Solver(object):
         Apply the displacement from the solid to the fluid interface
         '''
 
-        BC = (disp-self.get_position().numpy())/tb.Step.dt
+        BC = (disp-self.get_position())/tb.Step.dt
         if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
 
         for i, vector in enumerate(self.BC):
-            for j, value in enumerate(BC[i]): vector[j] = value
+            for j, value in enumerate(BC[i]): vector[j] = value.item()
 
     def apply_temperature(self, temp: np.ndarray):
         '''
@@ -105,21 +105,21 @@ class Solver(object):
         Return the nodal positions of the fluid interface
         '''
 
-        result = np.zeros((self.get_size(), self.dim))
+        result = pt.zeros((self.get_size(), self.dim))
 
         for i, data in enumerate(result):
 
             node = self.mesh.getNode(self.FSI[i])
             for j in range(self.dim): data[j] = node.getCoordinate(j)
 
-        return pt.from_numpy(result)
+        return result
 
     def get_velocity(self):
         '''
         Return the nodal velocity of the fluid interface
         '''
 
-        result = np.zeros((self.get_size(), self.dim))
+        result = pt.zeros((self.get_size(), self.dim))
 
         for i, data in enumerate(result):
 

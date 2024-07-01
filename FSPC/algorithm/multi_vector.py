@@ -1,7 +1,5 @@
 from ..general import toolbox as tb
 from .block_gauss import BGS
-import numpy as np
-
 import torch as pt
 
 pt.set_grad_enabled(False)
@@ -139,19 +137,19 @@ class MVJ(BGS):
 
             if not self.verified:
 
-                self.jac_therm.set_zero(tb.ResTher.residual.size)
+                self.jac_therm.set_zero(tb.ResTher.residual.numel())
                 delta = self.omega*tb.ResTher.residual
 
             else:
 
-                R = np.hstack(-tb.ResTher.residual)
-                delta = np.dot(self.jac_therm.prev_J, R)-R
-                delta = np.split(delta, tb.Solver.get_size())
+                R = pt.flatten(-tb.ResTher.residual)
+                delta = self.jac_therm.prev_J.matmul(R)-R
+                delta = delta.reshape(tb.Solver.get_size(), -1)
 
         else:
 
-            W = np.hstack(temp-self.prev_temp)
-            V = np.hstack(tb.ResTher.residual-tb.ResTher.prev_res)
+            W = pt.flatten(temp-self.prev_temp)
+            V = pt.flatten(tb.ResTher.residual-tb.ResTher.prev_res)
 
             self.jac_therm.W.append(W)
             self.jac_therm.V.append(V)
@@ -161,4 +159,4 @@ class MVJ(BGS):
         # Update the pedicted temperature
 
         tb.Interp.temp += delta
-        self.prev_temp = np.copy(temp)
+        self.prev_temp = temp.clone()

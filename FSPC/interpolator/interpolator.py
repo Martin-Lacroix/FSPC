@@ -1,7 +1,5 @@
 from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
-import numpy as np
-
 import torch as pt
 
 pt.set_grad_enabled(False)
@@ -114,13 +112,13 @@ class Interpolator(object):
 
         if not hasattr(self, 'prev_temp') or verified:
 
-            self.prev_temp = np.copy(self.temp)
+            self.prev_temp = self.temp.clone()
             self.velocity_temp = tb.Solver.get_tempgrad()
             self.temp += tb.Step.dt*self.velocity_temp
 
         else:
 
-            self.temp = np.copy(self.prev_temp)
+            self.temp = self.prev_temp.clone()
             self.temp += tb.Step.dt*self.velocity_temp
 
     def update_solver(self):

@@ -1,5 +1,3 @@
-import numpy as np
-
 import torch as pt
 
 pt.set_grad_enabled(False)
@@ -23,9 +21,9 @@ class Residual(object):
 
         self.prev_res = pt.zeros(0)
         self.residual = pt.zeros(0)
-        self.epsilon = np.inf
+        self.epsilon = float('inf')
 
-    def update_res(self, result: np.ndarray, prediction: np.ndarray):
+    def update_res(self, result: pt.Tensor, prediction: pt.Tensor):
         '''
         Compute the residual and update the convergence criterion
         '''
