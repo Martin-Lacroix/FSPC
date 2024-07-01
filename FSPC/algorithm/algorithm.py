@@ -1,6 +1,11 @@
 from ..general import toolbox as tb
 import numpy as np
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Base fluid-structure coupling algorithm class
 
 class Algorithm(object):

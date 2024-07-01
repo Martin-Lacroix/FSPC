@@ -2,6 +2,11 @@ from ..general import toolbox as tb
 from .block_gauss import BGS
 import numpy as np
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Inverse least squares approximate Jacobian class
 
 class InvJacobian(object):
@@ -13,43 +18,39 @@ class InvJacobian(object):
         self.V = list()
         self.W = list()
 
-        self.J = np.ndarray(0)
-        self.prev_J = np.ndarray(0)
+        self.J = pt.zeros(0)
+        self.prev_J = pt.zeros(0)
 
     def update(self):
         '''
         Copy the current Jacobian into the previous Jacobian
         '''
 
-        self.prev_J = np.copy(self.J)
+        self.prev_J = self.J.clone()
 
     def set_zero(self, size: int):
         '''
         Reset the class attributes to their default values
         '''
 
-        self.J = np.zeros((size, size))
-        self.prev_J = np.zeros((size, size))
+        self.J = pt.zeros((size, size))
+        self.prev_J = pt.zeros((size, size))
 
-    def delta(self, residual: np.ndarray):
+    def delta(self, residual: pt.Tensor):
         '''
         Compute the predictor increment using the previous Jacobian
         '''
 
-        V = np.flip(np.transpose(self.V), axis=1)
-        W = np.flip(np.transpose(self.W), axis=1)
-        R = np.hstack(-residual)
+        V = pt.stack(self.V).transpose(0, 1).flip([1])
+        W = pt.stack(self.W).transpose(0, 1).flip([1])
+        R = pt.flatten(-residual)
 
-        # Update the inverse Jacobian
-
-        X = np.transpose(W-np.dot(self.prev_J, V))
-        correction = np.transpose(np.linalg.lstsq(V.T, X, -1)[0])
+        X = pt.transpose(W-self.prev_J.matmul(V), 0, 1)
+        correction = pt.linalg.lstsq(V.transpose(0, 1), X, driver='gelsd').solution.transpose(0, 1)
         self.J = self.prev_J+correction
 
-        # Return the solution correction increment
-
-        delta = np.dot(self.J, R)-R
-        return np.split(delta, tb.Solver.get_size())
+        delta = self.J.matmul(R)-R
+        return delta.reshape(tb.Solver.get_size(), -1)
 
 # Interface quasi-Newton with multi-vector Jacobian class
 
@@ -97,19 +98,19 @@ class MVJ(BGS):
 
             if not self.verified:
 
-                self.jac_mecha.set_zero(tb.ResMech.residual.size)
+                self.jac_mecha.set_zero(tb.ResMech.residual.numel())
                 delta = self.omega*tb.ResMech.residual
 
             else:
 
-                R = np.hstack(-tb.ResMech.residual)
-                delta = np.dot(self.jac_mecha.prev_J, R)-R
-                delta = np.split(delta, tb.Solver.get_size())
+                R = pt.flatten(-tb.ResMech.residual)
+                delta = self.jac_mecha.prev_J.matmul(R)-R
+                delta = delta.reshape(tb.Solver.get_size(), -1)
 
         else:
 
-            W = np.hstack(disp-self.prev_disp)
-            V = np.hstack(tb.ResMech.residual-tb.ResMech.prev_res)
+            W = pt.flatten(disp-self.prev_disp)
+            V = pt.flatten(tb.ResMech.residual-tb.ResMech.prev_res)
 
             self.jac_mecha.W.append(W)
             self.jac_mecha.V.append(V)
@@ -119,7 +120,7 @@ class MVJ(BGS):
         # Update the pedicted displacement
 
         tb.Interp.disp += delta
-        self.prev_disp = np.copy(disp)
+        self.prev_disp = disp.clone()
 
     @tb.only_thermal
     def update_temperature(self):

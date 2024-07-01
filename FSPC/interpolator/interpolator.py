@@ -2,6 +2,11 @@ from mpi4py.MPI import COMM_WORLD as CW
 from ..general import toolbox as tb
 import numpy as np
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Base fluid-structure interpolation class
 
 class Interpolator(object):
@@ -22,7 +27,7 @@ class Interpolator(object):
 
         elif tb.is_solid():
 
-            self.disp = np.copy(position)
+            self.disp = position.clone()
             if tb.has_therm: self.temp = tb.Solver.get_temperature()
 
             CW.send(position, 0, tag=1)
@@ -92,13 +97,13 @@ class Interpolator(object):
 
         if not hasattr(self, 'prev_disp') or verified:
 
-            self.prev_disp = np.copy(self.disp)
+            self.prev_disp = self.disp.clone()
             self.velocity_disp = tb.Solver.get_velocity()
             self.disp += tb.Step.dt*self.velocity_disp
 
         else:
 
-            self.disp = np.copy(self.prev_disp)
+            self.disp = self.prev_disp.clone()
             self.disp += tb.Step.dt*self.velocity_disp
 
     @tb.only_thermal

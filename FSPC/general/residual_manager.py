@@ -1,5 +1,10 @@
 import numpy as np
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Coupling convergence and residual manager class
 
 class Residual(object):
@@ -16,8 +21,8 @@ class Residual(object):
         Reset the class attributes to their default values
         '''
 
-        self.prev_res = np.ndarray(0)
-        self.residual = np.ndarray(0)
+        self.prev_res = pt.zeros(0)
+        self.residual = pt.zeros(0)
         self.epsilon = np.inf
 
     def update_res(self, result: np.ndarray, prediction: np.ndarray):
@@ -25,14 +30,14 @@ class Residual(object):
         Compute the residual and update the convergence criterion
         '''
 
-        self.prev_res = np.copy(self.residual)
+        self.prev_res = self.residual.clone()
         self.residual = result-prediction
 
-        res = np.linalg.norm(self.residual, axis=0)
-        den = np.linalg.norm(result, axis=0)
+        res = pt.norm(self.residual, dim=0)
+        den = pt.norm(result, dim=0)
 
         res = res/(den+self.tol)
-        self.epsilon = np.linalg.norm(res)
+        self.epsilon = pt.norm(res)
 
     def check(self):
         '''

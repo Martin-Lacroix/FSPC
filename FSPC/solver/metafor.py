@@ -4,6 +4,11 @@ import numpy as np
 import wrap as w
 import sys
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Solid solver wrapper class for Metafor
 
 class Solver(object):
@@ -114,7 +119,7 @@ class Solver(object):
                 data[i] += node.getValue(w.Field1D(axe, w.AB))
                 data[i] += node.getValue(w.Field1D(axe, w.RE))
 
-        return result
+        return pt.from_numpy(result)
 
     def get_velocity(self):
         '''
@@ -129,7 +134,7 @@ class Solver(object):
                 node = self.FSI.getMeshPoint(j)
                 data[i] = node.getValue(w.Field1D(axe, w.GV))
 
-        return result
+        return pt.from_numpy(result)
 
     def get_temperature(self):
         '''

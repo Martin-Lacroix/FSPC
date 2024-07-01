@@ -2,6 +2,11 @@ from ..general import toolbox as tb
 import pfem3Dw as w
 import numpy as np
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Fluid solver wrapper class for PFEM3D
 
 class Solver(object):
@@ -63,7 +68,7 @@ class Solver(object):
         Apply the displacement from the solid to the fluid interface
         '''
 
-        BC = (disp-self.get_position())/tb.Step.dt
+        BC = (disp-self.get_position().numpy())/tb.Step.dt
         if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
 
         for i, vector in enumerate(self.BC):
@@ -84,7 +89,7 @@ class Solver(object):
 
         vector = w.VectorVectorDouble()
         self.solver.computeStress('FSInterface', self.FSI, vector)
-        return np.copy(vector)
+        return pt.tensor(vector)
 
     def get_heatflux(self):
         '''
@@ -93,7 +98,7 @@ class Solver(object):
 
         vector = w.VectorVectorDouble()
         self.solver.computeHeatFlux('FSInterface', self.FSI, vector)
-        return np.copy(vector)
+        return pt.tensor(vector)
 
     def get_position(self):
         '''
@@ -107,7 +112,7 @@ class Solver(object):
             node = self.mesh.getNode(self.FSI[i])
             for j in range(self.dim): data[j] = node.getCoordinate(j)
 
-        return result
+        return pt.from_numpy(result)
 
     def get_velocity(self):
         '''

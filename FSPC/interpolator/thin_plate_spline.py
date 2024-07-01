@@ -3,6 +3,11 @@ from ..general import toolbox as tb
 from functools import partial
 import numpy as np
 
+import torch as pt
+
+pt.set_grad_enabled(False)
+pt.set_default_dtype(pt.double)
+
 # Thin plate spline radial basis function interpolation class
 
 class TPS(Interpolator):
@@ -26,11 +31,11 @@ class TPS(Interpolator):
         Return the interpolation from the source to the target mesh
         '''
 
-        zeros = np.zeros((1+tb.Solver.dim, np.size(recv_data, 1)))
-        result = np.vstack((recv_data, zeros))
+        zeros = pt.zeros((1+tb.Solver.dim, recv_data.size(dim=1)))
+        result = pt.vstack((recv_data, zeros))
 
-        result = np.linalg.lstsq(self.A, result, rcond=None)[0]
-        return np.dot(self.B, result)
+        result = pt.linalg.lstsq(self.A, result).solution
+        return pt.matmul(self.B, result).numpy()
     
     @staticmethod
     def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
@@ -48,8 +53,8 @@ class TPS(Interpolator):
         '''
 
         size = 1+len(self.recv_pos)+tb.Solver.dim
-        self.B = np.zeros((len(position), size))
-        self.A = np.zeros((size, size))
+        self.B = pt.zeros((len(position), size))
+        self.A = pt.zeros((size, size))
 
         # Index ranges for an efficient vectorization
 
@@ -62,7 +67,7 @@ class TPS(Interpolator):
         self.A[len(self.recv_pos), N] = 1
         self.A[N, len(self.recv_pos)] = 1
         self.A[np.ix_(N, L)] = self.recv_pos
-        self.A[np.ix_(L, N)] = np.transpose(self.recv_pos)
+        self.A[np.ix_(L, N)] = self.recv_pos.transpose(0, 1)
 
         # Initialize B without the basis function
 
@@ -71,7 +76,13 @@ class TPS(Interpolator):
 
         # Evaluate the radial basis function in parallel
 
-        RBF = partial(self.basis_func, recv=self.recv_pos, R=self.radius)
+        RBF = partial(self.basis_func, recv=self.recv_pos.numpy(), R=self.radius)
 
-        self.B[np.ix_(K, N)] = self.pool.map(RBF, position)
-        self.A[np.ix_(N, N)] = self.pool.map(RBF, self.recv_pos)
+        # self.B[np.ix_(K, N)] = self.pool.map(RBF, position)
+        # self.A[np.ix_(N, N)] = self.pool.map(RBF, recv_pos)
+
+        for i, line in enumerate(self.pool.map(RBF, position.numpy())): # Bad
+            self.B[K[i], N] = pt.from_numpy(line)
+
+        for i, line in enumerate(self.pool.map(RBF, self.recv_pos.numpy())): # Bad
+            self.A[N[i], N] = pt.from_numpy(line)
