@@ -2,16 +2,9 @@ from .interpolator import Interpolator
 from ..general import toolbox as tb
 from functools import partial
 import numpy as np
+import cupy as cp
 
-# Check if Pytorch and CUDA are available
-
-try:
-
-    import torch as tr
-    if not tr.cuda.is_available(): raise Exception('CUDA not found')
-    tr.set_grad_enabled(False)
-
-except: raise Exception('Pytorch package not found')
+cp.cuda.device.get_cublas_handle()
 
 # Thin plate spline radial basis function interpolation class
 
@@ -36,16 +29,15 @@ class TPS(Interpolator):
         Return the interpolation from the source to the target mesh
         '''
 
-        size = 1+tb.Solver.dim, np.size(recv_data, 1)
-        zeros = tr.zeros((size), device='cuda')
+        zeros = np.zeros((1+tb.Solver.dim, np.size(recv_data, 1)))
+        X = np.vstack((recv_data, zeros))
 
-        result = tr.from_numpy(recv_data).to(device='cuda')
-        result = tr.vstack((result, zeros))
+        result = cp.asarray(X)
 
-        # Solve the linear system on GPU and send it to the CPU
+        result = cp.linalg.lstsq(self.A, result, rcond=None)[0]
+        result = cp.dot(self.B, result)
 
-        result = tr.linalg.lstsq(self.A, result).solution
-        return tr.matmul(self.B, result).cpu().numpy()
+        return cp.asnumpy(result)
     
     @staticmethod
     def basis_func(position: np.ndarray, recv: np.ndarray, R: float):
@@ -91,9 +83,5 @@ class TPS(Interpolator):
         B[np.ix_(K, N)] = self.pool.map(RBF, position)
         A[np.ix_(N, N)] = self.pool.map(RBF, self.recv_pos)
 
-        # Move the interpolation matrices to the GPU
-
-        tr.cuda.empty_cache()
-
-        self.A = tr.from_numpy(A).to(device='cuda')
-        self.B = tr.from_numpy(B).to(device='cuda')
+        self.A = cp.asarray(A)
+        self.B = cp.asarray(B)

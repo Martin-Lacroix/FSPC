@@ -1,6 +1,7 @@
 from .interpolator import Interpolator
 from ..general import toolbox as tb
 from functools import partial
+from scipy import linalg
 import numpy as np
 
 # Thin plate spline radial basis function interpolation class
@@ -29,7 +30,7 @@ class TPS(Interpolator):
         zeros = np.zeros((1+tb.Solver.dim, np.size(recv_data, 1)))
         result = np.vstack((recv_data, zeros))
 
-        result = np.linalg.lstsq(self.A, result, rcond=None)[0]
+        result = linalg.lapack.dgels(self.A, result)[1]
         return np.dot(self.B, result)
     
     @staticmethod

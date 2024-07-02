@@ -13,10 +13,8 @@ class LEP(Interpolator):
 
         Interpolator.__init__(self)
 
-        match elem_type:
-
-            case 2: self.element = Line()
-            case 3: self.element = Triangle()
+        if elem_type == 2: self.element = Line()
+        if elem_type == 3: self.element = Triangle()
 
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):
