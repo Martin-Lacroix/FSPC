@@ -44,7 +44,7 @@ class TPS(Interpolator):
 
         # Solve the linear system on GPU and send it to the CPU
 
-        result = tr.linalg.lstsq(self.A, result).solution
+        result = tr.linalg.lstsq(self.A, result, driver='gels').solution
         return tr.matmul(self.B, result).cpu().numpy()
     
     @staticmethod
