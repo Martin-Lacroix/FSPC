@@ -9,7 +9,9 @@ try:
 
     import torch as tr
     if not tr.cuda.is_available(): raise Exception('CUDA not found')
+
     tr.set_grad_enabled(False)
+    device = tr.device('cpu')
 
 except: raise Exception('Pytorch package not found')
 
@@ -37,9 +39,9 @@ class TPS(Interpolator):
         '''
 
         size = 1+tb.Solver.dim, np.size(recv_data, 1)
-        zeros = tr.zeros((size), device='cuda')
+        zeros = tr.zeros((size), device=device)
 
-        result = tr.from_numpy(recv_data).to(device='cuda')
+        result = tr.from_numpy(recv_data).to(device=device)
         result = tr.vstack((result, zeros))
 
         # Solve the linear system on GPU and send it to the CPU
@@ -95,5 +97,5 @@ class TPS(Interpolator):
 
         tr.cuda.empty_cache()
 
-        self.A = tr.from_numpy(A).to(device='cuda')
-        self.B = tr.from_numpy(B).to(device='cuda')
+        self.A = tr.from_numpy(A).to(device=device)
+        self.B = tr.from_numpy(B).to(device=device)
