@@ -13,10 +13,6 @@ def getMetafor(parm):
     if metafor: return metafor
     metafor = w.Metafor()
 
-    w.StrVectorBase.useTBB()
-    w.StrMatrixBase.useTBB()
-    w.ContactInteraction.useTBB()
-
     # Dimension and DSS solver
 
     domain = metafor.getDomain()
@@ -47,22 +43,25 @@ def getMetafor(parm):
 
     # Material parameters
 
+    v = 0.4
+    E = 6.14e6
+    K = E/(3*(1-2*v))
+    G = E/(2*(1+v))
+
     materset = domain.getMaterialSet()
-    materset.define(1, w.ElastHypoMaterial)
-    materset(1).put(w.ELASTIC_MODULUS, 6e6)
-    materset(1).put(w.POISSON_RATIO, 0.45)
+    materset.define(1, w.NeoHookeanHyperPk2Material)
     materset(1).put(w.MASS_DENSITY, 1100)
+    materset(1).put(w.HYPER_K0, K)
+    materset(1).put(w.HYPER_G0, G)
     
     # Finite element properties
 
-    prp = w.ElementProperties(w.Volume3DElement)
-    prp.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_EAS)
-    prp.put(w.STIFFMETHOD, w.STIFF_ANALYTIC)
-    prp.put(w.TOTAL_LAGRANGIAN, True)
-    prp.put(w.GRAVITY_Z, -9.81)
-    prp.put(w.MATERIAL, 1)
-    prp.put(w.PEAS, 1e-9)
-    app.addProperty(prp)
+    prp1 = w.ElementProperties(w.Volume3DElement)
+    prp1.put(w.CAUCHYMECHVOLINTMETH, w.VES_CMVIM_STD)
+    prp1.put(w.STIFFMETHOD, w.STIFF_ANALYTIC)
+    prp1.put(w.GRAVITY_Z, -9.81)
+    prp1.put(w.MATERIAL, 1)
+    app.addProperty(prp1)
 
     # Elements for surface traction
 
@@ -78,10 +77,19 @@ def getMetafor(parm):
     
     # Boundary conditions
 
-    A = 4
-    W = 2*np.pi/1.6507
+    def theta(t):
 
-    theta = lambda t: A*np.sin(W*t)
+        K = 4.9
+        S = 2.144
+        R = 2.278
+        Q = 1.278
+
+        den = Q*(1+np.exp(S-K*t))
+        den += (R-Q)/(1+np.exp(t))
+        den += (R-Q)*np.exp(S-K*t)/(1+np.exp(t))
+
+        return 4*np.sin(2*np.pi*t/den)
+
     fct = w.PythonOneParameterFunction(theta)
 
     loadset = domain.getLoadingSet()

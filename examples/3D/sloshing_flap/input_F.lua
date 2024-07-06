@@ -88,11 +88,34 @@ end
 
 function Problem.Solver.MomContEq.BC.ContainerV(x, y, z, t)
 
-    local r = math.sqrt(x^2+z^2)
-    local W = 2*math.pi/1.6507
-    local A = 4*math.pi/180
+    local S = 2.144
+    local K = 4.9
+    local R = 2.278
+    local Q = 1.278
 
-    local theta_dt = (A*W)*math.cos(W*t)
+    -- Denominator inside the sine for theta
+
+    local den = Q*(1+math.exp(S-K*t))
+        + (R-Q)*math.exp(S-K*t)/(1+math.exp(t))
+        + (R-Q)/(1+math.exp(t))
+
+    local den_dt = -K*Q*math.exp(S-K*t)
+        - (R-Q)*math.exp(t)/(math.exp(t)+1)^2
+        + (Q-R)*(K*math.exp(-t)+1+K)*math.exp(-t-K*t+S)/(math.exp(-t)+1)^2
+
+    -- Numerator insine the sine for theta
+
+    local num = 2*math.pi*t
+    local num_dt = 2*math.pi
+
+    -- Compute the angular velocity in radian
+
+    local fun_dt = (num_dt*den-num*den_dt)/den^2
+    local theta_dt = 4*math.cos(num/den)*fun_dt*(math.pi/180)
+
+    -- Convert polar to cartesian velocity
+
+    local r = math.sqrt(x^2+z^2)
     local theta = math.atan(z, x)
 
     local x_dt = -r*math.sin(theta)*theta_dt

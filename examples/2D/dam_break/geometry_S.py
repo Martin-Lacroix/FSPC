@@ -5,8 +5,8 @@ gmsh.initialize()
 # Mesh Parameters
 
 L = 0.146
-w = 0.012
-h = 0.08
+W = 0.012
+H = 0.08
 
 d = 0.002
 N = 41
@@ -17,9 +17,9 @@ M = 7
 p = list()
 
 p.append(sh.occ.addPoint(2*L, 0, 0))
-p.append(sh.occ.addPoint(2*L+w, 0, 0))
-p.append(sh.occ.addPoint(2*L+w, h, 0))
-p.append(sh.occ.addPoint(2*L, h, 0))
+p.append(sh.occ.addPoint(2*L+W, 0, 0))
+p.append(sh.occ.addPoint(2*L+W, H, 0))
+p.append(sh.occ.addPoint(2*L, H, 0))
 
 # Lines list
 
@@ -32,7 +32,7 @@ l.append(sh.occ.addLine(p[3], p[0]))
 
 # Physical surface
 
-k = sh.occ.addCurveLoop([l[0], l[1], l[2], l[3]])
+k = sh.occ.addCurveLoop(l)
 s = sh.occ.addPlaneSurface([k])
 sh.occ.synchronize()
 
