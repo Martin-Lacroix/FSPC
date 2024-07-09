@@ -4,7 +4,7 @@ import numpy as np
 
 # List of test-cases to run in the battery
 
-case_name = ['vertical_container', 'dam_break', 'mooney_hyper', 'thermo_square']
+case_name = ['vertical_container', 'dam_break', 'rubber_gate', 'thermo_square']
 base = os.getcwd()
 
 # Set the environment variables (must be removed)
