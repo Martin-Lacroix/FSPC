@@ -34,7 +34,6 @@ class Solver(object):
 
         # Initialize the communication objects
 
-        self.poly = list()
         self.FSI = w.VectorInt()
         self.reset_interface_BC()
 
@@ -137,24 +136,12 @@ class Solver(object):
             self.mesh.getNode(i).setExtState(vector)
             self.BC.append(vector)
 
-    def update_polytope(self, polytope: list):
-        '''
-        Update the polytope list using the solid boundary
-        '''
-
-        for i, face_list in enumerate(polytope):
-
-            vec = w.VectorVectorDouble(face_list)
-            try: self.mesh.updatePoly(self.poly[i], vec)
-            except: self.poly.append(self.mesh.addPolytope(vec))
-
     @tb.compute_time
-    def update(self, surface_mesh: list):
+    def update(self):
         '''
         Remesh and store the current state of the solver
         '''
 
-        self.update_polytope(surface_mesh)
         self.mesh.remesh(verboseOutput = False)
         self.reset_interface_BC()
 

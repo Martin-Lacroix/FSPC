@@ -11,6 +11,7 @@ Problem.id = 'Boussinesq'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'CGAL_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
+Problem.Mesh.deleteBoundElements = {'FSInterface'}
 Problem.Mesh.localHcharGroups = {'FSInterface'}
 Problem.Mesh.boundingBox = {-5, -5, 5, 5}
 Problem.Mesh.exclusionZones = {}
@@ -25,7 +26,6 @@ Problem.Mesh.minHeightFactor = 1e-3
 Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = false
 
 -- Extractor Parameters
 

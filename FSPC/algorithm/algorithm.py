@@ -33,7 +33,7 @@ class Algorithm(object):
 
             if self.verified:
 
-                tb.Interp.update_solver()
+                tb.Solver.update()
                 tb.Step.update_exporter()
 
     @tb.only_solid

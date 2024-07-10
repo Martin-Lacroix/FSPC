@@ -110,7 +110,6 @@ def getMetafor(parm):
     iset.add(nod2)
 
     parm['interaction_M'] = [nod1, nod2]
-    parm['polytope'] = [nod1.getElementSet(), nod2.getElementSet()]
 
     # Contact properties
 

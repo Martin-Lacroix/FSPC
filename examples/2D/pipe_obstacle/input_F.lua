@@ -11,8 +11,9 @@ Problem.id = 'IncompNewtonNoT'
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'CGAL_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.boundingBox = {0, -0.26, 1.64, 0.26}
+Problem.Mesh.deleteBoundElements = {'FSInterface'}
 Problem.Mesh.exclusionZones = {{0.8, -0.26, 0.84, -0.15},{0.8, 0.15, 0.84, 0.26}}
+Problem.Mesh.boundingBox = {0, -0.26, 1.64, 0.26}
 
 Problem.Mesh.alpha = 1.2
 Problem.Mesh.omega = 0.7
@@ -24,7 +25,6 @@ Problem.Mesh.minHeightFactor = 1e-2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
-Problem.Mesh.deleteBoundElements = true
 
 -- Extractor Parameters
 

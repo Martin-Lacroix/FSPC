@@ -68,7 +68,6 @@ def getMetafor(parm):
     iset.add(heat)
 
     parm['interaction_T'] = heat
-    parm['polytope'] = heat.getElementSet()
 
     # Boundary conditions
 

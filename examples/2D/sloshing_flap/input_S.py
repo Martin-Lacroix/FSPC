@@ -81,7 +81,6 @@ def getMetafor(parm):
     iset.add(load)
 
     parm['interaction_M'] = load
-    parm['polytope'] = load.getElementSet()
     
     # Boundary conditions in degrees
 

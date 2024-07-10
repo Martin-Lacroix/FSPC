@@ -68,6 +68,8 @@ def getMetafor(parm):
     heat.addProperty(prp2)
     iset.add(heat)
 
+    parm['interaction_T'] = heat
+
     # Elements for surface traction
 
     prp3 = w.ElementProperties(w.NodTriangleStress3DElement)
@@ -76,9 +78,7 @@ def getMetafor(parm):
     load.addProperty(prp3)
     iset.add(load)
 
-    parm['interaction_T'] = heat
     parm['interaction_M'] = load
-    parm['polytope'] = load.getElementSet()
 
     # Initial and boundary conditions
 

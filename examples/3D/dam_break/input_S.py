@@ -64,7 +64,6 @@ def getMetafor(parm):
     iset.add(load)
 
     parm['interaction_M'] = load
-    parm['polytope'] = load.getElementSet()
     
     # Boundary conditions
     
@@ -102,6 +101,5 @@ def getMetafor(parm):
     # Build domain and folder
 
     domain.build()
-    parm['polytope'].activateBoundaryElements()
     os.makedirs('metafor')
     return metafor

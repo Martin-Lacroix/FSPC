@@ -12,6 +12,7 @@ Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'CGAL_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface', 'Reservoir', 'FreeSurface'}
+Problem.Mesh.deleteBoundElements = {'FSInterface'}
 Problem.Mesh.boundingBox = {0, 0, 0.584, 0.584}
 Problem.Mesh.exclusionZones = {}
 
@@ -25,7 +26,6 @@ Problem.Mesh.minHeightFactor = 1e-3
 Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = false
-Problem.Mesh.deleteBoundElements = false
 
 -- Extractor Parameters
 

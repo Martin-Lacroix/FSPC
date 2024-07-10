@@ -160,66 +160,6 @@ class Solver(object):
 
         return result
 
-    def get_surface_mesh(self):
-        '''
-        Return the list of elements forming the polytope
-        '''
-
-        face_list = list()
-        if not hasattr(self, 'polytope'): return face_list
-
-        for elementset in self.polytope:
-            face_list.append(self.get_facelist(elementset))
-
-        return face_list
-
-    def e_index(self, element: object):
-        '''
-        Split the quadangle elements into triangle elements
-        '''
-
-        size = element.getNumberOfNodes()
-
-        if size == 2: return np.array([[1, 0]])
-        if size == 3: return np.array([[2, 1, 0]])
-        if size == 4: return np.array([[0, 3, 2], [2, 1, 0]])
-
-    def get_facelist(self, elementset: object):
-        '''
-        Return the list of elements forming the elementset
-        '''
-
-        face_list = list()
-        for i in range(elementset.size()):
-
-            element = elementset.getElement(i)
-            if not element.getEnabled(): continue
-
-            # Split the square elements in two triangles
-
-            position = self.e_pos(element)[self.e_index(element)]
-            for pos in position: face_list.append(pos.ravel())
-
-        return face_list
-
-    def e_pos(self, element: object):
-        '''
-        Return the positions on the nodes forming the element
-        '''
-
-        size = element.getNumberOfNodes()
-        position = np.zeros((size, self.dim))
-
-        for i in range(size):
-
-            node = element.getNodeI(i)
-            for j, axe in enumerate(self.axis):
-
-                position[i, j] += node.getValue(w.Field1D(axe, w.AB))
-                position[i, j] += node.getValue(w.Field1D(axe, w.RE))
-
-        return position
-
     @tb.compute_time
     def update(self):
         '''

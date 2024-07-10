@@ -12,6 +12,7 @@ Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'Tetgen_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
 Problem.Mesh.localHcharGroups = {'FSInterface'}
+Problem.Mesh.deleteBoundElements = {'FSInterface'}
 Problem.Mesh.boundingBox = {-0.1, -0.1, 0, 0.1, 0.1, 1}
 Problem.Mesh.exclusionZones = {}
 
@@ -25,7 +26,6 @@ Problem.Mesh.minHeightFactor = 1e-2
 Problem.Mesh.addOnFS = false
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
-Problem.Mesh.deleteBoundElements = false
 
 -- Extractor Parameters
 

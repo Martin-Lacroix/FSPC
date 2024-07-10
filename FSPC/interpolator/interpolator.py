@@ -117,18 +117,3 @@ class Interpolator(object):
 
             self.temp = np.copy(self.prev_temp)
             self.temp += tb.Step.dt*self.velocity_temp
-
-    def update_solver(self):
-        '''
-        Update the solver after convergence of the coupling
-        '''
-
-        if tb.is_fluid():
-
-            surface_mesh = CW.recv(source=1, tag=7)
-            tb.Solver.update(surface_mesh)
-
-        elif tb.is_solid():
-
-            CW.send(tb.Solver.get_surface_mesh(), 0, tag=7)
-            tb.Solver.update()
