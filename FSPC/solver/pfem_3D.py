@@ -77,11 +77,18 @@ class Solver(tb.Static):
         Apply the displacement from the solid to the fluid interface
         '''
 
-        BC = (disp-self.get_position())/tb.Step.dt
-        if self.WC: BC = (BC-self.get_velocity())/(tb.Step.dt/2)
+        # Compute the velocity based on the positions
+
+        result = (disp-self.get_position())/tb.Step.dt
+
+        # Compute the acceleration if PFEM3D uses an explicit solver
+
+        if self.WC: result = (result-self.get_velocity())/(tb.Step.dt/2)
+
+        # Loop on the results and store them in the BC vectors
 
         for i, vector in enumerate(self.BC):
-            for j, value in enumerate(BC[i]): vector[j] = value
+            for j, value in enumerate(result[i]): vector[j] = value
 
     def apply_temperature(self, temp: np.ndarray):
         '''
