@@ -13,13 +13,16 @@ class TPS(Interpolator):
         '''
 
         Interpolator.__init__(self)
-        self.radius = radius
+        object.__setattr__(self, 'radius', radius)
 
         import multiprocessing as mp
-        self.pool = mp.Pool(mp.cpu_count())
+        object.__setattr__(self, 'pool', mp.Pool(mp.cpu_count()))
 
         import atexit
         atexit.register(self.pool.close)
+
+        object.__setattr__(self, 'A', np.ndarray(0))
+        object.__setattr__(self, 'B', np.ndarray(0))
 
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):

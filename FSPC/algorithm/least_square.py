@@ -10,8 +10,8 @@ class InvJacobian(object):
         Initialize the approximate inverse Jacobian class
         '''
 
-        self.V = list()
-        self.W = list()
+        object.__setattr__(self, 'V', list())
+        object.__setattr__(self, 'W', list())
 
     def delta(self, residual: np.ndarray):
         '''
@@ -37,14 +37,11 @@ class ILS(BGS):
 
         BGS.__init__(self, max_iter)
 
-    @tb.only_solid
-    def initialize(self):
-        '''
-        Reset the class attributes to their default values
-        '''
+        object.__setattr__(self, 'jac_mecha', InvJacobian())
+        object.__setattr__(self, 'jac_therm', InvJacobian())
 
-        if tb.has_mecha: self.jac_mecha = InvJacobian()
-        if tb.has_therm: self.jac_therm = InvJacobian()
+        object.__setattr__(self, 'prev_disp', np.ndarray(0))
+        object.__setattr__(self, 'prev_temp', np.ndarray(0))
 
     @tb.only_mechanical
     def update_displacement(self):
@@ -58,8 +55,8 @@ class ILS(BGS):
 
         if self.iteration == 0:
 
-            self.jac_mecha.V = list()
-            self.jac_mecha.W = list()
+            self.jac_mecha.V.clear()
+            self.jac_mecha.W.clear()
             delta = self.omega*tb.ResMech.residual
 
         else:
@@ -89,8 +86,8 @@ class ILS(BGS):
 
         if self.iteration == 0:
 
-            self.jac_mecha.V = list()
-            self.jac_mecha.W = list()
+            self.jac_mecha.V.clear()
+            self.jac_mecha.W.clear()
             delta = self.omega*tb.ResTher.residual
 
         else:

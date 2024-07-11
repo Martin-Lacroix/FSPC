@@ -3,17 +3,24 @@ import math, sys
 
 # Disk exporter and time step manager class
 
-class TimeStep(object):
+class TimeStep(tb.Static):
     def __init__(self, dt: float, dt_save: float):
         '''
         Initialize the disk exporter and time step manager class
         '''
 
-        self.time = 0
-        self.min_dt = 1e-9
+        object.__setattr__(self, 'time', 0)
+        object.__setattr__(self, 'min_dt', 1e-9)
 
-        self.max_dt = self.dt = dt
-        self.next = self.dt_save = dt_save
+        # Timee step for the fluid-structure simulation
+
+        object.__setattr__(self, 'dt', dt)
+        object.__setattr__(self, 'max_dt', dt)
+
+        # Time step for exporting the results on the disk
+
+        object.__setattr__(self, 'next', dt_save)
+        object.__setattr__(self, 'dt_save', dt_save)
 
     def next_time(self):
         '''

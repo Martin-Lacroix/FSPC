@@ -3,16 +3,15 @@ import numpy as np
 
 # Base fluid-structure coupling algorithm class
 
-class Algorithm(object):
+class Algorithm(tb.Static):
 
     @tb.compute_time
     def simulate(self, end_time: float):
         '''
         Run the fluid-structure simulation algorithm
         '''
-
-        self.verified = False
-        if hasattr(self, 'initialize'): self.initialize()
+        
+        object.__setattr__(self, 'verified', False)
         tb.Solver.save()
 
         # Main loop on the FSI coupling time steps

@@ -4,7 +4,7 @@ import numpy as np
 
 # Base fluid-structure interpolation class
 
-class Interpolator(object):
+class Interpolator(tb.Static):
 
     def initialize(self):
         '''
@@ -13,20 +13,27 @@ class Interpolator(object):
 
         position = tb.Solver.get_position()
 
+        object.__setattr__(self, 'prev_disp', np.ndarray(0))
+        object.__setattr__(self, 'prev_temp', np.ndarray(0))
+
+        object.__setattr__(self, 'velocity_disp', np.ndarray(0))
+        object.__setattr__(self, 'velocity_temp', np.ndarray(0))
+
         # Share the position vector between solvers
 
         if tb.is_fluid():
 
-            self.recv_pos = CW.recv(source=1, tag=1)
+            object.__setattr__(self, 'recv_pos', CW.recv(source=1, tag=1))
             CW.send(position, 1, tag=2)
 
         elif tb.is_solid():
 
-            self.disp = np.copy(position)
-            if tb.has_therm: self.temp = tb.Solver.get_temperature()
-
+            object.__setattr__(self, 'disp', position)
             CW.send(position, 0, tag=1)
-            self.recv_pos = CW.recv(source=0, tag=2)
+
+            if tb.has_therm:
+                object.__setattr__(self, 'temp', tb.Solver.get_temperature())
+            object.__setattr__(self, 'recv_pos', CW.recv(source=0, tag=2))
 
         # Compute the fluid-structure mesh interpolation matrix
 
@@ -90,7 +97,7 @@ class Interpolator(object):
         Predict the future displacement of the solid interface
         '''
 
-        if not hasattr(self, 'prev_disp') or verified:
+        if not self.prev_disp.size or verified:
 
             self.prev_disp = np.copy(self.disp)
             self.velocity_disp = tb.Solver.get_velocity()
@@ -107,10 +114,10 @@ class Interpolator(object):
         Predict the future temperature of the solid interface
         '''
 
-        if not hasattr(self, 'prev_temp') or verified:
+        if not self.prev_temp.size or verified:
 
             self.prev_temp = np.copy(self.temp)
-            self.velocity_temp = tb.Solver.get_tempgrad()
+            self.velocity_temp = tb.Solver.get_temperature_rate()
             self.temp += tb.Step.dt*self.velocity_temp
 
         else:

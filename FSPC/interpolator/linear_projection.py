@@ -12,9 +12,10 @@ class LEP(Interpolator):
         '''
 
         Interpolator.__init__(self)
+        object.__setattr__(self, 'H', np.ndarray(0))
 
-        if elem_type == 2: self.element = Line()
-        if elem_type == 3: self.element = Triangle()
+        if elem_type == 2: object.__setattr__(self, 'element', Line())
+        if elem_type == 3: object.__setattr__(self, 'element', Triangle())
 
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):

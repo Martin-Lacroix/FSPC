@@ -10,11 +10,11 @@ class InvJacobian(object):
         Initialize the approximate inverse Jacobian class
         '''
 
-        self.V = list()
-        self.W = list()
+        object.__setattr__(self, 'V', list())
+        object.__setattr__(self, 'W', list())
 
-        self.J = np.ndarray(0)
-        self.prev_J = np.ndarray(0)
+        object.__setattr__(self, 'J', np.ndarray(0))
+        object.__setattr__(self, 'prev_J', np.ndarray(0))
 
     def update(self):
         '''
@@ -61,14 +61,11 @@ class MVJ(BGS):
 
         BGS.__init__(self, max_iter)
 
-    @tb.only_solid
-    def initialize(self):
-        '''
-        Reset the class attributes to their default values
-        '''
+        object.__setattr__(self, 'jac_mecha', InvJacobian())
+        object.__setattr__(self, 'jac_therm', InvJacobian())
 
-        if tb.has_mecha: self.jac_mecha = InvJacobian()
-        if tb.has_therm: self.jac_therm = InvJacobian()
+        object.__setattr__(self, 'prev_disp', np.ndarray(0))
+        object.__setattr__(self, 'prev_temp', np.ndarray(0))
     
     @tb.only_solid
     def update(self, verified: bool):
@@ -92,8 +89,8 @@ class MVJ(BGS):
 
         if self.iteration == 0:
 
-            self.jac_mecha.V = list()
-            self.jac_mecha.W = list()
+            self.jac_mecha.V.clear()
+            self.jac_mecha.W.clear()
 
             if not self.verified:
 
@@ -133,8 +130,8 @@ class MVJ(BGS):
 
         if self.iteration == 0:
 
-            self.jac_therm.V = list()
-            self.jac_therm.W = list()
+            self.jac_therm.V.clear()
+            self.jac_therm.W.clear()
 
             if not self.verified:
 

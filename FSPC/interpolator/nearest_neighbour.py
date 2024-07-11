@@ -12,6 +12,7 @@ class NNI(Interpolator):
         '''
 
         Interpolator.__init__(self)
+        object.__setattr__(self, 'H', np.ndarray(0))
 
     @tb.compute_time
     def interpolate(self, recv_data: np.ndarray):

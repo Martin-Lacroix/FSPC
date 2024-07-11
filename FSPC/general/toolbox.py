@@ -15,6 +15,12 @@ def is_solid(): return CW.rank == 1
 import collections
 clock = collections.defaultdict(float)
 
+class Static(object):
+
+    def __setattr__(self, key: str, value):
+        if not hasattr(self, key): raise Exception('Unknown attribute '+key)
+        else: object.__setattr__(self, key, value)
+
 # Definition of the global function decorators
 
 def write_logs(function: Callable):

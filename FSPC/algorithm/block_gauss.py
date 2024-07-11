@@ -11,17 +11,13 @@ class BGS(Algorithm):
         '''
 
         Algorithm.__init__(self)
-        self.max_iter = max_iter
-        self.omega = 0.5
 
-    @tb.only_solid
-    def initialize(self):
-        '''
-        Reset the Aitken relaxation parameter to its default value
-        '''
+        object.__setattr__(self, 'omega', 0.5)
+        object.__setattr__(self, 'iteration', 0)
+        object.__setattr__(self, 'max_iter', max_iter)
 
-        if tb.has_mecha: self.aitk_mecha = self.omega
-        if tb.has_therm: self.aitk_therm = self.omega
+        object.__setattr__(self, 'aitk_mecha', self.omega)
+        object.__setattr__(self, 'aitk_mecha', self.omega)
 
     def coupling_algorithm(self):
         '''

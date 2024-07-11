@@ -1,15 +1,18 @@
+from . import toolbox as tb
 import numpy as np
 
 # Coupling convergence and residual manager class
 
-class Residual(object):
+class Residual(tb.Static):
     def __init__(self, tol: float):
         '''
         Initialize the coupling convergence and residual manager class
         '''
 
-        self.tol = tol
-        self.reset()
+        object.__setattr__(self, 'tol', tol)
+        object.__setattr__(self, 'prev_res', np.ndarray(0))
+        object.__setattr__(self, 'residual', np.ndarray(0))
+        object.__setattr__(self, 'epsilon', np.inf)
 
     def reset(self):
         '''
