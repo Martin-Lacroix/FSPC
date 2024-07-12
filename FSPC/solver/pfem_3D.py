@@ -20,14 +20,14 @@ class Solver(tb.Static):
 
         if 'WC' in self.problem.getID():
 
-            object.__setattr__(self, 'WC', True)
+            object.__setattr__(self, 'weakly_compressible', True)
             object.__setattr__(self, 'max_division', 1000)
 
         # Parameters for the implicit incompressible solver
 
         else:
 
-            object.__setattr__(self, 'WC', False)
+            object.__setattr__(self, 'weakly_compressible', False)
             object.__setattr__(self, 'max_division', 1)
 
         # Store the dimension and the interface nodes list
@@ -58,15 +58,15 @@ class Solver(tb.Static):
         min_dt = tb.Step.dt/self.max_division
         self.problem.setMinTimeStep(min_dt)
 
-        # Set the final time for the current FSI time step
+        # Set the final time and compute the next time step
         
-        end = tb.Step.time+tb.Step.dt
-        self.problem.setMaxSimTime(end)
+        self.problem.setMaxSimTime(tb.Step.time+tb.Step.dt)
+        self.problem.getSolver().computeNextDT()
 
-        # Compute the time step in explicit or impose it in implicit
+        # Impose the initial time step in implicit
 
-        if self.WC: self.problem.getSolver().computeNextDT()
-        else: self.problem.getSolver().setTimeStep(tb.Step.dt)
+        if not self.weakly_compressible:
+            self.problem.getSolver().setTimeStep(tb.Step.dt)
 
         # Return true if PFEM3D solved the time step successfully
 
@@ -83,7 +83,8 @@ class Solver(tb.Static):
 
         # Compute the acceleration if PFEM3D uses an explicit solver
 
-        if self.WC: result = (result-self.get_velocity())/(tb.Step.dt/2)
+        if self.weakly_compressible:
+            result = 2*(result-self.get_velocity())/tb.Step.dt
 
         # Loop on the results and store them in the BC vectors
 
@@ -194,7 +195,8 @@ class Solver(tb.Static):
 
         # Update the global matrix pattern if implicit solver
 
-        if not self.WC: self.problem.getSolver().precomputeMatrix()
+        if not self.weakly_compressible:
+            self.problem.getSolver().precomputeMatrix()
 
         # Save the current solution into a structure
 

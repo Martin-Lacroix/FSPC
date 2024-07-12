@@ -12,29 +12,27 @@ class TimeStep(tb.Static):
         object.__setattr__(self, 'time', 0)
         object.__setattr__(self, 'min_dt', 1e-9)
 
-        # Timee step for the fluid-structure simulation
+        # Time step and maximum for the fluid-structure simulation
 
         object.__setattr__(self, 'dt', dt)
         object.__setattr__(self, 'max_dt', dt)
 
-        # Time step for exporting the results on the disk
+        # Time step and first checkpoint for exporting on the disk
 
         object.__setattr__(self, 'next', dt_save)
         object.__setattr__(self, 'dt_save', dt_save)
-
-    def next_time(self):
-        '''
-        Return the physical time at the end of the current step
-        '''
-
-        return self.time+self.dt
 
     def update_exporter(self):
         '''
         Update the time step for the disk exporter
         '''
 
+        # Export the solution if the checkpoint has been reached
+
         if self.time >= self.next: tb.Solver.save()
+
+        # Update the next solution export checkpoint with dt_save
+
         next = math.floor(self.time/self.dt_save)
         self.next = (next+1)*self.dt_save
 
@@ -43,18 +41,29 @@ class TimeStep(tb.Static):
         Update the time step for the coupling algorithm
         '''
 
+        # The coupling did not converge the minimal time step is reached
+
         if not verified and (self.dt < self.min_dt):
+
+            # Wait for all processes and terminate the simulation
 
             tb.CW.Barrier()
             if tb.is_solid(): print('Reached minimal time step')
             sys.exit()
 
+        # Reduce the time step if the coupling did not converge 
+
         elif not verified: self.dt /= 2
+
+        # Increase the time step if the coupling has converged
 
         else:
 
             self.time += self.dt
             self.dt = math.pow(2, 1/7)*self.dt
+
+            # Prevent the time step to increase above the maximum
+
             self.dt = min(self.dt, self.max_dt)
 
     @tb.only_solid
@@ -62,6 +71,8 @@ class TimeStep(tb.Static):
         '''
         Print the current time step and physical time
         '''
+
+        # Use a scientific notation with a fixed number of digits
 
         current = 'Time : {:.3e}'.format(self.time).ljust(20)
         print('\n------------------------------------------')

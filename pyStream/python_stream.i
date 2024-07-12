@@ -1,8 +1,11 @@
 %include std_streambuf.i
 
-// Add necessary symbols to generated header
+// Add the necessary symbols to the generated header
 
 %module python_stream %{
     #include "python_stream.h"
 %}
+
+// We also need to include the python_stream header here
+
 %include "python_stream.h"

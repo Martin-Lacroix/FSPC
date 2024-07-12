@@ -116,7 +116,6 @@ class Solver(tb.Static):
                 node = self.FSInterface.getMeshPoint(i)
                 interaction.setNodVector(node, *data)
 
-    @tb.compute_time
     def get_position(self):
         '''
         Return the nodal positions of the solid interface
