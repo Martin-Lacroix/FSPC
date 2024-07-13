@@ -23,19 +23,19 @@ class InvJacobian(object):
         Compute the predictor increment using the current Jacobian
         '''
 
-        # Transform V and W into appropriate numpy matrices
+        # Transform V and W into numpy matrices
 
-        V = np.flip(np.transpose(self.V), axis=1)
-        W = np.flip(np.transpose(self.W), axis=1)
+        V = np.transpose(self.V)
+        W = np.transpose(self.W)
 
-        # Flatten the residual dimensions and take the opposite
+        # Compute the increment for the interface predictor
 
         R = np.hstack(-residual)
-
-        # Return the increment for the interface predictor
-
         delta = np.dot(W, np.linalg.lstsq(V, R, -1)[0])-R
-        return np.split(delta, tb.Solver.get_size())
+
+        # Reshape such that each dimension is along a column
+
+        return delta.reshape(residual.shape)
 
 # Interface quasi-Newton with inverse least squares class
 
@@ -82,15 +82,15 @@ class ILS(BGS):
 
         else:
 
-            # Flatten the position and residual differences
+            # Flatten the displacement and residual differences
 
             W = np.hstack(disp-self.prev_disp)
             V = np.hstack(tb.Res.residual_disp-tb.Res.prev_res_disp)
 
             # Add the new deltas at the end of the history list
 
-            self.jac_mecha.W.append(W)
-            self.jac_mecha.V.append(V)
+            self.jac_mecha.W.insert(0, W)
+            self.jac_mecha.V.insert(0, V)
 
             # Compute the interface displacement predictor increment
 
@@ -115,8 +115,8 @@ class ILS(BGS):
 
             # Remove the deltas stored at the previous time step
 
-            self.jac_mecha.V.clear()
-            self.jac_mecha.W.clear()
+            self.jac_therm.V.clear()
+            self.jac_therm.W.clear()
 
             # Use the default omega since we cannot use Aitken
 
@@ -133,8 +133,8 @@ class ILS(BGS):
 
             # Add the new deltas at the end of the history list
 
-            self.jac_therm.W.append(W)
-            self.jac_therm.V.append(V)
+            self.jac_therm.W.insert(0, W)
+            self.jac_therm.V.insert(0, V)
 
             # Compute the interface temperature predictor increment
 

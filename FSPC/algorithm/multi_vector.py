@@ -47,28 +47,24 @@ class InvJacobian(object):
         Compute the predictor increment using the previous Jacobian
         '''
 
-        # Transform V and W into appropriate numpy matrices
+        # Transform V and W into numpy matrices
 
-        V = np.flip(np.transpose(self.V), axis=1)
-        W = np.flip(np.transpose(self.W), axis=1)
+        V = np.array(self.V)
+        W = np.array(self.W)
 
-        # Flatten the residual dimensions and take the opposite
+        # Compute the current Jacobian using the previous one
+
+        X = W-np.dot(V, self.prev_J.T)
+        self.J = self.prev_J+np.linalg.lstsq(V, X, -1)[0].T
+
+        # Compute the increment for the interface predictor
 
         R = np.hstack(-residual)
-
-        # Compute the inverse Jacobian increment
-
-        X = np.transpose(W-np.dot(self.prev_J, V))
-        correction = np.transpose(np.linalg.lstsq(V.T, X, -1)[0])
-
-        # Compute the current inverse Jacobian from the previous one
-
-        self.J = self.prev_J+correction
-
-        # Return the increment for the interface predictor
-
         delta = np.dot(self.J, R)-R
-        return np.split(delta, tb.Solver.get_size())
+
+        # Reshape such that each dimension is along a column
+
+        return delta.reshape(residual.shape)
 
 # Interface quasi-Newton with multi-vector Jacobian class
 
@@ -91,12 +87,11 @@ class MVJ(BGS):
         object.__setattr__(self, 'prev_temp', np.ndarray(0))
     
     @tb.only_solid
-    def update(self, verified: bool):
+    def update(self):
         '''
         Copy the current Jacobian into the previous Jacobian
         '''
 
-        if not verified: return
         if tb.has_mecha: self.jac_mecha.update()
         if tb.has_therm: self.jac_therm.update()
 
@@ -139,15 +134,15 @@ class MVJ(BGS):
 
         else:
 
-            # Flatten the position and residual differences
+            # Flatten the displacement and residual differences
 
             W = np.hstack(disp-self.prev_disp)
             V = np.hstack(tb.Res.residual_disp-tb.Res.prev_res_disp)
 
-            # Add the new deltas at the end of the history list
+            # Add the new deltas at the begining of the history
 
-            self.jac_mecha.W.append(W)
-            self.jac_mecha.V.append(V)
+            self.jac_mecha.W.insert(0, W)
+            self.jac_mecha.V.insert(0, V)
 
             # Compute the interface displacement predictor increment
 
@@ -204,8 +199,8 @@ class MVJ(BGS):
 
             # Add the new deltas at the end of the history list
 
-            self.jac_therm.W.append(W)
-            self.jac_therm.V.append(V)
+            self.jac_therm.W.insert(0, W)
+            self.jac_therm.V.insert(0, V)
 
             # Compute the interface temperature predictor increment
 

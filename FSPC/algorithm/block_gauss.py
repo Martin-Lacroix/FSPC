@@ -62,8 +62,10 @@ class BGS(Algorithm):
 
             # Return true if the coupling algorithm has converged
 
-            if hasattr(self, 'update'): self.update(verified)
-            if verified: return True
+            if verified:
+                
+                if hasattr(self, 'update'): self.update()
+                return True
 
         # Bring back the solvers to their last equilibrium state
 
