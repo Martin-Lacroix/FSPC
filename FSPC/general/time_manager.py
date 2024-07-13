@@ -36,14 +36,14 @@ class TimeStep(tb.Static):
         next = math.floor(self.time/self.dt_save)
         self.next = (next+1)*self.dt_save
 
-    def update_time(self, verified: bool):
+    def update_time(self):
         '''
         Update the time step for the coupling algorithm
         '''
 
         # The coupling did not converge the minimal time step is reached
 
-        if not verified and (self.dt < self.min_dt):
+        if not tb.Algo.verified and (self.dt < self.min_dt):
 
             # Wait for all processes and terminate the simulation
 
@@ -53,7 +53,7 @@ class TimeStep(tb.Static):
 
         # Reduce the time step if the coupling did not converge 
 
-        elif not verified: self.dt /= 2
+        elif not tb.Algo.verified: self.dt /= 2
 
         # Increase the time step if the coupling has converged
 

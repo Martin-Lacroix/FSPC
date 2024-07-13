@@ -76,7 +76,7 @@ class ILS(BGS):
 
             # Use the default omega since we cannot use Aitken
 
-            delta = self.omega*tb.ResMech.residual
+            delta = self.omega*tb.Res.residual_disp
 
         # Perform a IQN iteration using the residual history
 
@@ -85,7 +85,7 @@ class ILS(BGS):
             # Flatten the position and residual differences
 
             W = np.hstack(disp-self.prev_disp)
-            V = np.hstack(tb.ResMech.residual-tb.ResMech.prev_res)
+            V = np.hstack(tb.Res.residual_disp-tb.Res.prev_res_disp)
 
             # Add the new deltas at the end of the history list
 
@@ -94,7 +94,7 @@ class ILS(BGS):
 
             # Compute the interface displacement predictor increment
 
-            delta = self.jac_mecha.delta(tb.ResMech.residual)
+            delta = self.jac_mecha.delta(tb.Res.residual_disp)
 
         # Update the pedicted interface displacement
 
@@ -120,7 +120,7 @@ class ILS(BGS):
 
             # Use the default omega since we cannot use Aitken
 
-            delta = self.omega*tb.ResTher.residual
+            delta = self.omega*tb.Res.residual_temp
 
         # Perform a IQN iteration using the residual history
 
@@ -129,7 +129,7 @@ class ILS(BGS):
             # Flatten the temperature and residual differences
 
             W = np.hstack(temp-self.prev_temp)
-            V = np.hstack(tb.ResTher.residual-tb.ResTher.prev_res)
+            V = np.hstack(tb.Res.residual_temp-tb.Res.prev_res_temp)
 
             # Add the new deltas at the end of the history list
 
@@ -138,7 +138,7 @@ class ILS(BGS):
 
             # Compute the interface temperature predictor increment
 
-            delta = self.jac_therm.delta(tb.ResTher.residual)
+            delta = self.jac_therm.delta(tb.Res.residual_temp)
 
         # Update the pedicted interface temperature
 

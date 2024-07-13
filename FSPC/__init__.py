@@ -48,7 +48,7 @@ def set_mechanical_res(residual: general.Residual):
     '''
 
     toolbox.has_mecha = True
-    toolbox.__setattr__('ResMech', residual)
+    toolbox.__setattr__('Res', residual)
 
 # Set the global thermal residual class from the user input
 
@@ -58,7 +58,18 @@ def set_thermal_res(residual: general.Residual):
     '''
 
     toolbox.has_therm = True
-    toolbox.__setattr__('ResTher', residual)
+    toolbox.__setattr__('Res', residual)
+
+# Set the thermo-mechanical residual class from the user input
+
+def set_thermo_mech_res(residual: general.Residual):
+    '''
+    Initialize the thermal convergence and residual manager
+    '''
+
+    toolbox.has_mecha = True
+    toolbox.has_therm = True
+    toolbox.__setattr__('Res', residual)
 
 # Set the global solver class from the user input path
 

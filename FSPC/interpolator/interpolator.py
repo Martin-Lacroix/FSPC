@@ -116,14 +116,14 @@ class Interpolator(tb.Static):
         else: CW.send(self.temp, 0, tag=6)
 
     @tb.only_mechanical
-    def predict_displacement(self, verified: bool):
+    def predict_displacement(self):
         '''
         Predict the future displacement of the solid interface
         '''
 
         # If first time step or if the equilibrium has been reached
 
-        if not self.prev_disp.size or verified:
+        if not self.prev_disp.size or tb.Algo.verified:
 
             # Update the previous solution with the current one
 
@@ -142,14 +142,14 @@ class Interpolator(tb.Static):
             self.disp += tb.Step.dt*self.velocity_disp
 
     @tb.only_thermal
-    def predict_temperature(self, verified: bool):
+    def predict_temperature(self):
         '''
         Predict the future temperature of the solid interface
         '''
 
         # If first time step or if the equilibrium has been reached
 
-        if not self.prev_temp.size or verified:
+        if not self.prev_temp.size or tb.Algo.verified:
 
             # Update the previous solution with the current one
 

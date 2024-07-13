@@ -123,14 +123,14 @@ class MVJ(BGS):
 
                 # Use the default omega since we cannot use Aitken
 
-                self.jac_mecha.set_zero(tb.ResMech.residual.size)
-                delta = self.omega*tb.ResMech.residual
+                self.jac_mecha.set_zero(tb.Res.residual_disp.size)
+                delta = self.omega*tb.Res.residual_disp
 
             # Use the Jacobian from the previous time step
 
             else:
 
-                R = np.hstack(-tb.ResMech.residual)
+                R = np.hstack(-tb.Res.residual_disp)
 
                 # Compute the interface displacement predictor increment
 
@@ -142,7 +142,7 @@ class MVJ(BGS):
             # Flatten the position and residual differences
 
             W = np.hstack(disp-self.prev_disp)
-            V = np.hstack(tb.ResMech.residual-tb.ResMech.prev_res)
+            V = np.hstack(tb.Res.residual_disp-tb.Res.prev_res_disp)
 
             # Add the new deltas at the end of the history list
 
@@ -151,7 +151,7 @@ class MVJ(BGS):
 
             # Compute the interface displacement predictor increment
 
-            delta = self.jac_mecha.delta(tb.ResMech.residual)
+            delta = self.jac_mecha.delta(tb.Res.residual_disp)
 
         # Update the pedicted interface displacement
 
@@ -181,14 +181,14 @@ class MVJ(BGS):
 
                 # Use the default omega since we cannot use Aitken
 
-                self.jac_therm.set_zero(tb.ResTher.residual.size)
-                delta = self.omega*tb.ResTher.residual
+                self.jac_therm.set_zero(tb.Res.residual_temp.size)
+                delta = self.omega*tb.Res.residual_temp
 
             # Use the Jacobian from the previous time step
 
             else:
 
-                R = np.hstack(-tb.ResTher.residual)
+                R = np.hstack(-tb.Res.residual_temp)
 
                 # Compute the interface temperature predictor increment
 
@@ -200,7 +200,7 @@ class MVJ(BGS):
             # Flatten the temperature and residual differences
 
             W = np.hstack(temp-self.prev_temp)
-            V = np.hstack(tb.ResTher.residual-tb.ResTher.prev_res)
+            V = np.hstack(tb.Res.residual_temp-tb.Res.prev_res_temp)
 
             # Add the new deltas at the end of the history list
 
@@ -209,7 +209,7 @@ class MVJ(BGS):
 
             # Compute the interface temperature predictor increment
 
-            delta = self.jac_therm.delta(tb.ResTher.residual)
+            delta = self.jac_therm.delta(tb.Res.residual_temp)
 
         # Update the pedicted interface temperature
 

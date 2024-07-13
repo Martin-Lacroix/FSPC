@@ -82,8 +82,8 @@ class BGS(Algorithm):
 
             # Compute some temporary variables for Aitken relaxation
 
-            D = tb.ResMech.residual-tb.ResMech.prev_res
-            A = np.tensordot(D, tb.ResMech.prev_res)
+            D = tb.Res.residual_disp-tb.Res.prev_res_disp
+            A = np.tensordot(D, tb.Res.prev_res_disp)
 
             # Update the mechanical Aitken relaxation parameter
 
@@ -99,7 +99,7 @@ class BGS(Algorithm):
 
         # Update the predicted interface displacement
 
-        tb.Interp.disp += self.aitk_mecha*tb.ResMech.residual
+        tb.Interp.disp += self.aitk_mecha*tb.Res.residual_disp
 
     @tb.only_thermal
     def update_temperature(self):
@@ -113,8 +113,8 @@ class BGS(Algorithm):
 
             # Compute some temporary variables for Aitken relaxation
 
-            D = tb.ResTher.residual-tb.ResTher.prev_res
-            A = np.tensordot(D, tb.ResTher.prev_res)
+            D = tb.Res.residual_temp-tb.Res.prev_res_temp
+            A = np.tensordot(D, tb.Res.prev_res_temp)
 
             # Update the thermal Aitken relaxation parameter
 
@@ -130,4 +130,4 @@ class BGS(Algorithm):
 
         # Update the predicted interface temperature
 
-        tb.Interp.temp += self.aitk_therm*tb.ResTher.residual
+        tb.Interp.temp += self.aitk_therm*tb.Res.residual_temp
