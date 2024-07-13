@@ -1,10 +1,10 @@
 from .interpolator import Interpolator
 del interpolator
 
-# Linear element projection interpolation class
+# Wendland C2 function interpolation class
 
-from .linear_projection import LEP
-del linear_projection
+from .wendland_function import C2F
+del wendland_function
 
 # Thin plate spline interpolation class
 

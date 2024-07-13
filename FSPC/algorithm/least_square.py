@@ -10,19 +10,29 @@ class InvJacobian(object):
         Initialize the approximate inverse Jacobian class
         '''
 
-        self.V = list()
-        self.W = list()
+        # Store the residual differences between iterations
+
+        object.__setattr__(self, 'V', list())
+
+        # Store the displacement differences between iterations
+
+        object.__setattr__(self, 'W', list())
 
     def delta(self, residual: np.ndarray):
         '''
         Compute the predictor increment using the current Jacobian
         '''
 
+        # Transform V and W into appropriate numpy matrices
+
         V = np.flip(np.transpose(self.V), axis=1)
         W = np.flip(np.transpose(self.W), axis=1)
+
+        # Flatten the residual dimensions and take the opposite
+
         R = np.hstack(-residual)
 
-        # Return the solution correction increment
+        # Return the increment for the interface predictor
 
         delta = np.dot(W, np.linalg.lstsq(V, R, -1)[0])-R
         return np.split(delta, tb.Solver.get_size())
@@ -37,14 +47,15 @@ class ILS(BGS):
 
         BGS.__init__(self, max_iter)
 
-    @tb.only_solid
-    def initialize(self):
-        '''
-        Reset the class attributes to their default values
-        '''
+        # Initialise the classes of inverse Jacobians
 
-        if tb.has_mecha: self.jac_mecha = InvJacobian()
-        if tb.has_therm: self.jac_therm = InvJacobian()
+        object.__setattr__(self, 'jac_mecha', InvJacobian())
+        object.__setattr__(self, 'jac_therm', InvJacobian())
+
+        # Initialize the quantities stored from previous iterations
+
+        object.__setattr__(self, 'prev_disp', np.ndarray(0))
+        object.__setattr__(self, 'prev_temp', np.ndarray(0))
 
     @tb.only_mechanical
     def update_displacement(self):
@@ -54,25 +65,38 @@ class ILS(BGS):
 
         disp = tb.Solver.get_position()
 
-        # Perform either BGS or IQN iteration
+        # Perform a BGS iteration if no previous residual is available
 
         if self.iteration == 0:
 
-            self.jac_mecha.V = list()
-            self.jac_mecha.W = list()
-            delta = self.omega*tb.ResMech.residual
+            # Remove the deltas stored at the previous time step
+
+            self.jac_mecha.V.clear()
+            self.jac_mecha.W.clear()
+
+            # Use the default omega since we cannot use Aitken
+
+            delta = self.omega*tb.Res.residual_disp
+
+        # Perform a IQN iteration using the residual history
 
         else:
 
+            # Flatten the position and residual differences
+
             W = np.hstack(disp-self.prev_disp)
-            V = np.hstack(tb.ResMech.residual-tb.ResMech.prev_res)
+            V = np.hstack(tb.Res.residual_disp-tb.Res.prev_res_disp)
+
+            # Add the new deltas at the end of the history list
 
             self.jac_mecha.W.append(W)
             self.jac_mecha.V.append(V)
 
-            delta = self.jac_mecha.delta(tb.ResMech.residual)
+            # Compute the interface displacement predictor increment
 
-        # Update the pedicted displacement
+            delta = self.jac_mecha.delta(tb.Res.residual_disp)
+
+        # Update the pedicted interface displacement
 
         tb.Interp.disp += delta
         self.prev_disp = np.copy(disp)
@@ -85,25 +109,38 @@ class ILS(BGS):
 
         temp = tb.Solver.get_temperature()
 
-        # Perform either BGS or IQN iteration
+        # Perform a BGS iteration if no previous residual is available
 
         if self.iteration == 0:
 
-            self.jac_mecha.V = list()
-            self.jac_mecha.W = list()
-            delta = self.omega*tb.ResTher.residual
+            # Remove the deltas stored at the previous time step
+
+            self.jac_mecha.V.clear()
+            self.jac_mecha.W.clear()
+
+            # Use the default omega since we cannot use Aitken
+
+            delta = self.omega*tb.Res.residual_temp
+
+        # Perform a IQN iteration using the residual history
 
         else:
 
+            # Flatten the temperature and residual differences
+
             W = np.hstack(temp-self.prev_temp)
-            V = np.hstack(tb.ResTher.residual-tb.ResTher.prev_res)
+            V = np.hstack(tb.Res.residual_temp-tb.Res.prev_res_temp)
+
+            # Add the new deltas at the end of the history list
 
             self.jac_therm.W.append(W)
             self.jac_therm.V.append(V)
 
-            delta = self.jac_therm.delta(tb.ResTher.residual)
+            # Compute the interface temperature predictor increment
 
-        # Update the predicted temperature
+            delta = self.jac_therm.delta(tb.Res.residual_temp)
+
+        # Update the pedicted interface temperature
 
         tb.Interp.temp += delta
         self.prev_temp = np.copy(temp)

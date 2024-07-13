@@ -3,33 +3,41 @@ import numpy as np
 
 # Base fluid-structure coupling algorithm class
 
-class Algorithm(object):
+class Algorithm(tb.Static):
 
     @tb.compute_time
     def simulate(self, end_time: float):
         '''
         Run the fluid-structure simulation algorithm
         '''
+        
+        object.__setattr__(self, 'verified', False)
 
-        self.verified = False
-        if hasattr(self, 'initialize'): self.initialize()
+        # Export the initial solver state on the disk
+
         tb.Solver.save()
 
-        # Main loop on the FSI coupling time steps
+        # Loop over the time steps of the FSI coupling
 
         while tb.Step.time < end_time:
 
-            tb.Interp.initialize()
             tb.Step.display_time_step()
-            self.reset_convergence()
 
-            # Main loop on the FSI coupling iterations
+            # Build the interpolation matrices and reset the residual 
+
+            tb.Interp.initialize()
+            tb.Res.reset()
+
+            # Initial guess for the equilibrium interface solution
 
             self.compute_predictor()
-            self.verified = self.coupling_algorithm()
-            tb.Step.update_time(self.verified)
 
-            # Update the solvers for the next time step
+            # Perform the coupling iterations and update the time step
+
+            self.verified = self.coupling_algorithm()
+            tb.Step.update_time()
+
+            # Fluid remeshing and update the solution exporter
 
             if self.verified:
 
@@ -42,17 +50,10 @@ class Algorithm(object):
         Predict the future solution at the solid interface
         '''
 
-        tb.Interp.predict_temperature(self.verified)
-        tb.Interp.predict_displacement(self.verified)
+        # The functions run only if their respective coupling is enabled
 
-    @tb.only_solid
-    def reset_convergence(self):
-        '''
-        Reset the residual attributes to their default values
-        '''
-
-        if tb.has_mecha: tb.ResMech.reset()
-        if tb.has_therm: tb.ResTher.reset()
+        tb.Interp.predict_temperature()
+        tb.Interp.predict_displacement()
 
     @tb.only_solid
     @tb.compute_time
@@ -61,37 +62,30 @@ class Algorithm(object):
         Compute the predicted solution at the solid interface
         '''
 
-        self.compute_residual()
+        # Compute the residual between the predictor and Metafor
+
+        tb.Res.update_res_mech()
+        tb.Res.update_res_ther()
+
+        # Update the predictor using the per-node residual
+
         self.update_displacement()
         self.update_temperature()
-        self.display_residual()
 
-        # Check for coupling convergence
+        # Print the normalized residual on the terminal
 
-        ok_list = list()
-        if tb.has_mecha: ok_list.append(tb.ResMech.check())
-        if tb.has_therm: ok_list.append(tb.ResTher.check())
-        return np.all(ok_list)
+        tb.Res.display_residual()
 
-    def compute_residual(self):
-        '''
-        Compute the residual of the solution at the solid interface
-        '''
+        # Check if the convergence criterion has been reached
 
-        if tb.has_mecha:
-
-            disp = tb.Solver.get_position()
-            tb.ResMech.update_res(disp, tb.Interp.disp)
-
-        if tb.has_therm:
-
-            temp = tb.Solver.get_temperature()
-            tb.ResTher.update_res(temp, tb.Interp.temp)
+        return tb.Res.check()
 
     def transfer_dirichlet(self):
         '''
         Interpolate the solution from the solid to the fluid interface
         '''
+
+        # The functions run only if their respective coupling is enabled
 
         tb.Interp.apply_displacement()
         tb.Interp.apply_temperature()
@@ -101,21 +95,7 @@ class Algorithm(object):
         Interpolate the solution from the fluid to the solid interface
         '''
 
+        # The functions run only if their respective coupling is enabled
+
         tb.Interp.apply_loading()
         tb.Interp.apply_heatflux()
-
-    def display_residual(self):
-        '''
-        Print the current state of the convergence criterion
-        '''
-
-        if tb.has_mecha:
-
-            eps = 'Residual Mech : {:.3e}'.format(tb.ResMech.epsilon)
-            print('[{:.0f}]'.format(self.iteration), eps)
-
-        if tb.has_therm:
-
-            eps = 'Residual Ther : {:.3e}'.format(tb.ResTher.epsilon)
-            print('[{:.0f}]'.format(self.iteration), eps)
-

@@ -11,17 +11,20 @@ class BGS(Algorithm):
         '''
 
         Algorithm.__init__(self)
-        self.max_iter = max_iter
-        self.omega = 0.5
 
-    @tb.only_solid
-    def initialize(self):
-        '''
-        Reset the Aitken relaxation parameter to its default value
-        '''
+        # Omega is the user-defined initial Aitken relaxation
 
-        if tb.has_mecha: self.aitk_mecha = self.omega
-        if tb.has_therm: self.aitk_therm = self.omega
+        object.__setattr__(self, 'omega', 0.5)
+        object.__setattr__(self, 'iteration', 0)
+
+        # Maximum number of iterations allowed for FSI coupling
+
+        object.__setattr__(self, 'max_iter', max_iter)
+
+        # Initialize the Aitken parameters with the provided one
+
+        object.__setattr__(self, 'aitk_mecha', self.omega)
+        object.__setattr__(self, 'aitk_mecha', self.omega)
 
     def coupling_algorithm(self):
         '''
@@ -30,30 +33,39 @@ class BGS(Algorithm):
 
         self.iteration = 0
 
+        # Loop until the maximum number of iterations is reached
+
         while self.iteration < self.max_iter:
+
+            # Bring back the solvers to their last equilibrium state
 
             tb.Solver.way_back()
 
-            # Dirichlet transfer and fluid solver run
+            # Break the while loop if the fluid solver failed
 
             self.transfer_dirichlet()
             if not tb.run_fluid(): break
 
-            # Neumann transfer and solid solver run
+            # Break the while loop if the solid solver failed
 
             self.transfer_neumann()
             if not tb.run_solid(): break
 
-            # Compute the coupling residual
+            # Update the predictor and check the coupling convergence
 
             verified = self.relaxation()
+
+            # Share the convergence state to the fluid process
+
             verified = tb.CW.bcast(verified, root=1)
             self.iteration += 1
 
-            # Return true if the solution is converged
+            # Return true if the coupling algorithm has converged
 
             if hasattr(self, 'update'): self.update(verified)
             if verified: return True
+
+        # Bring back the solvers to their last equilibrium state
 
         tb.Solver.way_back()
         return False
@@ -64,18 +76,30 @@ class BGS(Algorithm):
         Compute the displacement predictor at the solid interface
         '''
 
+        # We need a previous residual to update aitk_mecha
+
         if self.iteration > 0:
 
-            D = tb.ResMech.residual-tb.ResMech.prev_res
-            A = np.tensordot(D, tb.ResMech.prev_res)
+            # Compute some temporary variables for Aitken relaxation
 
-            # Update the Aitken relaxation parameter
+            D = tb.Res.residual_disp-tb.Res.prev_res_disp
+            A = np.tensordot(D, tb.Res.prev_res_disp)
+
+            # Update the mechanical Aitken relaxation parameter
 
             self.aitk_mecha = -A*self.aitk_mecha/np.tensordot(D, D)
+
+            # Limit the Aitken parameter beteen zero and one
+
             self.aitk_mecha = max(min(self.aitk_mecha, 1), 0)
 
+        # Use omega if no previous residual is available
+
         else: self.aitk_mecha = self.omega
-        tb.Interp.disp += self.aitk_mecha*tb.ResMech.residual
+
+        # Update the predicted interface displacement
+
+        tb.Interp.disp += self.aitk_mecha*tb.Res.residual_disp
 
     @tb.only_thermal
     def update_temperature(self):
@@ -83,15 +107,27 @@ class BGS(Algorithm):
         Compute the temperature predictor at the solid interface
         '''
 
+        # We need a previous residual to update aitk_mecha
+
         if self.iteration > 0:
 
-            D = tb.ResTher.residual-tb.ResTher.prev_res
-            A = np.tensordot(D, tb.ResTher.prev_res)
+            # Compute some temporary variables for Aitken relaxation
 
-            # Update the Aitken relaxation parameter
+            D = tb.Res.residual_temp-tb.Res.prev_res_temp
+            A = np.tensordot(D, tb.Res.prev_res_temp)
+
+            # Update the thermal Aitken relaxation parameter
 
             self.aitk_therm = -A*self.aitk_therm/np.tensordot(D, D)
+
+            # Limit the Aitken parameter beteen zero and one
+
             self.aitk_therm = max(min(self.aitk_therm, 1), 0)
 
+        # Use omega if no previous residual is available
+
         else: self.aitk_therm = self.omega
-        tb.Interp.temp += self.aitk_therm*tb.ResTher.residual
+
+        # Update the predicted interface temperature
+
+        tb.Interp.temp += self.aitk_therm*tb.Res.residual_temp

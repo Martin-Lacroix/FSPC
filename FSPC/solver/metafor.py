@@ -6,13 +6,14 @@ import sys
 
 # Solid solver wrapper class for Metafor
 
-class Solver(object):
+class Solver(tb.Static):
     def __init__(self, path: str):
         '''
         Initialize the solid solver wrapper class
         '''
 
-        parm = dict()
+        # Hack to load Metafor as a Python module
+
         spec = util.spec_from_file_location('module.name', path)
         module = util.module_from_spec(spec)
         sys.modules['module.name'] = module
@@ -20,43 +21,34 @@ class Solver(object):
 
         # Actually initialize Metafor from a file
 
-        self.metafor = module.getMetafor(parm)
-        self.geometry = self.metafor.getDomain().getGeometry()
-        self.dim = self.geometry.getDimension().getNdim()
-        self.tsm = self.metafor.getTimeStepManager()
+        parm = dict()
 
-        # Sets the dimension of the interaction
+        object.__setattr__(self, 'metafor', module.getMetafor(parm))
+        object.__setattr__(self, 'max_division', 200)
 
-        if self.dim == 2: self.axis = (w.TX, w.TY)
-        if self.dim == 3: self.axis = (w.TX, w.TY, w.TZ)
+        # Copy the Metafor input dictionary into the wrapper
 
-        # Defines some internal variables
+        self.__dict__.update(parm)
+        geometry = self.metafor.getDomain().getGeometry()
 
-        self.FSI = parm['FSInterface']
-        self.exporter = parm['exporter']
+        # Store important classes and variables
 
-        # Mechanical and thermal interactions
-
-        if 'polytope' in parm:
-            self.polytope = np.atleast_1d(parm['polytope'])
-
-        if 'interaction_M' in parm:
-            self.interaction_M = np.atleast_1d(parm['interaction_M'])
-
-        if 'interaction_T' in parm:
-            self.interaction_T = np.atleast_1d(parm['interaction_T'])
+        object.__setattr__(self, 'dim', geometry.getDimension().getNdim())
+        object.__setattr__(self, 'axis', [w.TX, w.TY, w.TZ][:self.dim])
 
         # Create the memory fac used to restart
 
-        self.fac = w.MemoryFac()
-        self.meta_fac = w.MetaFac(self.metafor)
+        object.__setattr__(self, 'fac', w.MemoryFac())
+        object.__setattr__(self, 'meta_fac', w.MetaFac(self.metafor))
+
+        # Parameters : binary mode, zipped mode, memory mode
+
         self.meta_fac.mode(False, False, True)
         self.meta_fac.save(self.fac)
 
-        # Initialize the integration and restart
+        # Initialize the time integration and the boundary conditions
 
-        self.max_division = 200
-        self.tsm.setInitialTime(0, np.inf)
+        self.metafor.getTimeStepManager().setInitialTime(0, np.inf)
         self.metafor.getInitialConditionSet().update(0)
 
     @tb.write_logs
@@ -66,8 +58,18 @@ class Solver(object):
         Run the solid solver within the current time step
         '''
 
-        self.tsm.setNextTime(tb.Step.next_time(), 0, tb.Step.dt)
-        self.tsm.setMinimumTimeStep(tb.Step.dt/self.max_division)
+        # Parameters : next final time, number of facs, initial time step
+
+        end = tb.Step.time+tb.Step.dt
+        self.metafor.getTimeStepManager().setNextTime(end, 0, tb.Step.dt)
+
+        # The minimal time step is set by the maximum division factor
+
+        min_dt = tb.Step.dt/self.max_division
+        self.metafor.getTimeStepManager().setMinimumTimeStep(min_dt)
+
+        # Return true if Metafor solved the time step successfully
+
         return self.metafor.getTimeIntegration().integration()
 
     def apply_loading(self, load: np.ndarray):
@@ -75,18 +77,28 @@ class Solver(object):
         Apply the loading from the fluid to the solid interface
         '''
 
-        for interaction in self.interaction_M:
+        geometry = self.metafor.getDomain().getGeometry()
+
+        # Loop on the mechanical interactions defined by the user
+
+        for interaction in np.atleast_1d(self.interaction_M):
             for i, data in enumerate(load):
 
-                node = self.FSI.getMeshPoint(i)
+                node = self.FSInterface.getMeshPoint(i)
 
-                if self.geometry.isAxisymmetric():
+                # Axisymmetric stress tensor parameters : rr, tt, yy, ry
+
+                if geometry.isAxisymmetric():
                     interaction.setNodTensorAxi(node, *data)
 
-                elif self.geometry.is2D():
+                # 2D stress tensor parameters : xx, yy, xy
+
+                elif geometry.is2D():
                     interaction.setNodTensor2D(node, *data)
 
-                elif self.geometry.is3D():
+                # 3D stress tensor parameters : xx, yy, zz, xy, xz, yz
+
+                elif geometry.is3D():
                     interaction.setNodTensor3D(node, *data)
 
     def apply_heatflux(self, heat: np.ndarray):
@@ -94,10 +106,14 @@ class Solver(object):
         Apply the heat flux from the fluid to the solid interface
         '''
 
-        for interaction in self.interaction_T:
+        # Loop on the temperature interactions defined by the user
+
+        for interaction in np.atleast_1d(self.interaction_T):
             for i, data in enumerate(heat):
 
-                node = self.FSI.getMeshPoint(i)
+                # The temperature gradient is defined in global axis
+
+                node = self.FSInterface.getMeshPoint(i)
                 interaction.setNodVector(node, *data)
 
     def get_position(self):
@@ -105,60 +121,82 @@ class Solver(object):
         Return the nodal positions of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), self.dim))
+        result = np.zeros((self.dim, self.get_size()))
+
+        # Loop on the dimensions of the mesh : TX, TY and TZ
 
         for i, axe in enumerate(self.axis):
-            for j, data in enumerate(result):
 
-                node = self.FSI.getMeshPoint(j)
-                data[i] += node.getValue(w.Field1D(axe, w.AB))
-                data[i] += node.getValue(w.Field1D(axe, w.RE))
+            # Define a database nodal extractor for the absolute position
 
-        return result
+            field = w.Field1D(axe, w.AB)
+            result[i] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+
+            # Define a database nodal extractor for the relative position
+
+            field = w.Field1D(axe, w.RE)
+            result[i] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+
+        # Transpose because FSPC assumes result[i] = i-th node
+
+        return np.transpose(result)
 
     def get_velocity(self):
         '''
         Return the nodal velocity of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), self.dim))
+        result = np.zeros((self.dim, self.get_size()))
+
+        # Loop on the dimensions of the mesh : TX, TY and TZ
 
         for i, axe in enumerate(self.axis):
-            for j, data in enumerate(result):
 
-                node = self.FSI.getMeshPoint(j)
-                data[i] = node.getValue(w.Field1D(axe, w.GV))
+            # Define a database nodal extractor for the velocity field
 
-        return result
+            field = w.Field1D(axe, w.GV)
+            result[i] = w.DbNodalValueExtractor(self.FSInterface, field).extract()
+
+        # Transpose because FSPC assumes result[i] = i-th node
+
+        return np.transpose(result)
 
     def get_temperature(self):
         '''
         Return the nodal temperature of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), 1))
+        result = np.zeros((1, self.get_size()))
 
-        for i in range(self.get_size()):
+        # Define a database nodal extractor for the absolute temperature
 
-            node = self.FSI.getMeshPoint(i)
-            result[i] += node.getValue(w.Field1D(w.TO, w.AB))
-            result[i] += node.getValue(w.Field1D(w.TO, w.RE))
+        field = w.Field1D(w.TO, w.AB)
+        result[0] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
 
-        return result
+        # Define a database nodal extractor for the relative temperature
 
-    def get_tempgrad(self):
+        field = w.Field1D(w.TO, w.RE)
+        result[0] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+
+        # Transpose because FSPC assumes result[i] = i-th node
+
+        return np.transpose(result)
+
+    def get_temperature_rate(self):
         '''
         Return the nodal temperature rate of the solid interface
         '''
 
-        result = np.zeros((self.get_size(), 1))
+        result = np.zeros((1, self.get_size()))
 
-        for i in range(self.get_size()):
+        # Define a database nodal extractor for the temperature rate
 
-            node = self.FSI.getMeshPoint(i)
-            result[i] = node.getValue(w.Field1D(w.TO, w.GV))
+        field = w.Field1D(w.TO, w.GV)
+        result[0] = w.DbNodalValueExtractor(self.FSInterface, field).extract()
 
-        return result
+        # Transpose because FSPC assumes result[i] = i-th node
+
+        return np.transpose(result)
 
     @tb.compute_time
     def update(self):
@@ -175,15 +213,19 @@ class Solver(object):
         Revert back the solver to its last converged FSI state
         '''
 
-        stm = self.metafor.getStageManager()
-        check_step = self.metafor.getCurrentStepNo() > self.fac.getStepNo()
-        check_time = self.metafor.getLastTime() > self.metafor.getCurrentTime()
+        # Restart if either the step or the time has advanced
 
-        if check_step or check_time:
+        if self.metafor.getCurrentStepNo() > self.fac.getStepNo() or \
+           self.metafor.getLastTime() > self.metafor.getCurrentTime():
+
             self.metafor.restart(self.fac)
 
-        if not (stm.getCurNumStage() < 0) and (stm.getNumbOfStage() > 1):
-            self.tsm.removeLastStage()
+        # Remove the last stage if more than one stage has been stored
+
+        if not (self.metafor.getStageManager().getCurNumStage() < 0) \
+           and (self.metafor.getStageManager().getNumbOfStage() > 1):
+
+            self.metafor.getTimeStepManager().removeLastStage()
 
     @tb.write_logs
     @tb.compute_time
@@ -199,4 +241,4 @@ class Solver(object):
         Return the number of nodes on the solid interface mesh
         '''
         
-        return self.FSI.getNumberOfMeshPoints()
+        return self.FSInterface.getNumberOfMeshPoints()
