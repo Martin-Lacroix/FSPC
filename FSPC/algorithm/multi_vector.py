@@ -2,70 +2,6 @@ from ..general import toolbox as tb
 from .block_gauss import BGS
 import numpy as np
 
-# Inverse least squares approximate Jacobian class
-
-class InvJacobian(object):
-    def __init__(self):
-        '''
-        Initialize the approximate inverse Jacobian class
-        '''
-
-        # Store the residual differences between iterations
-
-        object.__setattr__(self, 'V', list())
-
-        # Store the displacement differences between iterations
-
-        object.__setattr__(self, 'W', list())
-
-        # Current Jacobian and Jacobian at previous time step
-
-        object.__setattr__(self, 'J', np.ndarray(0))
-        object.__setattr__(self, 'prev_J', np.ndarray(0))
-
-    def update(self):
-        '''
-        Copy the current Jacobian into the previous Jacobian
-        '''
-
-        # Explicit numpy copy to prevent variable dependency
-
-        self.prev_J = np.copy(self.J)
-
-    def set_zero(self, size: int):
-        '''
-        Reset the class attributes to their default values
-        '''
-
-        # The size of the Jacobian is the number of FSI nodes × DDL
-
-        self.J = np.zeros((size, size))
-        self.prev_J = np.zeros((size, size))
-
-    def delta(self, residual: np.ndarray):
-        '''
-        Compute the predictor increment using the previous Jacobian
-        '''
-
-        # Transform V and W into numpy matrices
-
-        V = np.array(self.V)
-        W = np.array(self.W)
-
-        # Compute the current Jacobian using the previous one
-
-        X = W-np.dot(V, self.prev_J.T)
-        self.J = self.prev_J+np.linalg.lstsq(V, X, -1)[0].T
-
-        # Compute the increment for the interface predictor
-
-        R = np.hstack(-residual)
-        delta = np.dot(self.J, R)-R
-
-        # Reshape such that each dimension is along a column
-
-        return delta.reshape(residual.shape)
-
 # Interface quasi-Newton with multi-vector Jacobian class
 
 class MVJ(BGS):
@@ -76,24 +12,30 @@ class MVJ(BGS):
 
         BGS.__init__(self, max_iter)
 
-        # Initialise the classes of inverse Jacobians
-
-        object.__setattr__(self, 'jac_mecha', InvJacobian())
-        object.__setattr__(self, 'jac_therm', InvJacobian())
-
         # Initialize the quantities stored from previous iterations
 
         object.__setattr__(self, 'prev_disp', np.ndarray(0))
         object.__setattr__(self, 'prev_temp', np.ndarray(0))
-    
-    @tb.only_solid
-    def update(self):
-        '''
-        Copy the current Jacobian into the previous Jacobian
-        '''
 
-        if tb.has_mecha: self.jac_mecha.update()
-        if tb.has_therm: self.jac_therm.update()
+        # Store the displacement differences between iterations
+
+        object.__setattr__(self, 'V_disp', list())
+        object.__setattr__(self, 'W_disp', list())
+
+        # Current and previous Jacobians for mechanical coupling
+
+        object.__setattr__(self, 'J_disp', np.ndarray(0))
+        object.__setattr__(self, 'prev_J_disp', np.ndarray(0))
+
+        # Store the temperature differences between iterations
+
+        object.__setattr__(self, 'V_temp', list())
+        object.__setattr__(self, 'W_temp', list())
+
+        # Current and previous Jacobians for thermal coupling
+
+        object.__setattr__(self, 'J_temp', np.ndarray(0))
+        object.__setattr__(self, 'prev_J_temp', np.ndarray(0))
 
     @tb.only_mechanical
     def update_displacement(self):
@@ -103,54 +45,80 @@ class MVJ(BGS):
 
         disp = tb.Solver.get_position()
 
-        # If no previous iterations are available
+        # Flatten the residual displacement along a single line
 
-        if self.iteration == 0:
+        R = np.hstack(-tb.Res.residual_disp)
 
-            # Remove the deltas stored at the previous time step
+        # Remove the previous Jaobian if the last time step failed
 
-            self.jac_mecha.V.clear()
-            self.jac_mecha.W.clear()
+        if not self.verified:
+            self.prev_J_disp = np.ndarray(0)
 
-            # Perform a BGS iteration if the previous coupling failed
+        # Store the previous Jacobian if the last time step converged
 
-            if not self.verified:
+        elif not self.iteration:
+            self.prev_J_disp = np.copy(self.J_disp)
 
-                # Use the default omega since we cannot use Aitken
+        # Clear the history matrices from the previous time step
 
-                self.jac_mecha.set_zero(tb.Res.residual_disp.size)
-                delta = self.omega*tb.Res.residual_disp
+        if not self.iteration:
 
-            # Use the Jacobian from the previous time step
+            self.V_disp.clear()
+            self.W_disp.clear()
 
-            else:
-
-                R = np.hstack(-tb.Res.residual_disp)
-
-                # Compute the interface displacement predictor increment
-
-                delta = np.dot(self.jac_mecha.prev_J, R)-R
-                delta = np.split(delta, tb.Solver.get_size())
+        # If the current iteration is not the first
 
         else:
 
-            # Flatten the displacement and residual differences
+            # Compute and flatten the residual and displacement deltas
 
             W = np.hstack(disp-self.prev_disp)
             V = np.hstack(tb.Res.residual_disp-tb.Res.prev_res_disp)
 
-            # Add the new deltas at the begining of the history
+            # Add those new deltas at the begining of the history
 
-            self.jac_mecha.W.insert(0, W)
-            self.jac_mecha.V.insert(0, V)
+            self.W_disp.insert(0, W)
+            self.V_disp.insert(0, V)
 
-            # Compute the interface displacement predictor increment
+        # Check if no history matrices are available
 
-            delta = self.jac_mecha.delta(tb.Res.residual_disp)
+        if not len(self.V_disp):
 
-        # Update the pedicted interface displacement
+            # Perform a BGS iteration if no previous Jacobian
 
-        tb.Interp.disp += delta
+            if not len(self.prev_J_disp):
+                delta = self.omega*tb.Res.residual_disp
+
+            # Use the previous Jacobian for computing the prediction
+
+            else: delta = self.prev_J_disp.dot(R)-R
+
+        # Perform a ILS iteration if no previous Jacobian
+        
+        elif not len(self.prev_J_disp):
+
+            result = np.linalg.lstsq(self.V_disp, self.W_disp, -1)
+
+            # Compute the current Jacobian and the predictor increment
+
+            self.J_disp = np.transpose(result[0])
+            delta = self.J_disp.dot(R)-R
+
+        # Perform a MVJ iteration if a previous Jacobian is available
+
+        else:
+
+            X = self.W_disp-np.dot(self.V_disp, self.prev_J_disp.T)
+            result = np.linalg.lstsq(self.V_disp, X, -1)
+
+            # Compute the current Jacobian and the predictor increment
+
+            self.J_disp = self.prev_J_disp+np.transpose(result[0])
+            delta = self.J_disp.dot(R)-R
+
+        # Actually update the pedicted interface displacement
+
+        tb.Interp.disp += delta.reshape(tb.Res.residual_disp.shape)
         self.prev_disp = np.copy(disp)
 
     @tb.only_thermal
@@ -161,52 +129,78 @@ class MVJ(BGS):
 
         temp = tb.Solver.get_temperature()
 
-        # If no previous iterations are available
+        # Flatten the residual displacement along a single line
 
-        if self.iteration == 0:
+        R = np.hstack(-tb.Res.residual_temp)
 
-            # Remove the deltas stored at the previous time step
+        # Remove the previous Jaobian if the last time step failed
 
-            self.jac_therm.V.clear()
-            self.jac_therm.W.clear()
-            
-            # Perform a BGS iteration if the previous coupling failed
+        if not self.verified:
+            self.prev_J_temp = np.ndarray(0)
 
-            if not self.verified:
+        # Store the previous Jacobian if the last time step converged
 
-                # Use the default omega since we cannot use Aitken
+        elif not self.iteration:
+            self.prev_J_temp = np.copy(self.J_temp)
 
-                self.jac_therm.set_zero(tb.Res.residual_temp.size)
-                delta = self.omega*tb.Res.residual_temp
+        # Clear the history matrices from the previous time step
 
-            # Use the Jacobian from the previous time step
+        if not self.iteration:
 
-            else:
+            self.V_temp.clear()
+            self.W_temp.clear()
 
-                R = np.hstack(-tb.Res.residual_temp)
-
-                # Compute the interface temperature predictor increment
-
-                delta = np.dot(self.jac_therm.prev_J, R)-R
-                delta = np.split(delta, tb.Solver.get_size())
+        # If the current iteration is not the first
 
         else:
 
-            # Flatten the temperature and residual differences
+            # Compute and flatten the residual and temperature deltas
 
             W = np.hstack(temp-self.prev_temp)
             V = np.hstack(tb.Res.residual_temp-tb.Res.prev_res_temp)
 
-            # Add the new deltas at the end of the history list
+            # Add those new deltas at the begining of the history
 
-            self.jac_therm.W.insert(0, W)
-            self.jac_therm.V.insert(0, V)
+            self.W_temp.insert(0, W)
+            self.V_temp.insert(0, V)
 
-            # Compute the interface temperature predictor increment
+        # Check if no history matrices are available
 
-            delta = self.jac_therm.delta(tb.Res.residual_temp)
+        if not len(self.V_temp):
 
-        # Update the pedicted interface temperature
+            # Perform a BGS iteration if no previous Jacobian
 
-        tb.Interp.temp += delta
+            if not len(self.prev_J_temp):
+                delta = self.omega*tb.Res.residual_temp
+
+            # Use the previous Jacobian for computing the prediction
+
+            else: delta = self.prev_J_temp.dot(R)-R
+
+        # Perform a ILS iteration if no previous Jacobian
+        
+        elif not len(self.prev_J_temp):
+
+            result = np.linalg.lstsq(self.V_temp, self.W_temp, -1)
+
+            # Compute the current Jacobian and the predictor increment
+
+            self.J_temp = np.transpose(result[0])
+            delta = self.J_temp.dot(R)-R
+
+        # Perform a MVJ iteration if a previous Jacobian is available
+
+        else:
+
+            X = self.W_temp-np.dot(self.V_temp, self.prev_J_temp.T)
+            result = np.linalg.lstsq(self.V_temp, X, -1)
+
+            # Compute the current Jacobian and the predictor increment
+
+            self.J_temp = self.prev_J_temp+np.transpose(result[0])
+            delta = self.J_temp.dot(R)-R
+
+        # Actually update the pedicted interface temperature
+
+        tb.Interp.temp += delta.reshape(tb.Res.residual_temp.shape)
         self.prev_temp = np.copy(temp)
