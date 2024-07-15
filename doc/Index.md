@@ -95,7 +95,7 @@ The residual manager is responsible for checking the convergence of the fluid-st
 ```python
 residual = FSPC.general.Residual(tolerance)
 
-FSPC.set_thero_mech_res(residual)
+FSPC.set_thermo_mech_res(residual)
 FSPC.set_mechanical_res(residual)
 FSPC.set_thermal_res(residual)
 ```
