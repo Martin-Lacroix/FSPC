@@ -45,19 +45,20 @@ algorithm = FSPC.algorithm.MVJ(max_iter)
 FSPC.set_algorithm(algorithm)
 ```
 
-| Input             | Type                | Description                      |
-|-------------------|---------------------|----------------------------------|
-| *max_iter*        | *int*               | *maximum number of iterations*   |
+| Input             | Type                | Description                          |
+|-------------------|---------------------|--------------------------------------|
+| *max_iter*        | *int*               | *maximum number of iterations*       |
+| *algorithm*       | *object*            | *instance of algorithm class*        |
 
 <br />
 
-The interpolator is used to transfer nodal data from one solver to another. The class `NNS` holds for nearest neighbour search and is valid for matching meshes. The class `LEP` holds for linear element projection and is an extension of the `NNS` for non-matching meshes that uses projections into virtual 2-node segments or 3-node triangle elements to interpolate the data with the shape functions. The `TPS` is a radial-basis function interpolation with thin plate spline. The latter is more robust but involves more computations.
+The interpolator is used to transfer nodal data from one solver to another. The class `NNS` holds for nearest neighbour search and is valid for matching meshes. The class `LEP` holds for Wendland C2 function and is a radial-basis function interpolation with compact support, meaning that every node farther than this characteristic radius are ignored. The `TPS` is a radial-basis function interpolation with thin plate spline. The latter is more robust but involves more computations.
 
 <br />
 
 ```python
 interpolator = FSPC.interpolator.NNS()
-interpolator = FSPC.interpolator.LEP(elem_type)
+interpolator = FSPC.interpolator.C2F(radius)
 interpolator = FSPC.interpolator.TPS(radius)
 
 FSPC.set_interpolator(interpolator)
@@ -65,8 +66,8 @@ FSPC.set_interpolator(interpolator)
 
 | Input             | Type                | Description                                     |
 |-------------------|---------------------|-------------------------------------------------|
-| *elem_type*         | *int*               | *type of element for projection*                  |
-| *radius*         | *float*               | *characteristic radius of the RBF*                  |
+| *radius*          | *float*             | *characteristic radius of the RBF*              |
+| *interpolator*    | *object*            | *instance of interpolator class*                |
 
 <br />
 
@@ -81,27 +82,28 @@ FSPC.set_time_step(step)
 
 | Input             | Type                | Description                                     |
 |-------------------|---------------------|-------------------------------------------------|
-| *dt*         | *float*               | *initial coupling time step*                  |
-| *st_save*         | *float*               | *time step for saving on the disk*                  |
+| *dt*              | *float*             | *initial coupling time step*                    |
+| *st_save*         | *float*             | *time step for saving on the disk*              |
+| *step*            | *object*            | *instance of time step manager class*           |
 
 <br />
 
-The residual manager is responsible for checking the convergence of the fluid-structure coupling algorithm. The `Residual` class must be defined for enabling the corresponding coupling type. For instance, calling `FSPC.set_mechanical_res` with a valid input will enable the mechanical coupling. In the same way, calling `FSPC.set_thermal_res` will enable the thermal coupling. Both couplings may also be enabled together for a thermo-mechanical fluid-structure simulation.
+The residual manager is responsible for checking the convergence of the fluid-structure coupling algorithm. The `Residual` class must be defined for enabling the corresponding coupling type. For instance, calling `FSPC.set_mechanical_res` will enable the mechanical coupling. In the same way, calling `FSPC.set_thermal_res` will enable the thermal coupling. Both couplings may also be enabled together with `FSPC.set_thermo_mech_res`. Note that only one of the above function should be called for your simulation.
 
 <br />
 
 ```python
-residual = FSPC.general.Residual(tol_disp)
-FSPC.set_mechanical_res(residual)
+residual = FSPC.general.Residual(tolerance)
 
-residual = FSPC.general.Residual(tol_temp)
+FSPC.set_thero_mech_res(residual)
+FSPC.set_mechanical_res(residual)
 FSPC.set_thermal_res(residual)
 ```
 
-| Input             | Type                | Description                                     |
-|-------------------|---------------------|-------------------------------------------------|
-| *tol_disp*         | *float*               | *tolerance for the displacement*                  |
-| *tol_temp*         | *float*               | *tolerance for the temperature*                  |
+| Input             | Type                | Description                                 |
+|-------------------|---------------------|---------------------------------------------|
+| *tolerance*       | *float*             | *tolerance for the convergence*             |
+| *residual*        | *object*        | *instance of residual manager class*            |
 
 <br />
 
