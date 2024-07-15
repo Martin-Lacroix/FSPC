@@ -52,7 +52,7 @@ FSPC.set_algorithm(algorithm)
 
 <br />
 
-The interpolator is used to transfer nodal data from one solver to another. The class `NNS` holds for nearest neighbour search and is valid for matching meshes. The class `LEP` holds for Wendland C2 function and is a radial-basis function interpolation with compact support, meaning that every node farther than this characteristic radius are ignored. The `TPS` is a radial-basis function interpolation with thin plate spline. The latter is more robust but involves more computations.
+The interpolator is used to transfer nodal data from one solver to another. The class `NNS` holds for nearest neighbour search and is valid for matching meshes. The class `C2F` holds for Wendland C2 function and is a radial-basis function interpolation with compact support, meaning that every node farther than this characteristic radius are ignored. The `TPS` is a radial-basis function interpolation with thin plate spline. The latter is more robust but involves more computations.
 
 <br />
 
