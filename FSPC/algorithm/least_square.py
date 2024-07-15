@@ -37,7 +37,7 @@ class ILS(BGS):
 
         # Perform a BGS iteration if no previous residual is available
 
-        if self.iteration == 0:
+        if not self.iteration:
 
             # Clear the history matrices from the previous time step
 
@@ -87,7 +87,7 @@ class ILS(BGS):
 
         # Perform a BGS iteration if no previous residual is available
 
-        if self.iteration == 0:
+        if not self.iteration:
 
             # Clear the history matrices from the previous time step
 
