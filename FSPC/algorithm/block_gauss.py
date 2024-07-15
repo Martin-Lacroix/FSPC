@@ -23,8 +23,8 @@ class BGS(Algorithm):
 
         # Initialize the Aitken parameters with the provided one
 
-        object.__setattr__(self, 'aitk_mecha', self.omega)
-        object.__setattr__(self, 'aitk_mecha', self.omega)
+        object.__setattr__(self, 'aitk_disp', self.omega)
+        object.__setattr__(self, 'aitk_temp', self.omega)
 
     def coupling_algorithm(self):
         '''
@@ -75,7 +75,7 @@ class BGS(Algorithm):
         Compute the displacement predictor at the solid interface
         '''
 
-        # We need a previous residual to update aitk_mecha
+        # We need a previous residual to update aitk_disp
 
         if self.iteration > 0:
 
@@ -86,19 +86,19 @@ class BGS(Algorithm):
 
             # Update the mechanical Aitken relaxation parameter
 
-            self.aitk_mecha = -A*self.aitk_mecha/np.tensordot(D, D)
+            self.aitk_disp = -A*self.aitk_disp/np.tensordot(D, D)
 
             # Limit the Aitken parameter beteen zero and one
 
-            self.aitk_mecha = max(min(self.aitk_mecha, 1), 0)
+            self.aitk_disp = max(min(self.aitk_disp, 1), 0)
 
         # Use omega if no previous residual is available
 
-        else: self.aitk_mecha = self.omega
+        else: self.aitk_disp = self.omega
 
         # Update the predicted interface displacement
 
-        tb.Interp.disp += self.aitk_mecha*tb.Res.residual_disp
+        tb.Interp.disp += self.aitk_disp*tb.Res.residual_disp
 
     @tb.only_thermal
     def update_temperature(self):
@@ -106,7 +106,7 @@ class BGS(Algorithm):
         Compute the temperature predictor at the solid interface
         '''
 
-        # We need a previous residual to update aitk_mecha
+        # We need a previous residual to update aitk_temp
 
         if self.iteration > 0:
 
@@ -117,16 +117,16 @@ class BGS(Algorithm):
 
             # Update the thermal Aitken relaxation parameter
 
-            self.aitk_therm = -A*self.aitk_therm/np.tensordot(D, D)
+            self.aitk_temp = -A*self.aitk_temp/np.tensordot(D, D)
 
             # Limit the Aitken parameter beteen zero and one
 
-            self.aitk_therm = max(min(self.aitk_therm, 1), 0)
+            self.aitk_temp = max(min(self.aitk_temp, 1), 0)
 
         # Use omega if no previous residual is available
 
-        else: self.aitk_therm = self.omega
+        else: self.aitk_temp = self.omega
 
         # Update the predicted interface temperature
 
-        tb.Interp.temp += self.aitk_therm*tb.Res.residual_temp
+        tb.Interp.temp += self.aitk_temp*tb.Res.residual_temp
