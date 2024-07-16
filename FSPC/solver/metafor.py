@@ -215,8 +215,8 @@ class Solver(tb.Static):
 
         # Restart if either the step or the time has advanced
 
-        if self.metafor.getCurrentStepNo() > self.fac.getStepNo() or \
-           self.metafor.getLastTime() > self.metafor.getCurrentTime():
+        if (self.metafor.getCurrentStepNo() > self.fac.getStepNo()) or \
+           (self.metafor.getLastTime() >= self.metafor.getCurrentTime()):
 
             self.metafor.restart(self.fac)
 
