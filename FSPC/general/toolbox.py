@@ -42,9 +42,9 @@ def write_logs(function: Callable):
 
         rank = str(CW.rank)
 
-        # Open the file solver_rank.dat or create if not exist
+        # Open the file solver_rank.txt or create if not exist
 
-        with open('solver_'+rank+'.dat', 'a') as output:
+        with open('solver_'+rank+'.txt', 'a') as output:
 
             # This will capture both stdout and stderr from Python
 
