@@ -70,7 +70,11 @@ class Solver(tb.Static):
 
         # Return true if PFEM3D solved the time step successfully
 
-        return self.problem.simulate()
+        #return self.problem.simulate()
+
+        ok = self.problem.simulate()
+        self.problem.getSolver().testSaveDeltaQ()
+        return ok
 
     def apply_displacement(self, disp: np.ndarray):
         '''
@@ -187,6 +191,8 @@ class Solver(tb.Static):
         '''
         Remesh and store the current state of the solver
         '''
+
+        self.problem.getSolver().testEmptyDeltaQ()
 
         # Perform a silent remeshing and reset the boundary conditions
 
