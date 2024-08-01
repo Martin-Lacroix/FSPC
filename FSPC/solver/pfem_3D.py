@@ -70,11 +70,14 @@ class Solver(tb.Static):
 
         # Return true if PFEM3D solved the time step successfully
 
-        #return self.problem.simulate()
+        if self.problem.simulate():
 
-        ok = self.problem.simulate()
-        self.problem.getMesh().testSaveDeltaQ()
-        return ok
+            self.problem.getMesh().savePredictor(True)
+            return True
+
+        # Return false if PFEM3D failed to solve the time step
+
+        else: return False
 
     def apply_displacement(self, disp: np.ndarray):
         '''
