@@ -122,12 +122,12 @@ class Residual(tb.Static):
 
             # Print the normalized residual for the mechanical coupling
 
-            eps = 'Residual Mech : {:.3e}'.format(self.epsilon_disp)
-            print('[{:.0f}]'.format(tb.Algo.iteration), eps)
+            epsilon = f'Residual Mech : {self.epsilon_disp:.3e}'
+            print(f'[{tb.Algo.iteration}]', epsilon)
 
         if tb.has_therm:
 
             # Print the normalized residual for the thermal coupling
 
-            eps = 'Residual Ther : {:.3e}'.format(self.epsilon_temp)
-            print('[{:.0f}]'.format(tb.Algo.iteration), eps)
+            epsilon = f'Residual Ther : {self.epsilon_temp:.3e}'
+            print(f'[{tb.Algo.iteration}]', epsilon)

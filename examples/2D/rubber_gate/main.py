@@ -1,11 +1,10 @@
-import os.path as path
 import FSPC
+import os
 
 # Path to the solver input files
 
-path_F = path.dirname(__file__)+'/input_F.lua'
-path_S = path.dirname(__file__)+'/input_S.py'
-FSPC.init_solver(path_F, path_S)
+base = os.path.dirname(__file__)
+FSPC.init_solver(f'{base}/input_F.lua', f'{base}/input_S.py')
 
 # Set the coupling algorithm
 
@@ -31,3 +30,7 @@ FSPC.set_mechanical_res(residual)
 
 algorithm.simulate(0.4)
 FSPC.general.print_clock()
+
+# Compare the results with a reference solution
+
+os.system(f'python3 {base}/battery.py')

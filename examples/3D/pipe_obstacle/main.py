@@ -1,14 +1,10 @@
-import os.path as path
 import FSPC
+import os
 
 # Path to the solver input files
 
-path_F = path.dirname(__file__)+'/input_F.lua'
-path_S = path.dirname(__file__)+'/input_S.py'
-
-solver = FSPC.init_solver(path_F, path_S)
-if FSPC.general.is_fluid(): solver.max_division = 1
-if FSPC.general.is_solid(): solver.max_division = 1000
+base = os.path.dirname(__file__)
+FSPC.init_solver(f'{base}/input_F.lua', f'{base}/input_S.py')
 
 # Set the coupling algorithm
 

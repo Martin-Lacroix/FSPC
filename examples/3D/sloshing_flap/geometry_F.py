@@ -169,6 +169,6 @@ sh.addPhysicalGroup(2, s[:4]+s[12:]+r[1:], name='Container')
 # Write the mesh
 
 sh.mesh.generate(3)
-gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
+gmsh.write(f'{os.path.dirname(__file__)}/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

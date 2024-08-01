@@ -19,17 +19,7 @@ plt.plot(*np.transpose(
 
 gmsh.initialize()
 gmsh.option.setNumber('General.Terminal', 0)
-
 directory = natsorted(os.listdir('metafor'))
-gmsh.open('metafor/'+directory[0])
-
-# Find the tag of the node to track
-
-node_tags, coord, _ = gmsh.model.mesh.getNodes()
-coord = coord.reshape(len(node_tags), 3)
-
-distance = np.linalg.norm(coord, axis=1)
-tag = node_tags[np.argmin(distance)]
 
 # Extract the results from Gmsh
 
@@ -38,7 +28,7 @@ result = list()
 
 for i, file in enumerate(directory):
 
-    gmsh.open('metafor/'+file)
+    gmsh.open(f'metafor/{file}')
 
     time.append(float(file.replace('.msh', '').replace('output_', '')))
     temperature = gmsh.view.getModelData(2, i)[2][1400][0]+2000

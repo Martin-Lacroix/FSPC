@@ -47,6 +47,6 @@ sh.addPhysicalGroup(1, l[1:2], name='Wall')
 
 sh.mesh.generate(2)
 gmsh.model.mesh.reverse()
-gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
+gmsh.write(f'{os.path.dirname(__file__)}/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

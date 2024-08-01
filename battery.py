@@ -9,11 +9,11 @@ base = os.getcwd()
 
 # Set the environment variables (must be removed)
 
-os.environ['PYTHONPATH'] += base+'/../FSPC:'
-os.environ['PYTHONPATH'] += base+'/../FSPC/pyStream/build:'
-os.environ['PYTHONPATH'] += base+'/../Metafor/oo_meta:'
-os.environ['PYTHONPATH'] += base+'/../Metafor/oo_metaB/bin:'
-os.environ['PYTHONPATH'] += base+'/../PFEM3D/build/bin:'
+os.environ['PYTHONPATH'] += f'{base}:'
+os.environ['PYTHONPATH'] += f'{base}/pyStream/build:'
+os.environ['PYTHONPATH'] += f'{base}/../Metafor/oo_meta:'
+os.environ['PYTHONPATH'] += f'{base}/../Metafor/oo_metaB/bin:'
+os.environ['PYTHONPATH'] += f'{base}/../PFEM3D/build/bin:'
 
 # Make the workspace and clear previous results
 
@@ -26,24 +26,22 @@ def run_test(case_name: str):
     '''
 
     rank = mp.current_process()._identity[0]
-    cpu_bind = [(rank-1)+(rank-1), rank+(rank-1)]
+    cpu_1, cpu_2 = (rank-1)+(rank-1), rank+(rank-1)
 
-    print('Rank', rank, '- CPU', cpu_bind, '-', case_name)
+    print(f'Rank {rank} : CPU {cpu_1, cpu_2} - {case_name}')
 
     # Bind the MPI process to specific CPU sokets
 
-    os.sched_setaffinity(0, cpu_bind)
-    opt = 'mpiexec --bind-to core --cpu-set {},{} -n 2'.format(*cpu_bind)
-    run = '{} python3 {}/examples/2D/{}/main.py'.format(opt, base, case_name)
+    opt = f'mpiexec --bind-to core --cpu-set {cpu_1},{cpu_2} -n 2'
+    run = f'{opt} python3 {base}/examples/2D/{case_name}/main.py'
 
     # Run the test-case and plot the results
 
-    os.chdir('{}/workspace'.format(base))
+    os.chdir(f'{base}/workspace')
     os.mkdir(case_name)
     os.chdir(case_name)
 
-    os.system('{} 2>&1 | tee workspace.txt > /dev/null'.format(run))
-    os.system('python3 {}/battery/{}.py'.format(base, case_name))
+    os.system(f'{run} 2>&1 | tee workspace.txt > /dev/null')
 
 # Run the battery on all available physical cores
 

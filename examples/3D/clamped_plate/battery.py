@@ -26,7 +26,7 @@ result = list()
 
 for file in directory:
 
-    gmsh.open('metafor/'+file)
+    gmsh.open(f'metafor/{file}')
 
     time.append(float(file.replace('.msh', '').replace('output_', '')))
     distance = gmsh.model.mesh.getNode(1561)[0][2]

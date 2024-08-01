@@ -27,7 +27,7 @@ class Static(object):
 
         # Raise an exception of the attrubite does not exist
         
-        if not hasattr(self, key): raise Exception('Unknown attribute '+key)
+        if not hasattr(self, key): raise Exception(f'Unknown attribute {key}')
 
         # Update the attribute if it already exists in the class
 
@@ -44,7 +44,7 @@ def write_logs(function: Callable):
 
         # Open the file solver_rank.txt or create if not exist
 
-        with open('solver_'+rank+'.txt', 'a') as output:
+        with open(f'solver_{rank}.txt', 'a') as output:
 
             # This will capture both stdout and stderr from Python
 
@@ -67,8 +67,8 @@ def compute_time(function: Callable):
 
         # Build the name of the function to use in the clock
 
-        parent = args[0].__class__.__name__+' : '
-        clock[parent+function.__name__] += time.time()-start
+        key = f'{args[0].__class__.__name__} : {function.__name__}'
+        clock[key] += time.time()-start
 
         # Return the result of the timed function if any
 
@@ -164,10 +164,10 @@ def print_clock():
     # Print the name of the process that is being displayed
 
     print('\n------------------------------------')
-    print('Process {:.0f} : Time Stats'.format(CW.rank))
+    print(f'Process {CW.rank} : Time Stats')
     print('------------------------------------\n')
 
     # Loop on all function names that have been stored in clock
 
     for key, value in clock.items():
-        print('{}{:.5f}'.format(key.ljust(25), value))
+        print(f'{key.ljust(24)} {value:.5f}')
