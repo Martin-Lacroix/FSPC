@@ -28,7 +28,7 @@ FSPC.set_mechanical_res(residual)
 
 # Start the fluid-structure simulation
 
-algorithm.simulate(0.1)
+algorithm.simulate(1)
 FSPC.general.print_clock()
 
 # Compare the results with a reference solution

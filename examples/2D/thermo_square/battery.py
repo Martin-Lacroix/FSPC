@@ -31,7 +31,7 @@ for i, file in enumerate(directory):
     gmsh.open(f'metafor/{file}')
 
     time.append(float(file.replace('.msh', '').replace('output_', '')))
-    temperature = gmsh.view.getModelData(2, i)[2][1400][0]+2000
+    temperature = gmsh.view.getModelData(1, i)[2][1400][0]+2000
     result.append(temperature)
 
 # Plot the results on the graph
