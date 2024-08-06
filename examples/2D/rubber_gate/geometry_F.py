@@ -60,7 +60,7 @@ sh.mesh.field.setNumber(1, 'Sampling', 1e4)
 sh.mesh.field.setNumbers(1, 'CurvesList', l[2:5]+h)
 
 sh.mesh.field.add('MathEval', 2)
-sh.mesh.field.setString(2, 'F', str(d)+'+0.1*F1')
+sh.mesh.field.setString(2, 'F', f'{d}+0.1*F1')
 
 sh.mesh.field.setAsBackgroundMesh(2)
 gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
@@ -69,6 +69,6 @@ gmsh.option.setNumber('Mesh.MeshSizeExtendFromBoundary', 0)
 # Write the mesh
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
+gmsh.write(f'{os.path.dirname(__file__)}/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

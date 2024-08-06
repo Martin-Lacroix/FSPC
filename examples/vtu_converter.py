@@ -32,6 +32,5 @@ for folder in folderList:
     for i, F in enumerate(file):
 
         if 'msh' not in F: break
-        msh = meshio.gmsh.read(F)
-        fileName = 'convert_'+str(i)+'.vtu'
-        meshio.write(fileName, msh, file_format='vtu')
+        msh_file = meshio.gmsh.read(F)
+        meshio.write(f'convert_{i}.vtu', msh_file, file_format='vtu')

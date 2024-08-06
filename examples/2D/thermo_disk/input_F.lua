@@ -71,9 +71,10 @@ Problem.Solver.id = 'PSPG'
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
+Problem.Solver.solveHeatFirst = false
+
 Problem.Solver.coeffDTDecrease = 2
 Problem.Solver.coeffDTincrease = 1
-Problem.Solver.solveHeatFirst = true
 
 -- Momentum Continuity Equation
 

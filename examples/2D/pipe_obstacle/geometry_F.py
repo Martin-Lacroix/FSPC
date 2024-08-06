@@ -128,6 +128,6 @@ sh.addPhysicalGroup(1, l+h, name='Border')
 # Write the mesh file
 
 sh.mesh.generate(2)
-gmsh.write(os.path.dirname(__file__)+'/geometry_F.msh')
+gmsh.write(f'{os.path.dirname(__file__)}/geometry_F.msh')
 gmsh.fltk.run()
 gmsh.finalize()

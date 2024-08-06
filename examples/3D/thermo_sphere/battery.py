@@ -28,7 +28,7 @@ result = list()
 
 for file in directory:
 
-    gmsh.open('metafor/'+file)
+    gmsh.open(f'metafor/{file}')
 
     time.append(float(file.replace('.msh', '').replace('output_', '')))
     temperature = gmsh.view.getModelData(1, i)[2][628][0]+270

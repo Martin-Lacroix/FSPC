@@ -74,7 +74,7 @@ class TimeStep(tb.Static):
 
         # Use a scientific notation with a fixed number of digits
 
-        current = 'Time : {:.3e}'.format(self.time).ljust(20)
+        current_time = f'Time : {self.time:.3e}'.ljust(20)
         print('\n------------------------------------------')
-        print(current, 'Time Step : {:.3e}'.format(self.dt))
+        print(current_time, f'Time Step : {self.dt:.3e}')
         print('------------------------------------------')

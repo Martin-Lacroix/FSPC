@@ -60,6 +60,6 @@ sh.addPhysicalGroup(1, l[:3], name='FSInterface')
 
 sh.mesh.generate(2)
 gmsh.option.setNumber('Mesh.SaveParametric', 1)
-gmsh.write(os.path.dirname(__file__)+'/geometry_S.msh')
+gmsh.write(f'{os.path.dirname(__file__)}/geometry_S.msh')
 gmsh.fltk.run()
 gmsh.finalize()
