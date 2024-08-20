@@ -21,6 +21,7 @@ Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 5e-3
 Problem.Mesh.gammaFS = 0.2
 Problem.Mesh.alphaOut = 0.6
+Problem.Mesh.gammaBound = 0.2
 Problem.Mesh.minHeightFactor = 1e-2
 
 Problem.Mesh.addOnFS = true
