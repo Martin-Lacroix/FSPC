@@ -70,7 +70,14 @@ class Solver(tb.Static):
 
         # Return true if Metafor solved the time step successfully
 
-        return self.metafor.getTimeIntegration().integration()
+        if self.metafor.getTimeIntegration().integration():
+
+            self.metafor.getTimeIntegration().savePredictor()
+            return True
+
+        # Return false if Metafor failed to solve the time step
+
+        else: return False
 
     def apply_loading(self, load: np.ndarray):
         '''
@@ -205,6 +212,7 @@ class Solver(tb.Static):
         '''
 
         self.meta_fac.save(self.fac)
+        self.metafor.getTimeIntegration().setCustomPredictor(False)
 
     @tb.write_logs
     @tb.compute_time
