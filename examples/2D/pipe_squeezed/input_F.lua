@@ -74,12 +74,12 @@ Problem.Solver.ContEq.stabilization = 'CLS'
 
 -- Momentum Continuity BC
 
-Problem.IC = {}
+Problem.Solver.IC = {}
 Problem.Solver.MomEq.BC = {}
 Problem.Solver.ContEq.BC = {}
 Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true
 
-function Problem.IC.initStates(x, y, z)
+function Problem.Solver.IC.initStates(x, y, z)
 	return {0, 0, 0, Problem.Material.rhoStar, 0, 0}
 end
 

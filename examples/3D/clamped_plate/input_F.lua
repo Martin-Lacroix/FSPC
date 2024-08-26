@@ -76,13 +76,13 @@ Problem.Solver.MomContEq.bodyForce = {0, 0, -9.81}
 
 -- Fluid Structure Interface
 
-Problem.IC = {}
+Problem.Solver.IC = {}
 Problem.Solver.MomContEq.BC = {}
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
 -- Boundary Condition Functions
 
-function Problem.IC.initStates(x, y, z)
+function Problem.Solver.IC.initStates(x, y, z)
 	return {0, 0, 0, 0}
 end
 
