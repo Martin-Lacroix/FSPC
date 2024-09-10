@@ -31,39 +31,59 @@ Problem.Mesh.deleteFlyingNodes = true
 -- Extractor Parameters
 
 Problem.Extractors = {}
-Problem.Extractors[0] = {}
-Problem.Extractors[0].kind = 'GMSH'
-Problem.Extractors[0].writeAs = 'NodesElements'
-Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'T', 'velocity'}
-Problem.Extractors[0].timeBetweenWriting = math.huge
-
 Problem.Extractors[1] = {}
-Problem.Extractors[1].kind = 'Global'
-Problem.Extractors[1].whatToWrite = 'mass'
-Problem.Extractors[1].outputFile = 'mass.txt'
+Problem.Extractors[1].kind = 'GMSH'
+Problem.Extractors[1].writeAs = 'NodesElements'
+Problem.Extractors[1].outputFile = 'pfem/output.msh'
+Problem.Extractors[1].whatToWrite = {'T', 'velocity'}
 Problem.Extractors[1].timeBetweenWriting = math.huge
+
+Problem.Extractors[2] = {}
+Problem.Extractors[2].kind = 'Global'
+Problem.Extractors[2].whatToWrite = 'mass'
+Problem.Extractors[2].outputFile = 'mass.txt'
+Problem.Extractors[2].timeBetweenWriting = math.huge
 
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 1e-2
-Problem.Material.rho = 1000
-Problem.Material.R = 8.31446261815324
-Problem.Material.cp = 1000
-Problem.Material.k = 50
+Problem.Material[1] = {}
 
-Problem.Material.gamma = 0
-Problem.Material.epsRad = 0
-Problem.Material.sigmaRad = 0
-Problem.Material.alphaLin = 0
-Problem.Material.DgammaDT = 0
-Problem.Material.DmuDT = 0
-Problem.Material.DcpDT = 0
-Problem.Material.DkDT = 0
-Problem.Material.Tinf = 0
-Problem.Material.Tr = 0
-Problem.Material.h = 0
+Problem.Material[1].StateEquation = {}
+Problem.Material[1].StateEquation.type = 'Incompressible'
+Problem.Material[1].StateEquation.rho = 1000
+
+Problem.Material[1].CaloricStateEq = {}
+Problem.Material[1].CaloricStateEq.type = 'LinearHeatCapacity'
+Problem.Material[1].CaloricStateEq.cp = 1000
+Problem.Material[1].CaloricStateEq.DcpDT = 0
+Problem.Material[1].CaloricStateEq.Tr = 340
+
+Problem.Material[1].HeatFlux = {}
+Problem.Material[1].HeatFlux.type = 'LinearFourierFlux'
+Problem.Material[1].HeatFlux.k = 50
+Problem.Material[1].HeatFlux.DkDT = 0
+Problem.Material[1].HeatFlux.Tr = 340
+
+Problem.Material[1].CoolingLaw = {}
+Problem.Material[1].CoolingLaw.type = 'LinearCoolingLaw'
+Problem.Material[1].CoolingLaw.h = 0.0
+Problem.Material[1].CoolingLaw.Tinf = 340
+
+Problem.Material[1].OpticalProperties = {}
+Problem.Material[1].OpticalProperties.type = 'ConstantOpticalProperties'
+Problem.Material[1].OpticalProperties.emissivity = 0
+Problem.Material[1].OpticalProperties.sigmaSB = 0
+Problem.Material[1].OpticalProperties.absorptivity = 0
+Problem.Material[1].OpticalProperties.Tinf = 340
+
+Problem.Material[1].Stress = {}
+Problem.Material[1].Stress.type = 'NewtonianFluid'
+Problem.Material[1].Stress.mu = 1e-2
+
+Problem.Material[1].SurfaceStress = {}
+Problem.Material[1].SurfaceStress.type = 'SurfaceTension'
+Problem.Material[1].SurfaceStress.gamma = 0
 
 -- Solver Parameters
 

@@ -30,25 +30,35 @@ Problem.Mesh.deleteFlyingNodes = false
 -- Extractor Parameters
 
 Problem.Extractors = {}
-Problem.Extractors[0] = {}
-Problem.Extractors[0].kind = 'GMSH'
-Problem.Extractors[0].writeAs = 'NodesElements'
-Problem.Extractors[0].outputFile = 'pfem/output.msh'
-Problem.Extractors[0].whatToWrite = {'p', 'velocity'}
-Problem.Extractors[0].timeBetweenWriting = math.huge
-
 Problem.Extractors[1] = {}
-Problem.Extractors[1].kind = 'Global'
-Problem.Extractors[1].whatToWrite = 'mass'
-Problem.Extractors[1].outputFile = 'mass.txt'
+Problem.Extractors[1].kind = 'GMSH'
+Problem.Extractors[1].writeAs = 'NodesElements'
+Problem.Extractors[1].outputFile = 'pfem/output.msh'
+Problem.Extractors[1].whatToWrite = {'p', 'velocity'}
 Problem.Extractors[1].timeBetweenWriting = math.huge
+
+Problem.Extractors[2] = {}
+Problem.Extractors[2].kind = 'Global'
+Problem.Extractors[2].whatToWrite = 'mass'
+Problem.Extractors[2].outputFile = 'mass.txt'
+Problem.Extractors[2].timeBetweenWriting = math.huge
 
 -- Material Parameters
 
 Problem.Material = {}
-Problem.Material.mu = 1e+3
-Problem.Material.gamma = 0
-Problem.Material.rho = 1000
+Problem.Material[1] = {}
+
+Problem.Material[1].Stress = {}
+Problem.Material[1].Stress.type = 'NewtonianFluid'
+Problem.Material[1].Stress.mu = 1e+3
+
+Problem.Material[1].StateEquation = {}
+Problem.Material[1].StateEquation.type = 'Incompressible'
+Problem.Material[1].StateEquation.rho = 1000
+
+Problem.Material[1].SurfaceStress = {}
+Problem.Material[1].SurfaceStress.type = 'SurfaceTension'
+Problem.Material[1].SurfaceStress.gamma = 0
 
 -- Solver Parameters
 

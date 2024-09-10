@@ -73,6 +73,7 @@ class Solver(tb.Static):
         if self.metafor.getTimeIntegration().integration():
 
             self.metafor.getTimeIntegration().savePredictor()
+            self.metafor.getTimeIntegration().setCustomPredictor(True)
             return True
 
         # Return false if Metafor failed to solve the time step

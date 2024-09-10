@@ -85,7 +85,6 @@ def only_solid(function: Callable):
         # Run the function only if we are on the solid process
 
         if is_solid(): return function(*args)
-
     return wrapper
 
 def only_mechanical(function: Callable):
@@ -98,7 +97,6 @@ def only_mechanical(function: Callable):
         # Run the function only if mechanical coupling is enabled
 
         if has_mecha: return function(*args)
-
     return wrapper
 
 def only_thermal(function: Callable):
@@ -111,7 +109,6 @@ def only_thermal(function: Callable):
         # Run the function only if thermal coupling is enabled
 
         if has_therm: return function(*args)
-
     return wrapper
 
 def run_fluid():
