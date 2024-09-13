@@ -52,7 +52,7 @@ class MVJ(BGS):
         # Remove the previous Jaobian if the last time step failed
 
         if not self.verified:
-            #self.prev_J_disp = np.ndarray(0)
+            #self.prev_J_disp = np.ndarray(0) # !!!!
             pass
 
         # Store the previous Jacobian if the last time step converged
@@ -137,7 +137,8 @@ class MVJ(BGS):
         # Remove the previous Jaobian if the last time step failed
 
         if not self.verified:
-            self.prev_J_temp = np.ndarray(0)
+            # self.prev_J_temp = np.ndarray(0) # !!!!
+            pass
 
         # Store the previous Jacobian if the last time step converged
 
