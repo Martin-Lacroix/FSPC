@@ -49,23 +49,17 @@ class MVJ(BGS):
 
         R = np.hstack(-tb.Res.residual_disp)
 
-        # Remove the previous Jaobian if the last time step failed
-
-        if not self.verified:
-            #self.prev_J_disp = np.ndarray(0) # !!!!
-            pass
-
-        # Store the previous Jacobian if the last time step converged
-
-        elif not self.iteration:
-            self.prev_J_disp = np.copy(self.J_disp)
-
         # Clear the history matrices from the previous time step
 
         if not self.iteration:
 
             self.V_disp.clear()
             self.W_disp.clear()
+
+            # Store the Jacobian if the last time step converged
+
+            if self.verified:
+                self.prev_J_disp = np.copy(self.J_disp)
 
         # If the current iteration is not the first
 
@@ -134,23 +128,17 @@ class MVJ(BGS):
 
         R = np.hstack(-tb.Res.residual_temp)
 
-        # Remove the previous Jaobian if the last time step failed
-
-        if not self.verified:
-            # self.prev_J_temp = np.ndarray(0) # !!!!
-            pass
-
-        # Store the previous Jacobian if the last time step converged
-
-        elif not self.iteration:
-            self.prev_J_temp = np.copy(self.J_temp)
-
         # Clear the history matrices from the previous time step
 
         if not self.iteration:
 
             self.V_temp.clear()
             self.W_temp.clear()
+
+            # Store the Jacobian if the last time step converged
+
+            if self.verified:
+                self.prev_J_temp = np.copy(self.J_temp)
 
         # If the current iteration is not the first
 

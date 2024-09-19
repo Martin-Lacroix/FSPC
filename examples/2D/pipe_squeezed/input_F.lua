@@ -1,10 +1,11 @@
 -- Problem Parameters
 
 Problem = {}
+Problem.id = 'Mechanical'
+
 Problem.verboseOutput = false
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
-Problem.id = 'WCompNewtonNoT'
 
 -- Mesh Parameters
 
@@ -30,6 +31,7 @@ Problem.Mesh.deleteFlyingNodes = false
 -- Extractor Parameters
 
 Problem.Extractors = {}
+
 Problem.Extractors[1] = {}
 Problem.Extractors[1].kind = 'GMSH'
 Problem.Extractors[1].writeAs = 'NodesElements'
@@ -66,7 +68,9 @@ Problem.Material[1].SurfaceStress.gamma = 0
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'CDS_dpdt'
+Problem.Solver.IC = {}
+Problem.Solver.type = 'Explicit'
+Problem.Solver.timeIntegration = 'CDS'
 Problem.Solver.securityCoeff = 0.2
 
 Problem.Solver.adaptDT = true
@@ -74,24 +78,28 @@ Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
 Problem.Solver.maxRemeshDT = math.huge
 
--- Momentum Continuity Equation
+-- Momentum Equation
 
 Problem.Solver.MomEq = {}
-Problem.Solver.ContEq = {}
+Problem.Solver.MomEq.BC = {}
 Problem.Solver.MomEq.pExt = 0
 Problem.Solver.MomEq.bodyForce = {0, 0}
+Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true
+
+-- Continuity Equation
+
+Problem.Solver.ContEq = {}
+Problem.Solver.ContEq.BC = {}
+Problem.Solver.ContEq.version = 'DpDt'
 Problem.Solver.ContEq.stabilization = 'CLS'
 
--- Momentum Continuity BC
-
-Problem.Solver.IC = {}
-Problem.Solver.MomEq.BC = {}
-Problem.Solver.ContEq.BC = {}
-Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true
+-- Initial Conditions
 
 function Problem.Solver.IC.initStates(x, y, z)
 	return {0, 0, 0, Problem.Material[1].StateEquation.rho0, 0, 0}
 end
+
+-- Momentum Equation BC
 
 function Problem.Solver.MomEq.BC.WallV(x, y, z, t)
 	return 0, 0

@@ -1,10 +1,11 @@
 -- Problem Parameters
 
 Problem = {}
+Problem.id = 'ThermoMechanicalBoussinesq'
+
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
-Problem.id = 'Boussinesq'
 
 -- Mesh Parameters
 
@@ -30,6 +31,7 @@ Problem.Mesh.deleteFlyingNodes = true
 -- Extractor Parameters
 
 Problem.Extractors = {}
+
 Problem.Extractors[1] = {}
 Problem.Extractors[1].kind = 'GMSH'
 Problem.Extractors[1].writeAs = 'NodesElements'
@@ -87,7 +89,8 @@ Problem.Material[1].SurfaceStress.gamma = 0
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.IC = {}
+Problem.Solver.type = 'Implicit'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -100,9 +103,14 @@ Problem.Solver.coeffDTincrease = 1
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.BC = {}
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.stabilization = 'PSPG'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomContEq.timeIntegration = 'BackwardEuler'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
@@ -112,31 +120,30 @@ Problem.Solver.MomContEq.bodyForce = {0, -9.81}
 --Heat Equation
 
 Problem.Solver.HeatEq = {}
-Problem.Solver.HeatEq.residual = 'Ax_f'
+Problem.Solver.HeatEq.BC = {}
+Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
+
 Problem.Solver.HeatEq.nlAlgo = 'Picard'
-Problem.Solver.HeatEq.sparseSolver = 'CG'
+Problem.Solver.HeatEq.residual = 'Ax_f'
+Problem.Solver.HeatEq.timeIntegration = 'BackwardEuler'
 
 Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-6
 Problem.Solver.HeatEq.tolerance = 1e-16
 
--- Fluid Structure Interface
-
-Problem.Solver.IC = {}
-Problem.Solver.HeatEq.BC = {}
-Problem.Solver.MomContEq.BC = {}
-Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
-
--- Boundary Condition Functions
+-- Initial Conditions
 
 function Problem.Solver.IC.initStates(x, y, z)
 	return {0, 0, 0, 340}
 end
 
+-- Momentum Continuity Equation BC
+
 function Problem.Solver.MomContEq.BC.WallV(x, y, z, t)
 	return 0, 0
 end
+
+-- Heat Equation BC
 
 function Problem.Solver.HeatEq.BC.WallQ(x, y, z, t)
     return 0, 0

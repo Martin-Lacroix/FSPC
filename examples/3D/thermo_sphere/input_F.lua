@@ -1,10 +1,11 @@
 -- Problem Parameters
 
 Problem = {}
+Problem.id = 'ThermoMechanicalBoussinesq'
+
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
-Problem.id = 'Boussinesq'
 
 -- Mesh Parameters
 
@@ -21,10 +22,11 @@ Problem.Mesh.omega = 0.7
 Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 3e-3
 Problem.Mesh.gammaFS = 0.2
+Problem.Mesh.alphaOut = 0.6
 Problem.Mesh.gammaBound = 0.2
 Problem.Mesh.minHeightFactor = 1e-2
 
-Problem.Mesh.addOnFS = false
+Problem.Mesh.addOnFS = true
 Problem.Mesh.keepFluidElements = true
 Problem.Mesh.deleteFlyingNodes = true
 
@@ -88,7 +90,8 @@ Problem.Material[1].SurfaceStress.gamma = 0
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'FracStep'
+Problem.Solver.IC = {}
+Problem.Solver.type = 'Implicit'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
@@ -101,8 +104,13 @@ Problem.Solver.coeffDTincrease = 1
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'U_P'
+Problem.Solver.MomContEq.BC = {}
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'U_P'
+Problem.Solver.MomContEq.stabilization = 'FracStep'
+Problem.Solver.MomContEq.timeIntegration = 'BackwardEuler'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
@@ -114,8 +122,12 @@ Problem.Solver.MomContEq.bodyForce = {0, 0, -9.81}
 -- Heat Equation
 
 Problem.Solver.HeatEq = {}
-Problem.Solver.HeatEq.residual = 'Ax_f'
+Problem.Solver.HeatEq.BC = {}
+Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
+
 Problem.Solver.HeatEq.nlAlgo = 'Picard'
+Problem.Solver.HeatEq.residual = 'Ax_f'
+Problem.Solver.HeatEq.timeIntegration = 'BackwardEuler'
 
 Problem.Solver.HeatEq.maxIter = 25
 Problem.Solver.HeatEq.minRes = 1e-6
@@ -129,15 +141,19 @@ Problem.Solver.MomContEq.BC = {}
 Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
 Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
 
--- Boundary Condition Functions
+-- Initial Conditions
 
 function Problem.Solver.IC.initStates(x, y, z)
 	return {0, 0, 0, 0, 340}
 end
 
+-- Momentum Continuity Equation BC
+
 function Problem.Solver.MomContEq.BC.ContainerV(x, y, z, t)
 	return 0, 0, 0
 end
+
+-- Heat Equation BC
 
 function Problem.Solver.HeatEq.BC.ContainerQ(x, y, z, t)
     return 0, 0, 0
@@ -146,6 +162,8 @@ end
 function Problem.Solver.HeatEq.BC.FreeSurfaceQ(x, y, z, t)
     return 0, 0, 0
 end
+
+-- Characteristic Size
 
 function Problem.Mesh.computeHcharFromDistance(x, y, z, t, dist)
     return Problem.Mesh.hchar+dist*0.05

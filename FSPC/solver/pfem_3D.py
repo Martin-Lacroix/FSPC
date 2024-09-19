@@ -16,18 +16,19 @@ class Solver(tb.Static):
         atexit.register(self.print_clock)
         object.__setattr__(self, 'problem', w.getProblem(path))
 
-        # Parameters for the explicit weakly compressible solver
+        # Check if the non-linear solver is explicit or implicit
 
-        if 'WC' in self.problem.getID():
+        solver_type = self.problem.getSolver().getType()
+        object.__setattr__(self, 'solver_type', solver_type)
 
-            object.__setattr__(self, 'weakly_compressible', True)
+        # Default minimum time step fraction for explicit solver
+
+        if solver_type ==  w.SolverType_Explicit:
             object.__setattr__(self, 'max_division', 1000)
 
-        # Parameters for the implicit incompressible solver
+        # Default minimum time step fraction for implicit solver
 
-        else:
-
-            object.__setattr__(self, 'weakly_compressible', False)
+        elif solver_type == w.SolverType_Implicit:
             object.__setattr__(self, 'max_division', 1)
 
         # Store the dimension and the interface nodes list
@@ -65,7 +66,7 @@ class Solver(tb.Static):
 
         # Impose the initial time step in implicit
 
-        if not self.weakly_compressible:
+        if self.solver_type == w.SolverType_Implicit:
             self.problem.getSolver().setTimeStep(tb.Step.dt)
 
         # Return true if PFEM3D solved the time step successfully
@@ -88,9 +89,9 @@ class Solver(tb.Static):
 
         result = (disp-self.get_position())/tb.Step.dt
 
-        # Compute the acceleration if PFEM3D uses an explicit solver
+        # Compute the acceleration if we use an explicit solver
 
-        if self.weakly_compressible:
+        if self.solver_type == w.SolverType_Explicit:
             result = 2*(result-self.get_velocity())/tb.Step.dt
 
         # Loop on the results and store them in the BC vectors
@@ -202,7 +203,7 @@ class Solver(tb.Static):
 
         # Update the global matrix pattern if implicit solver
 
-        if not self.weakly_compressible:
+        if self.solver_type == w.SolverType_Implicit:
             self.problem.getSolver().precomputeMatrix()
 
         # Save the current solution into a structure

@@ -1,10 +1,11 @@
 -- Problem Parameters
 
 Problem = {}
+Problem.id = 'Mechanical'
+
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
-Problem.id = 'IncompNewtonNoT'
 
 -- Mesh Parameters
 
@@ -29,6 +30,7 @@ Problem.Mesh.deleteFlyingNodes = false
 -- Extractor Parameters
 
 Problem.Extractors = {}
+
 Problem.Extractors[1] = {}
 Problem.Extractors[1].kind = 'GMSH'
 Problem.Extractors[1].writeAs = 'NodesElements'
@@ -62,37 +64,40 @@ Problem.Material[1].SurfaceStress.gamma = 0
 -- Solver Parameters
 
 Problem.Solver = {}
-Problem.Solver.id = 'PSPG'
+Problem.Solver.IC = {}
+Problem.Solver.type = 'Implicit'
 
 Problem.Solver.adaptDT = true
 Problem.Solver.maxDT = math.huge
 Problem.Solver.initialDT = math.huge
+
 Problem.Solver.coeffDTDecrease = 2
 Problem.Solver.coeffDTincrease = 1
 
 -- Momentum Continuity Equation
 
 Problem.Solver.MomContEq = {}
-Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.BC = {}
+Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+
 Problem.Solver.MomContEq.nlAlgo = 'Picard'
+Problem.Solver.MomContEq.residual = 'Ax_f'
+Problem.Solver.MomContEq.stabilization = 'PSPG'
 Problem.Solver.MomContEq.sparseSolverLib = 'MKL'
+Problem.Solver.MomContEq.timeIntegration = 'BackwardEuler'
 
 Problem.Solver.MomContEq.pExt = 0
 Problem.Solver.MomContEq.maxIter = 25
 Problem.Solver.MomContEq.minRes = 1e-8
 Problem.Solver.MomContEq.bodyForce = {0, -9.81}
 
--- Fluid Structure Interface
-
-Problem.Solver.IC = {}
-Problem.Solver.MomContEq.BC = {}
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
-
--- Boundary Condition Functions
+-- Initial Conditions
 
 function Problem.Solver.IC.initStates(x, y, z)
 	return {0, 0, 0}
 end
+
+-- Momentum Continuity Equation BC
 
 function Problem.Solver.MomContEq.BC.WallV(x, y, z, t)
 	return 0, 0
