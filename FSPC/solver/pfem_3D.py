@@ -41,6 +41,11 @@ class Solver(tb.Static):
         object.__setattr__(self, 'BC', list())
         self.reset_interface_BC()
 
+        # Initialize the previous interface load and heat flux
+
+        object.__setattr__(self, 'prev_load', 0)
+        object.__setattr__(self, 'prev_heat', 0)
+
         # Save the current mesh solution and print the parameters
 
         object.__setattr__(self, 'prev_solution', w.SolutionData())
@@ -119,7 +124,7 @@ class Solver(tb.Static):
         # This command will also update the node indices in FSI
 
         self.problem.getSolver().computeStress('FSInterface', self.FSI, vector)
-        return np.copy(vector)
+        return (np.copy(vector)+self.prev_load)/2
 
     def get_heatflux(self):
         '''
@@ -131,7 +136,7 @@ class Solver(tb.Static):
         # This command will also update the node indices in FSI
 
         self.problem.getSolver().computeHeatFlux('FSInterface', self.FSI, vector)
-        return np.copy(vector)
+        return (np.copy(vector)+self.prev_heat)/2
 
     def get_position(self):
         '''
@@ -206,9 +211,24 @@ class Solver(tb.Static):
         if self.solver_type == w.SolverType_Implicit:
             self.problem.getSolver().precomputeMatrix()
 
-        # Save the current solution into a structure
+        # Store the current solution for potential restart
 
         self.problem.copySolution(self.prev_solution)
+        vector = w.VectorVectorDouble()
+
+        # Store the current loading on the interface
+
+        if tb.has_mecha:
+
+            self.problem.getSolver().computeStress('FSInterface', self.FSI, vector)
+            self.prev_load = np.copy(vector)
+
+        # Store the current heat flux on the interface
+
+        if tb.has_therm:
+
+            self.problem.getSolver().computeHeatFlux('FSInterface', self.FSI, vector)
+            self.prev_heat = np.copy(vector)
 
     @tb.compute_time
     def way_back(self):
