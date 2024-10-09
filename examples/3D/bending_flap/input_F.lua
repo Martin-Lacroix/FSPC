@@ -107,8 +107,10 @@ function Problem.Solver.MomContEq.BC.InletVEuler(x, y, z, t)
     local tmax = 0.1
     local vmax = 0.5
     local v = vmax*t/tmax
-    
-    if (t < tmax) then
+
+    if (z < 1e-6) then
+        return 0, 0, 0
+    elseif (t < tmax) then
 	    return v, 0, 0
 	else
 	    return vmax, 0, 0
