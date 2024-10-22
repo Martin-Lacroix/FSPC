@@ -22,7 +22,7 @@ Problem.Mesh.omega = 1.0
 Problem.Mesh.gamma = 0.3
 Problem.Mesh.hchar = 0.1
 Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.gammaBound = 0.2
+Problem.Mesh.gammaEdge = 0.2
 Problem.Mesh.minHeightFactor = 1e-3
 
 Problem.Mesh.addOnFS = false

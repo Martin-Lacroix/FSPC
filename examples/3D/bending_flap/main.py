@@ -18,7 +18,7 @@ FSPC.set_interpolator(interpolator)
 
 # Set the time step manager
 
-step = FSPC.general.TimeStep(5e-4, 5e-4)
+step = FSPC.general.TimeStep(5e-4, 1e-3)
 FSPC.set_time_step(step)
 
 # Set the convergence manager
