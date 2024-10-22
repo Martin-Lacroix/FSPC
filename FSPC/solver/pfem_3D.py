@@ -10,9 +10,10 @@ class Solver(tb.Static):
         Initialize the fluid solver wrapper class
         '''
 
+        import atexit
+
         # Load PFEM3D and defines a function called at exit
 
-        import atexit
         atexit.register(self.print_clock)
         object.__setattr__(self, 'problem', w.getProblem(path))
 

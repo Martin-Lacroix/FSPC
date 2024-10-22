@@ -1,5 +1,4 @@
 from .radial_basis_function import RBF
-from functools import partial
 import numpy as np
 
 # Thin plate spline radial basis function interpolation class
@@ -11,6 +10,7 @@ class TPS(RBF):
         '''
 
         RBF.__init__(self)
+        from functools import partial
 
         # Build a static basis_func(position, recv) with fixed radius
 

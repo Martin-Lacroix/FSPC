@@ -1,5 +1,4 @@
 from .interpolator import Interpolator
-from scipy.sparse import dok_matrix
 from ..general import toolbox as tb
 import numpy as np
 
@@ -35,6 +34,7 @@ class NNI(Interpolator):
 
         # The dictionary of keys based matrix is suited for filling
 
+        from scipy.sparse import dok_matrix
         self.H = dok_matrix((len(position), len(self.recv_pos)))
 
         # Loop on the positions of the nodes in the target mesh

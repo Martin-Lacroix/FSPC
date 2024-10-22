@@ -1,6 +1,5 @@
 from contextlib import redirect_stdout as stdout
 from contextlib import redirect_stderr as stderr
-from mpi4py.MPI import COMM_WORLD as CW
 from typing import Callable
 import time
 
@@ -10,6 +9,8 @@ has_mecha = False
 has_therm = False
 
 # Check if we are on the solid of the fluid processes
+
+from mpi4py.MPI import COMM_WORLD as CW
 
 def is_fluid(): return CW.rank == 0
 def is_solid(): return CW.rank == 1

@@ -1,5 +1,4 @@
 from .radial_basis_function import RBF
-from functools import partial
 import numpy as np
 
 # Wendland C2 radial basis function interpolation class
@@ -11,6 +10,7 @@ class C2F(RBF):
         '''
 
         RBF.__init__(self)
+        from functools import partial
 
         # Build a static basis_func(position, recv) with fixed radius
 

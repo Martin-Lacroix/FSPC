@@ -10,16 +10,15 @@ class Solver(tb.Static):
         Initialize the solid solver wrapper class
         '''
 
-        # Hack to load Metafor as a Python module
-
+        import sys
         import importlib.util as util
+
+        # Hack to load Metafor as a Python module
 
         spec = util.spec_from_file_location('module.name', path)
         module = util.module_from_spec(spec)
 
         # Hack to import and execute the Metafor module
-
-        import sys
 
         sys.modules['module.name'] = module
         spec.loader.exec_module(module)
