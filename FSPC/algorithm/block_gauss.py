@@ -57,7 +57,7 @@ class BGS(Algorithm):
 
             # Share the convergence state to the fluid process
 
-            verified = tb.CW.bcast(verified, root=1)
+            verified = tb.com.bcast(verified, root=1)
             self.iteration += 1
 
             # Return true if the coupling algorithm has converged

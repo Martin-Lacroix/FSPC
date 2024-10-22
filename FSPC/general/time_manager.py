@@ -47,7 +47,7 @@ class TimeStep(tb.Static):
 
             # Wait for all processes and terminate the simulation
 
-            tb.CW.Barrier()
+            tb.com.Barrier()
             if tb.is_solid(): print('Reached minimal time step')
             sys.exit()
 

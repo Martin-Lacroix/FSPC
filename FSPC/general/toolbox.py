@@ -10,10 +10,10 @@ has_therm = False
 
 # Check if we are on the solid of the fluid processes
 
-from mpi4py.MPI import COMM_WORLD as CW
+from mpi4py.MPI import COMM_WORLD as com
 
-def is_fluid(): return CW.rank == 0
-def is_solid(): return CW.rank == 1
+def is_fluid(): return com.rank == 0
+def is_solid(): return com.rank == 1
 
 # The clock will store the measured computation times
 
@@ -41,7 +41,7 @@ def write_logs(function: Callable):
 
     def wrapper(*args):
 
-        rank = str(CW.rank)
+        rank = str(com.rank)
 
         # Open the file solver_rank.txt or create if not exist
 
@@ -131,7 +131,7 @@ def run_fluid():
 
     # Share the output of the fluid solver with the solid rank
 
-    return CW.bcast(verified, root=0)
+    return com.bcast(verified, root=0)
 
 def run_solid():
     '''
@@ -152,7 +152,7 @@ def run_solid():
 
     # Share the output of the solid solver with the fluid rank
 
-    return CW.bcast(verified, root=1)
+    return com.bcast(verified, root=1)
 
 def print_clock():
     '''
@@ -162,7 +162,7 @@ def print_clock():
     # Print the name of the process that is being displayed
 
     print('\n------------------------------------')
-    print(f'Process {CW.rank} : Time Stats')
+    print(f'Process {com.rank} : Time Stats')
     print('------------------------------------\n')
 
     # Loop on all function names that have been stored in clock

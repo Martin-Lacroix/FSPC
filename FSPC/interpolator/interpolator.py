@@ -1,4 +1,4 @@
-from mpi4py.MPI import COMM_WORLD as CW
+from mpi4py.MPI import COMM_WORLD as com
 from ..general import toolbox as tb
 import numpy as np
 
@@ -27,16 +27,16 @@ class Interpolator(tb.Static):
 
         if tb.is_fluid():
 
-            object.__setattr__(self, 'recv_pos', CW.recv(source=1, tag=1))
-            CW.send(position, 1, tag=2)
+            object.__setattr__(self, 'recv_pos', com.recv(source=1, tag=1))
+            com.send(position, 1, tag=2)
 
         elif tb.is_solid():
 
             # The displacement is actually the solid position predictor
 
-            CW.send(position, 0, tag=1)
+            com.send(position, 0, tag=1)
             object.__setattr__(self, 'disp', position)
-            object.__setattr__(self, 'recv_pos', CW.recv(source=0, tag=2))
+            object.__setattr__(self, 'recv_pos', com.recv(source=0, tag=2))
 
             # Also initialize the temperature in thermal coupling
 
@@ -57,12 +57,12 @@ class Interpolator(tb.Static):
 
             # Recieve the interface stress tensor from the fluid
 
-            recv = CW.recv(source=0, tag=3)
+            recv = com.recv(source=0, tag=3)
             tb.Solver.apply_loading(self.interpolate(recv))
 
         # Send the interface stress tensor to the solid solver
 
-        else: CW.send(tb.Solver.get_loading(), 1, tag=3)
+        else: com.send(tb.Solver.get_loading(), 1, tag=3)
 
     @tb.only_mechanical
     def apply_displacement(self):
@@ -74,12 +74,12 @@ class Interpolator(tb.Static):
 
             # Recieve the new interface position from the solid
 
-            recv = CW.recv(source=1, tag=4)
+            recv = com.recv(source=1, tag=4)
             tb.Solver.apply_displacement(self.interpolate(recv))
 
         # Send the new interface position to the fluid solver
 
-        else: CW.send(self.disp, 0, tag=4)
+        else: com.send(self.disp, 0, tag=4)
 
     @tb.only_thermal
     def apply_heatflux(self):
@@ -91,12 +91,12 @@ class Interpolator(tb.Static):
 
             # Recieve the interface heat flux from the fluid
 
-            recv = CW.recv(source=0, tag=5)
+            recv = com.recv(source=0, tag=5)
             tb.Solver.apply_heatflux(self.interpolate(recv))
 
         # Send the interface heat flux to the solid solver
 
-        else: CW.send(tb.Solver.get_heatflux(), 1, tag=5)
+        else: com.send(tb.Solver.get_heatflux(), 1, tag=5)
 
     @tb.only_thermal
     def apply_temperature(self):
@@ -108,12 +108,12 @@ class Interpolator(tb.Static):
 
             # Recieve the new interface temperature from the solid
 
-            recv = CW.recv(source=1, tag=6)
+            recv = com.recv(source=1, tag=6)
             tb.Solver.apply_temperature(self.interpolate(recv))
 
         # Send the new interface temperature to the fluid solver
 
-        else: CW.send(self.temp, 0, tag=6)
+        else: com.send(self.temp, 0, tag=6)
 
     @tb.only_mechanical
     def predict_displacement(self):
