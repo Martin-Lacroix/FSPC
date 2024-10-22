@@ -23,7 +23,11 @@ class C2F(RBF):
         Return the value of the wendland function at the nodes
         '''
 
+        # Use broadcasting to compute the pairwise distances
+
+        difference = position[:, np.newaxis, :]-recv[np.newaxis, :, :]
+        r = np.clip(np.linalg.norm(difference, axis=2)/R, 0, 1)
+
         # Compact support basis function where r/R is capped at one
 
-        r = np.clip(np.linalg.norm(position-recv, axis=1)/R, 0, 1)
         return np.power(1-r, 4)*(4*r+1)

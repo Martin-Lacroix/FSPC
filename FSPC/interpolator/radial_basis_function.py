@@ -13,16 +13,6 @@ class RBF(Interpolator):
 
         Interpolator.__init__(self)
 
-        # Multiprocessing pool for nodal distance computation
-
-        import multiprocessing as mp
-        object.__setattr__(self, 'pool', mp.Pool(mp.cpu_count()))
-
-        # Close the multiprocessing pool before class destructor
-
-        import atexit
-        atexit.register(self.pool.close)
-
         # Initialize the mesh interpolation matrices
 
         object.__setattr__(self, 'A', np.ndarray(0))
@@ -81,9 +71,9 @@ class RBF(Interpolator):
         # Build a static basis_func(position) with a single parameter
 
         from functools import partial
-        func = partial(self.basis_func, recv=self.recv_pos)
+        basis_function = partial(self.basis_func, recv=self.recv_pos)
 
         # Evaluate the radial basis function in parallel
 
-        self.B[np.ix_(K, N)] = self.pool.map(func, position)
-        self.A[np.ix_(N, N)] = self.pool.map(func, self.recv_pos)
+        self.B[np.ix_(K, N)] = basis_function(position)
+        self.A[np.ix_(N, N)] = basis_function(self.recv_pos)
