@@ -1,8 +1,6 @@
 from ..general import toolbox as tb
-import importlib.util as util
 import numpy as np
 import wrap as w
-import sys
 
 # Solid solver wrapper class for Metafor
 
@@ -14,8 +12,15 @@ class Solver(tb.Static):
 
         # Hack to load Metafor as a Python module
 
+        import importlib.util as util
+
         spec = util.spec_from_file_location('module.name', path)
         module = util.module_from_spec(spec)
+
+        # Hack to import and execute the Metafor module
+
+        import sys
+
         sys.modules['module.name'] = module
         spec.loader.exec_module(module)
 

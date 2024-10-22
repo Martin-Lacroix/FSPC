@@ -1,5 +1,4 @@
 from ..general import toolbox as tb
-import numpy as np
 
 # Base fluid-structure coupling algorithm class
 
