@@ -157,7 +157,6 @@ for i in (0,10):
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
-sh.addPhysicalGroup(1, q[1:2], name='FreeSurface')
 sh.addPhysicalGroup(1, h[0:1]+h[2:3]+q[0:1]+q[2:3], name='Wall')
 sh.addPhysicalGroup(1, l+r+c, name='FSInterface')
 sh.addPhysicalGroup(1, h[1:2], name='Inlet')

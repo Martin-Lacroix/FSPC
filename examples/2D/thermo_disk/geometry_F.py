@@ -76,7 +76,6 @@ sh.mesh.setTransfiniteCurve(u[1], N)
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, h+r+u, name='FSInterface')
-sh.addPhysicalGroup(1, l[2:3], name='FreeSurface')
 sh.addPhysicalGroup(1, l[:2]+l[3:], name='Wall')
 
 # Write the mesh file

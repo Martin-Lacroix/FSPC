@@ -54,7 +54,6 @@ sh.occ.synchronize()
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, H, name='FSInterface')
 sh.addPhysicalGroup(1, l[0:3]+l[5:], name='Reservoir')
-sh.addPhysicalGroup(1, l[3:5], name='FreeSurface')
 
 # Mesh characteristic size
 

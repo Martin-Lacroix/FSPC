@@ -95,7 +95,6 @@ s = np.append(s, y[0:1])
 
 sh.addPhysicalGroup(3, [x], name='Fluid')
 sh.addPhysicalGroup(2, k, name='FSInterface')
-sh.addPhysicalGroup(2, y[1:2], name='FreeSurface')
 sh.addPhysicalGroup(2, y[2:3], name='Inlet')
 sh.addPhysicalGroup(2, s, name='Border')
 
