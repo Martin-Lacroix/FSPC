@@ -1,8 +1,9 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.id = 'ThermoMechanicalBoussinesq'
-
+Problem.thermal = true
+Problem.mechanical = true
+Problem.boussinesq = true
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
@@ -153,6 +154,10 @@ end
 -- Heat Equation BC
 
 function Problem.Solver.HeatEq.BC.WallQ(x, y, z, t)
+    return 0, 0
+end
+
+function Problem.Solver.HeatEq.BC.FreeSurfaceQ(x, y, z, t)
     return 0, 0
 end
 

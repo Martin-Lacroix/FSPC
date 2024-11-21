@@ -1,8 +1,9 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.id = 'ThermoMechanicalBoussinesq'
-
+Problem.thermal = true
+Problem.mechanical = true
+Problem.boussinesq = true
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge
@@ -12,7 +13,7 @@ Problem.simulationTime = math.huge
 Problem.Mesh = {}
 Problem.Mesh.remeshAlgo = 'Tetgen_Edge'
 Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.localHcharGroups = {'FSInterface'}
+Problem.Mesh.localHcharGroups = {'FSInterface', 'FreeSurface'}
 Problem.Mesh.deleteBoundElements = {'FSInterface'}
 Problem.Mesh.boundingBox = {-0.1, -0.1, 0, 0.1, 0.1, 1}
 Problem.Mesh.exclusionZones = {}
@@ -148,13 +149,21 @@ end
 
 -- Momentum Continuity Equation BC
 
-function Problem.Solver.MomContEq.BC.ContainerV(x, y, z, t)
+function Problem.Solver.MomContEq.BC.TopV(x, y, z, t)
+	return 0, 0, 0
+end
+
+function Problem.Solver.MomContEq.BC.BottomV(x, y, z, t)
 	return 0, 0, 0
 end
 
 -- Heat Equation BC
 
-function Problem.Solver.HeatEq.BC.ContainerQ(x, y, z, t)
+function Problem.Solver.HeatEq.BC.TopQ(x, y, z, t)
+    return 0, 0, 0
+end
+
+function Problem.Solver.HeatEq.BC.BottomQ(x, y, z, t)
     return 0, 0, 0
 end
 

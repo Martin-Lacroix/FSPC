@@ -1,8 +1,7 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.id = 'Mechanical'
-
+Problem.mechanical = true
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge

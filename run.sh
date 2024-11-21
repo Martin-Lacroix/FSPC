@@ -21,7 +21,7 @@ export SCRIPT=${PWD}/examples/2D/dam_break/main.py
 # export SCRIPT=${PWD}/examples/2D/von_karman/main.py
 
 # export SCRIPT=${PWD}/examples/3D/bending_flap/main.py
-# export SCRIPT=${PWD}/examples/3D/clamped_beam/main.py
+# export SCRIPT=${PWD}/examples/3D/clamped_plate/main.py
 # export SCRIPT=${PWD}/examples/3D/dam_break/main.py
 # export SCRIPT=${PWD}/examples/3D/pipe_obstacle/main.py
 # export SCRIPT=${PWD}/examples/3D/thermo_sphere/main.py

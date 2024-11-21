@@ -1,8 +1,9 @@
 -- Problem Parameters
 
 Problem = {}
-Problem.id = 'ThermoMechanicalBoussinesq'
-
+Problem.thermal = true
+Problem.mechanical = true
+Problem.boussinesq = true
 Problem.verboseOutput = true
 Problem.autoRemeshing = false
 Problem.simulationTime = math.huge

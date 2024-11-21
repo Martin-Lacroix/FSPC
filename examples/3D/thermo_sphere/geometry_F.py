@@ -94,13 +94,14 @@ sh.occ.synchronize()
 
 sh.addPhysicalGroup(3, [v], name='Fluid')
 sh.addPhysicalGroup(2, [g], name='FSInterface')
-sh.addPhysicalGroup(2, s[1:], name='Container')
+sh.addPhysicalGroup(2, s[1:6], name='Bottom')
+sh.addPhysicalGroup(2, s[6:], name='Top')
 
 # Mesh characteristic size
 
 sh.mesh.field.add('Distance', 1)
 sh.mesh.field.setNumber(1, 'Sampling', 1e3)
-sh.mesh.field.setNumbers(1, 'SurfacesList', [g])
+sh.mesh.field.setNumbers(1, 'SurfacesList', s[6:]+[s[0], g])
 
 sh.mesh.field.add('MathEval', 2)
 sh.mesh.field.setString(2, 'F', f'{d}+0.05*F1')
