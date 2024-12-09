@@ -22,7 +22,7 @@ sh.occ.synchronize()
 # Physical surface
 
 sh.addPhysicalGroup(3, [v], name='Solid')
-sh.addPhysicalGroup(2, [g], name='FSInterface')
+sh.addPhysicalGroup(2, [g], name='FSI')
 
 # Write the mesh file
 

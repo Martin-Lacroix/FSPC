@@ -29,7 +29,7 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
-    parm['FSI'] = groups['FSInterface']
+    parm['FSI'] = groups['FSI']
     
     # Defines the solid domain
 

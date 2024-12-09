@@ -6,7 +6,7 @@ $PhysicalNames
 1 4 "Circle"
 1 5 "Side"
 1 6 "Clamped"
-1 7 "FSInterface"
+1 7 "FSI"
 2 1 "Disk"
 2 2 "Wall"
 2 3 "Solid"

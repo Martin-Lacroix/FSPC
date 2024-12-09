@@ -112,7 +112,7 @@ Problem.Solver.MomContEq = {
 
     -- Enable the fluid-structure interface
 
-    BC = {FSInterfaceVExt = true},
+    BC = {FSIVExt = true},
 
     -- Define the solver algorithms
 

@@ -62,7 +62,7 @@ sh.occ.synchronize()
 # Physical boundary
 
 sh.addPhysicalGroup(2, s, name='Fluid')
-sh.addPhysicalGroup(1, l[3:5]+l[8:9], name='FSInterface')
+sh.addPhysicalGroup(1, l[3:5]+l[8:9], name='FSI')
 sh.addPhysicalGroup(1, l[1:3]+l[5:7]+l[9:11], name='Container')
 
 # Mesh characteristic size

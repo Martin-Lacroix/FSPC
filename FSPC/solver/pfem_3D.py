@@ -124,7 +124,7 @@ class Solver(tb.Static):
 
         # This command will also update the node indices in FSI
 
-        self.problem.getSolver().computeStress('FSInterface', self.FSI, vector)
+        self.problem.getSolver().computeStress('FSI', self.FSI, vector)
         return (np.copy(vector)+self.prev_load)/2
 
     def get_heatflux(self):
@@ -136,7 +136,7 @@ class Solver(tb.Static):
 
         # This command will also update the node indices in FSI
 
-        self.problem.getSolver().computeHeatFlux('FSInterface', self.FSI, vector)
+        self.problem.getSolver().computeHeatFlux('FSI', self.FSI, vector)
         return (np.copy(vector)+self.prev_heat)/2
 
     def get_position(self):
@@ -183,7 +183,7 @@ class Solver(tb.Static):
         # Clear the list of BC and update the interface node indices
 
         self.BC.clear()
-        self.problem.getMesh().getNodesIndex('FSInterface', self.FSI)
+        self.problem.getMesh().getNodesIndex('FSI', self.FSI)
 
         # Loop on the interface node indices
 
@@ -221,14 +221,14 @@ class Solver(tb.Static):
 
         if tb.has_mecha:
 
-            self.problem.getSolver().computeStress('FSInterface', self.FSI, vector)
+            self.problem.getSolver().computeStress('FSI', self.FSI, vector)
             self.prev_load = np.copy(vector)
 
         # Store the current heat flux on the interface
 
         if tb.has_therm:
 
-            self.problem.getSolver().computeHeatFlux('FSInterface', self.FSI, vector)
+            self.problem.getSolver().computeHeatFlux('FSI', self.FSI, vector)
             self.prev_heat = np.copy(vector)
 
     @tb.compute_time

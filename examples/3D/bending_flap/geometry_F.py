@@ -119,7 +119,7 @@ sh.occ.synchronize()
 # Physical surface
 
 sh.addPhysicalGroup(3, [v], name='Fluid')
-sh.addPhysicalGroup(2, s[6:11], name='FSInterface')
+sh.addPhysicalGroup(2, s[6:11], name='FSI')
 sh.addPhysicalGroup(2, s[0:1]+s[11:14], name='Inlet')
 sh.addPhysicalGroup(2, s[2:6], name='Bottom')
 sh.addPhysicalGroup(2, s[1:2], name='Outlet')

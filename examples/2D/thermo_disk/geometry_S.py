@@ -82,7 +82,7 @@ sh.addPhysicalGroup(2, s, name='S1')
 sh.addPhysicalGroup(2, u, name='S2')
 sh.addPhysicalGroup(2, v, name='S3')
 sh.addPhysicalGroup(2, s+u+v, name='Solid')
-sh.addPhysicalGroup(1, l+h+c, name='FSInterface')
+sh.addPhysicalGroup(1, l+h+c, name='FSI')
 
 # Write the mesh file
 

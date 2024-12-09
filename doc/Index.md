@@ -136,13 +136,13 @@ Problem.autoRemeshing = false
 
 <br />
 
-In order to enable the FSI coupling, it is mandatory to give the name `FSInterface` to the physical group representing your fluid-structure interface, and activate the external boundary conditions on this interface. This allows FSPC to dynamically enforce a Dirichlet condition on the nodes. For instance, the external temperature and velocity conditions are enabled for an incompressible fluid as follows.
+In order to enable the FSI coupling, it is mandatory to give the name `FSI` to the physical group representing your fluid-structure interface, and activate the external boundary conditions on this interface. This allows FSPC to dynamically enforce a Dirichlet condition on the nodes. For instance, the external temperature and velocity conditions are enabled for an incompressible fluid as follows.
 
 <br />
 
 ```lua
-Problem.Solver.HeatEq.BC['FSInterfaceTExt'] = true
-Problem.Solver.MomContEq.BC['FSInterfaceVExt'] = true
+Problem.Solver.HeatEq.BC['FSITExt'] = true
+Problem.Solver.MomContEq.BC['FSIVExt'] = true
 ```
 
 <br />
@@ -179,7 +179,7 @@ importer.execute()
 
 <br />
 
-The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSInterface` entry of the parameter dictionary retrieved from `getMetafor(parm)`.
+The name of the physical group related to the fluid-structure interface can be chosen freely, but the corresponding nodes must be stored in the `FSI` entry of the parameter dictionary retrieved from `getMetafor(parm)`.
 
 <br />
 
@@ -198,7 +198,7 @@ The coupling is performed with the help of a nodal interaction allowing to dynam
 prp = ElementProperties(NodStress2DElement)
 
 interaction_M = NodInteraction(1)
-interaction_M.push(groups['FSInterface'])
+interaction_M.push(groups['FSI'])
 interaction_M.addProperty(prp)
 ```
 

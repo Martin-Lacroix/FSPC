@@ -4,7 +4,7 @@ $EndMeshFormat
 $PhysicalNames
 3
 2 2 "Clamped"
-2 3 "FSInterface"
+2 3 "FSI"
 3 1 "Solid"
 $EndPhysicalNames
 $Entities

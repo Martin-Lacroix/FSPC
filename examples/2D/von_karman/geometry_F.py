@@ -68,7 +68,7 @@ sh.mesh.setTransfiniteCurve(r[2], N)
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
-sh.addPhysicalGroup(1, r, name='FSInterface')
+sh.addPhysicalGroup(1, r, name='FSI')
 sh.addPhysicalGroup(1, l[1:2], name='Outlet')
 sh.addPhysicalGroup(1, l[0:1]+l[2:3]+h, name='Wall')
 sh.addPhysicalGroup(1, l[3:4], name='Inlet')

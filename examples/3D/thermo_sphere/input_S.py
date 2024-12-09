@@ -29,7 +29,7 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
-    parm['FSI'] = groups['FSInterface']
+    parm['FSI'] = groups['FSI']
 
     # Defines the solid domain
 
@@ -64,7 +64,7 @@ def getMetafor(parm):
 
     prp2 = w.ElementProperties(w.NodTriangleHeatFlux3DElement)
     heat = w.NodInteraction(2)
-    heat.push(groups['FSInterface'])
+    heat.push(groups['FSI'])
     heat.addProperty(prp2)
     iset.add(heat)
 
@@ -74,7 +74,7 @@ def getMetafor(parm):
 
     prp3 = w.ElementProperties(w.NodTriangleStress3DElement)
     load = w.NodInteraction(3)
-    load.push(groups['FSInterface'])
+    load.push(groups['FSI'])
     load.addProperty(prp3)
     iset.add(load)
 
@@ -84,7 +84,7 @@ def getMetafor(parm):
 
     initset = domain.getInitialConditionSet()
     initset.define(groups['Solid'], w.Field1D(w.TO, w.AB), 270)
-    initset.define(groups['FSInterface'], w.Field1D(w.TO, w.AB), 270)
+    initset.define(groups['FSI'], w.Field1D(w.TO, w.AB), 270)
 
     # Mechanical and thermal time integration
 

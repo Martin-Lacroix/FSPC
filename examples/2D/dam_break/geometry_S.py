@@ -47,7 +47,7 @@ sh.mesh.setRecombine(2, s)
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Solid')
-sh.addPhysicalGroup(1, l[1:], name='FSInterface')
+sh.addPhysicalGroup(1, l[1:], name='FSI')
 sh.addPhysicalGroup(1, l[0:1], name='Base')
 
 # Write the mesh file

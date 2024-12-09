@@ -91,7 +91,7 @@ sh.mesh.setRecombine(3, v)
 
 sh.addPhysicalGroup(3, [v], name='Solid')
 sh.addPhysicalGroup(2, s[0:1], name='Clamped')
-sh.addPhysicalGroup(2, s[1:], name='FSInterface')
+sh.addPhysicalGroup(2, s[1:], name='FSI')
 
 # Write the mesh file
 

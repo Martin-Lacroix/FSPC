@@ -32,7 +32,7 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
-    parm['FSI'] = groups['FSInterface']
+    parm['FSI'] = groups['FSI']
 
     # Defines the solid domain
 
@@ -67,7 +67,7 @@ def getMetafor(parm):
 
     prp2 = w.ElementProperties(w.NodStress3DElement)
     load = w.NodInteraction(2)
-    load.push(groups['FSInterface'])
+    load.push(groups['FSI'])
     load.push(groups['Clamped'])
     load.addProperty(prp2)
     iset.add(load)

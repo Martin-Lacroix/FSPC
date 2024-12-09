@@ -36,7 +36,7 @@ sh.occ.synchronize()
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
-sh.addPhysicalGroup(1, l[0:1], name='FSInterface')
+sh.addPhysicalGroup(1, l[0:1], name='FSI')
 sh.addPhysicalGroup(1, l[1:2]+l[3:4], name='Wall')
 
 # Write the mesh file

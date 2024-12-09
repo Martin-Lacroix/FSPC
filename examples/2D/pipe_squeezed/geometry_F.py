@@ -158,7 +158,7 @@ for i in (0,10):
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
 sh.addPhysicalGroup(1, h[0:1]+h[2:3]+q[0:1]+q[2:3], name='Wall')
-sh.addPhysicalGroup(1, l+r+c, name='FSInterface')
+sh.addPhysicalGroup(1, l+r+c, name='FSI')
 sh.addPhysicalGroup(1, h[1:2], name='Inlet')
 
 # Write the mesh file

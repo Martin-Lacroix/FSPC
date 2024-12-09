@@ -14,7 +14,7 @@ Problem.Mesh = {
 
     remeshAlgo = 'Tetgen_Edge',
     mshFile = 'geometry_F.msh',
-    localHcharGroups = {'FSInterface'},
+    localHcharGroups = {'FSI'},
     boundingBox = {-0.2, -0.2, 0, 0.2, 0.2, 0.64},
     exclusionZones = {},
 
@@ -111,7 +111,7 @@ Problem.Solver.MomContEq = {
 
     -- Enable the fluid-structure interface
 
-    BC = {FSInterfaceVExt = true},
+    BC = {FSIVExt = true},
 
     -- Define the solver algorithms
 

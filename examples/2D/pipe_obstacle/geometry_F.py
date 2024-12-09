@@ -120,7 +120,7 @@ sh.mesh.setTransfiniteCurve(b[3], N)
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
-sh.addPhysicalGroup(1, b, name='FSInterface')
+sh.addPhysicalGroup(1, b, name='FSI')
 sh.addPhysicalGroup(1, r[0:1], name='Inlet')
 sh.addPhysicalGroup(1, l+h, name='Border')
 

@@ -29,7 +29,7 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
-    parm['FSI'] = groups['FSInterface']
+    parm['FSI'] = groups['FSI']
 
     # Defines the ball domain
 
@@ -63,7 +63,7 @@ def getMetafor(parm):
 
     prp2 = w.ElementProperties(w.NodHeatFlux2DElement)
     heat = w.NodInteraction(2)
-    heat.push(groups['FSInterface'])
+    heat.push(groups['FSI'])
     heat.addProperty(prp2)
     iset.add(heat)
 

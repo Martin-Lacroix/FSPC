@@ -48,7 +48,7 @@ sh.occ.synchronize()
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
-sh.addPhysicalGroup(1, l[2:3], name='FSInterface')
+sh.addPhysicalGroup(1, l[2:3], name='FSI')
 sh.addPhysicalGroup(1, l[0:1]+l[5:6], name='Reservoir')
 sh.addPhysicalGroup(1, h+l[3:4], name='Refine')
 

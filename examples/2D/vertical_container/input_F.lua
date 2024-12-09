@@ -14,7 +14,7 @@ Problem.Mesh = {
 
     remeshAlgo = 'CGAL_Edge',
     mshFile = 'geometry_F.msh',
-    localHcharGroups = {'FSInterface', 'Reservoir', 'FreeSurface'},
+    localHcharGroups = {'FSI', 'Reservoir', 'FreeSurface'},
     boundingBox = {-4, -4, 4, 6.25},
     exclusionZones = {},
 
@@ -111,7 +111,7 @@ Problem.Solver.MomContEq = {
 
     -- Enable the fluid-structure interface
 
-    BC = {FSInterfaceVExt = true},
+    BC = {FSIVExt = true},
 
     -- Define the solver algorithms
 

@@ -59,7 +59,7 @@ sh.mesh.setTransfiniteCurve(h[2], B)
 # Physical boundary
 
 sh.addPhysicalGroup(2, [s], name='Fluid')
-sh.addPhysicalGroup(1, h, name='FSInterface')
+sh.addPhysicalGroup(1, h, name='FSI')
 sh.addPhysicalGroup(1, l[0:3]+l[5:], name='Reservoir')
 
 # Mesh characteristic size

@@ -162,7 +162,7 @@ sh.occ.synchronize()
 # Physical surface
 
 sh.addPhysicalGroup(3, [v], name='Fluid')
-sh.addPhysicalGroup(2, s[8:12]+r[:1], name='FSInterface')
+sh.addPhysicalGroup(2, s[8:12]+r[:1], name='FSI')
 sh.addPhysicalGroup(2, s[:4]+s[12:]+r[1:], name='Container')
 
 # Write the mesh

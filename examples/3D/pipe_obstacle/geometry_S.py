@@ -100,7 +100,7 @@ w = ext[1, idx]
 # |-----------------------------------|
 
 sh.addPhysicalGroup(3, w, name='Solid')
-sh.addPhysicalGroup(2, s, name='FSInterface')
+sh.addPhysicalGroup(2, s, name='FSI')
 
 # Write the mesh
 

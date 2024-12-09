@@ -153,7 +153,7 @@ sh.addPhysicalGroup(2, [x, y, z], name='Solid')
 sh.addPhysicalGroup(1, c, name='Circle')
 sh.addPhysicalGroup(1, l+h, name='Side')
 sh.addPhysicalGroup(1, l[0:1]+h[0:1], name='Clamped')
-sh.addPhysicalGroup(1, l[1:]+h[1:]+c, name='FSInterface')
+sh.addPhysicalGroup(1, l[1:]+h[1:]+c, name='FSI')
 
 # Write the mesh file
 
