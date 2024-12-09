@@ -33,12 +33,33 @@ class Solver(tb.Static):
         # Copy the Metafor input dictionary into the wrapper
 
         self.__dict__.update(parm)
-        geo = self.metafor.getDomain().getGeometry()
+        geometry = self.metafor.getDomain().getGeometry()
 
-        # Store important classes and variables
+        # Guess the dimension of the mesh geometry
 
-        object.__setattr__(self, 'dim', geo.getDimension().getNdim())
-        object.__setattr__(self, 'axis', [w.TX, w.TY, w.TZ][:self.dim])
+        if geometry.isAxisymmetric():
+
+            # Axisymmetric stress tensor parameters (rr, tt, yy, ry)
+
+            object.__setattr__(self, 'dim', 2)
+            object.__setattr__(self, 'axis', [w.TX, w.TY])
+            object.__setattr__(self, 'load_func', 'setNodTensorAxi')
+
+        elif geometry.is2D():
+
+            # 2D stress tensor parameters (xx, yy, xy)
+
+            object.__setattr__(self, 'dim', 2)
+            object.__setattr__(self, 'axis', [w.TX, w.TY])
+            object.__setattr__(self, 'load_func', 'setNodTensor2D')
+
+        elif geometry.is3D():
+
+            # 3D stress tensor parameters (xx, yy, zz, xy, xz, yz)
+
+            object.__setattr__(self, 'dim', 3)
+            object.__setattr__(self, 'axis', [w.TX, w.TY, w.TZ])
+            object.__setattr__(self, 'load_func', 'setNodTensor3D')
 
         # Create the memory fac used to restart
 
@@ -96,22 +117,10 @@ class Solver(tb.Static):
         for interaction in np.atleast_1d(self.interaction_M):
             for i, data in enumerate(load):
 
+                # The stress tensor is defined in global axis
+
                 node = self.FSI.getMeshPoint(i)
-
-                # Axisymmetric stress tensor parameters : rr, tt, yy, ry
-
-                if geometry.isAxisymmetric():
-                    interaction.setNodTensorAxi(node, *data)
-
-                # 2D stress tensor parameters : xx, yy, xy
-
-                elif geometry.is2D():
-                    interaction.setNodTensor2D(node, *data)
-
-                # 3D stress tensor parameters : xx, yy, zz, xy, xz, yz
-
-                elif geometry.is3D():
-                    interaction.setNodTensor3D(node, *data)
+                getattr(interaction, self.load_func)(node, *data)
 
     def apply_heatflux(self, heat: np.ndarray):
         '''
