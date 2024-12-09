@@ -23,7 +23,7 @@ FSPC.set_time_step(step)
 
 # Set the convergence manager
 
-residual = FSPC.general.Residual(1e-8)
+residual = FSPC.general.Residual(1e-6)
 FSPC.set_mechanical_res(residual)
 
 # Start the fluid-structure simulation

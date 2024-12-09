@@ -54,8 +54,6 @@ def getMetafor(parm):
     prp1.put(w.MATERIAL, 1)
     app.addProperty(prp1)
 
-    parm['interaction_M'] = load
-
     # Elements for surface traction
 
     prp2 = w.ElementProperties(w.NodStress2DElement)
@@ -63,6 +61,8 @@ def getMetafor(parm):
     load.push(groups['FSInterface'])
     load.addProperty(prp2)
     iset.add(load)
+
+    parm['interaction_M'] = load
 
     # Boundary conditions
     

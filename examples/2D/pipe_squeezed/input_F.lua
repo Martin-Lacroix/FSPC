@@ -1,96 +1,138 @@
--- Problem Parameters
+Problem = {
 
-Problem = {}
-Problem.mechanical = true
-Problem.verboseOutput = false
-Problem.autoRemeshing = false
-Problem.simulationTime = math.huge
+    -- Main simulation parameters
 
--- Mesh Parameters
+    mechanical = true,
+    verboseOutput = true,
+    autoRemeshing = false,
+    simulationTime = math.huge
+}
 
-Problem.Mesh = {}
-Problem.Mesh.remeshAlgo = 'CGAL_Edge'
-Problem.Mesh.mshFile = 'geometry_F.msh'
-Problem.Mesh.deleteBoundElements = {'FSInterface'}
-Problem.Mesh.boundingBox = {-1, -2.625, 1, 2.375}
-Problem.Mesh.exclusionZones = {}
+Problem.Mesh = {
 
-Problem.Mesh.alpha = 1.2
-Problem.Mesh.omega = 0.5
-Problem.Mesh.gamma = 0.3
-Problem.Mesh.hchar = 0.04
-Problem.Mesh.gammaFS = 0.2
-Problem.Mesh.gammaEdge = 0.2
-Problem.Mesh.minHeightFactor = 1e-3
+    -- Input mesh and bounding box
 
-Problem.Mesh.addOnFS = true
-Problem.Mesh.keepFluidElements = false
-Problem.Mesh.deleteFlyingNodes = false
+    remeshAlgo = 'CGAL_Edge',
+    mshFile = 'geometry_F.msh',
+    deleteBoundElements = {'FSInterface'},
+    boundingBox = {-1, -2.625, 1, 2.375},
+    exclusionZones = {},
 
--- Extractor Parameters
+    -- Remeshing internal parameters
+
+    alpha = 1.2,
+    omega = 0.5,
+    gamma = 0.3,
+    hchar = 0.04,
+    gammaFS = 0.2,
+    gammaEdge = 0.2,
+    minHeightFactor = 1e-3,
+
+    -- Enable or disable algorithms
+
+    addOnFS = true,
+    keepFluidElements = false,
+    deleteFlyingNodes = false
+}
 
 Problem.Extractors = {}
 
-Problem.Extractors[1] = {}
-Problem.Extractors[1].kind = 'GMSH'
-Problem.Extractors[1].writeAs = 'NodesElements'
-Problem.Extractors[1].outputFile = 'pfem/output.msh'
-Problem.Extractors[1].whatToWrite = {'p', 'velocity'}
-Problem.Extractors[1].timeBetweenWriting = math.huge
+-- Add an extractor for each output kind
 
-Problem.Extractors[2] = {}
-Problem.Extractors[2].kind = 'Global'
-Problem.Extractors[2].whatToWrite = 'mass'
-Problem.Extractors[2].outputFile = 'mass.txt'
-Problem.Extractors[2].timeBetweenWriting = math.huge
+Problem.Extractors[1] = {
 
--- Material Parameters
+    -- Export the mesh in a GMSH file
+
+    kind = 'GMSH',
+    writeAs = 'NodesElements',
+    outputFile = 'pfem/output.msh',
+    whatToWrite = {'p', 'velocity'},
+    timeBetweenWriting = math.huge
+}
+
+Problem.Extractors[2] = {
+
+    -- Export the total fluid mass
+
+    kind = 'Global',
+    whatToWrite = 'mass',
+    outputFile = 'mass.txt',
+    timeBetweenWriting = math.huge
+}
 
 Problem.Material = {}
-Problem.Material[1] = {}
 
-Problem.Material[1].Stress = {}
-Problem.Material[1].Stress.type = 'NewtonianFluid'
-Problem.Material[1].Stress.mu = 1e-3
+-- First material is the fluid
 
-Problem.Material[1].StateEquation = {}
-Problem.Material[1].StateEquation.type = 'TaitMurnaghan'
-Problem.Material[1].StateEquation.K0 = 100
-Problem.Material[1].StateEquation.K0p = 1
-Problem.Material[1].StateEquation.rho0 = 1e-6
-Problem.Material[1].StateEquation.p0 = 0
+Problem.Material[1] = {
 
-Problem.Material[1].SurfaceStress = {}
-Problem.Material[1].SurfaceStress.type = 'SurfaceTension'
-Problem.Material[1].SurfaceStress.gamma = 0
+    -- Parameters for the viscosity
 
--- Solver Parameters
+    Stress = {
+        type = 'NewtonianFluid',
+        mu = 1e-3
+    },
+    
+    -- Parameters for the fluid bulk
 
-Problem.Solver = {}
-Problem.Solver.IC = {}
-Problem.Solver.type = 'Explicit'
-Problem.Solver.timeIntegration = 'CDS'
-Problem.Solver.securityCoeff = 0.2
+    StateEquation = {
+        type = 'TaitMurnaghan',
+        rho0 = 1e-6,
+        K0 = 100,
+        K0p = 1,
+        p0 = 0
+    },
 
-Problem.Solver.adaptDT = true
-Problem.Solver.maxDT = math.huge
-Problem.Solver.initialDT = math.huge
-Problem.Solver.maxRemeshDT = math.huge
+    -- Parameters for surface tension
 
--- Momentum Equation
+    SurfaceStress = {
+        type = 'SurfaceTension',
+        gamma = 0
+    }
+}
 
-Problem.Solver.MomEq = {}
-Problem.Solver.MomEq.BC = {}
-Problem.Solver.MomEq.pExt = 0
-Problem.Solver.MomEq.bodyForce = {0, 0}
-Problem.Solver.MomEq.BC['FSInterfaceVExt'] = true
+Problem.Solver = {
 
--- Continuity Equation
+    -- Initial conditions and type
 
-Problem.Solver.ContEq = {}
-Problem.Solver.ContEq.BC = {}
-Problem.Solver.ContEq.version = 'DpDt'
-Problem.Solver.ContEq.stabilization = 'CLS'
+    IC = {},
+    type = 'Explicit',
+    timeIntegration = 'CDS',
+
+    -- Factors of time step changes
+
+    securityCoeff = 0.2,
+
+    -- Enable or disable algorithms
+
+    adaptDT = true,
+    maxDT = math.huge,
+    initialDT = math.huge
+}
+
+Problem.Solver.MomEq = {
+
+    -- Enable the fluid-structure interface
+
+    BC = {FSInterfaceVExt = true},
+
+    -- Other simulation parameters
+
+    pExt = 0,
+    bodyForce = {0, 0}
+}
+
+Problem.Solver.ContEq = {
+
+    -- Enable the boundary conditions
+
+    BC = {},
+
+    -- Define the solver algorithms
+
+    version = 'DpDt',
+    stabilization = 'CLS'
+}
 
 -- Initial Conditions
 
