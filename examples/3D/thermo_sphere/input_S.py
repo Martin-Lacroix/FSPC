@@ -29,7 +29,7 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
-    parm['FSInterface'] = groups['FSInterface']
+    parm['FSI'] = groups['FSInterface']
 
     # Defines the solid domain
 
@@ -82,7 +82,7 @@ def getMetafor(parm):
 
     # Initial and boundary conditions
 
-    initset = metafor.getInitialConditionSet()
+    initset = domain.getInitialConditionSet()
     initset.define(groups['Solid'], w.Field1D(w.TO, w.AB), 270)
     initset.define(groups['FSInterface'], w.Field1D(w.TO, w.AB), 270)
 

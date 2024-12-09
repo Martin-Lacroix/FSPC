@@ -33,11 +33,11 @@ class Solver(tb.Static):
         # Copy the Metafor input dictionary into the wrapper
 
         self.__dict__.update(parm)
-        geometry = self.metafor.getDomain().getGeometry()
+        geo = self.metafor.getDomain().getGeometry()
 
         # Store important classes and variables
 
-        object.__setattr__(self, 'dim', geometry.getDimension().getNdim())
+        object.__setattr__(self, 'dim', geo.getDimension().getNdim())
         object.__setattr__(self, 'axis', [w.TX, w.TY, w.TZ][:self.dim])
 
         # Create the memory fac used to restart
@@ -53,7 +53,7 @@ class Solver(tb.Static):
         # Initialize the time integration and the boundary conditions
 
         self.metafor.getTimeStepManager().setInitialTime(0, np.inf)
-        self.metafor.getInitialConditionSet().update(0)
+        self.metafor.getDomain().getInitialConditionSet().update(0)
 
     @tb.write_logs
     @tb.compute_time
@@ -96,7 +96,7 @@ class Solver(tb.Static):
         for interaction in np.atleast_1d(self.interaction_M):
             for i, data in enumerate(load):
 
-                node = self.FSInterface.getMeshPoint(i)
+                node = self.FSI.getMeshPoint(i)
 
                 # Axisymmetric stress tensor parameters : rr, tt, yy, ry
 
@@ -125,7 +125,7 @@ class Solver(tb.Static):
 
                 # The temperature gradient is defined in global axis
 
-                node = self.FSInterface.getMeshPoint(i)
+                node = self.FSI.getMeshPoint(i)
                 interaction.setNodVector(node, *data)
 
     def get_position(self):
@@ -142,12 +142,12 @@ class Solver(tb.Static):
             # Define a database nodal extractor for the absolute position
 
             field = w.Field1D(axe, w.AB)
-            result[i] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+            result[i] += w.DbNodalValueExtractor(self.FSI, field).extract()
 
             # Define a database nodal extractor for the relative position
 
             field = w.Field1D(axe, w.RE)
-            result[i] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+            result[i] += w.DbNodalValueExtractor(self.FSI, field).extract()
 
         # Transpose because FSPC assumes result[i] = i-th node
 
@@ -167,7 +167,7 @@ class Solver(tb.Static):
             # Define a database nodal extractor for the velocity field
 
             field = w.Field1D(axe, w.GV)
-            result[i] = w.DbNodalValueExtractor(self.FSInterface, field).extract()
+            result[i] = w.DbNodalValueExtractor(self.FSI, field).extract()
 
         # Transpose because FSPC assumes result[i] = i-th node
 
@@ -183,12 +183,12 @@ class Solver(tb.Static):
         # Define a database nodal extractor for the absolute temperature
 
         field = w.Field1D(w.TO, w.AB)
-        result[0] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+        result[0] += w.DbNodalValueExtractor(self.FSI, field).extract()
 
         # Define a database nodal extractor for the relative temperature
 
         field = w.Field1D(w.TO, w.RE)
-        result[0] += w.DbNodalValueExtractor(self.FSInterface, field).extract()
+        result[0] += w.DbNodalValueExtractor(self.FSI, field).extract()
 
         # Transpose because FSPC assumes result[i] = i-th node
 
@@ -204,7 +204,7 @@ class Solver(tb.Static):
         # Define a database nodal extractor for the temperature rate
 
         field = w.Field1D(w.TO, w.GV)
-        result[0] = w.DbNodalValueExtractor(self.FSInterface, field).extract()
+        result[0] = w.DbNodalValueExtractor(self.FSI, field).extract()
 
         # Transpose because FSPC assumes result[i] = i-th node
 
@@ -254,4 +254,4 @@ class Solver(tb.Static):
         Return the number of nodes on the solid interface mesh
         '''
         
-        return self.FSInterface.getNumberOfMeshPoints()
+        return self.FSI.getNumberOfMeshPoints()

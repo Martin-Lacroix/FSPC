@@ -185,7 +185,7 @@ The name of the physical group related to the fluid-structure interface can be c
 
 ```python
 groups = importer.groups
-parm['FSInterface'] = groups['myInterface']
+parm['FSI'] = groups['myInterface']
 ```
 
 <br />

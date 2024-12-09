@@ -29,7 +29,7 @@ def getMetafor(parm):
     groups = importer.groups
     importer.execute()
 
-    parm['FSInterface'] = groups['FSInterface']
+    parm['FSI'] = groups['FSInterface']
 
     # Defines the ball domain
 
@@ -71,7 +71,7 @@ def getMetafor(parm):
 
     # Boundary conditions
 
-    initset = metafor.getInitialConditionSet()
+    initset = domain.getInitialConditionSet()
     initset.define(groups['Solid'], w.Field1D(w.TO, w.AB), 2e3)
 
     loadset = domain.getLoadingSet()
