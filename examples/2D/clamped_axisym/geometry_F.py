@@ -7,8 +7,8 @@ gmsh.initialize()
 L = 1
 HF = 0.2
 HS = 0.02
-d = 0.01
-N = 40
+d = 0.05
+N = 5
 
 # Points list
 

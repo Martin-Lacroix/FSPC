@@ -39,11 +39,11 @@ class Solver(tb.Static):
 
         if geometry.isAxisymmetric():
 
-            # Axisymmetric stress tensor parameters (rr, tt, yy, ry)
+            # Axisymmetric stress tensor parameters (rr, yy, tt, ry)
 
             object.__setattr__(self, 'dim', 2)
             object.__setattr__(self, 'axis', [w.TX, w.TY])
-            object.__setattr__(self, 'load_func', 'setNodTensorAxi')
+            object.__setattr__(self, 'load_func', 'setNodTensor3D')
 
         elif geometry.is2D():
 
